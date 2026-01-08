@@ -59,6 +59,19 @@ skills/skill-index.json
 # Skills junction (created by setup.ts fix - points to ../skills)
 .claude/skills
 
+# Local Claude commands (user-specific)
+.claude/commands/
+
+# Windsurf IDE settings
+.windsurf/
+
+# BMAD local files
+_bmad/
+
+# BMAD output files
+bmad-output/
+**/bmad-output/
+
 # Include .claude/settings.json (hook definitions template with $env:PAI_DIR)
 
 # ============================================

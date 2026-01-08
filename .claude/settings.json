@@ -1,8 +1,5 @@
 {
-  "env": {
-    "PAI_DIR": "C:/Users/fujos/.pai"
-  },
-  "hooks": {
+    "hooks": {
     "SessionStart": [
       {
         "matcher": "*",
