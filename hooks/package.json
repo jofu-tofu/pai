@@ -1,0 +1,11 @@
+{
+  "name": "pai-hooks",
+  "private": true,
+  "scripts": {
+    "test": "bun test",
+    "test:watch": "bun test --watch"
+  },
+  "devDependencies": {
+    "bun-types": "^1.2.0"
+  }
+}
