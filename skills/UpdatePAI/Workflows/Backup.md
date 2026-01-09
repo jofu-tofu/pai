@@ -1,275 +1,98 @@
 # Backup Workflow
 
-Creates comprehensive timestamped backup of current PAI installation before making any changes.
+Create comprehensive timestamped backup of current PAI installation.
 
-## Objective
+## Context
 
-Safely preserve entire PAI installation including:
-- Complete directory structure
-- Custom skills (EpicCode, EpicGit, EpicWiki)
-- Settings and configuration
-- History and learnings
-- Environment variables
-- Hook configurations
+Preserves complete installation including custom skills, settings, history, and configuration before making changes.
 
-## Steps
+## Instructions
 
-### 1. Verify PAI_DIR
-```bash
-echo "Current PAI_DIR: $PAI_DIR"
-ls -la $PAI_DIR/ | head -20
-```
+### 1. Create Backup Directories
 
-### 2. Create Timestamp
 ```bash
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-echo "Backup timestamp: $TIMESTAMP"
-```
-
-### 3. Create Backup Directory
-```bash
-# Main backup location
 BACKUP_DIR="/c/EpicSource/pai-backup-$TIMESTAMP"
-mkdir -p "$BACKUP_DIR"
-
-echo "Creating backup at: $BACKUP_DIR"
-```
-
-### 4. Backup Complete PAI Installation
-```bash
-# Copy entire PAI directory
-echo "Backing up complete PAI installation..."
-cp -r "$PAI_DIR" "$BACKUP_DIR/pai-complete/"
-
-# Verify backup
-echo "Backup size:"
-du -sh "$BACKUP_DIR/pai-complete/"
-
-echo "Backup contents:"
-ls -la "$BACKUP_DIR/pai-complete/"
-```
-
-### 5. Backup Custom Skills Separately
-```bash
-# Extra safety for custom Epic skills
 CUSTOM_SKILLS_DIR="/c/EpicSource/pai-custom-skills-$TIMESTAMP"
+
+mkdir -p "$BACKUP_DIR"
 mkdir -p "$CUSTOM_SKILLS_DIR"
-
-echo "Backing up custom Epic skills separately..."
-
-if [ -d "$PAI_DIR/skills/EpicCode" ]; then
-    cp -r "$PAI_DIR/skills/EpicCode" "$CUSTOM_SKILLS_DIR/"
-    echo "✓ Backed up EpicCode"
-fi
-
-if [ -d "$PAI_DIR/skills/EpicGit" ]; then
-    cp -r "$PAI_DIR/skills/EpicGit" "$CUSTOM_SKILLS_DIR/"
-    echo "✓ Backed up EpicGit"
-fi
-
-if [ -d "$PAI_DIR/skills/EpicWiki" ]; then
-    cp -r "$PAI_DIR/skills/EpicWiki" "$CUSTOM_SKILLS_DIR/"
-    echo "✓ Backed up EpicWiki"
-fi
-
-echo "Custom skills backup location: $CUSTOM_SKILLS_DIR"
-ls -la "$CUSTOM_SKILLS_DIR/"
 ```
 
-### 6. Backup Settings
-```bash
-# Backup Claude Code settings
-if [ -f "$PAI_DIR/.claude/settings.json" ]; then
-    cp "$PAI_DIR/.claude/settings.json" "/c/Users/jzfu/pai-settings-backup-$TIMESTAMP.json"
-    echo "✓ Backed up settings.json"
-fi
+### 2. Backup Complete Installation
 
-# Backup environment config
-if [ -f "$PAI_DIR/.env" ]; then
-    cp "$PAI_DIR/.env" "$BACKUP_DIR/env-backup"
-    echo "✓ Backed up .env"
-fi
+```bash
+cp -r "$PAI_DIR" "$BACKUP_DIR/pai-complete/"
+echo "Backup size: $(du -sh "$BACKUP_DIR/pai-complete/" | cut -f1)"
 ```
 
-### 7. Backup History Separately
+### 3. Backup Custom Skills Separately
+
 ```bash
-# Extra backup of history for manual migration
+for skill in EpicCode EpicGit EpicWiki; do
+    if [ -d "$PAI_DIR/skills/$skill" ]; then
+        cp -r "$PAI_DIR/skills/$skill" "$CUSTOM_SKILLS_DIR/"
+        echo "Backed up: $skill"
+    fi
+done
+```
+
+### 4. Backup Settings
+
+```bash
+[ -f "$PAI_DIR/.claude/settings.json" ] && \
+    cp "$PAI_DIR/.claude/settings.json" "/c/Users/$USER/pai-settings-backup-$TIMESTAMP.json"
+```
+
+### 5. Backup History
+
+```bash
 HISTORY_BACKUP="/c/EpicSource/pai-history-backup-$TIMESTAMP"
 mkdir -p "$HISTORY_BACKUP"
-
-echo "Backing up history separately for migration..."
-cp -r "$PAI_DIR/history" "$HISTORY_BACKUP/"
-
-echo "History backup location: $HISTORY_BACKUP"
-du -sh "$HISTORY_BACKUP"
+cp -r "$PAI_DIR/history" "$HISTORY_BACKUP/" 2>/dev/null || \
+    cp -r "$PAI_DIR/MEMORY" "$HISTORY_BACKUP/"
 ```
 
-### 8. Create Backup Manifest
-```bash
-# Generate manifest file
-MANIFEST_FILE="$BACKUP_DIR/BACKUP_MANIFEST.md"
+### 6. Create Manifest
 
-cat > "$MANIFEST_FILE" << EOF
+```bash
+cat > "$BACKUP_DIR/BACKUP_MANIFEST.md" << EOF
 # PAI Backup Manifest
 
-**Backup Date:** $(date +"%Y-%m-%d %H:%M:%S")
-**Backup Timestamp:** $TIMESTAMP
+**Date:** $(date +"%Y-%m-%d %H:%M:%S")
 **Original PAI_DIR:** $PAI_DIR
 
-## Backup Locations
+## Locations
+- Complete: $BACKUP_DIR/pai-complete/
+- Custom Skills: $CUSTOM_SKILLS_DIR/
+- History: $HISTORY_BACKUP/
+- Settings: /c/Users/$USER/pai-settings-backup-$TIMESTAMP.json
 
-### Complete Installation
-\`\`\`
-$BACKUP_DIR/pai-complete/
-\`\`\`
-
-### Custom Skills (Separate)
-\`\`\`
-$CUSTOM_SKILLS_DIR/
-\`\`\`
-
-### History (Separate)
-\`\`\`
-$HISTORY_BACKUP/
-\`\`\`
-
-### Settings
-\`\`\`
-/c/Users/jzfu/pai-settings-backup-$TIMESTAMP.json
-\`\`\`
-
-## Backup Contents
-
-### Directory Structure
-\`\`\`
-$(ls -lh "$BACKUP_DIR/pai-complete/" 2>/dev/null)
-\`\`\`
-
-### Custom Skills
-\`\`\`
-$(ls -la "$CUSTOM_SKILLS_DIR/" 2>/dev/null)
-\`\`\`
-
-### Backup Sizes
-- Complete installation: $(du -sh "$BACKUP_DIR/pai-complete/" 2>/dev/null | cut -f1)
-- Custom skills: $(du -sh "$CUSTOM_SKILLS_DIR/" 2>/dev/null | cut -f1)
-- History: $(du -sh "$HISTORY_BACKUP/" 2>/dev/null | cut -f1)
-
-## Restoration Instructions
-
-### Full Restoration (Emergency)
+## Restoration
 \`\`\`bash
-# Stop any running PAI processes
-# Remove corrupted installation
-rm -rf $PAI_DIR
-
-# Restore complete backup
 cp -r $BACKUP_DIR/pai-complete/ $PAI_DIR/
-
-# Restore settings
-cp /c/Users/jzfu/pai-settings-backup-$TIMESTAMP.json $PAI_DIR/.claude/settings.json
 \`\`\`
 
-### Partial Restoration (Custom Skills Only)
-\`\`\`bash
-# Restore specific custom skill
-cp -r $CUSTOM_SKILLS_DIR/EpicCode $PAI_DIR/skills/
-cp -r $CUSTOM_SKILLS_DIR/EpicGit $PAI_DIR/skills/
-cp -r $CUSTOM_SKILLS_DIR/EpicWiki $PAI_DIR/skills/
-\`\`\`
-
-### History Recovery
-\`\`\`bash
-# Restore history
-cp -r $HISTORY_BACKUP/history $PAI_DIR/
-\`\`\`
-
-## Backup Verification
-
-- [ ] Complete installation backed up
-- [ ] Custom skills backed up separately
-- [ ] Settings backed up
-- [ ] History backed up separately
-- [ ] Manifest file created
-- [ ] All paths verified
-
-## Retention
-
-**Keep this backup for:** 30 days minimum
-**Delete after:** Successful migration and verification
-**Archive if:** Contains critical unique history
-
----
-*Generated by UpdatePAI skill - Backup workflow*
+**Retention:** 30 days minimum
 EOF
-
-echo "✓ Created backup manifest at: $MANIFEST_FILE"
-cat "$MANIFEST_FILE"
 ```
 
-### 9. Verify Backup Integrity
+### 7. Verify Backup
+
 ```bash
-echo "=== Backup Verification ==="
-
-# Check complete backup
-if [ -d "$BACKUP_DIR/pai-complete" ]; then
-    echo "✓ Complete backup exists"
-else
-    echo "✗ ERROR: Complete backup missing!"
-    exit 1
-fi
-
-# Check custom skills backup
-if [ -d "$CUSTOM_SKILLS_DIR" ]; then
-    echo "✓ Custom skills backup exists"
-else
-    echo "⚠ Warning: Custom skills backup missing"
-fi
-
-# Check critical files
-if [ -f "$BACKUP_DIR/pai-complete/skills/CORE/SKILL.md" ]; then
-    echo "✓ CORE skill backed up"
-else
-    echo "✗ ERROR: CORE skill missing in backup!"
-    exit 1
-fi
-
-echo ""
-echo "=== Backup Summary ==="
-echo "Backup location: $BACKUP_DIR"
-echo "Custom skills: $CUSTOM_SKILLS_DIR"
-echo "History: $HISTORY_BACKUP"
-echo "Settings: /c/Users/jzfu/pai-settings-backup-$TIMESTAMP.json"
-echo "Manifest: $MANIFEST_FILE"
-echo ""
-echo "✓ Backup completed successfully!"
+[ -d "$BACKUP_DIR/pai-complete" ] && echo "Complete backup: OK" || echo "ERROR: Backup failed"
+[ -f "$BACKUP_DIR/pai-complete/skills/CORE/SKILL.md" ] && echo "CORE skill: OK" || echo "ERROR: CORE missing"
 ```
 
 ## Output
 
-Report to user:
-1. Backup locations (main, custom skills, history)
-2. Backup sizes
-3. Verification status
-4. Manifest file location
-5. Restoration instructions reference
-6. Next steps (ready for update)
+Report backup locations, sizes, and verification status.
 
-## Recovery Information
+## Success Criteria
 
-Backups are stored for 30 days and can be restored using instructions in the manifest file.
-
-**Quick restoration command:**
-```bash
-# Full restoration
-cp -r /c/EpicSource/pai-backup-TIMESTAMP/pai-complete/ /c/EpicSource/pai/
-```
-
-## Safety Notes
-
-- Backups include complete directory structure
-- Custom skills backed up separately for extra safety
-- Settings backed up to user directory
-- History backed up separately for selective migration
-- Manifest provides detailed restoration instructions
-- All backups timestamped to prevent conflicts
+- [ ] Complete installation backed up
+- [ ] Custom skills backed up separately
+- [ ] Settings backed up
+- [ ] History backed up
+- [ ] Manifest created
+- [ ] Backup verified
