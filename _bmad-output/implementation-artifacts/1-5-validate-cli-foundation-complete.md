@@ -1,6 +1,6 @@
 # Story 1.5: Validate CLI Foundation Complete
 
-Status: in-progress
+Status: done
 
 ## Story
 

@@ -41,12 +41,12 @@ story_location: "{project-root}/_bmad-output/implementation-artifacts"
 
 development_status:
   # Epic 1: CLI Foundation & Core Framework
-  epic-1: in-progress
+  epic-1: done
   1-1-generate-oclif-cli-scaffold: done
   1-2-configure-development-environment: done
   1-3-create-shared-library-structure: done
   1-4-set-up-testing-infrastructure: done
-  1-5-validate-cli-foundation-complete: in-progress
+  1-5-validate-cli-foundation-complete: done
   epic-1-retrospective: optional
 
   # Epic 2: Zero-Friction Claude Code Launch
