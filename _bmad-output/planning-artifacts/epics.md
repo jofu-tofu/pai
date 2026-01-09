@@ -142,7 +142,7 @@ This document provides the complete epic and story breakdown for .pai (PAI CLI),
 - Workspace detection by checking for `.pai` markers
 
 **From Architecture - Hook System:**
-- Integration via symlink: `~/.claude/settings.json` → `~/.pai/settings/claude.json`
+- Integration via symlink: `~/.claude/settings.json` → `~/.pai/.claude/settings.json`
 - One-time setup that persists across sessions
 - Requires `pai setup` command for symlink creation
 
@@ -251,7 +251,7 @@ This document provides the complete epic and story breakdown for .pai (PAI CLI),
 
 **Implementation Notes:**
 - `pai launch` spawns Claude Code with `--dangerouslySkipPermissions`
-- `pai setup` creates hook symlink (`~/.claude/settings.json` → `~/.pai/settings/claude.json`)
+- `pai setup` creates hook symlink (`~/.claude/settings.json` → `~/.pai/.claude/settings.json`)
 - Configuration resolution: `~/.pai` default, `PAI_HOME` override
 - Token status bar via Claude Code native status line
 - `--debug` flag for troubleshooting
@@ -517,7 +517,7 @@ So that my PAI functionality is available in every Claude Code session.
 
 **Given** PAI CLI is installed
 **When** I run `pai setup`
-**Then** a symlink is created: `~/.claude/settings.json` → `~/.pai/settings/claude.json` (FR3)
+**Then** a symlink is created: `~/.claude/settings.json` → `~/.pai/.claude/settings.json` (FR3)
 **And** success message confirms the setup
 **And** subsequent `pai launch` sessions have PAI hooks active (FR5)
 

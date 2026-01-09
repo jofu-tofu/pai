@@ -187,7 +187,7 @@ pai-cli/
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | Integration Method | Symlink settings.json | One-time setup, persists across sessions |
-| Settings Location | `~/.claude/settings.json` → `~/.pai/settings/claude.json` | Clean separation |
+| Settings Location | `~/.claude/settings.json` → `~/.pai/.claude/settings.json` | Clean separation |
 | Hook Discovery | Read from PAI settings structure | Follows existing PAI patterns |
 
 ### Status Bar & Monitoring
@@ -196,6 +196,20 @@ pai-cli/
 |----------|--------|-----------|
 | Token Display | Claude Code native status line | Zero implementation, native integration |
 | Progress Feedback | Oclif built-in spinners (when not piped) | Consistent with CLI patterns |
+
+### Performance Baseline
+
+| Metric | Target | Actual | Status |
+|--------|--------|--------|--------|
+| CLI Startup | <100ms | 209ms | Accepted Deviation |
+
+**Rationale:** The 209ms startup time exceeds the 100ms target (FR43) due to Oclif framework overhead (~187ms for core loading). This is accepted because:
+1. Oclif provides essential features (help, completion, plugins) that would require significant custom code
+2. The overhead is consistent and predictable
+3. User-perceived "instant" threshold (~300ms) is still met
+4. Alternative frameworks would require reimplementing Oclif's built-in capabilities
+
+**Monitoring:** Track startup time in future releases; consider bundling optimization if it exceeds 300ms.
 
 ### Error Handling
 

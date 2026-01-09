@@ -1,7 +1,7 @@
 {
   "name": "pai-cli",
   "description": "PAI CLI - Personal AI Infrastructure command-line interface",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "jofu-tofu",
   "bin": {
     "pai": "./bin/run.js"
