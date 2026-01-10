@@ -1,6 +1,6 @@
 ---
 name: UpdateSkill
-description: Modify and maintain existing skills. USE WHEN update skill, edit skill, add workflow, remove workflow, modify skill, refactor skill, skill maintenance.
+description: Modify and maintain existing skills. USE WHEN update skill OR edit skill OR review skill OR improve skill OR add workflow OR remove workflow OR modify skill OR refactor skill OR optimize skill prompts OR skill maintenance.
 ---
 
 # UpdateSkill
