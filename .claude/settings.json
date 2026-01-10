@@ -1,8 +1,4 @@
 {
-    "statusLine": {
-        "type": "command",
-        "command": "powershell -NoProfile -Command \"$input = $input | ConvertFrom-Json; $total = $input.context_window.total_input_tokens + $input.context_window.total_output_tokens; $usage = $input.context_window.current_usage; if ($usage) { $current = $usage.input_tokens + $usage.cache_creation_input_tokens + $usage.cache_read_input_tokens; $size = $input.context_window.context_window_size; $pct = [math]::Floor($current * 100 / $size); Write-Host ('{0:N0} tokens | {1}% context' -f $total, $pct) } else { Write-Host ('{0:N0} tokens | 0% context' -f $total) }\""
-    },
     "hooks": {
     "SessionStart": [
       {
