@@ -4,10 +4,24 @@
  */
 
 // Configuration resolution
-export {getPaiHome, type PaiConfig} from './config.js'
+export {getPaiHome, loadConfig, type PaiConfig, validatePaiHome} from './config.js'
+
+// Debug logging
+export {debug, isDebugEnabled, setDebugEnabled} from './debug.js'
 
 // Custom error classes
 export {ConfigNotFoundError, EnvironmentError, PaiError} from './errors.js'
 
 // Cross-platform path utilities
-export {isWorkspace, resolvePath} from './paths.js'
+export {
+  expandPath,
+  findWorkspaceRoot,
+  getHomePath,
+  getWorkspacePath,
+  isWorkspace,
+  normalizePath,
+  pathExists,
+  resolvePath,
+  toUnixPath,
+  toWindowsPath,
+} from './paths.js'

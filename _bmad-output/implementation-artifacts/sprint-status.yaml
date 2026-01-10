@@ -50,9 +50,9 @@ development_status:
   epic-1-retrospective: done
 
   # Epic 2: Zero-Friction Claude Code Launch
-  epic-2: backlog
-  2-1-implement-configuration-resolution: backlog
-  2-2-implement-cross-platform-path-utilities: backlog
+  epic-2: in-progress
+  2-1-implement-configuration-resolution: done
+  2-2-implement-cross-platform-path-utilities: review
   2-3-create-error-handling-system: backlog
   2-4-implement-debug-logging: backlog
   2-5-create-process-spawning-utilities: backlog
