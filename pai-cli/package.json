@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "@oclif/core": "^4",
+    "@oclif/plugin-autocomplete": "^3.2.39",
     "@oclif/plugin-help": "^6",
-    "@oclif/plugin-plugins": "^5"
+    "@oclif/plugin-plugins": "^5",
+    "chalk": "^5.6.2",
+    "ora": "^9.0.0"
   },
   "devDependencies": {
     "@eslint/compat": "^1",
@@ -32,6 +35,8 @@
     "prettier": "^3.7.4",
     "shx": "^0.3.3",
     "sinon": "^21.0.1",
+    "stdout-stderr": "^0.1.13",
+    "strip-ansi": "^7.1.2",
     "ts-node": "^10",
     "typescript": "^5"
   },
@@ -59,6 +64,7 @@
     "dirname": "pai",
     "commands": "./dist/commands",
     "plugins": [
+      "@oclif/plugin-autocomplete",
       "@oclif/plugin-help",
       "@oclif/plugin-plugins"
     ],

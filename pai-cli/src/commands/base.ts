@@ -1,6 +1,10 @@
 import {Command, Flags} from '@oclif/core'
+import {type Ora} from 'ora'
 
 import {debugVersion, setDebugEnabled} from '../lib/debug.js'
+import {logDebug, logError, logInfo, logSuccess, logWarning} from '../lib/output.js'
+import {isQuietMode, setQuietMode} from '../lib/quiet.js'
+import {createSpinner} from '../lib/spinner.js'
 
 /**
  * Base command class that all PAI CLI commands should extend.
@@ -64,10 +68,26 @@ import {debugVersion, setDebugEnabled} from '../lib/debug.js'
  * }
  */
 export default abstract class BaseCommand extends Command {
+  /**
+   * Global flags inherited by all PAI CLI commands.
+   * All command classes should spread these flags into their own flag definitions:
+   * `static override flags = { ...BaseCommand.baseFlags, /* command-specific flags *\/ }`
+   *
+   * @see Command Development Guide in README.md for usage patterns
+   */
   static override baseFlags = {
     debug: Flags.boolean({
       char: 'd',
       description: 'Enable verbose debug logging',
+      default: false,
+    }),
+    help: Flags.help({
+      char: 'h',
+      description: 'Show help for command',
+    }),
+    quiet: Flags.boolean({
+      char: 'q',
+      description: 'Suppress informational output (errors still shown)',
       default: false,
     }),
   }
@@ -76,7 +96,10 @@ export default abstract class BaseCommand extends Command {
     await super.init()
     const {flags} = await this.parse(this.constructor as typeof BaseCommand)
     const debugEnabled = flags.debug ?? false
+    const quietEnabled = flags.quiet ?? false
+
     setDebugEnabled(debugEnabled)
+    setQuietMode(quietEnabled)
 
     // Automatically show version info in debug mode (AC4, FR24)
     if (debugEnabled) {
@@ -84,6 +107,63 @@ export default abstract class BaseCommand extends Command {
     }
   }
 
+  /**
+   * Check if quiet mode is enabled.
+   * Returns true if --quiet/-q flag was passed.
+   */
+  protected isQuiet(): boolean {
+    // Access via module-level state (set in init())
+    return isQuietMode()
+  }
+
+  /**
+   * Log debug message (stdout, dim in TTY).
+   * Debug output is independent of quiet mode.
+   */
+  protected logDebug(message: string): void {
+    logDebug(message)
+  }
+
+  /**
+   * Log error message (stderr, red in TTY).
+   * Errors are NEVER suppressed, even in quiet mode.
+   */
+  protected logError(message: string): void {
+    logError(message)
+  }
+
+  /**
+   * Log informational message (stdout, no color).
+   * Suppressed in quiet mode.
+   */
+  protected logInfo(message: string): void {
+    logInfo(message, this.isQuiet())
+  }
+
+  /**
+   * Log success message (stdout, green in TTY).
+   * Suppressed in quiet mode.
+   */
+  protected logSuccess(message: string): void {
+    logSuccess(message, this.isQuiet())
+  }
+
+  /**
+   * Log warning message (stdout, yellow in TTY).
+   * Suppressed in quiet mode.
+   */
+  protected logWarning(message: string): void {
+    logWarning(message, this.isQuiet())
+  }
+
   // Force subclasses to implement run method
   abstract override run(): Promise<void>
+
+  /**
+   * Create a TTY-aware spinner for long-running operations.
+   * Automatically disabled when output is piped, in CI environments, or in quiet mode.
+   */
+  protected spinner(text: string): Ora {
+    return createSpinner(text, {quiet: isQuietMode()})
+  }
 }

@@ -58,6 +58,7 @@ describe('setup integration tests', () => {
   })
 
   describe('Task 8.1-8.2: CLI invocation test', () => {
+    // eslint-disable-next-line mocha/no-skipped-tests
     it.skip('should execute setup --help via actual CLI (SKIPPED: requires CLI build)', async () => {
       // This test requires the CLI to be built and registered
       // Currently skipped due to module loading issues in dev environment

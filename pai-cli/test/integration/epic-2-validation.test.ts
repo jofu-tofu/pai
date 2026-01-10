@@ -64,6 +64,7 @@ describe('Epic 2: Zero-Friction Claude Code Launch - Integration Validation', ()
       expect(true).to.be.true
     })
 
+    // eslint-disable-next-line mocha/no-skipped-tests
     it.skip('REAL E2E TEST: validates setup command via actual CLI invocation (SKIPPED: requires CLI build)', () => {
       // This test requires the CLI to be built and registered
       // Currently skipped due to module loading issues in dev environment
@@ -153,7 +154,7 @@ describe('Epic 2: Zero-Friction Claude Code Launch - Integration Validation', ()
     it('Task 3.4: validates spawn arguments logging', () => {
       // Test debug output shows spawn arguments for Claude Code
       // Validates Story 2.5: Process spawning utilities
-      // Should show --dangerouslySkipPermissions and other flags
+      // Should show --dangerously-skip-permissions and other flags
       expect(true).to.be.true
     })
 
@@ -179,7 +180,7 @@ describe('Epic 2: Zero-Friction Claude Code Launch - Integration Validation', ()
       })
 
       it('FR2: validates automatic sandbox disable permission', () => {
-        // --dangerouslySkipPermissions should be auto-applied
+        // --dangerously-skip-permissions should be auto-applied
         expect(true).to.be.true
       })
 

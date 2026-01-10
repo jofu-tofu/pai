@@ -92,10 +92,16 @@ export async function getClaudeCodeVersion(): Promise<null | string> {
     // Set 5 second timeout to prevent hanging
     const {stdout} = await execAsync('claude --version', {timeout: 5000})
 
-    // Parse version from output: "claude 0.1.0" or "claude version 0.1.0"
-    const match = stdout.match(/claude\s+(?:version\s+)?(\d+\.\d+\.\d+)/)
+    // Parse version from output formats:
+    // - New format: "2.1.3 (Claude Code)"
+    // - Old format: "claude 0.1.0" or "claude version 0.1.0"
+    const newFormatMatch = stdout.match(/^(\d+\.\d+\.\d+)\s+\(Claude Code\)/i)
+    if (newFormatMatch?.[1]) {
+      return newFormatMatch[1]
+    }
 
-    return match?.[1] ?? null
+    const oldFormatMatch = stdout.match(/claude\s+(?:version\s+)?(\d+\.\d+\.\d+)/i)
+    return oldFormatMatch?.[1] ?? null
   } catch {
     // Command not found, execution failed, timeout, or other error
     // Gracefully return null to allow launch to continue

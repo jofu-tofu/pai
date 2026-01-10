@@ -73,8 +73,8 @@ describe('launch command', () => {
       // Should pass 'claude' command
       expect(source).to.include("'claude'")
 
-      // Should pass --dangerouslySkipPermissions flag
-      expect(source).to.include('--dangerouslySkipPermissions')
+      // Should pass --dangerously-skip-permissions flag
+      expect(source).to.include('--dangerously-skip-permissions')
 
       // Should handle exit code
       expect(source).to.include('exitCode')
@@ -108,9 +108,9 @@ describe('launch command', () => {
       expect(source).to.include('spawnProcess')
     })
 
-    it('Task 5.7: implementation passes --dangerouslySkipPermissions flag', () => {
+    it('Task 5.7: implementation passes --dangerously-skip-permissions flag', () => {
       const source = LaunchCommand.prototype.run.toString()
-      expect(source).to.include('--dangerouslySkipPermissions')
+      expect(source).to.include('--dangerously-skip-permissions')
     })
 
     it('implementation handles generic errors with GENERAL_ERROR', () => {

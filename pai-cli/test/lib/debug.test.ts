@@ -123,17 +123,17 @@ describe('debug', () => {
   describe('debugSpawn', () => {
     it('should log command and arguments in debug mode', () => {
       setDebugEnabled(true)
-      debugSpawn('claude', ['--dangerouslySkipPermissions', '--sandbox'])
+      debugSpawn('claude', ['--dangerously-skip-permissions', '--sandbox'])
       expect(stderrStub.called).to.be.true
       const output = stderrStub.firstCall.args[0]
       expect(output).to.include('claude')
-      expect(output).to.include('--dangerouslySkipPermissions')
+      expect(output).to.include('--dangerously-skip-permissions')
       expect(output).to.include('--sandbox')
     })
 
     it('should not log when debug is disabled', () => {
       setDebugEnabled(false)
-      debugSpawn('claude', ['--dangerouslySkipPermissions'])
+      debugSpawn('claude', ['--dangerously-skip-permissions'])
       expect(stderrStub.called).to.be.false
     })
 

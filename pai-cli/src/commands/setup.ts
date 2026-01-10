@@ -15,10 +15,16 @@ import {EXIT_CODES} from '../types/index.js'
  */
 export default class SetupCommand extends BaseCommand {
   static override description =
-    'Configure PAI hooks (one-time setup for Claude Code integration)'
+    'Configure PAI hooks (one-time setup for Claude Code integration)\n\n' +
+    'EXIT CODES\n' +
+    '  0  Success - PAI hooks configured successfully\n' +
+    '  1  General error - unexpected failure during setup\n' +
+    '  2  Invalid usage - check your arguments and flags\n' +
+    '  3  Environment error - PAI_HOME not found or permission denied'
   static override examples = [
     '<%= config.bin %> <%= command.id %>',
     '<%= config.bin %> <%= command.id %> --debug  # Enable verbose logging',
+    '# Verify success\n<%= config.bin %> <%= command.id %> && echo "Setup complete"',
   ]
 
   async run(): Promise<void> {
@@ -36,7 +42,7 @@ export default class SetupCommand extends BaseCommand {
       // Check if symlink already exists and is correct
       const isConfigured = await this.checkExistingSymlink(linkPath, targetPath)
       if (isConfigured) {
-        this.log('✓ PAI hooks already configured')
+        this.logSuccess('✓ PAI hooks already configured')
         this.log(`  ${linkPath} → ${targetPath}`)
         return
       }
@@ -52,7 +58,7 @@ export default class SetupCommand extends BaseCommand {
       await symlink(targetPath, linkPath)
 
       // Success message
-      this.log('✓ PAI hooks configured successfully')
+      this.logSuccess('✓ PAI hooks configured successfully')
       this.log(`  ${linkPath} → ${targetPath}`)
       this.log('')
       this.log('Next step: Run `pai launch` to start Claude Code with PAI hooks active')
@@ -68,7 +74,7 @@ export default class SetupCommand extends BaseCommand {
 
       const err = error as NodeJS.ErrnoException
 
-      if (err.code === 'EACCES') {
+      if (err.code === 'EACCES' || err.code === 'EPERM') {
         this.error(
           'Permission denied creating symlink. On Windows, enable Developer Mode or run as administrator.',
           {exit: EXIT_CODES.ENVIRONMENT_ERROR},
@@ -126,7 +132,7 @@ export default class SetupCommand extends BaseCommand {
         const backupPath = `${linkPath}.backup-${timestamp}`
 
         await rename(linkPath, backupPath)
-        this.log(`✓ Backup created: ${backupPath}`)
+        this.logSuccess(`✓ Backup created: ${backupPath}`)
       }
     } catch (error: unknown) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {

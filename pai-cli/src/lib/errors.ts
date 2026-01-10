@@ -128,7 +128,10 @@ export class InvalidUsageError extends PaiError {
  * ```
  */
 export class ProcessSpawnError extends PaiError {
-  constructor(message: string) {
+  constructor(
+    message: string,
+    public readonly code?: string,
+  ) {
     super(message, EXIT_CODES.ENVIRONMENT_ERROR)
     this.name = 'ProcessSpawnError'
   }

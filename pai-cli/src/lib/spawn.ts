@@ -17,7 +17,7 @@
  * ```typescript
  * import {spawnProcess} from '../lib/spawn.js'
  *
- * const exitCode = await spawnProcess('claude', ['--dangerouslySkipPermissions'])
+ * const exitCode = await spawnProcess('claude', ['--dangerously-skip-permissions'])
  * if (exitCode !== 0) {
  *   console.error('Claude Code exited with error')
  * }
@@ -26,8 +26,8 @@
  * ### Parallel Sessions (Detached Mode)
  * ```typescript
  * // Launch multiple Claude Code sessions concurrently
- * const session1 = spawnProcess('claude', ['--dangerouslySkipPermissions'], {detached: true})
- * const session2 = spawnProcess('claude', ['--dangerouslySkipPermissions'], {detached: true})
+ * const session1 = spawnProcess('claude', ['--dangerously-skip-permissions'], {detached: true})
+ * const session2 = spawnProcess('claude', ['--dangerously-skip-permissions'], {detached: true})
  * await Promise.all([session1, session2])
  * ```
  *
@@ -39,7 +39,7 @@
  * @module lib/spawn
  */
 
-import {spawn as nodeSpawn} from 'node:child_process'
+import {execSync, spawn as nodeSpawn} from 'node:child_process'
 import type {ChildProcess, SpawnOptions} from 'node:child_process'
 
 import {debug, debugSpawn} from './debug.js'
@@ -93,19 +93,19 @@ export interface SpawnProcessOptions {
  * Multiple calls can run concurrently without conflicts.
  *
  * @param command - Command to execute (e.g., 'claude', 'npm', 'git')
- * @param args - Arguments array (e.g., ['--dangerouslySkipPermissions'])
+ * @param args - Arguments array (e.g., ['--dangerously-skip-permissions'])
  * @param options - Spawn configuration options
  * @returns Promise<number> - Exit code (0 = success, non-zero = error)
  * @throws ProcessSpawnError - When spawn fails (command not found, permissions, etc.)
  *
  * @example
  * // Launch Claude Code with sandbox disabled
- * const exitCode = await spawnProcess('claude', ['--dangerouslySkipPermissions'])
+ * const exitCode = await spawnProcess('claude', ['--dangerously-skip-permissions'])
  *
  * @example
  * // Parallel session with detached mode
- * const session1 = spawnProcess('claude', ['--dangerouslySkipPermissions'], {detached: true})
- * const session2 = spawnProcess('claude', ['--dangerouslySkipPermissions'], {detached: true})
+ * const session1 = spawnProcess('claude', ['--dangerously-skip-permissions'], {detached: true})
+ * const session2 = spawnProcess('claude', ['--dangerously-skip-permissions'], {detached: true})
  * await Promise.all([session1, session2])
  *
  * @example
@@ -122,15 +122,54 @@ export async function spawnProcess(
   // Log spawn details in debug mode
   debugSpawn(command, args)
 
-  return new Promise((resolve, reject) => {
+  // Windows hybrid approach: try without shell first, fallback to .cmd if ENOENT
+  // This preserves error detection while supporting .cmd files from npm
+  if (process.platform === 'win32') {
     try {
-      const spawnOptions: SpawnOptions = {
-        cwd,
-        stdio,
-        detached,
-        shell: false, // Direct spawn for security (prevent shell injection)
+      return await attemptSpawn(command, args, {cwd, stdio, detached, shell: false})
+    } catch (error) {
+      // If command not found and .cmd file exists, use cmd.exe wrapper
+      // This avoids DEP0190 deprecation warning while supporting npm-installed commands
+      if (
+        error instanceof ProcessSpawnError &&
+        error.code === 'ENOENT' &&
+        commandExistsInPath(`${command}.cmd`)
+      ) {
+        // Use cmd.exe /c to execute .cmd file without shell mode or deprecation warning
+        return attemptSpawn('cmd.exe', ['/c', command, ...args], {cwd, stdio, detached, shell: false})
       }
 
+      throw error
+    }
+  }
+
+  // Unix: always use shell: false for security
+  return attemptSpawn(command, args, {cwd, stdio, detached, shell: false})
+}
+
+/**
+ * Check if a command exists in PATH (Windows only).
+ * Uses 'where' command to check if file exists in PATH.
+ */
+function commandExistsInPath(command: string): boolean {
+  try {
+    execSync(`where ${command}`, {stdio: 'ignore', windowsHide: true})
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Internal helper to attempt process spawn with given options.
+ */
+function attemptSpawn(
+  command: string,
+  args: string[],
+  spawnOptions: SpawnOptions,
+): Promise<number> {
+  return new Promise((resolve, reject) => {
+    try {
       const childProcess: ChildProcess = nodeSpawn(command, args, spawnOptions)
 
       // Handle spawn errors (ENOENT, EACCES, etc.)
@@ -139,18 +178,21 @@ export async function spawnProcess(
           reject(
             new ProcessSpawnError(
               `Command not found: ${command}. Install Claude Code from https://claude.ai/download.`,
+              'ENOENT',
             ),
           )
         } else if (error.code === 'EACCES') {
           reject(
             new ProcessSpawnError(
               `Permission denied: ${command}. Check file permissions.`,
+              'EACCES',
             ),
           )
         } else {
           reject(
             new ProcessSpawnError(
               `Failed to spawn ${command}: ${error.message}. Check that the command exists and is executable.`,
+              error.code,
             ),
           )
         }
@@ -169,7 +211,7 @@ export async function spawnProcess(
       })
 
       // Unref detached processes to allow parent to exit
-      if (detached && childProcess.unref) {
+      if (spawnOptions.detached && childProcess.unref) {
         childProcess.unref()
       }
     } catch (error) {

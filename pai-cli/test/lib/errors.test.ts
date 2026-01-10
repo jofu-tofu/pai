@@ -6,6 +6,7 @@ import {
   formatErrorMessage,
   InvalidUsageError,
   PaiError,
+  ProcessSpawnError,
 } from '../../src/lib/errors.js'
 import {EXIT_CODES} from '../../src/types/exit-codes.js'
 
@@ -91,6 +92,40 @@ describe('errors', () => {
       const message = 'Invalid --format value \'xyz\'. Use \'json\' or \'text\'.'
       const error = new InvalidUsageError(message)
       expect(error.message).to.equal(message)
+    })
+  })
+
+  describe('ProcessSpawnError', () => {
+    it('has correct name', () => {
+      const error = new ProcessSpawnError('spawn failed')
+      expect(error.name).to.equal('ProcessSpawnError')
+    })
+
+    it('has ENVIRONMENT_ERROR exit code', () => {
+      const error = new ProcessSpawnError('spawn failed')
+      expect(error.exitCode).to.equal(EXIT_CODES.ENVIRONMENT_ERROR)
+    })
+
+    it('extends PaiError', () => {
+      const error = new ProcessSpawnError('spawn failed')
+      expect(error).to.be.instanceOf(PaiError)
+    })
+
+    it('stores error code when provided', () => {
+      const error = new ProcessSpawnError('Command not found', 'ENOENT')
+      expect(error.code).to.equal('ENOENT')
+    })
+
+    it('handles missing error code', () => {
+      const error = new ProcessSpawnError('spawn failed')
+      expect(error.code).to.be.undefined
+    })
+
+    it('preserves message with error code', () => {
+      const message = 'Command not found: claude. Install Claude Code from https://claude.ai/download.'
+      const error = new ProcessSpawnError(message, 'ENOENT')
+      expect(error.message).to.equal(message)
+      expect(error.code).to.equal('ENOENT')
     })
   })
 
