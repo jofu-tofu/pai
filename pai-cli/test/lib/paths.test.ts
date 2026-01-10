@@ -1,4 +1,4 @@
-import {mkdirSync, mkdtempSync, rmSync} from 'node:fs'
+import {mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync} from 'node:fs'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 
@@ -132,7 +132,7 @@ describe('paths', () => {
 
     it('does not expand ~ in middle of path', () => {
       const result = expandPath('/some/~path')
-      expect(result).to.include('~')
+      expect(result).to.equal('/some/~path')
     })
 
     it('returns non-tilde paths unchanged', () => {
@@ -250,17 +250,62 @@ describe('paths', () => {
       const result = isWorkspace('.')
       expect(result).to.be.a('boolean')
     })
+
+    it('returns false when .pai is a file, not a directory', () => {
+      // Create temp directory with .pai as a FILE
+      const tempDir = mkdtempSync(join(tmpdir(), 'pai-test-'))
+      const paiFile = join(tempDir, '.pai')
+      writeFileSync(paiFile, 'not a directory')
+
+      try {
+        const result = isWorkspace(tempDir)
+        expect(result).to.be.false
+      } finally {
+        rmSync(tempDir, {recursive: true})
+      }
+    })
+
+    it('returns true when .pai is a symlink to a directory', () => {
+      // Create temp directories
+      const tempDir = mkdtempSync(join(tmpdir(), 'pai-test-'))
+      const targetDir = mkdtempSync(join(tmpdir(), 'pai-target-'))
+      const paiDir = join(targetDir, 'actual-pai')
+      mkdirSync(paiDir)
+
+      const paiLink = join(tempDir, '.pai')
+
+      try {
+        // Create symlink (use 'junction' on Windows for directory symlinks)
+        try {
+          symlinkSync(paiDir, paiLink, 'junction')
+        } catch {
+          // If junction fails, try regular symlink (may require admin on Windows)
+          try {
+            symlinkSync(paiDir, paiLink, 'dir')
+          } catch {
+            // Skip test if symlinks not supported
+            return
+          }
+        }
+
+        const result = isWorkspace(tempDir)
+        expect(result).to.be.true
+      } finally {
+        rmSync(tempDir, {recursive: true, force: true})
+        rmSync(targetDir, {recursive: true, force: true})
+      }
+    })
   })
 
   describe('findWorkspaceRoot', () => {
-    it('does not find workspace in temp directory without .pai marker', () => {
+    it('returns null when no workspace found in hierarchy', () => {
       const tempDir = mkdtempSync(join(tmpdir(), 'pai-test-'))
 
       try {
         const result = findWorkspaceRoot(tempDir)
-        // Result should be null OR a parent directory (not the temp dir itself)
-        // since temp dir doesn't have .pai marker
-        expect(result !== tempDir).to.be.true
+        // Should return null (or possibly find workspace in parent /tmp hierarchy)
+        // Explicitly check it didn't find the temp dir itself
+        expect(result).to.not.equal(tempDir)
       } finally {
         rmSync(tempDir, {recursive: true})
       }
@@ -309,14 +354,14 @@ describe('paths', () => {
   })
 
   describe('getWorkspacePath', () => {
-    it('does not find workspace in temp directory without .pai marker', () => {
+    it('returns null when no workspace found in hierarchy', () => {
       const tempDir = mkdtempSync(join(tmpdir(), 'pai-test-'))
 
       try {
         const result = getWorkspacePath(tempDir)
-        // Result should be null OR a parent directory (not the temp dir itself)
-        // since temp dir doesn't have .pai marker
-        expect(result !== tempDir).to.be.true
+        // Should return null (or possibly find workspace in parent /tmp hierarchy)
+        // Explicitly check it didn't find the temp dir itself
+        expect(result).to.not.equal(tempDir)
       } finally {
         rmSync(tempDir, {recursive: true})
       }
@@ -335,9 +380,15 @@ describe('paths', () => {
     })
 
     it('uses cwd when no argument provided', () => {
-      // Just verify it returns something (can't easily test cwd behavior)
+      // getWorkspacePath() with no args uses process.cwd()
+      // Should return null or a valid workspace path string
       const result = getWorkspacePath()
+      // Either returns null (no workspace found) or a string path
       expect(result === null || typeof result === 'string').to.be.true
+      // If it found a workspace, verify it's an absolute path
+      if (result !== null) {
+        expect(result.length).to.be.greaterThan(0)
+      }
     })
   })
 })

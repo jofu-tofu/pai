@@ -1,4 +1,4 @@
-import {existsSync} from 'node:fs'
+import {existsSync, statSync} from 'node:fs'
 import {access} from 'node:fs/promises'
 import {homedir} from 'node:os'
 import {dirname, join, normalize} from 'node:path'
@@ -73,6 +73,11 @@ export function normalizePath(inputPath: string): string {
 
 /**
  * Check if a path exists asynchronously.
+ *
+ * WARNING: Subject to Time-of-Check-Time-of-Use (TOCTOU) race condition.
+ * The path may be created/deleted between checking and using it.
+ * For critical operations, use try/catch around the actual file operation instead.
+ *
  * @param pathToCheck - Path to check for existence
  * @returns Promise resolving to true if path exists, false otherwise
  */
@@ -93,11 +98,16 @@ export function resolvePath(...segments: string[]): string {
 }
 
 /**
- * Check if directory is a PAI workspace (contains .pai marker).
- * The marker can be either a file or directory named .pai.
+ * Check if directory is a PAI workspace (contains .pai directory marker).
+ * Per AC3: The marker must be a directory, not a file.
  */
 export function isWorkspace(dir: string): boolean {
-  return existsSync(join(dir, '.pai'))
+  const paiPath = join(dir, '.pai')
+  try {
+    return existsSync(paiPath) && statSync(paiPath).isDirectory()
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -128,9 +138,14 @@ export function findWorkspaceRoot(startDir: string): null | string {
  * Get the workspace path if in a PAI workspace, or null otherwise.
  * Alias for findWorkspaceRoot with current directory as default.
  * @param startDir - Directory to start searching from (defaults to cwd)
- * @returns Path to workspace root, or null if not in a workspace
+ * @returns Path to workspace root, or null if not in a workspace or cwd unavailable
  */
 export function getWorkspacePath(startDir?: string): null | string {
-  const dir = startDir ?? process.cwd()
-  return findWorkspaceRoot(dir)
+  try {
+    const dir = startDir ?? process.cwd()
+    return findWorkspaceRoot(dir)
+  } catch {
+    // process.cwd() can throw ENOENT if current directory was deleted
+    return null
+  }
 }

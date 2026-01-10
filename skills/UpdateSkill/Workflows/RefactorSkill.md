@@ -50,37 +50,170 @@ Common refactoring scenarios:
 | **Restructure workflows** | Rename/reorganize workflow files, update routing |
 | **Canonicalize** | Apply TitleCase, add missing sections, fix structure |
 
-### Step 3: Plan Changes
+### Step 3: Analyze Current State
 
-Present refactoring plan to user:
+**Scoping Note:** Match analysis depth to refactoring complexity:
+- **Simple** (rename 1-2 files, fix TitleCase): Review only relevant dimensions below
+- **Moderate** (restructure workflows, add sections): Review all dimensions briefly
+- **Complex** (rename skill, merge skills, major changes): Conduct full analysis with checklists
+
+Before proposing specific changes, analyze these dimensions as needed:
+
+#### 3.1 Structural Issues
+
+Examine the skill's organization and file structure:
+
+- **File organization:** Are files in correct directories (Tools/, Workflows/)?
+- **Naming consistency:** Do files follow TitleCase conventions?
+- **Section ordering:** Does SKILL.md follow standard section order?
+- **Duplicate content:** Is information repeated across multiple files?
+- **Missing components:** Are required sections/files absent?
+
+**Structural Checklist**
+- [ ] Directory structure matches SkillSystem.md requirements
+- [ ] All files use TitleCase naming
+- [ ] No duplicate workflow definitions
+- [ ] Required sections present (Examples, Prerequisites, etc.)
+
+#### 3.2 Usability Issues
+
+Evaluate how easy it is to understand and use the skill:
+
+- **Workflow routing:** Can users easily find the right workflow?
+- **Examples clarity:** Are examples realistic and helpful?
+- **Documentation completeness:** Are all features documented?
+- **Discoverability:** Can users figure out what the skill does?
+- **Onboarding friction:** What barriers exist for first-time users?
+
+**Usability Checklist**
+- [ ] Routing table clearly maps triggers to workflows
+- [ ] Each workflow has concrete examples
+- [ ] USE WHEN clauses are specific and actionable
+- [ ] Frontmatter description accurately reflects capabilities
+
+#### 3.3 Compliance Issues
+
+Check adherence to SkillSystem.md requirements:
+
+- **Frontmatter validity:** YAML syntax correct, required fields present
+- **TitleCase compliance:** Skill name, files, and workflows properly cased
+- **USE WHEN clauses:** Present in frontmatter description
+- **Routing table:** Properly formatted and complete
+- **Tool documentation:** All tools documented with usage instructions
+
+**Compliance Checklist**
+- [ ] YAML frontmatter parses without errors
+- [ ] Name follows TitleCase (no spaces, hyphens, underscores)
+- [ ] Description includes "USE WHEN" clause
+- [ ] Routing table uses correct markdown format
+- [ ] Tools/ scripts have header comments with usage
+
+#### 3.4 Impact and Risk Factors
+
+Identify factors that will inform your decision framework:
+
+- **Breaking changes** - Changes affecting existing users or integrations
+- **Backward compatibility** - What must be preserved for existing workflows
+- **Complexity implications** - Added complexity vs. improved clarity
+- **Maintenance burden** - Long-term implications for skill maintenance
+- **User impact scope** - Who is affected and how significantly
+
+**Common Impact Patterns**
+- **Renaming skill** → User commands, git history, documentation
+- **Restructuring workflows** → Existing user workflows, routing
+- **Adding sections** → Increased length vs. better guidance
+- **Removing content** → Lost information vs. reduced noise
+
+> Document these factors in detail in Step 4 Decision Framework.
+
+### Step 4: Plan Changes with Decision Framework
+
+For each proposed change, document using this framework:
+
+#### Change Documentation Template
+
+For each proposed change, document concisely:
+
+```
+CHANGE #: [Title of change]
+
+What changes: [Specific files, sections, or content being modified]
+Why: [Root problem being addressed]
+Impact: [CRITICAL/HIGH/MEDIUM/LOW] - [who/what affected]
+Risk: [HIGH/MEDIUM/LOW] - [brief justification]
+Rollback: [Specific steps to undo, or "Revert file changes" for simple cases]
+Dependencies: [List if any, or "None"]
+```
+
+**Note:** Keep each field to 1-2 lines. For simple changes, brief answers are acceptable.
+
+#### Present Complete Plan
+
+Show users the complete plan with all changes documented:
 
 ```
 REFACTORING PLAN: [SkillName]
 
-Goal: [What we're trying to achieve]
+Goal: [High-level objective]
 
-Changes:
-1. [First change]
-2. [Second change]
-3. [Third change]
+Summary:
+  - X breaking changes (HIGH risk)
+  - Y structural improvements (MEDIUM risk)
+  - Z minor cleanups (LOW risk)
 
-Files affected:
-- [file1] - [what changes]
-- [file2] - [what changes]
+CHANGE 1: [Title]
+  What: [Brief summary]
+  Why: [Brief reason]
+  Impact: [Severity level]
+  Risk: [Level]
+
+CHANGE 2: [Title]
+  What: [Brief summary]
+  Why: [Brief reason]
+  Impact: [Severity level]
+  Risk: [Level]
+
+Total files affected: X
+Estimated rollback effort: [Quick / Moderate / Extensive]
 
 Confirm to proceed? (yes/no)
 ```
 
-### Step 4: Execute Changes
+#### Example: Simple Refactor Walkthrough
 
-**Execute in order:**
+**Scenario:** Fix TitleCase violation in DaemonSkill - rename "cleanup.md" to "Cleanup.md"
+
+**Step 3 Analysis (Simple refactor - abbreviated):**
+- **Structural:** ✓ TitleCase violation found (cleanup.md)
+- **Usability:** ✓ No impact (routing will be updated, functionality unchanged)
+- **Compliance:** ✓ Fixes TitleCase requirement from SkillSystem.md
+- **Impact Factors:** Breaking=No, Backward Compat=Yes, Complexity=Minimal, User Impact=None
+
+**Step 4 Decision Framework:**
+
+```
+CHANGE 1: Fix TitleCase for cleanup workflow
+
+What changes: Workflows/cleanup.md → Workflows/Cleanup.md, update routing in SKILL.md
+Why: TitleCase convention compliance per SkillSystem.md requirements
+Impact: LOW - Internal file rename with routing update, no user-facing changes
+Risk: LOW - Single file rename, straightforward operation
+Rollback: Rename file back to cleanup.md, revert SKILL.md routing table
+Dependencies: None
+```
+
+**Result:** Clear, concise documentation for a simple 1-file refactor. For complex refactors, expand each section accordingly.
+
+### Step 5: Execute Changes
+
+**Execute in dependency order per Decision Framework:**
 
 1. **Backup reference** - Note all original values
 2. **File operations** - Renames, moves, creates
 3. **Content updates** - Internal references, routing tables
 4. **Cleanup** - Remove orphaned files/references
 
-### Step 5: Validate Result
+### Step 6: Validate Result
 
 Run full validation:
 
@@ -94,8 +227,10 @@ Manual checks:
 - [ ] TitleCase naming throughout
 - [ ] Examples section present
 - [ ] Tools/ directory exists
+- [ ] Risk assessments from Decision Framework were accurate
+- [ ] No unexpected side effects occurred
 
-### Step 6: Report Before/After
+### Step 7: Report Before/After
 
 ```
 REFACTORING COMPLETE: [SkillName]

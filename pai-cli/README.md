@@ -8,6 +8,56 @@ A new CLI generated with oclif
 [![Version](https://img.shields.io/npm/v/pai-cli.svg)](https://npmjs.org/package/pai-cli)
 [![Downloads/week](https://img.shields.io/npm/dw/pai-cli.svg)](https://npmjs.org/package/pai-cli)
 
+## Requirements
+
+**Minimum Claude Code Version:** 0.1.0 or later
+
+PAI CLI automatically detects your Claude Code version and warns if incompatibilities are detected. The CLI will continue to launch even with version warnings (graceful degradation).
+
+### Known Incompatible Versions
+
+- **0.0.9** - Has known issues with PAI CLI integration
+
+If you encounter version compatibility warnings, upgrade Claude Code to the latest version:
+
+```bash
+# Upgrade Claude Code to latest version
+npm install -g @anthropic-ai/claude-code@latest
+```
+
+## Troubleshooting
+
+### Version Compatibility Issues
+
+**Symptom:** Warning message about Claude Code version incompatibility
+
+**Solution:**
+1. Check your current Claude Code version: `claude --version`
+2. Upgrade to version 0.1.0 or later (see above)
+3. If version cannot be detected, ensure Claude Code is installed and in your PATH
+
+**Debug Mode:**
+
+Use `--debug` flag to see detailed version information:
+
+```bash
+pai launch --debug
+```
+
+Debug output includes:
+- Resolved PAI_HOME path
+- Claude Code version detection
+- Compatibility check results
+- Spawn arguments and configuration
+
+### Version Check Failed
+
+If `claude --version` fails or hangs:
+- Verify Claude Code is installed: `which claude` (Unix) or `where claude` (Windows)
+- Check PATH includes Claude Code installation directory
+- Reinstall Claude Code if necessary
+
+PAI CLI assumes compatibility if version cannot be determined and will proceed with launch.
 
 <!-- toc -->
 * [Usage](#usage)

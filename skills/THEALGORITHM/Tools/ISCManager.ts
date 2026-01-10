@@ -16,6 +16,7 @@
 import { parseArgs } from "util";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
+import Anthropic from "@anthropic-ai/sdk";
 
 type Source = "EXPLICIT" | "INFERRED" | "IMPLICIT";
 type Status = "PENDING" | "ACTIVE" | "DONE" | "ADJUSTED" | "BLOCKED";

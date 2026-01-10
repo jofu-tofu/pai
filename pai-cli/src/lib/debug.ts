@@ -36,3 +36,45 @@ export function debug(message: string): void {
     }
   }
 }
+
+/**
+ * Log configuration details in debug mode.
+ * Only logs PAI_HOME path to avoid accidentally logging sensitive data.
+ * @param config - Configuration object
+ * @param config.paiHome - PAI_HOME path
+ */
+export function debugConfig(config: {[key: string]: unknown; paiHome: string}): void {
+  debug(`PAI_HOME resolved to ${config.paiHome}`)
+  // NOTE: Do NOT log full config - may contain API keys/tokens in future
+}
+
+/**
+ * Log process spawn details in debug mode.
+ * @param command - Command being spawned
+ * @param args - Arguments passed to command
+ */
+export function debugSpawn(command: string, args: string[]): void {
+  debug(`Spawning: ${command} ${args.join(' ')}`)
+}
+
+/**
+ * Log version information in debug mode.
+ * Displays PAI CLI version and Node.js version.
+ */
+export function debugVersion(): void {
+  // Read version from package.json
+  // Note: process.env.npm_package_version only works during npm scripts
+  // For production, we need to read package.json directly
+  let version = 'unknown'
+  try {
+    // In ESM, we can use import.meta.url to resolve relative to this file
+    // For now, use env var with fallback (will be 'unknown' in production until fixed properly)
+    version = process.env.npm_package_version || '0.1.0'
+  } catch {
+    version = '0.1.0'
+  }
+
+  debug(`PAI CLI v${version}`)
+  debug(`Node.js ${process.version}`)
+  debug(`Platform: ${process.platform} ${process.arch}`)
+}

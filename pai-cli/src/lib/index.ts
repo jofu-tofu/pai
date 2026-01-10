@@ -7,10 +7,17 @@
 export {getPaiHome, loadConfig, type PaiConfig, validatePaiHome} from './config.js'
 
 // Debug logging
-export {debug, isDebugEnabled, setDebugEnabled} from './debug.js'
+export {debug, debugConfig, debugSpawn, debugVersion, isDebugEnabled, setDebugEnabled} from './debug.js'
 
-// Custom error classes
-export {ConfigNotFoundError, EnvironmentError, PaiError} from './errors.js'
+// Custom error classes and utilities
+export {
+  ConfigNotFoundError,
+  EnvironmentError,
+  formatErrorMessage,
+  InvalidUsageError,
+  PaiError,
+  ProcessSpawnError,
+} from './errors.js'
 
 // Cross-platform path utilities
 export {
@@ -25,3 +32,6 @@ export {
   toUnixPath,
   toWindowsPath,
 } from './paths.js'
+
+// Process spawning utilities
+export {spawnProcess, type SpawnProcessOptions} from './spawn.js'

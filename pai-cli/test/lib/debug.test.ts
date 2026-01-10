@@ -1,15 +1,15 @@
 import {expect} from 'chai'
-import sinon from 'sinon'
+import {type SinonStub, stub} from 'sinon'
 
-import {debug, isDebugEnabled, setDebugEnabled} from '../../src/lib/debug.js'
+import {debug, debugConfig, debugSpawn, debugVersion, isDebugEnabled, setDebugEnabled} from '../../src/lib/debug.js'
 
 describe('debug', () => {
-  let stderrStub: sinon.SinonStub
+  let stderrStub: SinonStub
 
   beforeEach(() => {
     // Reset debug state before each test
     setDebugEnabled(false)
-    stderrStub = sinon.stub(process.stderr, 'write')
+    stderrStub = stub(process.stderr, 'write')
   })
 
   afterEach(() => {
@@ -88,6 +88,86 @@ describe('debug', () => {
       debug(String.raw`path: C:\Users\test\.pai`)
       const output = stderrStub.firstCall.args[0]
       expect(output).to.include(String.raw`C:\Users\test\.pai`)
+    })
+  })
+
+  describe('debugConfig', () => {
+    it('should log PAI_HOME path in debug mode', () => {
+      setDebugEnabled(true)
+      debugConfig({paiHome: '/home/user/.pai'})
+      expect(stderrStub.called).to.be.true
+      const output = stderrStub.firstCall.args[0]
+      expect(output).to.include('PAI_HOME')
+      expect(output).to.include('/home/user/.pai')
+    })
+
+    it('should not log when debug is disabled', () => {
+      setDebugEnabled(false)
+      debugConfig({paiHome: '/home/user/.pai'})
+      expect(stderrStub.called).to.be.false
+    })
+
+    it('should NOT log full config object (security)', () => {
+      setDebugEnabled(true)
+      debugConfig({paiHome: '/home/user/.pai', secretApiKey: 'should-not-appear'})
+      expect(stderrStub.called).to.be.true
+      const allOutput = stderrStub.getCalls().map((call) => call.args[0]).join('')
+      // Should log PAI_HOME
+      expect(allOutput).to.include('/home/user/.pai')
+      // Should NOT log other config properties (security fix)
+      expect(allOutput).to.not.include('secretApiKey')
+      expect(allOutput).to.not.include('should-not-appear')
+    })
+  })
+
+  describe('debugSpawn', () => {
+    it('should log command and arguments in debug mode', () => {
+      setDebugEnabled(true)
+      debugSpawn('claude', ['--dangerouslySkipPermissions', '--sandbox'])
+      expect(stderrStub.called).to.be.true
+      const output = stderrStub.firstCall.args[0]
+      expect(output).to.include('claude')
+      expect(output).to.include('--dangerouslySkipPermissions')
+      expect(output).to.include('--sandbox')
+    })
+
+    it('should not log when debug is disabled', () => {
+      setDebugEnabled(false)
+      debugSpawn('claude', ['--dangerouslySkipPermissions'])
+      expect(stderrStub.called).to.be.false
+    })
+
+    it('should handle empty arguments array', () => {
+      setDebugEnabled(true)
+      debugSpawn('claude', [])
+      expect(stderrStub.called).to.be.true
+      const output = stderrStub.firstCall.args[0]
+      expect(output).to.include('claude')
+    })
+  })
+
+  describe('debugVersion', () => {
+    it('should log Node.js version in debug mode', () => {
+      setDebugEnabled(true)
+      debugVersion()
+      expect(stderrStub.called).to.be.true
+      const allOutput = stderrStub.getCalls().map(call => call.args[0]).join('')
+      expect(allOutput).to.include('Node.js')
+      expect(allOutput).to.include(process.version)
+    })
+
+    it('should not log when debug is disabled', () => {
+      setDebugEnabled(false)
+      debugVersion()
+      expect(stderrStub.called).to.be.false
+    })
+
+    it('should log platform information', () => {
+      setDebugEnabled(true)
+      debugVersion()
+      const allOutput = stderrStub.getCalls().map(call => call.args[0]).join('')
+      expect(allOutput).to.include('Platform')
+      expect(allOutput).to.include(process.platform)
     })
   })
 })
