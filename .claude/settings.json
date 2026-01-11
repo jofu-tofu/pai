@@ -1,4 +1,5 @@
 {
+    "model": "sonnet",
     "statusLine": {
         "type": "command",
         "command": "powershell -NoProfile -Command \"& \\\"$env:PAI_DIR/scripts/statusline.ps1\\\"\""
