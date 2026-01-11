@@ -33,6 +33,7 @@ pai-cli/
 │   │   │
 │   │   │ # === FOUNDATIONAL LIBRARIES (Required) ===
 │   │   ├── config.ts              # 🔒 Config resolution (PAI_HOME)
+│   │   ├── template-resolver.ts   # 🔒 Bundled template path resolution
 │   │   ├── paths.ts               # 🔒 Cross-platform path utilities
 │   │   ├── errors.ts              # 🔒 Error handling + exit codes
 │   │   ├── spawn.ts               # 🔒 Process spawning (Claude Code)
@@ -47,8 +48,20 @@ pai-cli/
 │   │   ├── version.ts             # ✏️ Claude Code version checking
 │   │   └── bmad-installer.ts      # ✏️ BMAD installation utility
 │   │
-│   └── types/                     # TypeScript type definitions
-│       └── (shared interfaces)
+│   ├── types/                     # TypeScript type definitions
+│   │   └── (shared interfaces)
+│   │
+│   └── templates/                 # Bundled templates for installation
+│       └── bmad/                  # BMAD methodology framework (335 files)
+│           ├── _bmad/             # BMAD data and configuration (290 files)
+│           │   ├── core/          # Core BMAD module
+│           │   ├── bmm/           # Build-Measure Module
+│           │   └── _config/       # Configuration manifests
+│           └── .claude/           # Claude Code commands (45 files)
+│               └── commands/
+│                   └── bmad/      # BMAD slash commands
+│                       ├── core/  # Core workflows
+│                       └── bmm/   # BMM workflows and agents
 │
 ├── test/                          # Test files (mirrors src/)
 │   ├── commands/                  # Unit tests for commands
@@ -60,6 +73,9 @@ pai-cli/
 │   │   └── hello/
 │   │       ├── index.test.ts
 │   │       └── world.test.ts
+│   │
+│   ├── lib/                       # Library unit tests
+│   │   └── template-resolver.test.ts # Template path resolution tests
 │   │
 │   ├── integration/               # Integration tests
 │   │   ├── cli.test.ts            # General CLI behavior
@@ -81,6 +97,10 @@ pai-cli/
 │   ├── commands/
 │   ├── lib/
 │   ├── types/
+│   ├── templates/                 # Copied from src/templates during build
+│   │   └── bmad/
+│   │       ├── _bmad/
+│   │       └── .claude/
 │   └── index.js
 │
 ├── node_modules/                  # Dependencies (gitignored)

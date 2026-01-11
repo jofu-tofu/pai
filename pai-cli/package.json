@@ -80,7 +80,7 @@
     "url": "git+https://github.com/pai-cli/pai-cli.git"
   },
   "scripts": {
-    "build": "shx rm -rf dist && tsc -b",
+    "build": "shx rm -rf dist && tsc -b && shx cp -r src/templates dist/",
     "check": "npm run lint && npm run build",
     "clean": "shx rm -rf dist",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

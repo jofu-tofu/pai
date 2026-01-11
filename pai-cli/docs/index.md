@@ -86,6 +86,7 @@ Detailed breakdown of what each command depends on and how they work:
 Complete documentation of `src/lib/` utilities:
 - **Foundational Libraries** (Required, cannot be removed)
   - `config.ts` - Configuration resolution
+  - `template-resolver.ts` - Bundled template path resolution
   - `paths.ts` - Cross-platform path utilities
   - `errors.ts` - Error handling with exit codes
   - `spawn.ts` - Process spawning
