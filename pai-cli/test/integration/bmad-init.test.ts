@@ -65,6 +65,15 @@ describe('BMAD Installation Integration Tests', () => {
     expect(await pathExists(outputDir)).to.be.true
     expect(await pathExists(join(outputDir, 'planning-artifacts'))).to.be.true
     expect(await pathExists(join(outputDir, 'implementation-artifacts'))).to.be.true
+
+    // Verify .claude/commands/bmad structure
+    const claudeCommandsDir = join(testDir, '.claude', 'commands', 'bmad')
+    expect(await pathExists(claudeCommandsDir)).to.be.true
+    expect(await pathExists(join(claudeCommandsDir, 'core'))).to.be.true
+    expect(await pathExists(join(claudeCommandsDir, 'bmm'))).to.be.true
+    expect(await pathExists(join(claudeCommandsDir, 'core', 'agents'))).to.be.true
+    expect(await pathExists(join(claudeCommandsDir, 'bmm', 'agents'))).to.be.true
+    expect(await pathExists(join(claudeCommandsDir, 'bmm', 'workflows'))).to.be.true
   })
 
   it('should generate custom configuration files', async function () {

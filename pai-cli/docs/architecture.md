@@ -281,7 +281,7 @@ These are the **inherent, foundational** design principles that define PAI CLI:
 | Module | Usage | Foundational? |
 |--------|-------|---------------|
 | `bmad-installer.ts` | BMAD installation logic | No - Feature-specific |
-| `config.ts` | Resolve PAI paths | **Yes** - Path resolution |
+| `template-resolver.ts` | Resolve bundled template paths | **Yes** - Path resolution |
 | `paths.ts` | Cross-platform paths | **Yes** - Required |
 | `errors.ts` | Error handling | **Yes** - Error handling |
 | `output.ts` | Display progress | No - UI enhancement |
@@ -289,10 +289,11 @@ These are the **inherent, foundational** design principles that define PAI CLI:
 
 **What It Does:**
 1. Checks if BMAD is already installed in target directory
-2. Validates PAI_HOME has BMAD framework
-3. Copies BMAD structure to target project
-4. Creates necessary directories and files
-5. Initializes workflow tracking
+2. Resolves bundled BMAD template path from package
+3. Copies BMAD data structure (`_bmad/`) from bundled templates to target project
+4. Copies Claude Code commands (`.claude/commands/bmad/`) from bundled templates
+5. Creates necessary output directories
+6. Generates custom configuration files
 
 **Can Be Modified:**
 - Installation steps and checks
@@ -300,7 +301,7 @@ These are the **inherent, foundational** design principles that define PAI CLI:
 - Directory structure created
 
 **Cannot Be Modified (within init bmad):**
-- Integration with PAI_HOME structure
+- Template resolution mechanism (uses bundled templates)
 - File system operations pattern
 
 **Extensibility:** New init commands can be added following this pattern.
@@ -330,6 +331,29 @@ The `src/lib/` directory contains foundational utilities used across commands.
 **Modification Allowed:**
 - Default location (currently `~/.pai`)
 - Environment variable name (currently `PAI_HOME`)
+
+---
+
+#### `template-resolver.ts` - Bundled Template Path Resolution
+
+**Purpose:** Resolve paths to bundled templates within the pai-cli package.
+
+**Exports:**
+- `getBmadTemplatePath()` - Returns absolute path to bundled BMAD template root (contains `_bmad/` and `.claude/`)
+
+**Logic:**
+1. Uses `import.meta.url` to determine current file location
+2. Resolves relative path to `templates/bmad/` directory
+3. Works in both development (`src/`) and production (`dist/`) contexts
+4. Returns parent directory containing both `_bmad/` and `.claude/` structures
+
+**Why Foundational:** Enables self-contained template distribution without external dependencies.
+
+**Modification Allowed:**
+- Template directory structure
+- Additional template resolvers for other frameworks
+
+**Cannot Change:** Must work in both dev and production environments.
 
 ---
 
@@ -535,6 +559,7 @@ The `src/lib/` directory contains foundational utilities used across commands.
 | ESM modules | Module system | ⚠️ Limited | Future-proofing |
 | **Core Libraries** | | | |
 | config.ts | Library | ⚠️ Logic only | Path/env var names modifiable |
+| template-resolver.ts | Library | ⚠️ Logic only | Template paths modifiable |
 | paths.ts | Library | ⚠️ Logic only | Must stay cross-platform |
 | errors.ts | Library | ⚠️ Messages only | Exit codes are locked |
 | spawn.ts | Library | ⚠️ Limited | Stdio inheritance required |
