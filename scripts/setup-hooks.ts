@@ -3,7 +3,6 @@
  * PAI System Hook Setup Script
  *
  * Creates .claude/settings.json in PAI_DIR with all PAI System hooks configured.
- * This script is PAI System-specific and should NOT be part of the pai-cli command set.
  *
  * Usage:
  *   bun run scripts/setup-hooks.ts

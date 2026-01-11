@@ -606,43 +606,6 @@ async function addPaiDirToShellProfile(): Promise<void> {
   }
 }
 
-async function offerPaiCliInstall(): Promise<void> {
-  logSection('PAI CLI Installation');
-
-  const paiCliDir = join(PAI_DIR, 'pai-cli');
-
-  if (!existsSync(paiCliDir)) {
-    log('⚠️', 'pai-cli directory not found. Skipping CLI installation.');
-    return;
-  }
-
-  log('ℹ️', 'PAI CLI provides convenience commands like `pai launch` and `pai init bmad`');
-  log('ℹ️', 'Note: This will eventually be decoupled from PAI System');
-
-  const wantCli = await askYesNo('Install pai-cli globally?', true);
-
-  if (!wantCli) {
-    log('⏭️', 'Skipping pai-cli installation');
-    return;
-  }
-
-  try {
-    log('🔧', 'Installing pai-cli dependencies...');
-    await $`cd ${paiCliDir} && npm install`.quiet();
-
-    log('🔧', 'Building pai-cli...');
-    await $`cd ${paiCliDir} && npm run build`.quiet();
-
-    log('🔧', 'Installing pai-cli globally...');
-    await $`cd ${paiCliDir} && npm install -g .`.quiet();
-
-    log('✅', 'pai-cli installed successfully');
-    log('ℹ️', 'You can now use: pai launch, pai init bmad');
-  } catch (e) {
-    log('❌', 'Failed to install pai-cli');
-    console.error(e);
-  }
-}
 
 // ============================================
 // Main Functions
@@ -752,9 +715,6 @@ async function install(): Promise<void> {
   // Step 2: Add PAI_DIR to shell profile
   await addPaiDirToShellProfile();
 
-  // Step 3: Offer pai-cli installation
-  await offerPaiCliInstall();
-
   // Final success message
   logSection('Installation Complete');
   log('✅', 'PAI System installed successfully!');
@@ -762,8 +722,6 @@ async function install(): Promise<void> {
   console.log('  1. Restart your terminal (or source your shell profile)');
   console.log('  2. Launch Claude Code:');
   console.log(`     cd ${PAI_DIR} && claude`);
-  console.log('     OR');
-  console.log('     pai launch  (if you installed pai-cli)');
   console.log('');
 }
 
