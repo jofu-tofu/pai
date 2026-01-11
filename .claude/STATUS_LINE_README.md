@@ -70,7 +70,7 @@ The script outputs a single-line string displayed in the status bar:
 1. **Environment Variable:** `PAI_DIR` must be set (default: `C:\Users\<username>\.pai`)
 2. **Script Exists:** `$env:PAI_DIR\scripts\statusline.ps1` must exist
 3. **PowerShell:** PowerShell 5.1+ (included in Windows 10/11)
-4. **Symlink:** `~/.claude/settings.json` → `~/.pai/.claude/settings.json` (created by `pai setup`)
+4. **Settings:** `.claude/settings.json` configured in PAI directory (created by PAI installation)
 
 ## Troubleshooting
 
@@ -131,9 +131,9 @@ The script outputs a single-line string displayed in the status bar:
    [System.Environment]::SetEnvironmentVariable('PAI_DIR', "$env:USERPROFILE\.pai", 'User')
    ```
 
-2. **Ensure symlink exists:**
-   - `~/.claude/settings.json` → `~/.pai/.claude/settings.json`
-   - Run `pai setup` to create/verify symlink
+2. **Ensure settings are configured:**
+   - `.claude/settings.json` should exist in your PAI directory
+   - Run `bun run scripts/setup-hooks.ts` from PAI directory to configure
 
 3. **CRITICAL: Restart Claude Code completely**
    - Close ALL Claude Code windows
@@ -249,7 +249,7 @@ Parses to: `powershell -Command "& \"$env:VAR\""`
 ## References
 
 - **Script Implementation:** `scripts/statusline.ps1`
-- **Integration:** Story 2.7 (`pai setup` command creates symlink)
-- **Launch Command:** Story 2.6 (`pai launch` command launches Claude Code)
+- **Hook Configuration:** `scripts/setup-hooks.ts` creates settings.json
+- **Launch Command:** `pai launch` command launches Claude Code
 - **Git Commit:** f8dcc82 (Jan 9, 2026) - Statusline refactoring
 - **Syntax Fix:** (Jan 10, 2026) - Fixed PowerShell variable expansion with `-Command` and proper quoting

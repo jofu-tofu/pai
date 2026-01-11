@@ -86,7 +86,7 @@ npm install -g .   # Install globally
 
 ```bash
 pai launch         # Launch Claude Code with PAI context
-pai setup          # Setup PAI infrastructure
+pai init bmad      # Initialize BMAD workflow in current project
 pai --help         # See all available commands
 ```
 
