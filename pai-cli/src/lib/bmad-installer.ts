@@ -2,7 +2,8 @@ import {execSync} from 'node:child_process'
 import {promises as fs} from 'node:fs'
 import {join} from 'node:path'
 
-import {getBmadTemplatePath} from './template-resolver.js'
+import {copyDir} from './template-installer.js'
+import {getTemplatePath} from './template-resolver.js'
 
 /**
  * BMAD version to install
@@ -79,23 +80,6 @@ ides:
 `
 }
 
-/**
- * Copy directory recursively with proper error handling
- */
-async function copyDir(src: string, dest: string): Promise<void> {
-  await fs.mkdir(dest, {recursive: true})
-
-  const entries = await fs.readdir(src, {withFileTypes: true})
-
-  const operations = entries.map(async (entry) => {
-    const srcPath = join(src, entry.name)
-    const destPath = join(dest, entry.name)
-
-    return entry.isDirectory() ? copyDir(srcPath, destPath) : fs.copyFile(srcPath, destPath)
-  })
-
-  await Promise.all(operations)
-}
 
 /**
  * Install BMAD structure in target directory
@@ -104,17 +88,7 @@ export async function installBmad(config: BmadInstallConfig): Promise<void> {
   const {projectName, targetDir, username} = config
 
   // Get bundled BMAD template path (parent directory containing _bmad/ and .claude/)
-  const templateRootPath = getBmadTemplatePath()
-
-  // Verify template exists
-  try {
-    await fs.access(templateRootPath)
-  } catch {
-    throw new Error(
-      `BMAD template not found at ${templateRootPath}. ` +
-      `This indicates a corrupted installation. Please reinstall pai-cli.`
-    )
-  }
+  const templateRootPath = await getTemplatePath('bmad')
 
   const bmadPath = join(targetDir, '_bmad')
   const claudePath = join(targetDir, '.claude')
@@ -158,34 +132,26 @@ export async function installBmad(config: BmadInstallConfig): Promise<void> {
 }
 
 /**
- * Update .gitignore with BMAD patterns
+ * Generate BMAD configuration files in the target directory.
+ * Used as a post-install hook after template installation.
+ *
+ * @param targetDir - Directory where BMAD was installed
+ * @param username - Username for configuration
+ * @param projectName - Project name for configuration
  */
-export async function updateGitignore(targetDir: string): Promise<void> {
-  const gitignorePath = join(targetDir, '.gitignore')
+export async function generateBmadConfigs(
+  targetDir: string,
+  username: string,
+  projectName: string,
+): Promise<void> {
+  const bmadPath = join(targetDir, '_bmad')
+  const coreConfigPath = join(bmadPath, 'core', 'config.yaml')
+  const bmmConfigPath = join(bmadPath, 'bmm', 'config.yaml')
+  const manifestPath = join(bmadPath, '_config', 'manifest.yaml')
 
-  const bmadPatterns = `
-# BMAD Installation
-_bmad/
-_bmad-output/
-bmad-output/
-**/bmad-output/
-`
-
-  try {
-    // Try to read existing .gitignore
-    const existing = await fs.readFile(gitignorePath, 'utf8')
-
-    // Check if BMAD patterns already present
-    if (existing.includes('# BMAD Installation') || existing.includes('_bmad/')) {
-      return // Already has BMAD patterns
-    }
-
-    // Append patterns
-    await fs.writeFile(gitignorePath, existing + '\n' + bmadPatterns, 'utf8')
-  } catch {
-    // .gitignore doesn't exist, create it
-    await fs.writeFile(gitignorePath, bmadPatterns.trim() + '\n', 'utf8')
-  }
+  await fs.writeFile(coreConfigPath, generateCoreConfig(username), 'utf8')
+  await fs.writeFile(bmmConfigPath, generateBmmConfig(projectName, username), 'utf8')
+  await fs.writeFile(manifestPath, generateManifest(), 'utf8')
 }
 
 /**

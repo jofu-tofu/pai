@@ -1,3 +1,4 @@
+import {randomUUID} from 'node:crypto'
 import {promises as fs} from 'node:fs'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
@@ -5,14 +6,15 @@ import {join} from 'node:path'
 import {expect} from 'chai'
 import {afterEach, beforeEach, describe, it} from 'mocha'
 
-import {installBmad, updateGitignore} from '../../src/lib/bmad-installer.js'
+import {installBmad} from '../../src/lib/bmad-installer.js'
+import {updateGitignore} from '../../src/lib/gitignore-manager.js'
 
 describe('BMAD Installation Integration Tests', () => {
   let testDir: string
 
   beforeEach(async () => {
     // Create a unique temp directory for each test
-    testDir = join(tmpdir(), `pai-bmad-test-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`)
+    testDir = join(tmpdir(), `pai-bmad-test-${randomUUID()}`)
     await fs.mkdir(testDir, {recursive: true})
   })
 
@@ -104,10 +106,10 @@ describe('BMAD Installation Integration Tests', () => {
   })
 
   it('should create .gitignore with BMAD patterns when it does not exist', async () => {
-    await updateGitignore(testDir)
+    await updateGitignore(testDir, ['_bmad', '_bmad-output', 'bmad-output', '**/bmad-output'])
 
     const gitignore = await fs.readFile(join(testDir, '.gitignore'), 'utf8')
-    expect(gitignore).to.include('# BMAD Installation')
+    expect(gitignore).to.include('# PAI Installation')
     expect(gitignore).to.include('_bmad/')
     expect(gitignore).to.include('_bmad-output/')
     expect(gitignore).to.include('bmad-output/')
@@ -117,7 +119,7 @@ describe('BMAD Installation Integration Tests', () => {
     const existingContent = '# My project\nnode_modules/\ndist/\n'
     await fs.writeFile(join(testDir, '.gitignore'), existingContent, 'utf8')
 
-    await updateGitignore(testDir)
+    await updateGitignore(testDir, ['_bmad', '_bmad-output'])
 
     const gitignore = await fs.readFile(join(testDir, '.gitignore'), 'utf8')
 
@@ -126,22 +128,22 @@ describe('BMAD Installation Integration Tests', () => {
     expect(gitignore).to.include('node_modules/')
     expect(gitignore).to.include('dist/')
 
-    // Should add BMAD patterns
-    expect(gitignore).to.include('# BMAD Installation')
+    // Should add PAI patterns
+    expect(gitignore).to.include('# PAI Installation')
     expect(gitignore).to.include('_bmad/')
   })
 
-  it('should not duplicate BMAD patterns if already present', async () => {
-    const existingContent = '# My project\nnode_modules/\n\n# BMAD Installation\n_bmad/\n_bmad-output/\n'
+  it('should not duplicate PAI patterns if already present', async () => {
+    const existingContent = '# My project\nnode_modules/\n\n# PAI Installation\n_bmad/\n_bmad-output/\n'
     await fs.writeFile(join(testDir, '.gitignore'), existingContent, 'utf8')
 
-    await updateGitignore(testDir)
+    await updateGitignore(testDir, ['_bmad', '_bmad-output'])
 
     const gitignore = await fs.readFile(join(testDir, '.gitignore'), 'utf8')
 
     // Should not add duplicate patterns
-    const matches = gitignore.match(/# BMAD Installation/g)
-    expect(matches).to.have.lengthOf(1, 'BMAD patterns should only appear once')
+    const matches = gitignore.match(/# PAI Installation/g)
+    expect(matches).to.have.lengthOf(1, 'PAI patterns should only appear once')
   })
 
   it('should install agents from template', async function () {
