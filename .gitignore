@@ -16,6 +16,9 @@
 .current-session
 agent-sessions.json
 
+# Memory system runtime data (segments, indexes, metrics)
+mem-store/
+
 # ============================================
 # LOGS & HISTORY
 # ============================================
