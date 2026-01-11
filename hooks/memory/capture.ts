@@ -16,6 +16,7 @@ import { homedir } from 'os';
 import { generateSessionId } from './lib/id-generator';
 import { isProcessorRunning } from './lib/lock';
 import { getMemoryConfig } from './core/config';
+import './core/register-providers'; // Register MVP providers
 
 // Constants
 const STALE_LOCK_TIMEOUT_MS = 60000; // 60 seconds

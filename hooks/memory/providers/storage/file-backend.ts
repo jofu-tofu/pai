@@ -30,6 +30,8 @@ import {
   StorageError,
 } from './interface';
 import { parseFrontmatter, serializeFrontmatter } from '../../lib/frontmatter';
+import { KeywordIndexManager } from './keyword-index';
+import { FlatByDateOrganizeProvider } from '../organize/flat-by-date';
 
 /**
  * Get the PAI directory path.
@@ -76,6 +78,14 @@ export class FileBackend implements StorageProvider {
   name = 'FileBackend';
   version = '1.0.0';
 
+  private keywordIndex: KeywordIndexManager;
+  private organizer: FlatByDateOrganizeProvider;
+
+  constructor() {
+    this.keywordIndex = new KeywordIndexManager();
+    this.organizer = new FlatByDateOrganizeProvider();
+  }
+
   /**
    * Initialize the file backend.
    * Verifies that the mem-store directories exist and creates them if needed.
@@ -90,6 +100,16 @@ export class FileBackend implements StorageProvider {
       // Create directories if they don't exist
       await fs.mkdir(segmentsDir, { recursive: true });
       await fs.mkdir(structuredDir, { recursive: true });
+
+      // Initialize keyword index
+      await this.keywordIndex.initialize();
+
+      // Initialize organizer
+      const organizeInit = await this.organizer.initialize();
+      if (!organizeInit.ok) {
+        console.error(`[Memory:FileBackend] Organizer init failed: ${organizeInit.error.message}`);
+        // Non-fatal - can fall back to default path
+      }
 
       console.log(`[Memory:FileBackend] Initialized at ${memStoreDir}`);
 
@@ -111,12 +131,26 @@ export class FileBackend implements StorageProvider {
    */
   async store(segment: MemorySegment): Promise<Result<StoreResult, StorageError>> {
     try {
-      const yearMonth = getYearMonth(segment.timestamp);
-      const segmentsDir = join(getPaiDir(), 'mem-store', 'segments', yearMonth);
-      const filePath = join(segmentsDir, `${segment.id}.md`);
+      // Get organized path from organize provider
+      const organizeResult = await this.organizer.organize(segment);
+      let dirPath: string;
+
+      if (!organizeResult.ok) {
+        // Fall back to default path if organization fails
+        console.error(`[Memory:FileBackend] Organization failed, using default: ${organizeResult.error.message}`);
+        dirPath = 'segments'; // Flat default
+      } else {
+        dirPath = organizeResult.value;
+      }
+
+      // Full directory path
+      const fullDirPath = join(getPaiDir(), 'mem-store', dirPath);
 
       // Create directory if it doesn't exist
-      await fs.mkdir(segmentsDir, { recursive: true });
+      await fs.mkdir(fullDirPath, { recursive: true });
+
+      // Construct file path
+      const filePath = join(fullDirPath, `${segment.id}.md`);
 
       // Serialize segment to markdown with frontmatter
       const markdownResult = serializeFrontmatter(segment);
@@ -141,6 +175,18 @@ export class FileBackend implements StorageProvider {
           `[Memory:FileBackend] Failed to update registry: ${registryResult.error.message}`
         );
         // Don't fail the operation, just log the warning
+      }
+
+      // Update keyword index
+      if (segment.tags && segment.tags.length > 0) {
+        try {
+          await this.keywordIndex.addToIndex(segment.id, segment.tags);
+        } catch (indexError) {
+          console.error(
+            `[Memory:FileBackend] Failed to update keyword index: ${(indexError as Error).message}`
+          );
+          // Index update failure should not fail storage operation
+        }
       }
 
       console.log(`[Memory:FileBackend] Stored segment ${segment.id} at ${filePath}`);
@@ -360,6 +406,18 @@ export class FileBackend implements StorageProvider {
 
       const segment = retrieveResult.value;
 
+      // Remove from keyword index BEFORE deleting file
+      if (segment.tags && segment.tags.length > 0) {
+        try {
+          await this.keywordIndex.removeFromIndex(segment.id, segment.tags);
+        } catch (indexError) {
+          console.error(
+            `[Memory:FileBackend] Failed to remove from keyword index: ${(indexError as Error).message}`
+          );
+          // Index update failure should not fail delete operation
+        }
+      }
+
       // Determine file path
       const yearMonth = getYearMonth(segment.timestamp);
       const filePath = join(getPaiDir(), 'mem-store', 'segments', yearMonth, `${id}.md`);
@@ -485,15 +543,24 @@ export class FileBackend implements StorageProvider {
             segmentCount: 0,
             segments: [],
             tags: [],
+            // Retention metadata (Story 1.8)
+            archived: false,
+            consolidatedAt: null,
+            totalSize: 0,
+            lastAccessed: null
           };
         }
 
         const session = registry.sessions[segment.sessionId];
 
+        // Get organized path for segment
+        const organizeResult = await this.organizer.organize(segment);
+        const relativePath = organizeResult.ok ? organizeResult.value : `segments/${getYearMonth(segment.timestamp)}`;
+
         // Add segment metadata
         const segmentMeta = {
           id: segment.id,
-          path: `segments/${getYearMonth(segment.timestamp)}/${segment.id}.md`,
+          path: `${relativePath}/${segment.id}.md`,
           tags: segment.tags,
           timestamp: segment.timestamp,
           importanceScore: segment.importanceScore,
@@ -501,6 +568,10 @@ export class FileBackend implements StorageProvider {
 
         session.segments.push(segmentMeta);
         session.segmentCount++;
+
+        // Update totalSize metadata (estimate based on content length)
+        const segmentSize = Buffer.byteLength(segment.content, 'utf-8');
+        session.totalSize = (session.totalSize || 0) + segmentSize;
 
         // Update tag indexes
         for (const tag of segment.tags) {
@@ -525,6 +596,10 @@ export class FileBackend implements StorageProvider {
         // Remove from session
         const session = registry.sessions[segment.sessionId];
         if (session) {
+          // Update totalSize metadata (decrease by segment size)
+          const segmentSize = Buffer.byteLength(segment.content, 'utf-8');
+          session.totalSize = Math.max(0, (session.totalSize || 0) - segmentSize);
+
           session.segments = session.segments.filter((s: any) => s.id !== segment.id);
           session.segmentCount = session.segments.length;
 

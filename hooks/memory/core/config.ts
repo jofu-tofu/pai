@@ -153,7 +153,7 @@ const DEFAULT_CONFIG: MemoryConfig = {
   retention: {
     shortTermMaxSessions: 50,
     shortTermMaxAgeDays: 30,
-    autoConsolidate: false, // Manual consolidation by default
+    autoConsolidate: true, // Auto-consolidate by default (AC 3)
   },
   performance: {
     maxRetrievalMs: PERFORMANCE_DEFAULTS.MAX_RETRIEVAL_MS,
