@@ -75,7 +75,10 @@ function getPaiDir(): string {
  * Generates the complete settings.json configuration
  */
 function generateSettings(paiDir: string): SettingsJson {
-  const hookPath = (scriptName: string) => `$env:PAI_DIR/hooks/${scriptName}`;
+  const hookPath = (scriptName: string) =>
+    platform() === 'win32'
+      ? `$env:PAI_DIR/hooks/${scriptName}`
+      : `$PAI_DIR/hooks/${scriptName}`;
 
   return {
     model: 'sonnet',
