@@ -1,8 +1,11 @@
 {
   "extends": "../tsconfig",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "types": ["node", "mocha", "chai"],
+    "rootDir": "."
   },
+  "include": ["./**/*"],
   "references": [
     {"path": ".."}
   ]
