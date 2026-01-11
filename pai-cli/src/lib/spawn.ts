@@ -130,11 +130,7 @@ export async function spawnProcess(
     } catch (error) {
       // If command not found and .cmd file exists, use cmd.exe wrapper
       // This avoids DEP0190 deprecation warning while supporting npm-installed commands
-      if (
-        error instanceof ProcessSpawnError &&
-        error.code === 'ENOENT' &&
-        commandExistsInPath(`${command}.cmd`)
-      ) {
+      if (error instanceof ProcessSpawnError && error.code === 'ENOENT' && commandExistsInPath(`${command}.cmd`)) {
         // Use cmd.exe /c to execute .cmd file without shell mode or deprecation warning
         return attemptSpawn('cmd.exe', ['/c', command, ...args], {cwd, stdio, detached, shell: false})
       }
@@ -163,11 +159,7 @@ function commandExistsInPath(command: string): boolean {
 /**
  * Internal helper to attempt process spawn with given options.
  */
-function attemptSpawn(
-  command: string,
-  args: string[],
-  spawnOptions: SpawnOptions,
-): Promise<number> {
+function attemptSpawn(command: string, args: string[], spawnOptions: SpawnOptions): Promise<number> {
   return new Promise((resolve, reject) => {
     try {
       const childProcess: ChildProcess = nodeSpawn(command, args, spawnOptions)
@@ -182,12 +174,7 @@ function attemptSpawn(
             ),
           )
         } else if (error.code === 'EACCES') {
-          reject(
-            new ProcessSpawnError(
-              `Permission denied: ${command}. Check file permissions.`,
-              'EACCES',
-            ),
-          )
+          reject(new ProcessSpawnError(`Permission denied: ${command}. Check file permissions.`, 'EACCES'))
         } else {
           reject(
             new ProcessSpawnError(
@@ -215,11 +202,7 @@ function attemptSpawn(
         childProcess.unref()
       }
     } catch (error) {
-      reject(
-        new ProcessSpawnError(
-          `Spawn error: ${error instanceof Error ? error.message : String(error)}`,
-        ),
-      )
+      reject(new ProcessSpawnError(`Spawn error: ${error instanceof Error ? error.message : String(error)}`))
     }
   })
 }

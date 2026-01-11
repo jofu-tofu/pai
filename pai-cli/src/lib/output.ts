@@ -13,7 +13,7 @@ import {shouldUseColors} from './tty-detection.js'
 // Configure chalk globally based on context
 const useColors = shouldUseColors()
 if (!useColors) {
-  chalk.level = 0  // Disable all ANSI codes
+  chalk.level = 0 // Disable all ANSI codes
 }
 
 /**

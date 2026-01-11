@@ -9,7 +9,8 @@
     "noImplicitOverride": true,
     "exactOptionalPropertyTypes": true,
     "target": "es2022",
-    "moduleResolution": "node16"
+    "moduleResolution": "node16",
+    "composite": true
   },
   "include": ["./src/**/*"],
   "ts-node": {

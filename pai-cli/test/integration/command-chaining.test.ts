@@ -201,9 +201,7 @@ describe('Command Chaining Integration', () => {
     })
 
     it('chains work on current platform', () => {
-      const script = isWindows
-        ? `${binPath} launch --help && echo OK`
-        : `${binPath} launch --help && echo "OK"`
+      const script = isWindows ? `${binPath} launch --help && echo OK` : `${binPath} launch --help && echo "OK"`
 
       const result = execSync(script, {
         encoding: 'utf8',

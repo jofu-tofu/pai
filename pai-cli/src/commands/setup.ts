@@ -65,20 +65,18 @@ export default class SetupCommand extends BaseCommand {
     } catch (error: unknown) {
       // Handle known error types first
       if (error instanceof ConfigNotFoundError) {
-        this.error(
-          'PAI_HOME not found. Set PAI_HOME environment variable or ensure ~/.pai directory exists.',
-          {exit: EXIT_CODES.ENVIRONMENT_ERROR},
-        )
+        this.error('PAI_HOME not found. Set PAI_HOME environment variable or ensure ~/.pai directory exists.', {
+          exit: EXIT_CODES.ENVIRONMENT_ERROR,
+        })
         return // Unreachable due to exit, but explicit for clarity
       }
 
       const err = error as NodeJS.ErrnoException
 
       if (err.code === 'EACCES' || err.code === 'EPERM') {
-        this.error(
-          'Permission denied creating symlink. On Windows, enable Developer Mode or run as administrator.',
-          {exit: EXIT_CODES.ENVIRONMENT_ERROR},
-        )
+        this.error('Permission denied creating symlink. On Windows, enable Developer Mode or run as administrator.', {
+          exit: EXIT_CODES.ENVIRONMENT_ERROR,
+        })
         return // Unreachable due to exit, but explicit for clarity
       }
 

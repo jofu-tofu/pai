@@ -29,9 +29,7 @@ export function getPaiHome(): string {
  */
 export function validatePaiHome(paiHome: string): void {
   if (!existsSync(paiHome)) {
-    throw new ConfigNotFoundError(
-      `PAI_HOME not found at ${paiHome}. Run 'pai setup' or set PAI_HOME env var.`
-    )
+    throw new ConfigNotFoundError(`PAI_HOME not found at ${paiHome}. Run 'pai setup' or set PAI_HOME env var.`)
   }
 }
 

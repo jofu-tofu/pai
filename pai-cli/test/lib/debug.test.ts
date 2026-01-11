@@ -111,7 +111,10 @@ describe('debug', () => {
       setDebugEnabled(true)
       debugConfig({paiHome: '/home/user/.pai', secretApiKey: 'should-not-appear'})
       expect(stderrStub.called).to.be.true
-      const allOutput = stderrStub.getCalls().map((call) => call.args[0]).join('')
+      const allOutput = stderrStub
+        .getCalls()
+        .map((call) => call.args[0])
+        .join('')
       // Should log PAI_HOME
       expect(allOutput).to.include('/home/user/.pai')
       // Should NOT log other config properties (security fix)
@@ -151,7 +154,10 @@ describe('debug', () => {
       setDebugEnabled(true)
       debugVersion()
       expect(stderrStub.called).to.be.true
-      const allOutput = stderrStub.getCalls().map(call => call.args[0]).join('')
+      const allOutput = stderrStub
+        .getCalls()
+        .map((call) => call.args[0])
+        .join('')
       expect(allOutput).to.include('Node.js')
       expect(allOutput).to.include(process.version)
     })
@@ -165,7 +171,10 @@ describe('debug', () => {
     it('should log platform information', () => {
       setDebugEnabled(true)
       debugVersion()
-      const allOutput = stderrStub.getCalls().map(call => call.args[0]).join('')
+      const allOutput = stderrStub
+        .getCalls()
+        .map((call) => call.args[0])
+        .join('')
       expect(allOutput).to.include('Platform')
       expect(allOutput).to.include(process.platform)
     })

@@ -136,7 +136,7 @@ describe('Exit Code Consistency', () => {
           execSync(`${bin} ${cmd} --invalid`, {encoding: 'utf8'})
           expect.fail(`${cmd} should have thrown`)
         } catch (error: unknown) {
-        const err = error as {status: number; stderr: Buffer}
+          const err = error as {status: number; stderr: Buffer}
           // Oclif exits with 2 for invalid usage
           expect(err.status).to.equal(2, `${cmd} should return exit code 2`)
         }

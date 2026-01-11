@@ -24,10 +24,7 @@ export function createSpinner(text: string, flags?: {quiet?: boolean}): Ora {
  * Helper for common "loading" operations with spinner.
  * Automatically handles success/failure and cleanup.
  */
-export async function withSpinner<T>(
-  text: string,
-  operation: () => Promise<T>,
-): Promise<T> {
+export async function withSpinner<T>(text: string, operation: () => Promise<T>): Promise<T> {
   const spinner = createSpinner(text).start()
 
   try {

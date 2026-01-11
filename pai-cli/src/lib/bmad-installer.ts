@@ -111,9 +111,7 @@ export async function installBmad(config: BmadInstallConfig): Promise<void> {
   try {
     await fs.access(templateBmadPath)
   } catch {
-    throw new Error(
-      `BMAD template not found at ${templateBmadPath}. Please ensure PAI CLI is properly set up.`
-    )
+    throw new Error(`BMAD template not found at ${templateBmadPath}. Please ensure PAI CLI is properly set up.`)
   }
 
   const bmadPath = join(targetDir, '_bmad')

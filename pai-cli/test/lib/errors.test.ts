@@ -89,7 +89,7 @@ describe('errors', () => {
     })
 
     it('preserves custom message', () => {
-      const message = 'Invalid --format value \'xyz\'. Use \'json\' or \'text\'.'
+      const message = "Invalid --format value 'xyz'. Use 'json' or 'text'."
       const error = new InvalidUsageError(message)
       expect(error.message).to.equal(message)
     })
@@ -131,10 +131,7 @@ describe('errors', () => {
 
   describe('formatErrorMessage', () => {
     it('formats message with period separation', () => {
-      const result = formatErrorMessage(
-        'PAI_HOME directory not found',
-        'Set PAI_HOME env var or run "pai setup"',
-      )
+      const result = formatErrorMessage('PAI_HOME directory not found', 'Set PAI_HOME env var or run "pai setup"')
       expect(result).to.equal('PAI_HOME directory not found. Set PAI_HOME env var or run "pai setup".')
     })
 
@@ -144,19 +141,13 @@ describe('errors', () => {
     })
 
     it('preserves special characters', () => {
-      const result = formatErrorMessage(
-        'Invalid value "xyz"',
-        'Use --format=json',
-      )
+      const result = formatErrorMessage('Invalid value "xyz"', 'Use --format=json')
       expect(result).to.equal('Invalid value "xyz". Use --format=json.')
     })
 
     it('handles single quotes in messages', () => {
-      const result = formatErrorMessage(
-        'Config file not found',
-        'Run \'pai setup\' to configure',
-      )
-      expect(result).to.equal('Config file not found. Run \'pai setup\' to configure.')
+      const result = formatErrorMessage('Config file not found', "Run 'pai setup' to configure")
+      expect(result).to.equal("Config file not found. Run 'pai setup' to configure.")
     })
   })
 })

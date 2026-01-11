@@ -20,7 +20,6 @@ export async function detectExistingInstallation(targetDir: string): Promise<boo
   }
 }
 
-
 /**
  * Detect if current directory is a git repository.
  * Checks for .git directory existence.

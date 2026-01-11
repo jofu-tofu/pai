@@ -169,7 +169,7 @@ describe('TTY Detection', () => {
       const originalIsTTY = process.stdout.isTTY
       // @ts-ignore - Mocking read-only property for testing
       process.stdout.isTTY = true
-      expect(shouldShowSpinners({ quiet: true })).to.be.false
+      expect(shouldShowSpinners({quiet: true})).to.be.false
       // @ts-ignore - Restoring property
       process.stdout.isTTY = originalIsTTY
     })
@@ -177,11 +177,11 @@ describe('TTY Detection', () => {
 
   describe('isQuietMode()', () => {
     it('returns true when quiet flag is set', () => {
-      expect(isQuietMode({ quiet: true })).to.be.true
+      expect(isQuietMode({quiet: true})).to.be.true
     })
 
     it('returns false when quiet flag is false', () => {
-      expect(isQuietMode({ quiet: false })).to.be.false
+      expect(isQuietMode({quiet: false})).to.be.false
     })
 
     it('returns false when quiet flag is not provided', () => {

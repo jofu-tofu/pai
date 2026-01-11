@@ -22,11 +22,18 @@ describe('Epic 2: Zero-Friction Claude Code Launch - Integration Validation', ()
 
     // Create test settings.json in test PAI_HOME
     const settingsPath = join(testClaudeDir, 'settings.json')
-    writeFileSync(settingsPath, JSON.stringify({
-      'claude-code.statusLine.show': 'pai-statusline',
-      'claude-code.statusLine.command': 'powershell.exe',
-      'claude-code.statusLine.args': ['-NoProfile', '-File', join(testPaiHome, 'scripts', 'statusline.ps1')],
-    }, null, 2))
+    writeFileSync(
+      settingsPath,
+      JSON.stringify(
+        {
+          'claude-code.statusLine.show': 'pai-statusline',
+          'claude-code.statusLine.command': 'powershell.exe',
+          'claude-code.statusLine.args': ['-NoProfile', '-File', join(testPaiHome, 'scripts', 'statusline.ps1')],
+        },
+        null,
+        2,
+      ),
+    )
 
     process.env.PAI_HOME = testPaiHome
   })

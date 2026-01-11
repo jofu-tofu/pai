@@ -20,9 +20,7 @@ import {Command} from '@oclif/core'
  */
 export default class Init extends Command {
   static override description = 'Initialize tools and integrations in your project'
-  static override examples = [
-    '<%= config.bin %> <%= command.id %> bmad',
-  ]
+  static override examples = ['<%= config.bin %> <%= command.id %> bmad']
 
   async run(): Promise<void> {
     await this.parse(Init)
