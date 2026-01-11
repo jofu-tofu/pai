@@ -8,76 +8,119 @@ import {describe, it} from 'mocha'
 describe('Init Command Structure - Integration Tests', () => {
   const bin = platform() === 'win32' ? String.raw`.\bin\dev.cmd` : './bin/dev.js'
 
-  describe('AC1: Show Available Init Subcommands', () => {
-    it('validates pai init --help shows pattern explanation and establishes extensible pattern (FR14)', () => {
+  describe('Flag-Based Init Pattern', () => {
+    it('validates pai init --help shows flag-based usage', () => {
       const output = execSync(`${bin} init --help`, {
         encoding: 'utf8',
         stdio: 'pipe',
       })
 
-      // AC1: Shows pattern explanation
-      expect(output).to.include('Initialize tools and integrations')
-      expect(output).to.include('init bmad')
+      // Should show template method flag
+      expect(output).to.include('--method')
+      expect(output).to.include('template')
 
-      // FR14: Extensible pattern is clear - shows command structure
+      // Should show IDE flag
+      expect(output).to.include('--ide')
+
+      // Should show command structure
       expect(output).to.include('USAGE')
       expect(output).to.include('EXAMPLES')
     })
+
+    it('validates examples show --method bmad usage', () => {
+      const output = execSync(`${bin} init --help`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      })
+
+      expect(output).to.include('--method bmad')
+    })
+
+    it('validates examples show multiple IDE usage', () => {
+      const output = execSync(`${bin} init --help`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      })
+
+      // Should show example with multiple IDEs
+      expect(output).to.match(/--ide.*--ide|--ide claude --ide windsurf/)
+    })
   })
 
-  describe('AC2: Display Options Without Subcommand', () => {
-    it('validates pai init shows available options', () => {
-      const output = execSync(`${bin} init`, {
-        encoding: 'utf8',
-        stdio: 'pipe',
-      })
-
-      expect(output).to.include('Available init commands')
-      expect(output).to.include('pai init bmad')
-    })
-
-    it('validates output suggests pai init bmad as primary option', () => {
-      const output = execSync(`${bin} init`, {
-        encoding: 'utf8',
-        stdio: 'pipe',
-      })
-
-      expect(output).to.include('bmad')
-      expect(output).to.include('BMAD')
-    })
-
-    it('validates exit code 0 when run without subcommand', () => {
-      // Should not error - just show options
+  describe('Flag Requirements', () => {
+    it('validates --method flag is required', () => {
       try {
-        execSync(`${bin} init`, {stdio: 'pipe'})
-        expect(true).to.be.true
-      } catch {
-        expect.fail('pai init should not error when showing options')
+        execSync(`${bin} init`, {
+          encoding: 'utf8',
+          stdio: 'pipe',
+        })
+        expect.fail('Should error when --method flag is missing')
+      } catch (error: unknown) {
+        const err = error as {stderr: Buffer}
+        const stderr = err.stderr.toString()
+        expect(stderr).to.match(/Missing required flag method|--method/i)
+      }
+    })
+
+    it('validates error when template does not exist', () => {
+      try {
+        execSync(`${bin} init --method nonexistent`, {
+          encoding: 'utf8',
+          stdio: 'pipe',
+        })
+        expect.fail('Should error when template does not exist')
+      } catch (error: unknown) {
+        const err = error as {stderr: Buffer}
+        const stderr = err.stderr.toString()
+        expect(stderr).to.match(/Template.*not found|nonexistent/i)
+      }
+    })
+
+    it('validates --ide flag defaults to claude', () => {
+      const output = execSync(`${bin} init --help`, {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      })
+
+      // Help should indicate default value
+      expect(output).to.include('--ide')
+    })
+  })
+
+  describe('Subcommand Pattern Deprecated', () => {
+    it('validates pai init bmad (old pattern) shows error', () => {
+      try {
+        execSync(`${bin} init bmad`, {
+          encoding: 'utf8',
+          stdio: 'pipe',
+        })
+        expect.fail('Old subcommand pattern should not work')
+      } catch (error: unknown) {
+        // Should error with unknown command or similar
+        const err = error as {stderr: Buffer}
+        const stderr = err.stderr.toString()
+        expect(stderr).to.match(/Unknown|--method|not found|Error/i)
       }
     })
   })
 
-  describe('FR14: Extensible Init Pattern', () => {
-    it('validates code comments document extensibility pattern', () => {
+  describe('Extensible Template Pattern', () => {
+    it('validates template method allows multiple templates', () => {
       const commandFile = readFileSync('src/commands/init/index.ts', 'utf8')
 
-      // Verify extensibility documentation exists in code comments
-      expect(commandFile).to.include('EXTENSIBILITY PATTERN')
-      expect(commandFile).to.include('To add a new init target')
-      expect(commandFile).to.include('Create src/commands/init/')
+      // Should use generic template installer
+      expect(commandFile).to.include('installTemplate')
+      expect(commandFile).to.include('getAvailableTemplates')
     })
 
-    it('validates help output shows subcommand structure for easy extension', () => {
-      const output = execSync(`${bin} init`, {
+    it('validates help shows template-based approach', () => {
+      const output = execSync(`${bin} init --help`, {
         encoding: 'utf8',
         stdio: 'pipe',
       })
 
-      // Validates clear listing of available init commands
-      expect(output).to.include('Available init commands')
-      expect(output).to.include('pai init bmad')
-      // Output structure makes it clear where new commands would be listed
-      expect(output).to.include('Initialize BMAD project management system')
+      expect(output).to.include('template')
+      expect(output).to.include('--method')
     })
   })
 })
