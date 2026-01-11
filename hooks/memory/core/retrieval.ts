@@ -1,5 +1,7 @@
 import { Result } from '../types/common';
 import { KeywordSearch } from '../providers/search/keyword-search';
+import { applyFilters } from './filters';
+import { FilterOptions } from '../types/filters';
 
 /**
  * Memory context item returned by retrieval pipeline
@@ -19,6 +21,7 @@ export interface RetrievalOptions {
   maxResults?: number;      // Maximum number of memories to return
   maxTokens?: number;        // Maximum total tokens in results
   minRelevance?: number;     // Minimum relevance score (0-100)
+  filters?: FilterOptions;   // Filter options (Story 2.3)
 }
 
 /**
@@ -59,15 +62,15 @@ async function getSearchProvider(): Promise<Result<KeywordSearch, RetrievalError
 }
 
 /**
- * Retrieval Pipeline - Now with keyword search
+ * Retrieval Pipeline - Now with keyword search and filtering
  *
  * Story 2.2: ✅ Keyword search from inverted index
- * Stories 2.3-2.5 will add:
- * - Story 2.3: Filter by tags, recency, importance
+ * Story 2.3: ✅ Filter by tags, recency, importance, access count
+ * Stories 2.4-2.5 will add:
  * - Story 2.4: Rank by relevance score
  * - Story 2.5: Format for context injection and load full content
  *
- * For Story 2.2, this returns search results from keyword index.
+ * For Stories 2.2-2.3, this returns filtered search results with metadata.
  * Full memory context loading will be implemented in Story 2.5.
  *
  * @param query - User's search query text
@@ -89,7 +92,7 @@ export async function retrieveMemories(
 
     // Execute keyword search
     const searchResult = await provider.search(query, {
-      maxResults: options?.maxResults || 10,
+      maxResults: options?.maxResults || 100, // Increase for filtering
       minMatchCount: 1  // At least one term must match
     });
 
@@ -104,15 +107,32 @@ export async function retrieveMemories(
       };
     }
 
-    // For Story 2.2 (Stories 2.3-2.5 pending), return empty results
-    // Story 2.3 will add filtering, Story 2.4 ranking, Story 2.5 content loading
-    console.error(
-      `[Memory:Retrieval] Keyword search found ${searchResult.value.length} candidates (filtering/ranking/content-loading pending Story 2.3-2.5)`
+    // Apply filters to search results (Story 2.3)
+    const filterResult = await applyFilters(
+      searchResult.value,
+      options?.filters
     );
 
+    if (!filterResult.ok) {
+      return {
+        ok: false,
+        error: {
+          code: 'RETRIEVAL_FILTER_FAILED',
+          message: filterResult.error.message,
+          cause: filterResult.error.cause
+        }
+      };
+    }
+
+    console.error(
+      `[Memory:Retrieval] Filtered to ${filterResult.value.length} candidates (ranking/content loading pending Story 2.4-2.5)`
+    );
+
+    // Story 2.4 will add ranking here
+    // Story 2.5 will add content loading and formatting
     return {
       ok: true,
-      value: []  // Still return empty until Stories 2.3-2.5 implement full pipeline
+      value: []  // Still return empty until Stories 2.4-2.5
     };
 
   } catch (error) {
