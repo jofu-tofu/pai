@@ -69,36 +69,7 @@ Merge the hooks from `.pai/.claude/settings.json` into your `~/.claude/settings.
 bun run scripts/setup.ts doctor
 ```
 
-## PAI CLI Installation
-
-The PAI CLI provides a convenient command-line interface for managing your PAI infrastructure.
-
-**Install globally:**
-
-```bash
-cd ~/.pai/pai-cli  # or C:\Users\YOUR_USERNAME\.pai\pai-cli on Windows
-npm install        # Install dependencies
-npm run build      # Build the CLI
-npm install -g .   # Install globally
-```
-
-**Usage:**
-
-```bash
-pai launch         # Launch Claude Code with PAI context
-pai init bmad      # Initialize BMAD workflow in current project
-pai --help         # See all available commands
-```
-
-**Alternative - Run without global install:**
-
-```bash
-cd ~/.pai/pai-cli
-./bin/run.js launch   # Unix/Mac
-.\bin\run.cmd launch  # Windows
-```
-
-## Setup Scripts (Legacy)
+## Setup Scripts
 
 | Command | Description |
 |---------|-------------|

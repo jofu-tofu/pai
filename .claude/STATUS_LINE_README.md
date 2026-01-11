@@ -250,6 +250,5 @@ Parses to: `powershell -Command "& \"$env:VAR\""`
 
 - **Script Implementation:** `scripts/statusline.ps1`
 - **Hook Configuration:** `scripts/setup-hooks.ts` creates settings.json
-- **Launch Command:** `pai launch` command launches Claude Code
 - **Git Commit:** f8dcc82 (Jan 9, 2026) - Statusline refactoring
 - **Syntax Fix:** (Jan 10, 2026) - Fixed PowerShell variable expansion with `-Command` and proper quoting
