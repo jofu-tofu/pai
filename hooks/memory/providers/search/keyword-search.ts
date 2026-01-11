@@ -9,8 +9,8 @@ import { SearchProvider, SearchOptions, SearchResult, SearchError } from './inte
 import { Result, HealthStatus } from '../../types/common';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import { homedir } from 'os';
 import { DEFAULT_STOP_WORDS } from '../../lib/stop-words';
+import { getPaiDir } from '../../lib/utils';
 
 /**
  * Type definition for the inverted index
@@ -33,16 +33,9 @@ export class KeywordSearch implements SearchProvider {
   private stopWords: Set<string>;
 
   constructor(options?: { paiDir?: string; customStopWords?: Set<string> }) {
-    const paiDir = options?.paiDir || this.getPaiDir();
+    const paiDir = options?.paiDir || getPaiDir();
     this.indexPath = join(paiDir, 'mem-store', 'indexes', 'keyword', 'index.json');
     this.stopWords = options?.customStopWords || DEFAULT_STOP_WORDS;
-  }
-
-  /**
-   * Get PAI directory from environment or default
-   */
-  private getPaiDir(): string {
-    return process.env.PAI_DIR || join(homedir(), '.pai');
   }
 
   /**

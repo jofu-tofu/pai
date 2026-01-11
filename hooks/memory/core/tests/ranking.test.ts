@@ -29,6 +29,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_001',
           matchCount: 3,
           matchedTerms: ['typescript', 'hook', 'error'], // 3 matched terms
+          totalQueryTerms: 4, // Query had 4 terms total
           metadata: {
             id: 'seg_001',
             sessionId: 'mem_001',
@@ -44,6 +45,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_002',
           matchCount: 2,
           matchedTerms: ['typescript', 'hook'], // 2 matched terms
+          totalQueryTerms: 4, // Query had 4 terms total
           metadata: {
             id: 'seg_002',
             sessionId: 'mem_001',
@@ -63,11 +65,10 @@ describe('Ranking Pipeline', () => {
 
       expect(result.ok).toBe(true);
       if (result.ok) {
-        // seg_001 has 3 matched terms (3/5 = 60%), seg_002 has 2 matched terms (2/5 = 40%)
-        // Scoring uses saturation at 5 terms
+        // seg_001: 3 of 4 terms = 75%, seg_002: 2 of 4 terms = 50% (per AC)
         expect(result.value[0].segmentId).toBe('seg_001'); // Higher match count ranks first
-        expect(result.value[0].componentScores.termMatch).toBe(60);
-        expect(result.value[1].componentScores.termMatch).toBe(40);
+        expect(result.value[0].componentScores.termMatch).toBe(75);
+        expect(result.value[1].componentScores.termMatch).toBe(50);
       }
     });
   });
@@ -80,6 +81,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_recent',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_recent',
             sessionId: 'mem_001',
@@ -95,6 +97,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_old',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_old',
             sessionId: 'mem_001',
@@ -128,6 +131,7 @@ describe('Ranking Pipeline', () => {
         segmentId: 'seg_halflife',
         matchCount: 1,
         matchedTerms: ['test'],
+          totalQueryTerms: 4,
         metadata: {
           id: 'seg_halflife',
           sessionId: 'mem_001',
@@ -159,6 +163,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_high',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_high',
             sessionId: 'mem_001',
@@ -174,6 +179,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_low',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_low',
             sessionId: 'mem_001',
@@ -209,6 +215,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_popular',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_popular',
             sessionId: 'mem_001',
@@ -224,6 +231,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_rare',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_rare',
             sessionId: 'mem_001',
@@ -256,6 +264,7 @@ describe('Ranking Pipeline', () => {
         segmentId: 'seg_saturated',
         matchCount: 1,
         matchedTerms: ['test'],
+          totalQueryTerms: 4,
         metadata: {
           id: 'seg_saturated',
           sessionId: 'mem_001',
@@ -286,6 +295,8 @@ describe('Ranking Pipeline', () => {
         segmentId: 'seg_combined',
         matchCount: 3,
         matchedTerms: ['typescript', 'hook', 'error'],
+          totalQueryTerms: 4,
+        totalQueryTerms: 4, // Query had 4 terms
         metadata: {
           id: 'seg_combined',
           sessionId: 'mem_001',
@@ -304,8 +315,8 @@ describe('Ranking Pipeline', () => {
       if (result.ok) {
         const ranked = result.value[0];
 
-        // Term match: 3/5 = 0.6 → 60%
-        expect(ranked.componentScores.termMatch).toBeCloseTo(60, 0);
+        // Term match: 3 of 4 terms = 0.75 → 75% (per AC)
+        expect(ranked.componentScores.termMatch).toBe(75);
 
         // Recency: 7 days with 14-day half-life ≈ 70.7%
         expect(ranked.componentScores.recency).toBeCloseTo(70.7, 0);
@@ -316,9 +327,9 @@ describe('Ranking Pipeline', () => {
         // Access: 10/20 = 50%
         expect(ranked.componentScores.access).toBe(50);
 
-        // Final: 0.40*60 + 0.30*70.7 + 0.20*60 + 0.10*50
-        //      = 24 + 21.21 + 12 + 5 = 62.21
-        expect(ranked.relevanceScore).toBeCloseTo(62.21, 0);
+        // Final: 0.40*75 + 0.30*70.7 + 0.20*60 + 0.10*50
+        //      = 30 + 21.21 + 12 + 5 = 68.21
+        expect(ranked.relevanceScore).toBeCloseTo(68.21, 0);
       }
     });
   });
@@ -331,6 +342,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_low',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_low',
             sessionId: 'mem_001',
@@ -346,6 +358,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_high',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_high',
             sessionId: 'mem_001',
@@ -361,6 +374,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_medium',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_medium',
             sessionId: 'mem_001',
@@ -393,6 +407,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_old',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_old',
             sessionId: 'mem_001',
@@ -408,6 +423,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_new',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_new',
             sessionId: 'mem_001',
@@ -441,6 +457,7 @@ describe('Ranking Pipeline', () => {
         segmentId: `seg_${i}`,
         matchCount: 1,
         matchedTerms: ['test'],
+          totalQueryTerms: 4,
         metadata: {
           id: `seg_${i}`,
           sessionId: 'mem_001',
@@ -468,6 +485,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_high',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_high',
             sessionId: 'mem_001',
@@ -483,6 +501,7 @@ describe('Ranking Pipeline', () => {
           segmentId: 'seg_low',
           matchCount: 1,
           matchedTerms: ['test'],
+          totalQueryTerms: 4,
           metadata: {
             id: 'seg_low',
             sessionId: 'mem_001',
@@ -514,6 +533,7 @@ describe('Ranking Pipeline', () => {
         segmentId: `seg_${i}`,
         matchCount: 1,
         matchedTerms: ['test'],
+          totalQueryTerms: 4,
         metadata: {
           id: `seg_${i}`,
           sessionId: 'mem_001',
@@ -551,6 +571,7 @@ describe('Ranking Pipeline', () => {
         segmentId: 'seg_only',
         matchCount: 1,
         matchedTerms: ['test'],
+          totalQueryTerms: 4,
         metadata: {
           id: 'seg_only',
           sessionId: 'mem_001',
@@ -579,6 +600,7 @@ describe('Ranking Pipeline', () => {
         segmentId: 'seg_missing',
         matchCount: 1,
         matchedTerms: ['test'],
+          totalQueryTerms: 4,
         metadata: {
           id: 'seg_missing',
           sessionId: 'mem_001',
@@ -608,6 +630,7 @@ describe('Ranking Pipeline', () => {
         segmentId: `seg_${i}`,
         matchCount: Math.floor(Math.random() * 5) + 1,
         matchedTerms: ['test'],
+          totalQueryTerms: 4,
         metadata: {
           id: `seg_${i}`,
           sessionId: 'mem_001',
@@ -636,6 +659,7 @@ describe('Ranking Pipeline', () => {
         segmentId: 'seg_custom',
         matchCount: 1,
         matchedTerms: ['test'],
+          totalQueryTerms: 4,
         metadata: {
           id: 'seg_custom',
           sessionId: 'mem_001',

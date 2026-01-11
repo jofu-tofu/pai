@@ -101,7 +101,7 @@ export async function rankResults(
       const components: ScoringComponents = {
         termMatchScore: calculateTermMatchScore(
           result.matchCount,
-          result.matchedTerms.length
+          result.totalQueryTerms
         ),
         recencyScore: calculateRecencyScore(
           result.metadata.timestamp,

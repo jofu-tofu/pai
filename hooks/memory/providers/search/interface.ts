@@ -45,6 +45,9 @@ export interface SearchResult {
 
   /** List of terms that matched */
   matchedTerms: string[];
+
+  /** Total number of terms in the original query (for percentage calculation) */
+  totalQueryTerms: number;
 }
 
 /**
