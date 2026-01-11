@@ -60,7 +60,7 @@ User: "Add a new command to PAI CLI"
 ## Quick Reference
 
 **Installation:** `npm install -g .` from `~/.pai/pai-cli`
-**Primary Commands:** `pai launch`, `pai setup`, `pai init bmad`
+**Primary Commands:** `pai launch`, `pai init bmad`
 **Global Flags:** `--quiet`, `--debug`, `--help`
 **Exit Codes:** 0=success, 1=error, 2=invalid usage, 3=environment error
 

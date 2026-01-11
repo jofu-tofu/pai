@@ -27,10 +27,10 @@ These are features that exist in the Claude Code environment but cannot be autom
 - **Behavior:** Hooks execute in response to events, providing feedback visible to Claude Code
 - **AI Action:** Treat hook feedback as user input; respond to blocked actions by adjusting approach
 
-#### Sandbox Permissions
-- **Setup:** `pai setup` creates symlinks to enable sandbox access
-- **Purpose:** Allow Claude Code to read PAI configuration without manual approval
-- **AI Action:** If PAI config is inaccessible, suggest `pai setup`
+#### Settings Configuration
+- **Location:** Claude Code reads `.claude/settings.json` from the current working directory
+- **Behavior:** Hooks only active when working in a directory with settings.json
+- **AI Action:** If user wants PAI hooks active, they should work within the PAI System directory
 
 #### TTY Detection
 - **Behavior:** PAI CLI auto-adjusts output (colors, spinners) based on terminal type
@@ -46,7 +46,7 @@ These are features that exist in the Claude Code environment but cannot be autom
 - **AI Action:** If version warnings appear, suggest upgrading Claude Code
 
 #### Environment Variables
-- `PAI_HOME` - Override default `~/.pai` location
+- `PAI_DIR` - Override default `~/.pai` location
 - `NO_COLOR` - Disable colored output
 - `FORCE_COLOR` - Force colors in non-TTY environments
 - **AI Action:** Recognize these in debug output; suggest settings when appropriate
@@ -108,10 +108,10 @@ PAI CLI uses standardized codes for automation:
 ### 7. Autonomous Decision Making
 
 **Use PAI CLI knowledge to:**
-- Suggest `pai setup` when sandbox permissions are needed
 - Recommend `pai launch` over manual `claude` invocation for PAI users
 - Debug version compatibility issues
 - Understand why hooks might be blocking actions
+- Explain that hooks are directory-specific (via .claude/settings.json)
 
 **Don't:**
 - Over-explain PAI CLI's existence (users already know they're using it)

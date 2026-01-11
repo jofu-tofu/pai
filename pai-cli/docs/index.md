@@ -33,9 +33,8 @@ This is the comprehensive documentation for PAI CLI, a command-line interface fo
 ### Core Commands
 
 1. **`pai launch`** - Launch Claude Code with PAI configuration
-2. **`pai setup`** - Setup symlinks and sandbox permissions
-3. **`pai init`** - Initialize new projects
-4. **`pai init bmad`** - Install BMAD methodology framework
+2. **`pai init`** - Initialize new projects
+3. **`pai init bmad`** - Install BMAD methodology framework
 
 ### Key Technologies
 
@@ -78,7 +77,6 @@ Comprehensive project summary including:
 ### Command Dependencies
 Detailed breakdown of what each command depends on and how they work:
 - `pai launch` - Core launch mechanism and dependencies
-- `pai setup` - Symlink setup and permissions
 - `pai init` - Project initialization system
 - `pai init bmad` - BMAD methodology installer
 
