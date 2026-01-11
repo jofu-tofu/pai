@@ -79,6 +79,9 @@ export interface HealthStatus {
 
   /** Human-readable status message */
   message: string;
+
+  /** Optional provider-specific diagnostic details */
+  details?: Record<string, unknown>;
 }
 
 /**
