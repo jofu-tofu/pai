@@ -25,3 +25,11 @@ export type {
   SessionMetadata,
   SessionTranscript
 } from './segment';
+
+// Re-export all types from filters
+export type {
+  FilterOptions,
+  SegmentMetadata,
+  FilterResult,
+  FilterError
+} from './filters';
