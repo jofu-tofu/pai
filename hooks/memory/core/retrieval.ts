@@ -1,7 +1,9 @@
 import { Result } from '../types/common';
 import { KeywordSearch } from '../providers/search/keyword-search';
 import { applyFilters } from './filters';
+import { rankResults } from './ranking';
 import { FilterOptions } from '../types/filters';
+import { RankingOptions, RankedResult } from '../types/ranking';
 
 /**
  * Memory context item returned by retrieval pipeline
@@ -22,6 +24,7 @@ export interface RetrievalOptions {
   maxTokens?: number;        // Maximum total tokens in results
   minRelevance?: number;     // Minimum relevance score (0-100)
   filters?: FilterOptions;   // Filter options (Story 2.3)
+  ranking?: RankingOptions;  // Ranking options (Story 2.4)
 }
 
 /**
@@ -62,25 +65,25 @@ async function getSearchProvider(): Promise<Result<KeywordSearch, RetrievalError
 }
 
 /**
- * Retrieval Pipeline - Now with keyword search and filtering
+ * Retrieval Pipeline - Now with keyword search, filtering, and ranking
  *
  * Story 2.2: ✅ Keyword search from inverted index
  * Story 2.3: ✅ Filter by tags, recency, importance, access count
- * Stories 2.4-2.5 will add:
- * - Story 2.4: Rank by relevance score
+ * Story 2.4: ✅ Rank by relevance score (multi-factor scoring)
+ * Story 2.5 will add:
  * - Story 2.5: Format for context injection and load full content
  *
- * For Stories 2.2-2.3, this returns filtered search results with metadata.
+ * For Stories 2.2-2.4, this returns ranked search results with metadata.
  * Full memory context loading will be implemented in Story 2.5.
  *
  * @param query - User's search query text
  * @param options - Optional configuration for retrieval behavior
- * @returns Result containing array of MemoryContext items (empty until Story 2.5)
+ * @returns Result containing array of ranked results (Story 2.4+)
  */
 export async function retrieveMemories(
   query: string,
   options?: RetrievalOptions
-): Promise<Result<MemoryContext[], RetrievalError>> {
+): Promise<Result<RankedResult[], RetrievalError>> {
   try {
     // Get search provider (now returns Result)
     const providerResult = await getSearchProvider();
@@ -125,14 +128,38 @@ export async function retrieveMemories(
     }
 
     console.error(
-      `[Memory:Retrieval] Filtered to ${filterResult.value.length} candidates (ranking/content loading pending Story 2.4-2.5)`
+      `[Memory:Retrieval] Filtered to ${filterResult.value.length} candidates`
     );
 
-    // Story 2.4 will add ranking here
+    // Story 2.4: Rank results by relevance
+    const rankingResult = await rankResults(
+      filterResult.value,
+      {
+        limit: options?.maxResults || 10,
+        minScore: options?.minRelevance || 0,
+        ...options?.ranking
+      }
+    );
+
+    if (!rankingResult.ok) {
+      return {
+        ok: false,
+        error: {
+          code: 'RETRIEVAL_RANKING_FAILED',
+          message: rankingResult.error.message,
+          cause: rankingResult.error.cause
+        }
+      };
+    }
+
+    console.error(
+      `[Memory:Retrieval] Ranked to top ${rankingResult.value.length} results`
+    );
+
     // Story 2.5 will add content loading and formatting
     return {
       ok: true,
-      value: []  // Still return empty until Stories 2.4-2.5
+      value: rankingResult.value
     };
 
   } catch (error) {
