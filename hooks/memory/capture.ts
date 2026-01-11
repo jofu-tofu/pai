@@ -15,6 +15,7 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { generateSessionId } from './lib/id-generator';
 import { isProcessorRunning } from './lib/lock';
+import { getMemoryConfig } from './core/config';
 
 // Constants
 const STALE_LOCK_TIMEOUT_MS = 60000; // 60 seconds
@@ -76,7 +77,30 @@ async function main() {
   const startTime = Date.now();
 
   try {
-    // Read session payload from stdin
+    // LEVEL 1: Check if memory system is globally enabled
+    const configResult = await getMemoryConfig();
+
+    if (!configResult.ok) {
+      console.error(`[Memory:Capture] Failed to load config: ${configResult.error.message}`);
+      console.error('[Memory:Capture] Using defaults, assuming enabled');
+      // Graceful degradation - continue with defaults
+    } else {
+      const config = configResult.value;
+
+      // LEVEL 1: Global toggle check
+      if (!config.enabled) {
+        console.error('[Memory:Capture] Memory system disabled, exiting');
+        process.exit(0);  // No-op, zero overhead
+      }
+
+      // LEVEL 2: Hook-specific toggle check (Story 3.3)
+      if (!config.hooks.sessionEnd) {
+        console.error('[Memory:Capture] SessionEnd hook disabled, exiting');
+        process.exit(0);  // No-op, zero overhead
+      }
+    }
+
+    // THEN: Read session payload from stdin
     const input = await readStdin();
     if (!input.trim()) {
       // Empty input - graceful no-op

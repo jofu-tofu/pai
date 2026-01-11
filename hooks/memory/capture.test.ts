@@ -9,9 +9,36 @@ import { spawn } from 'bun';
 const TEST_PAI_DIR = join(homedir(), `.pai-test-capture-${process.pid}`);
 const HOOK_PATH = join(process.cwd(), 'hooks', 'memory', 'capture.ts');
 
+/**
+ * Helper: Create default settings.json for tests (Stories 3.2/3.3)
+ */
+function createDefaultSettings() {
+  const settingsDir = join(TEST_PAI_DIR, '.claude');
+  mkdirSync(settingsDir, { recursive: true });
+
+  const settings = {
+    memory: {
+      enabled: true,
+      hooks: {
+        sessionEnd: true,
+        userPromptSubmit: true,
+        sessionStart: false,
+      },
+    },
+  };
+
+  fs.writeFile(
+    join(settingsDir, 'settings.json'),
+    JSON.stringify(settings, null, 2),
+    'utf-8'
+  );
+}
+
 describe('capture.ts hook', () => {
-  beforeAll(() => {
+  beforeAll(async () => {
     mkdirSync(TEST_PAI_DIR, { recursive: true });
+    // Create default settings for Stories 3.2/3.3 config checks
+    await createDefaultSettings();
   });
 
   afterAll(() => {
@@ -226,6 +253,20 @@ describe('capture.ts hook', () => {
 
   test('should use PAI_DIR environment variable', async () => {
     const customPaiDir = join(TEST_PAI_DIR, 'custom-pai');
+
+    // Create settings.json in custom PAI dir
+    const customSettingsDir = join(customPaiDir, '.claude');
+    mkdirSync(customSettingsDir, { recursive: true });
+    await fs.writeFile(
+      join(customSettingsDir, 'settings.json'),
+      JSON.stringify({
+        memory: {
+          enabled: true,
+          hooks: { sessionEnd: true, userPromptSubmit: true, sessionStart: false },
+        },
+      }, null, 2),
+      'utf-8'
+    );
 
     const payload = JSON.stringify({
       transcript: 'Testing PAI_DIR variable'
