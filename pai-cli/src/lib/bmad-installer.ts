@@ -2,7 +2,7 @@ import {execSync} from 'node:child_process'
 import {promises as fs} from 'node:fs'
 import {join} from 'node:path'
 
-import {getPaiHome} from './config.js'
+import {getBmadTemplatePath} from './template-resolver.js'
 
 /**
  * BMAD version to install
@@ -103,20 +103,23 @@ async function copyDir(src: string, dest: string): Promise<void> {
 export async function installBmad(config: BmadInstallConfig): Promise<void> {
   const {projectName, targetDir, username} = config
 
-  // Get PAI home directory where template BMAD installation exists
-  const paiHome = getPaiHome()
-  const templateBmadPath = join(paiHome, '_bmad')
+  // Get bundled BMAD template path (parent directory containing _bmad/ and .claude/)
+  const templateRootPath = getBmadTemplatePath()
 
   // Verify template exists
   try {
-    await fs.access(templateBmadPath)
+    await fs.access(templateRootPath)
   } catch {
-    throw new Error(`BMAD template not found at ${templateBmadPath}. Please ensure PAI CLI is properly set up.`)
+    throw new Error(
+      `BMAD template not found at ${templateRootPath}. ` +
+      `This indicates a corrupted installation. Please reinstall pai-cli.`
+    )
   }
 
   const bmadPath = join(targetDir, '_bmad')
+  const claudePath = join(targetDir, '.claude')
 
-  // Create main directories
+  // Create main _bmad directories
   await fs.mkdir(join(bmadPath, '_config'), {recursive: true})
   await fs.mkdir(join(bmadPath, 'core'), {recursive: true})
   await fs.mkdir(join(bmadPath, 'bmm'), {recursive: true})
@@ -124,6 +127,9 @@ export async function installBmad(config: BmadInstallConfig): Promise<void> {
   // Create output directories
   await fs.mkdir(join(targetDir, '_bmad-output', 'planning-artifacts'), {recursive: true})
   await fs.mkdir(join(targetDir, '_bmad-output', 'implementation-artifacts'), {recursive: true})
+
+  // Copy _bmad/ structure from template
+  const templateBmadPath = join(templateRootPath, '_bmad')
 
   // Copy core module from template
   const templateCorePath = join(templateBmadPath, 'core')
@@ -139,6 +145,11 @@ export async function installBmad(config: BmadInstallConfig): Promise<void> {
   const templateConfigPath = join(templateBmadPath, '_config')
   const targetConfigPath = join(bmadPath, '_config')
   await copyDir(templateConfigPath, targetConfigPath)
+
+  // Copy .claude/commands/bmad/ structure from template
+  const templateClaudeBmadPath = join(templateRootPath, '.claude', 'commands', 'bmad')
+  const targetClaudeBmadPath = join(claudePath, 'commands', 'bmad')
+  await copyDir(templateClaudeBmadPath, targetClaudeBmadPath)
 
   // Generate and write custom configuration files (overwrite template configs)
   await fs.writeFile(join(targetCorePath, 'config.yaml'), generateCoreConfig(username), 'utf8')

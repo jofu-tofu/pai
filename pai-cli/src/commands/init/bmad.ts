@@ -115,9 +115,11 @@ export default class Bmad extends Command {
       }
 
       if (err.message.includes('BMAD template not found')) {
-        this.error(`BMAD template not found. Please ensure PAI CLI is properly set up. ${err.message}`, {
-          exit: EXIT_CODES.ENVIRONMENT_ERROR,
-        })
+        this.error(
+          `BMAD template not found. This indicates a corrupted pai-cli installation. ` +
+          `Please reinstall: npm install -g pai-cli. ${err.message}`,
+          {exit: EXIT_CODES.ENVIRONMENT_ERROR}
+        )
       }
 
       // Generic error fallback
