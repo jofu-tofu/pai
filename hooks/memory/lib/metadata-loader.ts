@@ -5,11 +5,7 @@ import { Result } from '../types/common';
 import { SegmentMetadata, FilterError } from '../types/filters';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import { homedir } from 'os';
-
-function getPaiDir(): string {
-  return process.env.PAI_DIR || join(homedir(), '.pai');
-}
+import { getPaiDir } from './utils';
 
 interface SessionRegistry {
   sessions: Array<{

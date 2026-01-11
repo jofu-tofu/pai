@@ -74,6 +74,7 @@ export async function applyFilters(
         segmentId: metadata.id,
         matchCount: searchResult?.matchCount || 0,
         matchedTerms: searchResult?.matchedTerms || [],
+        totalQueryTerms: searchResult?.totalQueryTerms || 0,
         metadata
       };
     });

@@ -6,32 +6,34 @@
  */
 
 /**
- * Calculate term match score based on absolute match count.
+ * Calculate term match score based on percentage of query terms matched.
  *
- * The term match score represents how well a segment matches the user's search query.
- * Since totalTerms is not available in FilterResult, we normalize based on a maximum
- * expected match count (5 terms typical, saturates at 10).
+ * Per AC (Story 2.4): "Given a segment matching 3 of 4 search terms,
+ * When termMatchCount is calculated, Then it scores 75% (3/4 = 0.75)"
+ *
+ * The term match score represents how well a segment matches the user's search query
+ * as a percentage of total search terms.
  *
  * @param matchCount - Number of search terms that matched this segment
- * @param totalTerms - Total number of search terms in query (matchedTerms.length as proxy)
- * @returns Normalized score 0-1 (where 1.0 = high match count)
+ * @param totalTerms - Total number of search terms in query
+ * @returns Normalized score 0-1 (where 1.0 = all terms matched)
  *
  * @example
  * ```typescript
- * // Segment matched 3 terms
- * calculateTermMatchScore(3, 3); // Returns 0.60 (3/5)
- * // Segment matched 5 terms
- * calculateTermMatchScore(5, 5); // Returns 1.0 (saturated)
+ * // Segment matched 3 of 4 terms
+ * calculateTermMatchScore(3, 4); // Returns 0.75 (75%)
+ * // Segment matched all 5 terms
+ * calculateTermMatchScore(5, 5); // Returns 1.0 (100%)
+ * // Segment matched 2 of 3 terms
+ * calculateTermMatchScore(2, 3); // Returns 0.67 (67%)
  * ```
  */
 export function calculateTermMatchScore(
   matchCount: number,
   totalTerms: number
 ): number {
-  const MAX_TERMS = 5; // Typical query has ~2-5 terms, saturate at 5
-
   // Handle edge case: no search terms
-  if (matchCount === 0 && totalTerms === 0) {
+  if (totalTerms === 0) {
     console.error('[Memory:TermMatchScorer] No search terms provided, returning 0');
     return 0;
   }
@@ -44,7 +46,7 @@ export function calculateTermMatchScore(
     return 0;
   }
 
-  // Normalize based on maximum expected match count
-  // Saturates at MAX_TERMS for high match counts
-  return Math.min(matchCount / MAX_TERMS, 1.0);
+  // Per AC: score = matchCount / totalTerms (e.g., 3/4 = 0.75)
+  // Cap at 1.0 in case matchCount somehow exceeds totalTerms
+  return Math.min(matchCount / totalTerms, 1.0);
 }

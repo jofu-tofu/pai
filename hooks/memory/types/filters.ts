@@ -23,6 +23,7 @@ export interface FilterResult {
   segmentId: string;
   matchCount: number;        // From keyword search
   matchedTerms: string[];    // From keyword search
+  totalQueryTerms: number;   // From keyword search (total terms in query)
   metadata: SegmentMetadata; // Loaded from registry
 }
 

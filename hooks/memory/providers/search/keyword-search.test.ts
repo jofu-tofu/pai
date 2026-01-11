@@ -101,9 +101,9 @@ describe('KeywordSearch Provider', () => {
         const sorted = result.value.sort((a, b) => a.segmentId.localeCompare(b.segmentId));
 
         expect(sorted).toEqual([
-          { segmentId: 'seg_001', matchCount: 1, matchedTerms: ['typescript'] },
-          { segmentId: 'seg_042', matchCount: 1, matchedTerms: ['typescript'] },
-          { segmentId: 'seg_089', matchCount: 1, matchedTerms: ['typescript'] }
+          { segmentId: 'seg_001', matchCount: 1, matchedTerms: ['typescript'], totalQueryTerms: 1 },
+          { segmentId: 'seg_042', matchCount: 1, matchedTerms: ['typescript'], totalQueryTerms: 1 },
+          { segmentId: 'seg_089', matchCount: 1, matchedTerms: ['typescript'], totalQueryTerms: 1 }
         ]);
       }
     });
