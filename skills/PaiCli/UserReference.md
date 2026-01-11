@@ -73,27 +73,6 @@ pai launch --help | grep "flags"
 
 ---
 
-### `pai setup`
-
-Setup symlinks and sandbox permissions for PAI configuration access.
-
-**Usage:**
-```bash
-pai setup              # Create symlinks for sandbox access
-pai setup --debug      # Show verbose setup process
-```
-
-**What it does:**
-- Creates symlinks from sandbox to `~/.pai/`
-- Enables Claude Code to read PAI config without manual approval
-- Required once per environment
-
-**Windows Notes:**
-- Requires Developer Mode OR Administrator privileges
-- See troubleshooting section if symlink creation fails
-
----
-
 ### `pai init`
 
 Initialize new projects with templates.
@@ -135,12 +114,12 @@ All commands support these flags:
 
 ## Environment Variables
 
-### `PAI_HOME`
+### `PAI_DIR`
 
 Override default PAI configuration directory.
 
 ```bash
-PAI_HOME=/custom/path pai launch
+PAI_DIR=/custom/path pai launch
 ```
 
 **Default:** `~/.pai`
@@ -199,7 +178,7 @@ EXIT_CODE=$?
 
 ```bash
 # Sequential execution (stops on failure)
-pai setup && pai launch
+pai init bmad && pai launch
 
 # Conditional execution
 pai launch || echo "Launch failed"
@@ -229,23 +208,6 @@ pai launch --help --quiet | wc -l
 
 ## Troubleshooting
 
-### Windows: Symlink Permission Denied
-
-**Symptom:** `pai setup` fails with "Permission denied" or "EPERM"
-
-**Solutions:**
-
-**Option 1: Enable Developer Mode (Recommended)**
-1. Windows Settings → Privacy & Security → For developers
-2. Enable "Developer Mode"
-3. Run `pai setup` again
-
-**Option 2: Run as Administrator**
-1. Open PowerShell as Administrator
-2. Run `pai setup`
-
----
-
 ### Version Compatibility Warning
 
 **Symptom:** Warning about Claude Code version incompatibility
@@ -273,14 +235,14 @@ pai launch --debug  # Shows version detection details
 
 ---
 
-### PAI_HOME Not Found
+### PAI_DIR Not Found
 
 **Symptom:** Error about missing PAI configuration
 
 **Solutions:**
 1. Verify `~/.pai/` exists
-2. Set `PAI_HOME` if using custom location
-3. Run `pai setup` to create necessary symlinks
+2. Set `PAI_DIR` environment variable to your PAI installation directory
+3. Ensure `.claude/settings.json` exists in PAI_DIR if you want hooks active
 
 ---
 
@@ -358,7 +320,7 @@ pai launch --help
 
 ```bash
 # Automated deployment
-pai setup && pai launch --quiet || exit 1
+pai launch --quiet || exit 1
 
 # CI/CD pipeline
 NO_COLOR=1 pai launch --quiet 2>&1 | tee deployment.log

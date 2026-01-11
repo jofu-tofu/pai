@@ -20,7 +20,6 @@ pai-cli/
 │   ├── commands/                  # CLI commands (Oclif pattern)
 │   │   ├── base.ts                # Base command with common functionality
 │   │   ├── launch.ts              # 🎯 CORE: Launch Claude Code with PAI config
-│   │   ├── setup.ts               # 🎯 CORE: Setup symlinks and permissions
 │   │   ├── init/                  # Init command topic (extensible)
 │   │   │   ├── index.ts           # Init base command
 │   │   │   └── bmad.ts            # Install BMAD methodology
@@ -32,7 +31,7 @@ pai-cli/
 │   │   ├── index.ts               # Library exports
 │   │   │
 │   │   │ # === FOUNDATIONAL LIBRARIES (Required) ===
-│   │   ├── config.ts              # 🔒 Config resolution (PAI_HOME)
+│   │   ├── config.ts              # 🔒 Config resolution (PAI_DIR)
 │   │   ├── template-resolver.ts   # 🔒 Bundled template path resolution
 │   │   ├── paths.ts               # 🔒 Cross-platform path utilities
 │   │   ├── errors.ts              # 🔒 Error handling + exit codes
@@ -134,7 +133,6 @@ pai-cli/
 
 **Pattern:** Oclif automatically discovers commands based on file structure:
 - `launch.ts` → `pai launch`
-- `setup.ts` → `pai setup`
 - `init/index.ts` → `pai init`
 - `init/bmad.ts` → `pai init bmad`
 
@@ -225,12 +223,12 @@ pai-cli/
 - Version checked via `version.ts`
 
 **File System:**
-- PAI_HOME directory (default: `~/.pai`)
+- PAI_DIR directory (default: `~/.pai`)
 - Claude Code settings directory
 - Symlinks created by `setup` command
 
 **Environment:**
-- `PAI_HOME` - Override PAI home directory
+- `PAI_DIR` - Override PAI home directory
 - `DEBUG` - Enable debug logging
 - CI environment detection
 
