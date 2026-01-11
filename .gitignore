@@ -62,8 +62,9 @@ skills/skill-index.json
 # Local Claude commands (user-specific)
 .claude/commands/
 
-# Windsurf IDE settings
+# Windsurf IDE settings (user-specific, but allow template files)
 .windsurf/
+!**/templates/**/.windsurf/
 
 # BMAD local files
 _bmad/
