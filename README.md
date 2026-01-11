@@ -2,6 +2,21 @@
 
 A personal AI infrastructure layer for Claude Code that adds hooks, skills, and more.
 
+---
+
+**⚠️ DEVELOPMENT WORKTREE NOTICE**
+
+This is the **Memory System Development Worktree** (`pai-memory-work` branch).
+
+**For Memory System Development:**
+- See **[DEVELOPMENT.md](./DEVELOPMENT.md)** for setup instructions
+- **CRITICAL:** Set `PAI_DIR` to repo root before testing: `$env:PAI_DIR = $PWD.Path` (PowerShell) or `export PAI_DIR="$(pwd)"` (Bash)
+- Story artifacts in `_bmad-output/implementation-artifacts/`
+
+**For Main PAI Documentation:** See below
+
+---
+
 ## Quick Install
 
 ```bash
