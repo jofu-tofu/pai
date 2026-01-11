@@ -27,7 +27,7 @@ PAI CLI is a **command-line wrapper** around Claude Code that provides:
 
 **Implementation:**
 - Single command replaces multi-step manual process
-- Automatic PAI_HOME detection
+- Automatic PAI_DIR detection
 - Pre-flight checks (version compatibility, permissions)
 - Graceful degradation (warns but doesn't block)
 
@@ -89,7 +89,7 @@ Entry point (bin/run.js)
 Oclif framework loads command
   ↓
 Launch command executes
-  ├─ Resolve PAI_HOME
+  ├─ Resolve PAI_DIR
   ├─ Check Claude Code version
   ├─ Validate prerequisites
   └─ Spawn Claude Code with PAI config
@@ -101,7 +101,7 @@ Claude Code runs (transparent to user)
 
 ```
 ┌─────────────────────────────────┐
-│   Commands (User Interface)     │  ← Commands (launch, setup, init)
+│   Commands (User Interface)     │  ← Commands (launch, init)
 ├─────────────────────────────────┤
 │   Shared Libraries              │  ← Utilities (config, spawn, debug)
 ├─────────────────────────────────┤
@@ -121,7 +121,6 @@ Claude Code runs (transparent to user)
 
 ```
 src/commands/launch.ts      → pai launch
-src/commands/setup.ts       → pai setup
 src/commands/init/bmad.ts   → pai init bmad
 ```
 
@@ -160,7 +159,7 @@ export default class Launch extends BaseCommand {
 
 | Library | Purpose | Why Foundational |
 |---------|---------|------------------|
-| `config.ts` | Resolve PAI_HOME, Claude Code path | Every command needs config |
+| `config.ts` | Resolve PAI_DIR, Claude Code path | Every command needs config |
 | `paths.ts` | Cross-platform path operations | Core to platform compatibility |
 | `errors.ts` | Standardized error handling | Ensures consistent exit codes |
 | `spawn.ts` | Process spawning with options | Core launch mechanism |
@@ -185,7 +184,7 @@ export default class Launch extends BaseCommand {
 ### `pai launch`
 
 **Depends on:**
-- 🔒 `config.ts` - Resolve PAI_HOME
+- 🔒 `config.ts` - Resolve PAI_DIR
 - 🔒 `spawn.ts` - Launch Claude Code
 - ✏️ `version.ts` - Version compatibility check
 - ✏️ `debug.ts` - Debug logging
@@ -195,18 +194,10 @@ export default class Launch extends BaseCommand {
 - `spinner.ts` - Launch works, just no loading indicator
 - `quiet.ts` - Launch works, just no quiet mode
 
-### `pai setup`
-
-**Depends on:**
-- 🔒 `config.ts` - Resolve PAI_HOME
-- 🔒 `paths.ts` - Cross-platform symlink paths
-- 🔒 `errors.ts` - Permission error handling
-- ✏️ `output.ts` - Status messages
-
 ### `pai init bmad`
 
 **Depends on:**
-- 🔒 `config.ts` - Resolve PAI_HOME
+- 🔒 `config.ts` - Resolve PAI_DIR
 - ✏️ `bmad-installer.ts` - Installation logic
 - ✏️ `output.ts` - Progress messages
 
@@ -312,12 +303,12 @@ pai plugins:install <plugin-name>
 ### PAI Configuration
 
 **Integration:**
-- Reads from `PAI_HOME` (default: `~/.pai`)
+- Reads from `PAI_DIR` (default: `~/.pai`)
 - Pre-loads hooks via `.clauderc`
 - Enables sandbox access via symlinks
 
 **Environment Variables:**
-- `PAI_HOME` - Override config location
+- `PAI_DIR` - Override config location
 - `NO_COLOR` - Disable colors
 - `FORCE_COLOR` - Force colors
 
@@ -371,13 +362,13 @@ expect(result).to.include('Launch Claude Code')
 
 ## Security Considerations
 
-### Symlink Creation
+### File System Operations
 
-**Risk:** Symlinks can be abused for directory traversal
+**Risk:** File operations can be abused for directory traversal
 
 **Mitigation:**
 - Validate source/target paths
-- Require explicit user action (`pai setup`)
+- Require explicit user action (installation scripts)
 - Warn on Windows (requires permissions)
 
 ### Process Spawning
@@ -394,7 +385,7 @@ expect(result).to.include('Launch Claude Code')
 **Risk:** Malicious environment override
 
 **Mitigation:**
-- Validate `PAI_HOME` path
+- Validate `PAI_DIR` path
 - Prefer defaults over user-provided values
 - Log overrides in debug mode
 

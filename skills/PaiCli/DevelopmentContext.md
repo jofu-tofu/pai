@@ -54,7 +54,6 @@ pai-cli/
 │   ├── commands/           # Command implementations
 │   │   ├── base.ts        # BaseCommand (ALL commands extend this)
 │   │   ├── launch.ts      # pai launch
-│   │   ├── setup.ts       # pai setup
 │   │   └── init/          # Topic: pai init
 │   │       └── bmad.ts    # pai init bmad
 │   ├── lib/               # Shared libraries
@@ -349,7 +348,7 @@ pai --version
 
 ### Debug Output Includes
 
-- Resolved PAI_HOME path
+- Resolved PAI_DIR path
 - Claude Code version detection
 - Compatibility check results
 - Spawn arguments and configuration

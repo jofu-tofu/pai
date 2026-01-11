@@ -35,7 +35,7 @@ These are the **inherent, foundational** design principles that define PAI CLI:
 
 **Implementation:**
 - `pai launch` handles all configuration resolution automatically
-- `pai setup` automates symlink creation and permissions
+- PAI System installation handles hook configuration
 - Graceful degradation when optional features are unavailable
 - Clear, actionable error messages
 
@@ -185,7 +185,7 @@ These are the **inherent, foundational** design principles that define PAI CLI:
 
 | Module | Usage | Foundational? |
 |--------|-------|---------------|
-| `config.ts` | Resolve PAI_HOME path | **Yes** - Core functionality |
+| `config.ts` | Resolve PAI_DIR path | **Yes** - Core functionality |
 | `paths.ts` | Get Claude Code settings path | **Yes** - Required for launch |
 | `spawn.ts` | Spawn Claude Code process | **Yes** - Core launch mechanism |
 | `version.ts` | Check Claude Code compatibility | No - Warning only |
@@ -195,7 +195,7 @@ These are the **inherent, foundational** design principles that define PAI CLI:
 | `spinner.ts` | Show loading state | No - UI enhancement |
 
 **What It Does:**
-1. Resolves PAI_HOME directory (default: `~/.pai`)
+1. Resolves PAI_DIR directory (default: `~/.pai`)
 2. Checks Claude Code version compatibility
 3. Verifies Claude Code is installed
 4. Spawns `claude` process with current directory as argument
@@ -209,41 +209,8 @@ These are the **inherent, foundational** design principles that define PAI CLI:
 
 **Cannot Be Modified:**
 - Core launch mechanism (spawn with stdio inherit)
-- PAI_HOME resolution logic
+- PAI_DIR resolution logic
 - Pass-through behavior
-
----
-
-### `pai setup` - Setup Command
-
-**Purpose:** Create symlinks for Claude Code settings to enable PAI hooks and configuration.
-
-**Dependencies:**
-
-| Module | Usage | Foundational? |
-|--------|-------|---------------|
-| `config.ts` | Resolve PAI_HOME | **Yes** - Required |
-| `paths.ts` | Get settings paths | **Yes** - Required |
-| `errors.ts` | Handle symlink errors | **Yes** - Critical for Windows |
-| `debug.ts` | Log setup operations | No - Debug feature |
-| `output.ts` | Display setup status | No - UI enhancement |
-
-**What It Does:**
-1. Resolves PAI_HOME directory
-2. Gets Claude Code settings directory path
-3. Creates symlink from Claude Code settings to PAI settings
-4. Handles Windows permission errors gracefully
-5. Verifies symlink creation
-
-**Can Be Modified:**
-- Error messages and suggestions
-- Success/failure output formatting
-- Debug logging details
-
-**Cannot Be Modified:**
-- Symlink-based approach (foundational integration method)
-- Settings directory paths
-- Cross-platform symlink handling
 
 ---
 
@@ -316,13 +283,13 @@ The `src/lib/` directory contains foundational utilities used across commands.
 
 #### `config.ts` - Configuration Resolution
 
-**Purpose:** Resolve PAI_HOME directory from environment or default.
+**Purpose:** Resolve PAI_DIR directory from environment or default.
 
 **Exports:**
 - `getPaiHome()` - Returns absolute path to PAI home directory
 
 **Logic:**
-1. Check `PAI_HOME` environment variable
+1. Check `PAI_DIR` environment variable
 2. Fall back to `~/.pai` (cross-platform)
 3. Return absolute path
 
@@ -330,7 +297,7 @@ The `src/lib/` directory contains foundational utilities used across commands.
 
 **Modification Allowed:**
 - Default location (currently `~/.pai`)
-- Environment variable name (currently `PAI_HOME`)
+- Environment variable name (currently `PAI_DIR`)
 
 ---
 
@@ -574,7 +541,6 @@ The `src/lib/` directory contains foundational utilities used across commands.
 | bmad-installer.ts | Library | ✅ Yes | Feature-specific |
 | **Commands** | | | |
 | pai launch | Command | ⚠️ Limited | Core command, logic modifiable |
-| pai setup | Command | ⚠️ Limited | Symlink approach is fixed |
 | pai init | Command | ✅ Yes | Can add subcommands |
 | pai init bmad | Command | ✅ Yes | Feature-specific |
 

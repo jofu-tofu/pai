@@ -71,7 +71,7 @@ npm install -g @anthropic-ai/claude-code@latest
 
 ### Windows Setup: Symlink Permission Denied
 
-**Symptom:** `pai setup` fails with "Permission denied creating symlink" or "EPERM: operation not permitted"
+**Symptom:** `pai init` fails with "Permission denied creating symlink" or "EPERM: operation not permitted"
 
 **Solution (choose one):**
 
@@ -79,11 +79,11 @@ npm install -g @anthropic-ai/claude-code@latest
 1. Open Windows Settings
 2. Go to "Privacy & Security" → "For developers"
 3. Enable "Developer Mode"
-4. Run `pai setup` again
+4. Run `pai init` again
 
 **Option 2: Run as Administrator**
 1. Open PowerShell or Command Prompt as Administrator
-2. Run `pai setup`
+2. Run `pai init`
 
 Developer Mode is recommended as it allows symlink creation without elevated privileges for all future operations.
 
@@ -105,7 +105,7 @@ pai launch --debug
 ```
 
 Debug output includes:
-- Resolved PAI_HOME path
+- Resolved PAI_DIR path
 - Claude Code version detection
 - Compatibility check results
 - Spawn arguments and configuration
@@ -147,12 +147,12 @@ FORCE_COLOR=2 pai launch
 FORCE_COLOR=3 pai launch
 ```
 
-### PAI_HOME
+### PAI_DIR
 
 Customize the PAI configuration directory (default: `~/.pai`):
 
 ```bash
-PAI_HOME=/custom/path pai launch
+PAI_DIR=/custom/path pai launch
 ```
 
 ## Output Behavior
@@ -236,13 +236,13 @@ Commands can be chained using `&&` to execute multiple operations sequentially, 
 
 ```bash
 # Execute multiple commands - stops if any fails
-pai launch --help && pai setup --help
+pai launch --help && pai init --help
 
 # Chain with other tools
 pai launch --help && echo "Launch command is available"
 
 # Complex chains
-pai setup && pai launch --quiet && echo "Setup and launch complete"
+pai init && pai launch --quiet && echo "Setup and launch complete"
 ```
 
 **How It Works:**
@@ -301,7 +301,7 @@ pai launch --help | grep "flags" | awk '{print $1}'
 **CI/CD Pipelines:**
 ```bash
 # Stop pipeline on first failure
-pai setup && pai launch --quiet && other-command || exit 1
+pai init && pai launch --quiet && other-command || exit 1
 ```
 
 **Scripting with Error Handling:**
@@ -332,7 +332,7 @@ PAI CLI uses standardized exit codes to enable reliable error handling in script
 | `0` | Success | Command completed successfully without errors |
 | `1` | General Error | Unexpected runtime failures, system errors, unhandled exceptions |
 | `2` | Invalid Usage | Invalid arguments, unknown flags, missing required parameters |
-| `3` | Environment Error | Missing prerequisites (Claude Code not installed, PAI_HOME not found, permission denied) |
+| `3` | Environment Error | Missing prerequisites (Claude Code not installed, PAI_DIR not found, permission denied) |
 
 ### Checking Exit Codes
 
@@ -355,13 +355,13 @@ EXIT_CODE=$?
 if [ $EXIT_CODE -eq 0 ]; then
   echo "Launch succeeded"
 elif [ $EXIT_CODE -eq 3 ]; then
-  echo "Environment error - run 'pai setup' or install Claude Code"
+  echo "Environment error - run 'pai init' or install Claude Code"
 else
   echo "Command failed with exit code $EXIT_CODE"
 fi
 
 # Chain commands (stops on first failure)
-pai setup && pai launch && echo "All commands succeeded"
+pai init && pai launch && echo "All commands succeeded"
 ```
 
 **PowerShell (Windows):**
@@ -376,7 +376,7 @@ pai launch
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Success!"
 } elseif ($LASTEXITCODE -eq 3) {
-    Write-Host "Environment error - run 'pai setup' or install Claude Code"
+    Write-Host "Environment error - run 'pai init' or install Claude Code"
 } else {
     Write-Host "Failed with exit code $LASTEXITCODE"
 }
@@ -402,7 +402,7 @@ pai launch
 echo %ERRORLEVEL%
 
 REM Conditional execution with &&
-pai setup && pai launch && echo Success!
+pai init && pai launch && echo Success!
 
 REM Check exit code in batch script
 pai launch
@@ -419,7 +419,7 @@ if %ERRORLEVEL% EQU 0 (
 
 **Success (0):**
 - Help displayed: `pai launch --help`
-- Setup completed successfully: `pai setup`
+- Setup completed successfully: `pai init`
 - Claude Code launched and exited normally: `pai launch`
 
 **General Error (1):**
@@ -436,8 +436,8 @@ if %ERRORLEVEL% EQU 0 (
 
 **Environment Error (3):**
 - Claude Code not installed: `pai launch` (when `claude` not in PATH)
-- PAI_HOME not found: `pai setup` (when ~/.pai doesn't exist and PAI_HOME not set)
-- Permission denied: `pai setup` (on Windows without Developer Mode or admin rights)
+- PAI_DIR not found: `pai init` (when ~/.pai doesn't exist and PAI_DIR not set)
+- Permission denied: `pai init` (on Windows without Developer Mode or admin rights)
 - Version incompatibility blocking operation
 
 ### Exit Codes in CI/CD
@@ -469,7 +469,7 @@ Every command documents its exit codes in help text:
 
 ```bash
 pai launch --help  # See EXIT CODES section
-pai setup --help   # See EXIT CODES section
+pai init --help   # See EXIT CODES section
 ```
 
 ## Shell Completion
@@ -629,13 +629,13 @@ Chain multiple commands together with proper error handling:
 **Bash/Zsh (Unix, macOS, Linux, Git Bash):**
 ```bash
 # Sequential execution - stops on first failure
-pai setup && pai launch
+pai init && pai launch
 
 # Multiple commands
-pai --version && pai setup && pai launch
+pai --version && pai init && pai launch
 
 # Continue on error
-pai setup || echo "Setup failed"
+pai init || echo "Setup failed"
 
 # Error handling with exit codes
 if pai launch; then
@@ -649,7 +649,7 @@ fi
 **PowerShell (Windows):**
 ```powershell
 # Sequential execution (PowerShell 7+)
-pai setup && pai launch
+pai init && pai launch
 
 # Error handling
 pai launch
@@ -663,7 +663,7 @@ if ($LASTEXITCODE -eq 0) {
 **CMD (Windows):**
 ```cmd
 REM Sequential execution
-pai setup && pai launch && echo Success
+pai init && pai launch && echo Success
 
 REM Error handling
 pai launch
@@ -733,7 +733,7 @@ case $EXIT_CODE in
     ;;
   3)
     echo "Environment issue - is Claude Code installed?"
-    pai setup  # Try setup
+    pai init  # Try setup
     ;;
   *)
     echo "Unexpected error: $EXIT_CODE"
@@ -741,7 +741,7 @@ case $EXIT_CODE in
 esac
 
 # Use exit codes in pipelines
-pai setup && pai launch || {
+pai init && pai launch || {
   echo "Failed at exit code $?"
   exit 1
 }
@@ -760,7 +760,7 @@ pai launch
 switch ($LASTEXITCODE) {
     0 { Write-Host "Success" }
     2 { Write-Host "Invalid usage" }
-    3 { Write-Host "Environment issue"; pai setup }
+    3 { Write-Host "Environment issue"; pai init }
     default { Write-Host "Error: $LASTEXITCODE" }
 }
 
@@ -810,7 +810,7 @@ jobs:
       - name: Setup PAI
         run: |
           npm install -g pai-cli
-          pai setup
+          pai init
 
       - name: Launch Claude Code
         run: pai launch --quiet || exit $?
@@ -826,7 +826,7 @@ jobs:
 ```yaml
 deploy:
   script:
-    - pai setup
+    - pai init
     - pai launch --quiet
   only:
     - main
@@ -839,7 +839,7 @@ pipeline {
     stages {
         stage('Setup') {
             steps {
-                sh 'pai setup'
+                sh 'pai init'
             }
         }
         stage('Launch') {
@@ -867,7 +867,7 @@ if ! pai --version > /dev/null 2>&1; then
 fi
 
 # Run setup
-pai setup || {
+pai init || {
   echo "Setup failed with code $?"
   exit 1
 }
@@ -1072,7 +1072,7 @@ static override flags = {
 |---------|------------|---------|
 | Command files | kebab-case | `launch.ts`, `init/bmad.ts` |
 | Command classes | PascalCase | `Launch`, `InitBmad` |
-| Flags | camelCase | `debug`, `paiHome`, `quiet` |
+| Flags | camelCase | `debug`, `paiDir`, `quiet` |
 | Constants | UPPER_SNAKE_CASE | `EXIT_CODES.SUCCESS` |
 
 ### Import Organization
@@ -1103,7 +1103,7 @@ import {EXIT_CODES} from '../types/index.js'
 
 // Actionable error format: {what_wrong}. {how_to_fix}
 this.error(
-  'Configuration file not found. Run `pai setup` to initialize.',
+  'Configuration file not found. Run `pai init` to initialize.',
   {exit: EXIT_CODES.ENVIRONMENT_ERROR}
 )
 ```
@@ -1156,7 +1156,7 @@ pai-cli/
 │   ├── commands/
 │   │   ├── base.ts           # BaseCommand (extend this)
 │   │   ├── launch.ts         # pai launch
-│   │   ├── setup.ts          # pai setup
+│   │   ├── setup.ts          # pai init
 │   │   └── init/             # Topic: pai init
 │   │       └── bmad.ts       # pai init bmad
 │   ├── lib/                  # Internal libraries

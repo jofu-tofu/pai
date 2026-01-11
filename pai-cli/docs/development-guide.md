@@ -362,16 +362,16 @@ DEBUG=* ./bin/dev.js launch
 
 **On Windows:**
 ```cmd
-# Test symlink creation
-pai setup
+# Test PAI CLI
+pai launch --help
 
-# Check for permission errors
+# Check for compatibility
 ```
 
 **On Unix/macOS:**
 ```bash
 # Test the same
-pai setup
+pai launch --help
 ```
 
 ### Updating Dependencies
@@ -439,13 +439,13 @@ npm uninstall -g pai-cli
 npm install -g .
 ```
 
-### Windows Symlink Errors
+### Windows Development Issues
 
-**Problem:** `pai setup` fails with "Permission denied"
+**Problem:** Permission errors during development
 
 **Solution:**
-1. Enable Developer Mode in Windows Settings
-2. Or run as Administrator
+1. Enable Developer Mode in Windows Settings for file system operations
+2. Or run development terminal as Administrator
 3. See [README.md](../README.md#troubleshooting) for details
 
 ### Module Resolution Errors
