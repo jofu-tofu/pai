@@ -64,6 +64,8 @@ skills/skill-index.json
 
 # Windsurf IDE settings
 .windsurf/
+# But allow Windsurf template files
+!**/templates/**/.windsurf/
 
 # BMAD local files
 _bmad/
