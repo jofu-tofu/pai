@@ -4,6 +4,7 @@ import { batchIncrementAccessCounts } from './core/access-tracker';
 import { logRetrieval, createLogEntry } from './lib/logging/retrieval-logger';
 import { estimateTokens } from './lib/formatting/token-counter';
 import { getMemoryConfig } from './core/config';
+import './core/register-providers'; // Register MVP providers
 
 /**
  * Read all input from stdin

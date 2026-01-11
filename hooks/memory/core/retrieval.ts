@@ -1,9 +1,10 @@
 import { Result } from '../types/common';
-import { KeywordSearch } from '../providers/search/keyword-search';
 import { applyFilters } from './filters';
 import { rankResults } from './ranking';
 import { FilterOptions } from '../types/filters';
 import { RankingOptions, RankedResult } from '../types/ranking';
+import { globalProviderRegistry, Provider } from './provider-registry';
+import { getMemoryConfig } from './config';
 
 /**
  * Memory context item returned by retrieval pipeline
@@ -36,31 +37,116 @@ export interface RetrievalError {
   cause?: Error;
 }
 
-// Global provider instance (initialized once)
-let searchProvider: KeywordSearch | null = null;
+/**
+ * Search provider interface
+ */
+export interface SearchProvider extends Provider {
+  search(
+    query: string,
+    options?: { maxResults?: number; minMatchCount?: number }
+  ): Promise<Result<any[], any>>;
+}
+
+// MVP default fallback
+const MVP_SEARCH_PROVIDER = 'keyword-search';
+
+// Cached provider instance (per-process)
+// NOTE: Not thread-safe - concurrent hook invocations could create multiple instances.
+// This is acceptable since: (1) hooks typically run sequentially, (2) globalProviderRegistry
+// has its own caching, so worst case is we create 2 instances that both work correctly.
+let searchProvider: SearchProvider | null = null;
+let providerLoadInProgress = false;
 
 /**
  * Get or initialize the search provider
- * Returns Result type to avoid throwing exceptions
+ *
+ * Loads search provider based on configuration with fallback to MVP default.
+ * Caches provider instance for session duration.
+ *
+ * Note: This function is not fully thread-safe. If multiple invocations occur
+ * concurrently, multiple provider instances might be created. However, this is
+ * acceptable since the globalProviderRegistry has its own caching.
+ *
+ * @returns Result with search provider or error
  */
-async function getSearchProvider(): Promise<Result<KeywordSearch, RetrievalError>> {
-  if (!searchProvider) {
-    searchProvider = new KeywordSearch();
-    const initResult = await searchProvider.initialize();
+async function getSearchProvider(): Promise<
+  Result<SearchProvider, RetrievalError>
+> {
+  // Return cached instance if available
+  if (searchProvider !== null) {
+    return { ok: true, value: searchProvider };
+  }
 
-    if (!initResult.ok) {
-      console.error(`[Memory:Retrieval] Failed to initialize search: ${initResult.error.message}`);
+  // Warn if concurrent loading detected (shouldn't happen in practice)
+  if (providerLoadInProgress) {
+    console.error(
+      '[Memory:Retrieval] Warning: Concurrent provider loading detected'
+    );
+  }
+  providerLoadInProgress = true;
+
+  // Load config to determine which provider to use
+  const configResult = await getMemoryConfig();
+
+  if (!configResult.ok) {
+    console.error(
+      `[Memory:Retrieval] Failed to load config: ${configResult.error.message}`
+    );
+    providerLoadInProgress = false;
+    return {
+      ok: false,
+      error: {
+        code: 'RETRIEVAL_CONFIG_FAILED',
+        message: `Failed to load configuration: ${configResult.error.message}`,
+        cause: configResult.error.cause,
+      },
+    };
+  }
+
+  const config = configResult.value;
+  const searchName = config.providers.search;
+
+  // Try to load configured search provider
+  const providerResult = await globalProviderRegistry.getProvider<SearchProvider>(
+    'search',
+    searchName
+  );
+
+  if (!providerResult.ok) {
+    console.error(
+      `[Memory:Config] Provider '${searchName}' not found, using default`
+    );
+
+    // Fallback to MVP default
+    const fallbackResult = await globalProviderRegistry.getProvider<SearchProvider>(
+      'search',
+      MVP_SEARCH_PROVIDER
+    );
+
+    if (!fallbackResult.ok) {
+      providerLoadInProgress = false;
       return {
         ok: false,
         error: {
           code: 'RETRIEVAL_PROVIDER_INIT_FAILED',
-          message: `Failed to initialize search provider: ${initResult.error.message}`,
-          cause: initResult.error.cause
-        }
+          message: `Fatal: Default search provider '${MVP_SEARCH_PROVIDER}' not registered`,
+        },
       };
     }
+
+    console.error(
+      `[Memory:Retrieval] Using search provider: ${fallbackResult.value.name}`
+    );
+    searchProvider = fallbackResult.value;
+    providerLoadInProgress = false;
+    return { ok: true, value: searchProvider };
   }
 
+  console.error(
+    `[Memory:Retrieval] Using search provider: ${providerResult.value.name}`
+  );
+  searchProvider = providerResult.value;
+  providerLoadInProgress = false;
   return { ok: true, value: searchProvider };
 }
 

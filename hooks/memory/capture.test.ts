@@ -12,7 +12,7 @@ const HOOK_PATH = join(process.cwd(), 'hooks', 'memory', 'capture.ts');
 /**
  * Helper: Create default settings.json for tests (Stories 3.2/3.3)
  */
-function createDefaultSettings() {
+async function createDefaultSettings() {
   const settingsDir = join(TEST_PAI_DIR, '.claude');
   mkdirSync(settingsDir, { recursive: true });
 
@@ -27,7 +27,7 @@ function createDefaultSettings() {
     },
   };
 
-  fs.writeFile(
+  await fs.writeFile(
     join(settingsDir, 'settings.json'),
     JSON.stringify(settings, null, 2),
     'utf-8'
@@ -53,6 +53,8 @@ describe('capture.ts hook', () => {
     if (existsSync(memStoreDir)) {
       rmSync(memStoreDir, { recursive: true, force: true });
     }
+    // Ensure settings file exists for each test
+    await createDefaultSettings();
   });
 
   test('should read stdin and create queue file', async () => {

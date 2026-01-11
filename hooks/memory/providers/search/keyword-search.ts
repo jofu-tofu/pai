@@ -134,7 +134,8 @@ export class KeywordSearch implements SearchProvider {
         ([segmentId, match]) => ({
           segmentId,
           matchCount: match.count,
-          matchedTerms: match.terms
+          matchedTerms: match.terms,
+          totalQueryTerms: terms.length
         })
       );
 
