@@ -3,6 +3,7 @@ import { formatMemoryContext } from './core/context-formatter';
 import { batchIncrementAccessCounts } from './core/access-tracker';
 import { logRetrieval, createLogEntry } from './lib/logging/retrieval-logger';
 import { estimateTokens } from './lib/formatting/token-counter';
+import { getMemoryConfig } from './core/config';
 
 /**
  * Read all input from stdin
@@ -49,7 +50,30 @@ async function main() {
   const startTime = Date.now();
 
   try {
-    // Read input payload
+    // LEVEL 1: Check if memory system is globally enabled
+    const configResult = await getMemoryConfig();
+
+    if (!configResult.ok) {
+      console.error(`[Memory:Retrieve] Failed to load config: ${configResult.error.message}`);
+      console.error('[Memory:Retrieve] Using defaults, assuming enabled');
+      // Graceful degradation - continue with defaults
+    } else {
+      const config = configResult.value;
+
+      // LEVEL 1: Global toggle check
+      if (!config.enabled) {
+        console.error('[Memory:Retrieve] Memory system disabled, exiting');
+        process.exit(0);  // No-op, zero overhead
+      }
+
+      // LEVEL 2: Hook-specific toggle check (Story 3.3)
+      if (!config.hooks.userPromptSubmit) {
+        console.error('[Memory:Retrieve] UserPromptSubmit hook disabled, exiting');
+        process.exit(0);  // No-op, zero overhead
+      }
+    }
+
+    // THEN: Read input payload
     const input = await readStdin();
     if (!input.trim()) {
       process.exit(0);
