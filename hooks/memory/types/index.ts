@@ -33,3 +33,11 @@ export type {
   FilterResult,
   FilterError
 } from './filters';
+
+// Re-export all types from ranking
+export type {
+  RankingOptions,
+  RankedResult,
+  RankingError,
+  ScoringComponents
+} from './ranking';
