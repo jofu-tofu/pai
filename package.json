@@ -1,0 +1,20 @@
+{
+  "name": ".pai-memory-work",
+  "version": "0.1.0",
+  "description": "PAI Memory System - Long-term memory for Claude Code sessions",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "test:watch": "bun test --watch"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "bun-types": "^1.2.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1"
+  }
+}

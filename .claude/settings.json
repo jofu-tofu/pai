@@ -88,6 +88,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/memory/capture.ts\"",
+            "description": "PAI Memory System - Capture session transcript to queue"
+          },
+          {
+            "type": "command",
             "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/capture-session-summary.ts\""
           },
           {
