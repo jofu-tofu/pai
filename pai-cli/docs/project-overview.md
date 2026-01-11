@@ -65,9 +65,8 @@ Single cohesive codebase with clear separation between commands and shared libra
 ## Core Commands
 
 1. **`pai launch`** - Launch Claude Code with PAI configuration
-2. **`pai setup`** - Setup symlinks and sandbox permissions
-3. **`pai init`** - Initialize new projects
-4. **`pai init bmad`** - Install BMAD methodology framework
+2. **`pai init`** - Initialize new projects
+3. **`pai init bmad`** - Install BMAD methodology framework
 
 ---
 

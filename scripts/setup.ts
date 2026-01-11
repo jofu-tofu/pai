@@ -3,15 +3,16 @@
  * PAI (Personal AI Infrastructure) Setup & Doctor Script
  *
  * Usage:
- *   bun run scripts/setup.ts          # Install/setup PAI
+ *   bun run scripts/setup.ts          # Interactive installation
  *   bun run scripts/setup.ts doctor   # Diagnose issues
  *   bun run scripts/setup.ts fix      # Auto-fix issues where possible
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from 'fs';
 import { join, dirname } from 'path';
-import { homedir } from 'os';
+import { homedir, platform } from 'os';
 import { $ } from 'bun';
+import * as readline from 'readline';
 
 // ============================================
 // Configuration
@@ -45,6 +46,28 @@ function logSection(title: string) {
   console.log('='.repeat(50));
 }
 
+async function askQuestion(question: string): Promise<string> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
+  });
+}
+
+async function askYesNo(question: string, defaultYes: boolean = true): Promise<boolean> {
+  const suffix = defaultYes ? ' [Y/n]: ' : ' [y/N]: ';
+  const answer = await askQuestion(question + suffix);
+
+  if (answer === '') return defaultYes;
+  return answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes';
+}
+
 async function commandExists(cmd: string): Promise<boolean> {
   try {
     await $`which ${cmd}`.quiet();
@@ -67,6 +90,33 @@ async function getCommandVersion(cmd: string): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+function detectShell(): { type: 'bash' | 'zsh' | 'powershell' | 'unknown', profilePath: string | null } {
+  const shell = process.env.SHELL || '';
+  const isWindows = platform() === 'win32';
+
+  if (isWindows) {
+    // PowerShell
+    const psProfile = process.env.PROFILE;
+    if (psProfile) {
+      return { type: 'powershell', profilePath: psProfile };
+    }
+    // Default PowerShell profile location
+    const defaultProfile = join(homedir(), 'Documents', 'PowerShell', 'Microsoft.PowerShell_profile.ps1');
+    return { type: 'powershell', profilePath: defaultProfile };
+  }
+
+  if (shell.includes('zsh')) {
+    return { type: 'zsh', profilePath: join(homedir(), '.zshrc') };
+  }
+
+  if (shell.includes('bash')) {
+    return { type: 'bash', profilePath: join(homedir(), '.bashrc') };
+  }
+
+  // Default to bash
+  return { type: 'bash', profilePath: join(homedir(), '.bashrc') };
 }
 
 // ============================================
@@ -428,6 +478,173 @@ async function checkSkills(): Promise<CheckResult> {
 }
 
 // ============================================
+// Interactive Installation Functions
+// ============================================
+
+async function configureHooks(): Promise<void> {
+  logSection('Hook Configuration');
+
+  log('🔧', 'Configuring PAI hooks...');
+
+  // Call setup-hooks.ts to create PAI's .claude/settings.json
+  const setupHooksScript = join(SCRIPT_DIR, 'setup-hooks.ts');
+
+  if (!existsSync(setupHooksScript)) {
+    log('❌', 'setup-hooks.ts not found. Skipping hook configuration.');
+    return;
+  }
+
+  try {
+    // Set PAI_DIR for the subprocess
+    process.env.PAI_DIR = PAI_DIR;
+    await $`bun run ${setupHooksScript}`.env({ PAI_DIR });
+    log('✅', 'PAI hooks configured successfully');
+  } catch (e) {
+    log('❌', 'Failed to configure hooks');
+    console.error(e);
+    return;
+  }
+
+  // Ask about global hooks
+  console.log('\nWhere should PAI hooks be active?');
+  console.log('  1. Only in PAI directory (recommended)');
+  console.log('  2. Globally for all Claude Code sessions');
+  console.log('');
+
+  const wantGlobal = await askYesNo('Install hooks globally?', false);
+
+  if (wantGlobal) {
+    log('🔧', 'Installing hooks globally...');
+
+    const paiSettings = join(PAI_DIR, '.claude', 'settings.json');
+
+    if (!existsSync(paiSettings)) {
+      log('❌', 'PAI settings.json not found');
+      return;
+    }
+
+    // Backup global settings if they exist
+    if (existsSync(CLAUDE_SETTINGS)) {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
+      const backupPath = join(CLAUDE_DIR, `settings.backup-${timestamp}.json`);
+      const existingContent = readFileSync(CLAUDE_SETTINGS, 'utf-8');
+      writeFileSync(backupPath, existingContent);
+      log('💾', `Backed up existing global settings: ${backupPath}`);
+    }
+
+    // Copy PAI settings to global
+    const paiSettingsContent = readFileSync(paiSettings, 'utf-8');
+    writeFileSync(CLAUDE_SETTINGS, paiSettingsContent);
+    log('✅', 'Global hooks installed');
+    log('ℹ️', 'PAI hooks will now be active in all directories');
+  } else {
+    log('✅', 'Hooks configured for PAI directory only');
+    log('ℹ️', 'Run Claude Code from PAI directory to activate hooks:');
+    log('  ', `cd ${PAI_DIR} && claude`);
+  }
+}
+
+async function addPaiDirToShellProfile(): Promise<void> {
+  logSection('Environment Variable Setup');
+
+  const shell = detectShell();
+
+  if (!shell.profilePath) {
+    log('⚠️', 'Could not detect shell profile. Please add PAI_DIR manually:');
+    log('  ', `export PAI_DIR="${PAI_DIR}"`);
+    return;
+  }
+
+  log('🔍', `Detected shell: ${shell.type}`);
+  log('📄', `Profile: ${shell.profilePath}`);
+
+  const wantAutoAdd = await askYesNo('Automatically add PAI_DIR to shell profile?', true);
+
+  if (!wantAutoAdd) {
+    log('ℹ️', 'Add this to your shell profile manually:');
+    if (shell.type === 'powershell') {
+      log('  ', `$env:PAI_DIR = "${PAI_DIR}"`);
+    } else {
+      log('  ', `export PAI_DIR="${PAI_DIR}"`);
+    }
+    return;
+  }
+
+  try {
+    // Ensure profile file exists
+    if (!existsSync(shell.profilePath)) {
+      const profileDir = dirname(shell.profilePath);
+      if (!existsSync(profileDir)) {
+        mkdirSync(profileDir, { recursive: true });
+      }
+      writeFileSync(shell.profilePath, '');
+    }
+
+    // Check if PAI_DIR is already set
+    const profileContent = readFileSync(shell.profilePath, 'utf-8');
+    if (profileContent.includes('PAI_DIR')) {
+      log('✅', 'PAI_DIR already configured in shell profile');
+      return;
+    }
+
+    // Add PAI_DIR to profile
+    const exportLine = shell.type === 'powershell'
+      ? `\n# PAI System\n$env:PAI_DIR = "${PAI_DIR}"\n`
+      : `\n# PAI System\nexport PAI_DIR="${PAI_DIR}"\n`;
+
+    appendFileSync(shell.profilePath, exportLine);
+    log('✅', `Added PAI_DIR to ${shell.profilePath}`);
+    log('ℹ️', 'Restart your terminal or run:');
+    if (shell.type === 'powershell') {
+      log('  ', `. $PROFILE`);
+    } else {
+      log('  ', `source ${shell.profilePath}`);
+    }
+  } catch (e) {
+    log('❌', 'Failed to add PAI_DIR to shell profile');
+    console.error(e);
+  }
+}
+
+async function offerPaiCliInstall(): Promise<void> {
+  logSection('PAI CLI Installation');
+
+  const paiCliDir = join(PAI_DIR, 'pai-cli');
+
+  if (!existsSync(paiCliDir)) {
+    log('⚠️', 'pai-cli directory not found. Skipping CLI installation.');
+    return;
+  }
+
+  log('ℹ️', 'PAI CLI provides convenience commands like `pai launch` and `pai init bmad`');
+  log('ℹ️', 'Note: This will eventually be decoupled from PAI System');
+
+  const wantCli = await askYesNo('Install pai-cli globally?', true);
+
+  if (!wantCli) {
+    log('⏭️', 'Skipping pai-cli installation');
+    return;
+  }
+
+  try {
+    log('🔧', 'Installing pai-cli dependencies...');
+    await $`cd ${paiCliDir} && npm install`.quiet();
+
+    log('🔧', 'Building pai-cli...');
+    await $`cd ${paiCliDir} && npm run build`.quiet();
+
+    log('🔧', 'Installing pai-cli globally...');
+    await $`cd ${paiCliDir} && npm install -g .`.quiet();
+
+    log('✅', 'pai-cli installed successfully');
+    log('ℹ️', 'You can now use: pai launch, pai init bmad');
+  } catch (e) {
+    log('❌', 'Failed to install pai-cli');
+    console.error(e);
+  }
+}
+
+// ============================================
 // Main Functions
 // ============================================
 
@@ -510,13 +727,44 @@ async function install(): Promise<void> {
   log('📍', `PAI Directory: ${PAI_DIR}`);
   log('🏠', `Home Directory: ${homedir()}`);
 
+  // Run checks first
   await runChecks();
   printResults();
 
   const hasFails = results.some(r => r.status === 'fail');
   if (hasFails) {
+    log('❌', 'Critical issues detected. Please fix issues and re-run setup.');
     process.exit(1);
   }
+
+  // Interactive configuration
+  console.log('\n');
+  const proceed = await askYesNo('Continue with interactive setup?', true);
+
+  if (!proceed) {
+    log('⏭️', 'Setup cancelled');
+    process.exit(0);
+  }
+
+  // Step 1: Configure hooks
+  await configureHooks();
+
+  // Step 2: Add PAI_DIR to shell profile
+  await addPaiDirToShellProfile();
+
+  // Step 3: Offer pai-cli installation
+  await offerPaiCliInstall();
+
+  // Final success message
+  logSection('Installation Complete');
+  log('✅', 'PAI System installed successfully!');
+  console.log('\nNext steps:');
+  console.log('  1. Restart your terminal (or source your shell profile)');
+  console.log('  2. Launch Claude Code:');
+  console.log(`     cd ${PAI_DIR} && claude`);
+  console.log('     OR');
+  console.log('     pai launch  (if you installed pai-cli)');
+  console.log('');
 }
 
 async function doctor(): Promise<void> {
