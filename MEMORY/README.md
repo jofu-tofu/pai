@@ -1,8 +1,8 @@
 # PAI Memory System - Architecture Analysis
 
-**Analysis Date:** 2026-01-09
-**Version:** 1.0.0
-**Status:** Active system with migration in progress
+**Analysis Date:** 2026-01-13
+**Version:** 1.1.0
+**Status:** Active system with partial migration complete
 
 ---
 
@@ -68,11 +68,11 @@ $PAI_DIR/MEMORY/
 
 ### Actual Current Structure (Local Installation)
 
-**MEMORY/** (created 2026-01-09 - newer, used by THEALGORITHM):
+**MEMORY/** (created 2026-01-09 - canonical location):
 ```
 MEMORY/
-├── State/                 # Contains algorithm-state.json
-├── Work/                  # ISC files from THEALGORITHM
+├── State/                 # Algorithm state tracking
+├── Work/                  # Per-task ISC files from THEALGORITHM
 ├── backups/
 ├── decisions/
 ├── execution/
@@ -85,7 +85,17 @@ MEMORY/
 └── README.md
 ```
 
-**history/** (created 2026-01-06 - older, used by hooks):
+**Note:** The following directories documented in MEMORYSYSTEM.md do NOT yet exist:
+- Learning/ (phase-based curated learnings)
+- Signals/ (pattern detection)
+- archive/ (compressed archives)
+- analysis/ (analysis documents)
+- ideas/ (brainstorm captures)
+- releases/ (release notes)
+- skills/ (skill-related history)
+- session-events.jsonl (main event log)
+
+**history/** (created 2026-01-06 - legacy location, still used by hooks):
 ```
 history/
 ├── decisions/
@@ -131,21 +141,23 @@ history/
 | `MEMORY/Signals/` | Failure tracking, loopback patterns |
 
 **Source files:**
-- `skills/THEALGORITHM/Tools/AlgorithmDisplay.ts:21-22`
-- `skills/THEALGORITHM/Tools/ISCManager.ts:51`
-- `skills/THEALGORITHM/Tools/RalphLoopExecutor.ts:51`
+- `skills/THEALGORITHM/Tools/AlgorithmDisplay.ts` (verified exists)
+- `skills/THEALGORITHM/Tools/ISCManager.ts` (verified exists)
+- `skills/THEALGORITHM/Tools/RalphLoopExecutor.ts` (verified exists)
 
 ### CORE Skill
 | Folder | Usage |
 |--------|-------|
 | `MEMORY/security/` | Security event logging |
 | `MEMORY/sessions/` | Session history references |
-| `MEMORY/Backups/` | Skill and config backups |
+| `MEMORY/backups/` | Skill and config backups |
 
 **Source files:**
-- `skills/CORE/USER/PAISECURITYSYSTEM/COMMANDINJECTION.md:295`
-- `skills/CORE/USER/PAISECURITYSYSTEM/PROMPTINJECTION.md:105`
-- `skills/CORE/USER/PAISECURITYSYSTEM/REPOSITORIES.md:159`
+- `skills/CORE/USER/PAISECURITYSYSTEM/COMMANDINJECTION.md` (verified exists)
+- `skills/CORE/USER/PAISECURITYSYSTEM/PROMPTINJECTION.md` (verified exists)
+- `skills/CORE/USER/PAISECURITYSYSTEM/REPOSITORIES.md` (verified exists)
+
+**Note:** Actual directory is `MEMORY/backups/` (lowercase), not `MEMORY/Backups/`.
 
 ### UpdatePAI Skill
 | Folder | Usage |
@@ -153,20 +165,28 @@ history/
 | `history/` | Source for migration (old system) |
 | `MEMORY/` | Target for migration (new system) |
 
-**Migration commands:**
-```bash
-cp -r "$PAI_DIR/history/learnings"/* "$NEW_PAI_DIR/MEMORY/learnings/"
-find "$PAI_DIR/history/sessions" -type f -mtime -30 -exec cp {} "$NEW_PAI_DIR/MEMORY/sessions/"
-```
+**Migration references:**
+Migration commands found in:
+- `skills/UpdatePAI/Workflows/HybridUpdate.md` (verified exists)
+- `skills/UpdatePAI/Workflows/AutoUpdate.md` (verified exists)
 
-### Hooks (initialize-session.ts)
-| Folder | Usage |
-|--------|-------|
-| `history/sessions` | Session initialization |
-| `history/learnings` | Learning capture |
-| `history/research` | Research outputs |
+These workflows contain migration logic to copy data from `history/` to `MEMORY/`.
+
+### Hooks (hooks/)
+| Hook File | Folder | Usage |
+|-----------|--------|-------|
+| `initialize-session.ts` | `history/sessions` | Creates session directories on session start |
+| `capture-session-summary.ts` | `history/sessions` | Captures session summaries on session end |
+| `capture-all-events.ts` | `history/raw-outputs` | Captures all hook events |
+| `stop-hook.ts` | `history/sessions` | Session cleanup |
 
 **CRITICAL GAP:** Hooks still write to `history/`, not `MEMORY/`.
+
+**Source verification:**
+- Lines 116-119 in `initialize-session.ts` reference `history/sessions`, `history/learnings`, `history/research`
+- Line 57 in `capture-session-summary.ts` references `history/raw-outputs`
+- Line 124 in `capture-session-summary.ts` uses `history/` directory
+- Line 133 in `capture-session-summary.ts` writes to `history/sessions`
 
 ---
 
@@ -198,23 +218,33 @@ find "$PAI_DIR/history/sessions" -type f -mtime -30 -exec cp {} "$NEW_PAI_DIR/ME
 
 ### CRITICAL: Duplicate Memory Systems
 
-| Folder | In `MEMORY/` | In `history/` | Conflict? |
-|--------|--------------|---------------|-----------|
-| sessions/ | Yes | Yes | **YES** |
-| learnings/ | Yes | Yes | **YES** |
-| research/ | Yes | Yes | **YES** |
-| decisions/ | Yes | Yes | **YES** |
-| execution/ | Yes | Yes | **YES** |
-| raw-outputs/ | Yes | Yes | **YES** |
-| State/ | Yes | No | No |
-| Work/ | Yes | No | No |
-| Signals/ | Yes | No | No |
-| Learning/ | Yes | No | No |
-| recovery/ | Yes | No | No |
-| security/ | Yes | No | No |
-| backups/ | Yes | No | No |
+| Folder | In `MEMORY/` | In `history/` | Conflict? | Status |
+|--------|--------------|---------------|-----------|--------|
+| sessions/ | Yes | Yes | **YES** | Both exist, hooks write to history/ |
+| learnings/ | Yes | Yes | **YES** | Both exist, hooks reference history/ |
+| research/ | Yes | Yes | **YES** | Both exist, hooks reference history/ |
+| decisions/ | Yes | Yes | **YES** | Both exist |
+| execution/ | Yes | Yes | **YES** | Both exist |
+| raw-outputs/ | Yes | Yes | **YES** | Both exist, hooks write to history/ |
+| State/ | Yes | No | No | Only in MEMORY/ |
+| Work/ | Yes | No | No | Only in MEMORY/ |
+| Signals/ | No* | No | No | Documented but not created |
+| Learning/ | No* | No | No | Documented but not created |
+| recovery/ | Yes | No | No | Only in MEMORY/ |
+| security/ | Yes | No | No | Only in MEMORY/ |
+| backups/ | Yes | No | No | Only in MEMORY/ |
+| archive/ | No* | No | No | Documented but not created |
+| analysis/ | No* | No | No | Documented but not created |
+| ideas/ | No* | No | No | Documented but not created |
+| releases/ | No* | No | No | Documented but not created |
+| skills/ | No* | No | No | Documented but not created |
 
-**Root Cause:** The hooks (installed from `pai-hook-system` pack) were designed for the old `history/` structure. The MEMORYSYSTEM.md documents the new canonical `MEMORY/` structure, but hooks haven't been updated.
+**Root Cause:** The hooks write to `history/` structure. MEMORYSYSTEM.md documents the canonical `MEMORY/` structure, but hooks haven't been updated to use it.
+
+**Verified via code inspection:**
+- `initialize-session.ts` lines 116-119 create `history/sessions`, `history/learnings`, `history/research`
+- `capture-session-summary.ts` lines 57, 124, 133 reference `history/` directories
+- No hooks currently write to `MEMORY/` directories
 
 ### Overlap Consequences
 
@@ -375,18 +405,23 @@ Based on the architecture, here's what the structure suggests for future develop
 
 | Gap | Status | Notes |
 |-----|--------|-------|
-| `Learning/` phase folders | Created but empty | Need curation logic |
-| `Signals/` files | Defined but not written | Need signal capture hooks |
-| `archive/` | Exists but no archiver | Need archival script |
-| `session-events.jsonl` | Documented but missing | Main event log not created |
+| `Learning/` phase folders | **Not created** | Documented in MEMORYSYSTEM.md but directories don't exist |
+| `Signals/` files | **Not created** | Documented in MEMORYSYSTEM.md but directory doesn't exist |
+| `archive/` | **Not created** | Documented in MEMORYSYSTEM.md but directory doesn't exist |
+| `analysis/` | **Not created** | Documented in MEMORYSYSTEM.md but directory doesn't exist |
+| `ideas/` | **Not created** | Documented in MEMORYSYSTEM.md but directory doesn't exist |
+| `releases/` | **Not created** | Documented in MEMORYSYSTEM.md but directory doesn't exist |
+| `skills/` | **Not created** | Documented in MEMORYSYSTEM.md but directory doesn't exist |
+| `session-events.jsonl` | **Not created** | Documented in MEMORYSYSTEM.md but file doesn't exist |
 
 ### Documentation Gaps
 
 | Gap | Location | Notes |
 |-----|----------|-------|
 | No cleanup schedule | MEMORYSYSTEM.md | Retention defined, not enforced |
-| No archival process | MEMORYSYSTEM.md | Archive folder exists, no process |
-| Hook-to-memory mapping | THEHOOKSYSTEM.md | Doesn't specify which hooks write where |
+| No archival process | MEMORYSYSTEM.md | Archive folder documented but not created, no process exists |
+| Hook-to-memory mapping | hooks/ | Hooks write to `history/` but docs specify `MEMORY/` |
+| Undocumented directories | MEMORYSYSTEM.md | Several documented directories don't exist in actual installation |
 
 ---
 
@@ -394,21 +429,121 @@ Based on the architecture, here's what the structure suggests for future develop
 
 ### Immediate Actions
 
-1. **Consolidate to MEMORY/**
+1. **Update hooks to write to MEMORY/**
+   - Modify `initialize-session.ts` lines 116-119 to create MEMORY/ subdirectories
+   - Modify `capture-session-summary.ts` lines 57, 124, 133 to write to MEMORY/
+   - Update all other hooks that reference history/
+
+2. **Create missing MEMORY/ directories**
    ```bash
-   # Migrate history/ to MEMORY/
+   mkdir -p "$PAI_DIR/MEMORY/Learning"/{OBSERVE,THINK,PLAN,BUILD,EXECUTE,VERIFY,ALGORITHM,sessions}
+   mkdir -p "$PAI_DIR/MEMORY/Signals"
+   mkdir -p "$PAI_DIR/MEMORY/archive"
+   mkdir -p "$PAI_DIR/MEMORY/analysis"
+   mkdir -p "$PAI_DIR/MEMORY/ideas"
+   mkdir -p "$PAI_DIR/MEMORY/releases"
+   mkdir -p "$PAI_DIR/MEMORY/skills"
+   ```
+
+3. **Optional: Consolidate existing history/ data into MEMORY/**
+   ```bash
+   # After hooks are updated, migrate existing history data
    cp -rn "$PAI_DIR/history/"* "$PAI_DIR/MEMORY/"
    ```
 
-2. **Update hooks** to write to `MEMORY/` instead of `history/`
-
-3. **Create cleanup script** and schedule via cron
+4. **Create cleanup script** and schedule for retention enforcement
 
 ### Future Enhancements
 
-1. Implement signal capture in THEALGORITHM VERIFY phase
-2. Add learning curation logic to bubble up insights
-3. Create memory search capability
+1. **Implement signal capture** in THEALGORITHM VERIFY phase
+   - Create `Signals/failures.jsonl`, `Signals/loopbacks.jsonl`, etc.
+   - Add signal capture hooks to algorithm execution
+
+2. **Add learning curation logic** to bubble up insights
+   - Implement logic to move learnings from Work/ to Learning/ by phase
+   - Create automated curation based on generalizability criteria
+
+3. **Create memory search capability**
+   - Index all markdown/JSONL files
+   - Enable semantic search across memory tiers
+
+4. **Deprecate history/ directory**
+   - Once hooks are updated and data migrated, remove history/ directory
+   - Update all documentation to remove history/ references
+
+---
+
+## 11. Verification Summary (2026-01-13)
+
+### Files and Directories Verified
+
+**Existing in MEMORY/:**
+- backups/ (created 2026-01-09)
+- decisions/ (created 2026-01-09)
+- execution/ (created 2026-01-09)
+- learnings/ (created 2026-01-09)
+- raw-outputs/ (created 2026-01-09)
+- recovery/ (created 2026-01-09)
+- research/ (created 2026-01-09)
+- security/ (created 2026-01-09)
+- sessions/ (created 2026-01-09)
+- State/ (created 2026-01-11)
+- Work/ (created 2026-01-12, contains algorithm-a1-implementation/)
+- README.md (last updated 2026-01-12)
+
+**Existing in history/:**
+- decisions/ (created 2026-01-06)
+- execution/ (created 2026-01-06)
+- learnings/ (created 2026-01-06)
+- raw-outputs/ (created 2026-01-06)
+- research/ (created 2026-01-07)
+- sessions/ (created 2026-01-06)
+- Upgrades.jsonl (created 2026-01-06)
+
+**Documented but NOT existing:**
+- MEMORY/Learning/ and all phase subdirectories
+- MEMORY/Signals/ and all signal files
+- MEMORY/archive/
+- MEMORY/analysis/
+- MEMORY/ideas/
+- MEMORY/releases/
+- MEMORY/skills/
+- MEMORY/session-events.jsonl
+
+### Hook Verification
+
+All hooks verified in `C:\Users\fujos\.pai\hooks\`:
+- capture-all-events.ts
+- capture-session-summary.ts (writes to history/raw-outputs and history/sessions)
+- cleanup-temp-files.ts
+- initialize-session.ts (creates history/sessions, history/learnings, history/research)
+- load-core-context.ts
+- security-validator.ts
+- stop-hook.ts
+- subagent-stop-hook.ts
+- update-tab-titles.ts
+
+**Confirmed:** Hooks write to `history/`, not `MEMORY/`.
+
+### Source Code Verification
+
+All referenced source files verified to exist:
+- skills/THEALGORITHM/Tools/AlgorithmDisplay.ts
+- skills/THEALGORITHM/Tools/ISCManager.ts
+- skills/THEALGORITHM/Tools/RalphLoopExecutor.ts
+- skills/CORE/USER/PAISECURITYSYSTEM/COMMANDINJECTION.md
+- skills/CORE/USER/PAISECURITYSYSTEM/PROMPTINJECTION.md
+- skills/CORE/USER/PAISECURITYSYSTEM/REPOSITORIES.md
+- skills/UpdatePAI/Workflows/HybridUpdate.md
+- skills/UpdatePAI/Workflows/AutoUpdate.md
+
+### Key Findings
+
+1. **Dual memory systems confirmed**: Both MEMORY/ and history/ exist and are actively used
+2. **Hooks use history/**: All session capture hooks write to history/ directories
+3. **Partial implementation**: Only core directories exist in MEMORY/, advanced features (Learning/, Signals/) not yet implemented
+4. **Documentation accuracy**: MEMORYSYSTEM.md describes ideal state, not current state
+5. **Migration incomplete**: Data exists in both locations, creating fragmentation
 
 ---
 

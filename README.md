@@ -91,10 +91,17 @@ bun run scripts/setup.ts doctor
 │   ├── CORE/          # Core identity and preferences
 │   ├── CreateSkill/   # Skill creation utilities
 │   ├── Prompting/     # Meta-prompting system
-│   └── UpdateSkill/   # Skill modification utilities
+│   ├── UpdateSkill/   # Skill modification utilities
+│   ├── UpdatePAI/     # PAI system updater
+│   ├── THEALGORITHM/  # Universal execution engine
+│   ├── Upgrades/      # Upgrade opportunity tracking
+│   └── Agents/        # Dynamic agent composition
 ├── tools/             # MCP tools and utilities
+├── MEMORY/            # Memory system storage (gitignored)
+├── mem-store/         # Additional memory storage (gitignored)
 ├── history/           # Session history and learnings (gitignored)
 ├── agentic_logs/      # Success/error logs (gitignored)
+├── voice/             # Voice/audio output (gitignored)
 └── scripts/           # Setup and utility scripts
 ```
 
@@ -103,15 +110,23 @@ bun run scripts/setup.ts doctor
 ### Hooks
 
 - **Security Validator** - Blocks dangerous commands (rm -rf /, reverse shells, etc.)
-- **Session Tracking** - Captures session summaries and learnings
-- **Event Capture** - Records all tool calls and session events
-- **Tab Titles** - Updates terminal tab with current task
+- **Session Summary Capture** - Captures session summaries and learnings at SessionEnd
+- **Event Capture** - Records all tool calls and session events (all hook types)
+- **Tab Title Updates** - Updates terminal tab with current task
+- **Temporary File Cleanup** - Cleans up tmpclaude-* files before each prompt
+- **Session Initialization** - Sets up session tracking and environment
+- **CORE Context Loading** - Loads CORE skill at session start
 
 ### Skills
 
 - **CORE** - Identity, preferences, and response format
 - **Prompting** - Meta-prompting and template system
-- **CreateSkill/UpdateSkill** - Skill management
+- **CreateSkill** - Skill creation utilities and validation
+- **UpdateSkill** - Skill modification and maintenance
+- **UpdatePAI** - Fully autonomous PAI system updater
+- **THEALGORITHM** - Universal execution engine using scientific method
+- **Upgrades** - Track PAI upgrade opportunities
+- **Agents** - Dynamic agent composition and management
 
 ## Configuration
 
