@@ -114,6 +114,7 @@ desktop.ini
 *.temp
 *.swp
 *~
+tmpclaude-*
 
 # Windows artifacts
 nul
