@@ -63,8 +63,14 @@ fi
 
 # Auto-update hook paths to use $PAI_DIR
 # This ensures hooks work regardless of PAI_DIR value
-merged=$(echo "$merged" | jq 'walk(if type == "string" then gsub("/c/EpicSource/pai"; "$PAI_DIR") else . end)' 2>/dev/null || echo "$merged")
-merged=$(echo "$merged" | jq 'walk(if type == "string" then gsub("C:\\\\EpicSource\\\\pai"; "$PAI_DIR") else . end)' 2>/dev/null || echo "$merged")
+# Note: The gsub patterns below are intentionally generic to catch any hardcoded absolute paths
+# They will be replaced with $PAI_DIR placeholder for portability
+merged=$(echo "$merged" | jq --arg pai_dir "${PAI_DIR}" 'walk(
+  if type == "string" then
+    # Replace common hardcoded path patterns with $PAI_DIR
+    gsub("(?<prefix>/[a-z]/[^/]+/pai|C:\\\\\\\\[^\\\\]+\\\\\\\\pai)"; "$PAI_DIR")
+  else . end
+)' 2>/dev/null || echo "$merged")
 
 # Write merged settings
 echo "$merged" | jq '.' > "$OUTPUT"

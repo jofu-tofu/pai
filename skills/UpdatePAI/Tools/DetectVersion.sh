@@ -4,7 +4,12 @@
 
 set -e
 
-PAI_DIR="${PAI_DIR:-/c/EpicSource/pai}"
+PAI_DIR="${PAI_DIR:-}"
+
+if [[ -z "$PAI_DIR" ]]; then
+    echo "ERROR: PAI_DIR environment variable not set" >&2
+    exit 1
+fi
 
 echo "Detecting PAI version at: $PAI_DIR"
 echo ""

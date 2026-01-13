@@ -7,7 +7,13 @@
 
 set -euo pipefail
 
-REPO_DIR="${1:-/c/EpicSource/Github/Personal_AI_Infrastructure}"
+REPO_DIR="${1:-}"
+
+if [[ -z "$REPO_DIR" ]]; then
+    echo "ERROR: REPO_DIR not specified" >&2
+    echo "Usage: $0 <repo_dir> [since_tag]" >&2
+    exit 1
+fi
 SINCE_TAG="${2:-}" # Optional: start from specific tag/commit
 
 if [[ ! -d "$REPO_DIR/.git" ]]; then
