@@ -1,0 +1,2 @@
+# This file preserves the mem-store directory structure in git
+# The actual memory store files are ignored via .gitignore
