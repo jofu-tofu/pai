@@ -6,7 +6,7 @@ A personal AI infrastructure layer for Claude Code that adds hooks, skills, obse
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/pai.git ~/.pai
+git clone https://github.com/jofu-tofu/pai.git ~/.pai
 
 # Run setup
 cd ~/.pai && bun run scripts/setup.ts
@@ -38,7 +38,7 @@ $env:PAI_DIR = "$HOME\.pai"
 
 **Windows (System Environment Variables):**
 - Search "Environment Variables" in Start menu
-- Add `PAI_DIR` with value `C:\Users\YOUR_USERNAME\.pai`
+- Add `PAI_DIR` with value `C:\Users\<YOUR_USERNAME>\.pai`
 
 ### 2. Install Dependencies
 

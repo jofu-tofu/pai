@@ -37,7 +37,7 @@ VERSION: 1.2.0
 | Property | Value |
 |----------|-------|
 | **Location** | `${PAI_DIR}/` |
-| **Repository** | github.com/[YOUR_USERNAME]/[PRIVATE_REPO] (PRIVATE, STAYS PRIVATE FOREVER) |
+| **Repository** | github.com/jofu-tofu/[PRIVATE_REPO] (PRIVATE, STAYS PRIVATE FOREVER) |
 | **Contains** | ALL sensitive data, API keys, personal history, contacts, private configurations |
 | **Purpose** | Your actual working PAI infrastructure |
 | **Status** | NEVER MAKE PUBLIC - contains real API keys, personal data, conversation history |
@@ -51,7 +51,7 @@ VERSION: 1.2.0
 | Property | Value |
 |----------|-------|
 | **Location** | `[YOUR_PUBLIC_REPO_PATH]/` |
-| **Repository** | github.com/[YOUR_USERNAME]/[PUBLIC_REPO] (PUBLIC) |
+| **Repository** | github.com/jofu-tofu/pai (PUBLIC) |
 | **Contains** | ONLY sanitized, generic, example code for others to use |
 | **Purpose** | Share PAI concepts and architecture with the community as templates |
 | **Status** | PUBLIC - anyone can see this |
