@@ -42,8 +42,8 @@ function getShellCommand(scriptPath: string): string {
   const isWindows = platform() === 'win32';
 
   if (isWindows) {
-    // Windows: Use PowerShell to run Bun scripts
-    return `powershell -Command "bun run ${scriptPath}"`;
+    // Windows: Use PowerShell Core to run Bun scripts
+    return `pwsh -Command "bun run ${scriptPath}"`;
   } else {
     // Unix-like: Direct bun execution
     return `bun run ${scriptPath}`;
@@ -84,7 +84,7 @@ function generateSettings(paiDir: string): SettingsJson {
     statusLine: {
       type: 'command',
       command: platform() === 'win32'
-        ? 'powershell -NoProfile -Command "& \\"$env:PAI_DIR/scripts/statusline.ps1\\""'
+        ? 'pwsh -NoProfile -Command "& \\"$env:PAI_DIR/scripts/statusline.ps1\\""'
         : 'bash $PAI_DIR/scripts/statusline.sh'
     },
     hooks: {
@@ -186,6 +186,10 @@ function generateSettings(paiDir: string): SettingsJson {
           hooks: [
             {
               type: 'command',
+              command: getShellCommand(hookPath('cleanup-temp-files.ts'))
+            },
+            {
+              type: 'command',
               command: getShellCommand(hookPath('update-tab-titles.ts'))
             },
             {
@@ -208,6 +212,7 @@ function validateHooks(paiDir: string): boolean {
     'load-core-context.ts',
     'security-validator.ts',
     'capture-all-events.ts',
+    'cleanup-temp-files.ts',
     'update-tab-titles.ts',
     'stop-hook.ts',
     'subagent-stop-hook.ts',

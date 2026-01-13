@@ -66,7 +66,7 @@ The PAI system uses `PAI_DIR` as the root path for all resource location:
 | Environment | PAI_DIR Value | Purpose |
 |-------------|---------------|---------|
 | **Development** | `$(pwd)` (worktree root) | Isolated testing in development branch |
-| **Production** | `~/.pai` or `$HOME\.pai` | Deployed global PAI system |
+| **Production** | `~/.pai` or `$HOME/.pai` | Deployed global PAI system |
 
 ## Working with Hooks
 
@@ -154,20 +154,26 @@ Each hook serves a specific purpose in the PAI System:
 
 #### UserPromptSubmit Hooks
 
-5. **update-tab-titles.ts** - UI updates
+5. **cleanup-temp-files.ts** - Temporary file cleanup
+   - Recursively scans working directory for temporary Claude files
+   - Deletes files and directories matching `tmpclaude-*` pattern
+   - Runs silently to avoid cluttering output
+   - Prevents accumulation of temporary files during sessions
+
+6. **update-tab-titles.ts** - UI updates
    - Updates terminal tab title based on user prompt
    - Extracts keywords from prompt
    - Sets dynamic tab title (e.g., "🤖 Fix authentication bug")
 
 #### Stop Hooks
 
-6. **stop-hook.ts** - Main session capture
+7. **stop-hook.ts** - Main session capture
    - Captures main agent work summaries
    - Detects learnings vs regular sessions
    - Routes to: `history/learnings/` or `history/sessions/`
    - Extracts summary from final response
 
-7. **subagent-stop-hook.ts** - Subagent output capture
+8. **subagent-stop-hook.ts** - Subagent output capture
    - Captures Task tool outputs
    - Routes by agent type:
      - `researcher` → `history/research/`
@@ -177,7 +183,7 @@ Each hook serves a specific purpose in the PAI System:
 
 #### SessionEnd Hooks
 
-8. **capture-session-summary.ts** - Final session summary
+9. **capture-session-summary.ts** - Final session summary
    - Analyzes entire session from raw events
    - Determines session focus (blog-work, hook-development, etc.)
    - Lists files changed, commands executed, tools used
@@ -283,9 +289,9 @@ Complete all items before deploying to production:
 
 **Environment Configuration:**
 - [ ] Set PAI_DIR to production path
-  - PowerShell: `$env:PAI_DIR = "$HOME\.pai"`
+  - PowerShell: `$env:PAI_DIR = "$HOME/.pai"`
   - Bash: `export PAI_DIR="$HOME/.pai"`
-- [ ] Verify production PAI_DIR: `echo $env:PAI_DIR`
+- [ ] Verify production PAI_DIR: `echo $env:PAI_DIR` (PowerShell) or `echo $PAI_DIR` (Bash)
 
 **Deployment Steps:**
 - [ ] Copy code to production location
