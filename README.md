@@ -1,6 +1,6 @@
 # PAI - Personal AI Infrastructure
 
-A personal AI infrastructure layer for Claude Code that adds hooks, skills, observability, and more.
+A personal AI infrastructure layer for Claude Code that adds hooks, skills, and more.
 
 ## Quick Install
 
@@ -44,8 +44,6 @@ $env:PAI_DIR = "$HOME\.pai"
 
 ```bash
 cd ~/.pai/hooks && bun install
-cd ~/.pai/observability/apps/server && bun install
-cd ~/.pai/observability/apps/client && bun install
 cd ~/.pai/skills/Prompting/Tools && bun install
 ```
 
@@ -88,14 +86,13 @@ bun run scripts/setup.ts doctor
 ```
 ~/.pai/
 ├── .claude/           # Claude Code project settings (hooks config)
-├── hooks/             # Hook scripts (security, observability, etc.)
+├── hooks/             # Hook scripts (security, session tracking, etc.)
 ├── skills/            # AI skills and workflows
 │   ├── CORE/          # Core identity and preferences
 │   ├── CreateSkill/   # Skill creation utilities
 │   ├── Prompting/     # Meta-prompting system
 │   └── UpdateSkill/   # Skill modification utilities
 ├── tools/             # MCP tools and utilities
-├── observability/     # Event viewer and analytics
 ├── history/           # Session history and learnings (gitignored)
 ├── agentic_logs/      # Success/error logs (gitignored)
 └── scripts/           # Setup and utility scripts
@@ -107,7 +104,7 @@ bun run scripts/setup.ts doctor
 
 - **Security Validator** - Blocks dangerous commands (rm -rf /, reverse shells, etc.)
 - **Session Tracking** - Captures session summaries and learnings
-- **Event Capture** - Records all tool calls for observability
+- **Event Capture** - Records all tool calls and session events
 - **Tab Titles** - Updates terminal tab with current task
 
 ### Skills
@@ -115,15 +112,6 @@ bun run scripts/setup.ts doctor
 - **CORE** - Identity, preferences, and response format
 - **Prompting** - Meta-prompting and template system
 - **CreateSkill/UpdateSkill** - Skill management
-
-### Observability
-
-Real-time event viewer for monitoring Claude Code activity.
-
-```bash
-cd ~/.pai/observability && ./manage.ps1 start  # Windows
-cd ~/.pai/observability && ./manage.cmd start  # Windows (cmd)
-```
 
 ## Configuration
 

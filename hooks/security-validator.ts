@@ -2,8 +2,6 @@
 // $PAI_DIR/hooks/security-validator.ts
 // PreToolUse hook: Validates commands and blocks dangerous operations
 
-import { sendEventToObservability, getCurrentTimestamp, getSourceApp } from './lib/observability';
-
 interface PreToolUsePayload {
   session_id: string;
   tool_name: string;
@@ -203,20 +201,6 @@ async function main() {
     }
 
     const validation = validateCommand(command);
-
-    // Send to observability if configured
-    if (validation.action) {
-      await sendEventToObservability({
-        source_app: getSourceApp(),
-        session_id: payload.session_id,
-        hook_event_type: 'PreToolUse',
-        timestamp: getCurrentTimestamp(),
-        tool_name: 'Bash',
-        tool_input: { command: command.substring(0, 200) },
-        security_action: validation.action,
-        security_message: validation.message
-      });
-    }
 
     if (!validation.allowed) {
       // Output the block message - Claude Code will see this
