@@ -2,13 +2,13 @@
 
 > Auto-generated tracking file. Run `bun $PAI_DIR/Tools/PaiArchitecture.ts generate` to refresh.
 
-**Last Updated:** 2026-01-07T04:03:34.351Z
+**Last Updated:** 2026-01-13T03:24:57.597Z
 
 ## Installation Summary
 
 | Category | Count |
 |----------|-------|
-| Packs | 3 |
+| Packs | 8 |
 | Bundles | 0 |
 | Upgrades | 2 |
 
@@ -16,9 +16,14 @@
 
 | Pack | Version | Status |
 |------|---------|--------|
+| Agents | 1.0.0 | healthy |
 | CORE | 1.0.0 | healthy |
 | CreateSkill | 1.0.0 | healthy |
 | Prompting | 1.0.0 | healthy |
+| THEALGORITHM | 1.0.0 | healthy |
+| UpdatePAI | 1.0.0 | healthy |
+| UpdateSkill | 1.0.0 | healthy |
+| Upgrades | 1.0.0 | healthy |
 
 ## Upgrade History
 
@@ -31,7 +36,7 @@
 
 - **Hook System:** ✓ Healthy
 - **History System:** ✓ Healthy
-- **Skills:** ✓ 3 loaded
+- **Skills:** ✓ 8 loaded
 
 ---
 
