@@ -409,7 +409,6 @@ Based on the architecture, here's what the structure suggests for future develop
 1. Implement signal capture in THEALGORITHM VERIFY phase
 2. Add learning curation logic to bubble up insights
 3. Create memory search capability
-4. Add observability dashboard for memory metrics
 
 ---
 

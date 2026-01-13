@@ -232,8 +232,6 @@ async function checkDirectories(): Promise<CheckResult> {
 async function checkDependencies(): Promise<CheckResult> {
   const packageDirs = [
     'hooks',
-    'observability/apps/server',
-    'observability/apps/client',
     'skills/Prompting/Tools',
   ];
 
