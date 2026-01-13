@@ -24,6 +24,13 @@ agentic_logs/
 history/
 
 # ============================================
+# MEMORY & STATE
+# ============================================
+# Local memory, state, and work tracking - never commit
+MEMORY/
+mem-store/
+
+# ============================================
 # DEPENDENCIES
 # ============================================
 # Installed from package.json - never commit
