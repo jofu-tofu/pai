@@ -2,7 +2,7 @@
   "model": "sonnet",
   "statusLine": {
     "type": "command",
-    "command": "powershell -NoProfile -Command \"& \\\"$env:PAI_DIR/scripts/statusline.ps1\\\"\""
+    "command": "pwsh -NoProfile -Command \"& \\\"$env:PAI_DIR/scripts/statusline.ps1\\\"\""
   },
   "hooks": {
     "SessionStart": [
@@ -11,15 +11,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/initialize-session.ts\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/initialize-session.ts\""
           },
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/load-core-context.ts\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/load-core-context.ts\""
           },
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type SessionStart\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type SessionStart\""
           }
         ]
       }
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/security-validator.ts\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/security-validator.ts\""
           }
         ]
       },
@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type PreToolUse\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type PreToolUse\""
           }
         ]
       }
@@ -50,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type PostToolUse\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type PostToolUse\""
           }
         ]
       }
@@ -60,11 +60,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/stop-hook.ts\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/stop-hook.ts\""
           },
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type Stop\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type Stop\""
           }
         ]
       }
@@ -74,11 +74,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/subagent-stop-hook.ts\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/subagent-stop-hook.ts\""
           },
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type SubagentStop\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type SubagentStop\""
           }
         ]
       }
@@ -88,11 +88,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/capture-session-summary.ts\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/capture-session-summary.ts\""
           },
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type SessionEnd\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type SessionEnd\""
           }
         ]
       }
@@ -103,11 +103,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/update-tab-titles.ts\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/cleanup-temp-files.ts\""
           },
           {
             "type": "command",
-            "command": "powershell -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type UserPromptSubmit\""
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/update-tab-titles.ts\""
+          },
+          {
+            "type": "command",
+            "command": "pwsh -Command \"bun run $env:PAI_DIR/hooks/capture-all-events.ts --event-type UserPromptSubmit\""
           }
         ]
       }
