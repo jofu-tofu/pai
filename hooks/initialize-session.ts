@@ -5,7 +5,6 @@
 import { existsSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
-import { sendEventToObservability, getCurrentTimestamp, getSourceApp } from './lib/observability';
 
 interface SessionStartPayload {
   session_id: string;
@@ -134,17 +133,7 @@ async function main() {
       project: projectName
     }, null, 2));
 
-    // 4. Send to observability dashboard
-    await sendEventToObservability({
-      source_app: getSourceApp(),
-      session_id: payload.session_id,
-      hook_event_type: 'SessionStart',
-      timestamp: getCurrentTimestamp(),
-      cwd: payload.cwd,
-      project: projectName
-    });
-
-    // 5. Background version check (non-blocking)
+    // 4. Background version check (non-blocking)
     checkForUpdates().catch(() => {});
 
     // Output session info

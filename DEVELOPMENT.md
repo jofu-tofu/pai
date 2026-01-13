@@ -130,7 +130,6 @@ Each hook serves a specific purpose in the PAI System:
    - Sets terminal tab title with project name
    - Creates required directory structure
    - Writes session marker file
-   - Sends events to observability
 
 2. **load-core-context.ts** - Context injection
    - Loads CORE skill from `$PAI_DIR/skills/CORE/SKILL.md`
