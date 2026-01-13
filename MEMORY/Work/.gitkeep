@@ -1,0 +1,2 @@
+# This file preserves the MEMORY/Work directory structure in git
+# The actual work files are ignored via .gitignore

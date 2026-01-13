@@ -26,9 +26,12 @@ history/
 # ============================================
 # MEMORY & STATE
 # ============================================
-# Local memory, state, and work tracking - never commit
-MEMORY/
-mem-store/
+# Local memory, state, and work tracking - never commit contents
+# But preserve folder structure
+MEMORY/**/*
+mem-store/**/*
+!MEMORY/**/.gitkeep
+!mem-store/**/.gitkeep
 
 # ============================================
 # DEPENDENCIES

@@ -1,0 +1,2 @@
+# This file preserves the MEMORY/State directory structure in git
+# The actual state files are ignored via .gitignore
