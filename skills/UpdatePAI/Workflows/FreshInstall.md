@@ -49,7 +49,7 @@ REPO_DIR="/c/EpicSource/Github/Personal_AI_Infrastructure"
 CORE_PACK="$REPO_DIR/Packs/pai-core-install"
 
 # Create directory structure
-mkdir -p "$PAI_DIR"/{.claude,hooks,observability,skills,tools}
+mkdir -p "$PAI_DIR"/{.claude,hooks,skills,tools}
 
 # Install core components
 cp -r "$CORE_PACK/src/MEMORY" "$PAI_DIR/"

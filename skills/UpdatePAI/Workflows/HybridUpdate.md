@@ -52,7 +52,7 @@ done
 ```bash
 CORE_PACK="$REPO_DIR/Packs/pai-core-install"
 
-mkdir -p "$NEW_PAI_DIR"/{.claude,hooks,observability,skills,tools}
+mkdir -p "$NEW_PAI_DIR"/{.claude,hooks,skills,tools}
 cp -r "$CORE_PACK/src/MEMORY" "$NEW_PAI_DIR/"
 cp -r "$CORE_PACK/src/skills/CORE" "$NEW_PAI_DIR/skills/"
 cp -r "$CORE_PACK/src/hooks" "$NEW_PAI_DIR/"

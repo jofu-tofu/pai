@@ -22,7 +22,7 @@ echo "PAI_DIR: $PAI_DIR"
 
 ```bash
 REQUIRED=(".claude" "skills" "hooks")
-OPTIONAL=("MEMORY" "history" "tools" "observability")
+OPTIONAL=("MEMORY" "history" "tools")
 
 for dir in "${REQUIRED[@]}"; do
     [ -d "$PAI_DIR/$dir" ] && echo "OK: $dir/" || echo "ERROR: $dir/ missing"
