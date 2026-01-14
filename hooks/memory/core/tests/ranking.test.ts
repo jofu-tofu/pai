@@ -87,8 +87,8 @@ describe('Ranking Pipeline', () => {
             sessionId: 'mem_001',
             timestamp: now - (2 * 24 * 60 * 60 * 1000),
             importanceScore: 0,
-            accessCount: 0,
-            lastAccessed: null,
+            accessCount: 1,
+            lastAccessed: now - (1 * 24 * 60 * 60 * 1000), // Accessed 1 day ago
             tags: [],
             memoryType: 'episodic'
           }
@@ -103,8 +103,8 @@ describe('Ranking Pipeline', () => {
             sessionId: 'mem_001',
             timestamp: now - (60 * 24 * 60 * 60 * 1000),
             importanceScore: 0,
-            accessCount: 0,
-            lastAccessed: null,
+            accessCount: 1,
+            lastAccessed: now - (30 * 24 * 60 * 60 * 1000), // Accessed 30 days ago
             tags: [],
             memoryType: 'episodic'
           }
@@ -121,7 +121,8 @@ describe('Ranking Pipeline', () => {
         expect(result.value[0].segmentId).toBe('seg_recent');
         expect(result.value[1].segmentId).toBe('seg_old');
         expect(result.value[0].componentScores.recency).toBeGreaterThan(90);
-        expect(result.value[1].componentScores.recency).toBeLessThan(10);
+        // Story 6.3: Old segment (60d creation, 30d access) scores ~15.6% with dual-recency
+        expect(result.value[1].componentScores.recency).toBeLessThan(20);
       }
     });
 
@@ -137,8 +138,8 @@ describe('Ranking Pipeline', () => {
           sessionId: 'mem_001',
           timestamp: now - (14 * 24 * 60 * 60 * 1000),
           importanceScore: 0,
-          accessCount: 0,
-          lastAccessed: null,
+          accessCount: 1,
+          lastAccessed: now - (14 * 24 * 60 * 60 * 1000), // Accessed same time as creation (14 days ago)
           tags: [],
           memoryType: 'episodic'
         }
@@ -150,6 +151,7 @@ describe('Ranking Pipeline', () => {
 
       expect(result.ok).toBe(true);
       if (result.ok) {
+        // With dual-recency at same timestamp: creation=0.5, access=0.5, combined = 0.4*0.5 + 0.6*0.5 = 0.5 = 50
         expect(result.value[0].componentScores.recency).toBeCloseTo(50, 0);
       }
     });
@@ -318,8 +320,11 @@ describe('Ranking Pipeline', () => {
         // Term match: 3 of 4 terms = 0.75 → 75% (per AC)
         expect(ranked.componentScores.termMatch).toBe(75);
 
-        // Recency: 7 days with 14-day half-life ≈ 70.7%
-        expect(ranked.componentScores.recency).toBeCloseTo(70.7, 0);
+        // Recency (Story 6.3 dual-recency):
+        // Created 7 days ago: 0.707
+        // Accessed just now: 1.0
+        // Combined: 0.4 * 0.707 + 0.6 * 1.0 = 0.8828 ≈ 88.3%
+        expect(ranked.componentScores.recency).toBeCloseTo(88.3, 0);
 
         // Importance: 60/100 = 60%
         expect(ranked.componentScores.importance).toBe(60);
@@ -327,9 +332,9 @@ describe('Ranking Pipeline', () => {
         // Access: 10/20 = 50%
         expect(ranked.componentScores.access).toBe(50);
 
-        // Final: 0.40*75 + 0.30*70.7 + 0.20*60 + 0.10*50
-        //      = 30 + 21.21 + 12 + 5 = 68.21
-        expect(ranked.relevanceScore).toBeCloseTo(68.21, 0);
+        // Final: 0.40*75 + 0.30*88.3 + 0.20*60 + 0.10*50
+        //      = 30 + 26.49 + 12 + 5 = 73.49
+        expect(ranked.relevanceScore).toBeCloseTo(73.49, 0);
       }
     });
   });

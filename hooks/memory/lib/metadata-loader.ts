@@ -8,13 +8,20 @@ import { join } from 'path';
 import { getPaiDir } from './utils';
 
 interface SessionRegistry {
-  sessions: Array<{
-    sessionId: string;
-    capturedAt: number;
-    segmentCount: number;
-    tags: string[];
-  }>;
-  segments: {
+  sessions: {
+    [sessionId: string]: {
+      sessionId: string;
+      capturedAt: number;
+      segmentCount: number;
+      segments: any[];
+      tags: string[];
+    };
+  };
+  indexes?: {
+    byTag?: { [tag: string]: string[] };
+    bySession?: { [sessionId: string]: string[] };
+  };
+  segments?: {
     [segmentId: string]: SegmentMetadata;
   };
 }
@@ -39,15 +46,27 @@ export async function loadSegmentMetadata(
     const metadata: SegmentMetadata[] = [];
 
     for (const segmentId of segmentIds) {
-      const segmentData = registry.segments[segmentId];
-
-      if (segmentData) {
-        metadata.push(segmentData);
+      // Check if registry has top-level segments index (new format)
+      if (registry.segments && registry.segments[segmentId]) {
+        metadata.push(registry.segments[segmentId]);
       } else {
-        // Segment not found in registry - log warning but continue
-        console.error(
-          `[Memory:MetadataLoader] Segment ${segmentId} not found in registry`
-        );
+        // Fallback: Search through sessions (current format)
+        let found = false;
+        for (const session of Object.values(registry.sessions || {})) {
+          const segment = session.segments?.find((s: any) => s.id === segmentId);
+          if (segment) {
+            metadata.push(segment as SegmentMetadata);
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          // Segment not found in registry - log warning but continue
+          console.error(
+            `[Memory:MetadataLoader] Segment ${segmentId} not found in registry`
+          );
+        }
       }
     }
 

@@ -80,9 +80,11 @@ export class FileBackend implements StorageProvider {
 
   private keywordIndex: KeywordIndexManager;
   private organizer: FlatByDateOrganizeProvider;
+  private basePath: string;
 
-  constructor() {
-    this.keywordIndex = new KeywordIndexManager();
+  constructor(config?: { storePath?: string }) {
+    this.basePath = config?.storePath || getPaiDir();
+    this.keywordIndex = new KeywordIndexManager(this.basePath);
     this.organizer = new FlatByDateOrganizeProvider();
   }
 
@@ -92,8 +94,7 @@ export class FileBackend implements StorageProvider {
    */
   async initialize(): Promise<Result<void, StorageError>> {
     try {
-      const paiDir = getPaiDir();
-      const memStoreDir = join(paiDir, 'mem-store');
+      const memStoreDir = join(this.basePath, 'mem-store');
       const segmentsDir = join(memStoreDir, 'segments');
       const structuredDir = join(memStoreDir, 'structured');
 
@@ -144,7 +145,7 @@ export class FileBackend implements StorageProvider {
       }
 
       // Full directory path
-      const fullDirPath = join(getPaiDir(), 'mem-store', dirPath);
+      const fullDirPath = join(this.basePath, 'mem-store', dirPath);
 
       // Create directory if it doesn't exist
       await fs.mkdir(fullDirPath, { recursive: true });
@@ -218,7 +219,7 @@ export class FileBackend implements StorageProvider {
   async retrieve(id: string): Promise<Result<MemorySegment | null, StorageError>> {
     try {
       // Strategy 1: Check session registry first for the path (fast)
-      const registryPath = join(getPaiDir(), 'mem-store', 'structured', 'session-registry.json');
+      const registryPath = join(this.basePath, 'mem-store', 'structured', 'session-registry.json');
 
       if (existsSync(registryPath)) {
         const registryContent = await fs.readFile(registryPath, 'utf-8');
@@ -228,7 +229,7 @@ export class FileBackend implements StorageProvider {
         for (const session of Object.values(registry.sessions || {})) {
           const segmentMeta = (session as any).segments.find((s: any) => s.id === id);
           if (segmentMeta) {
-            const filePath = join(getPaiDir(), 'mem-store', segmentMeta.path);
+            const filePath = join(this.basePath, 'mem-store', segmentMeta.path);
             if (existsSync(filePath)) {
               const content = await fs.readFile(filePath, 'utf-8');
               const parseResult = parseFrontmatter(content);
@@ -258,7 +259,7 @@ export class FileBackend implements StorageProvider {
 
       // Strategy 2: Registry miss - scan directories (fallback for race conditions)
       // This handles cases where file exists but registry update failed
-      const segmentsBaseDir = join(getPaiDir(), 'mem-store', 'segments');
+      const segmentsBaseDir = join(this.basePath, 'mem-store', 'segments');
       if (existsSync(segmentsBaseDir)) {
         const yearMonths = await fs.readdir(segmentsBaseDir);
         for (const yearMonth of yearMonths) {
@@ -308,7 +309,7 @@ export class FileBackend implements StorageProvider {
    */
   async query(filters: QueryFilters): Promise<Result<QueryResult, StorageError>> {
     try {
-      const registryPath = join(getPaiDir(), 'mem-store', 'structured', 'session-registry.json');
+      const registryPath = join(this.basePath, 'mem-store', 'structured', 'session-registry.json');
 
       // If registry doesn't exist, return empty result (not an error)
       if (!existsSync(registryPath)) {
@@ -386,6 +387,114 @@ export class FileBackend implements StorageProvider {
   }
 
   /**
+   * Update a memory segment with partial updates.
+   * Uses atomic read-modify-write pattern with temp file + rename.
+   * Special handling for accessCount - increments instead of replaces.
+   */
+  async update(
+    id: string,
+    updates: Partial<MemorySegment>
+  ): Promise<Result<MemorySegment, StorageError>> {
+    try {
+      // Read current segment
+      const retrieveResult = await this.retrieve(id);
+      if (!retrieveResult.ok) {
+        return {
+          ok: false,
+          error: retrieveResult.error,
+        };
+      }
+
+      if (retrieveResult.value === null) {
+        return {
+          ok: false,
+          error: {
+            code: 'STORAGE_NOT_FOUND',
+            message: `Segment ${id} not found`,
+          },
+        };
+      }
+
+      const current = retrieveResult.value;
+
+      // Merge updates with special handling for accessCount
+      const updated: MemorySegment = {
+        ...current,
+        ...updates,
+      };
+
+      // Special handling for accessCount - increment not replace
+      if (updates.accessCount !== undefined) {
+        updated.accessCount = current.accessCount + updates.accessCount;
+      }
+
+      // Determine file path
+      const yearMonth = getYearMonth(current.timestamp);
+      const filePath = join(
+        this.basePath,
+        'mem-store',
+        'segments',
+        yearMonth,
+        `${id}.md`
+      );
+
+      // Serialize updated segment
+      const markdownResult = serializeFrontmatter(updated);
+      if (!markdownResult.ok) {
+        return {
+          ok: false,
+          error: {
+            code: 'STORAGE_SERIALIZE_FAILED',
+            message: `Failed to serialize updated segment ${id}`,
+            cause: markdownResult.error,
+          },
+        };
+      }
+
+      // Atomic write: temp file + rename
+      const tempPath = `${filePath}.tmp.${process.pid}`;
+      await fs.writeFile(tempPath, markdownResult.value, 'utf-8');
+      await fs.rename(tempPath, filePath);
+
+      // Update keyword index if tags changed (AC2 requirement for Story 5.1)
+      const oldTags = current.tags || [];
+      const newTags = updated.tags || [];
+      const tagsChanged = JSON.stringify(oldTags.sort()) !== JSON.stringify(newTags.sort());
+
+      if (tagsChanged) {
+        try {
+          // Remove from old tags
+          if (oldTags.length > 0) {
+            await this.keywordIndex.removeFromIndex(id, oldTags);
+          }
+          // Add to new tags
+          if (newTags.length > 0) {
+            await this.keywordIndex.addToIndex(id, newTags);
+          }
+        } catch (indexError) {
+          console.error(
+            `[Memory:FileBackend] Failed to update keyword index on tag change: ${(indexError as Error).message}`
+          );
+          // Index update failure should not fail update operation (graceful degradation)
+        }
+      }
+
+      console.log(`[Memory:FileBackend] Updated segment ${id}`);
+
+      return { ok: true, value: updated };
+    } catch (error) {
+      return {
+        ok: false,
+        error: {
+          code: 'STORAGE_UPDATE_FAILED',
+          message: `Failed to update segment ${id}: ${(error as Error).message}`,
+          cause: error as Error,
+        },
+      };
+    }
+  }
+
+  /**
    * Delete a memory segment from storage.
    */
   async delete(id: string): Promise<Result<boolean, StorageError>> {
@@ -420,7 +529,7 @@ export class FileBackend implements StorageProvider {
 
       // Determine file path
       const yearMonth = getYearMonth(segment.timestamp);
-      const filePath = join(getPaiDir(), 'mem-store', 'segments', yearMonth, `${id}.md`);
+      const filePath = join(this.basePath, 'mem-store', 'segments', yearMonth, `${id}.md`);
 
       // Delete the file
       if (existsSync(filePath)) {
@@ -456,8 +565,7 @@ export class FileBackend implements StorageProvider {
    */
   async healthCheck(): Promise<Result<boolean, StorageError>> {
     try {
-      const paiDir = getPaiDir();
-      const memStoreDir = join(paiDir, 'mem-store');
+      const memStoreDir = join(this.basePath, 'mem-store');
 
       // Check if directories exist and are accessible
       const segmentsDir = join(memStoreDir, 'segments');
@@ -517,7 +625,7 @@ export class FileBackend implements StorageProvider {
     operation: 'add' | 'remove'
   ): Promise<Result<void, StorageError>> {
     try {
-      const registryPath = join(getPaiDir(), 'mem-store', 'structured', 'session-registry.json');
+      const registryPath = join(this.basePath, 'mem-store', 'structured', 'session-registry.json');
       const registryDir = dirname(registryPath);
 
       // Create directory if it doesn't exist

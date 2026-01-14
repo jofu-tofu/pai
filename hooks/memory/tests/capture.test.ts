@@ -38,6 +38,24 @@ function runCaptureHook(
 }
 
 /**
+ * Helper: Create required mem-store directories (Story 3.6 requirement)
+ */
+function ensureMemStoreDirectories() {
+  const dirs = [
+    join(TEST_PAI_DIR, 'mem-store'),
+    join(TEST_PAI_DIR, 'mem-store', 'segments'),
+    join(TEST_PAI_DIR, 'mem-store', 'structured'),
+    join(TEST_PAI_DIR, 'mem-store', 'indexes', 'keyword'),
+    join(TEST_PAI_DIR, 'mem-store', 'queue'),
+    join(TEST_PAI_DIR, 'mem-store', 'metrics'),
+    join(TEST_PAI_DIR, 'mem-store', 'cache')
+  ];
+  for (const dir of dirs) {
+    mkdirSync(dir, { recursive: true });
+  }
+}
+
+/**
  * Helper: Create settings.json with specific memory.enabled value
  */
 function createSettings(enabled: boolean) {
@@ -55,6 +73,9 @@ function createSettings(enabled: boolean) {
     JSON.stringify(settings, null, 2),
     'utf-8'
   );
+
+  // Pre-create directories for Story 3.6 graceful degradation
+  ensureMemStoreDirectories();
 }
 
 /**
@@ -85,6 +106,9 @@ function createHookSettings(config: {
     JSON.stringify(settings, null, 2),
     'utf-8'
   );
+
+  // Pre-create directories for Story 3.6 graceful degradation
+  ensureMemStoreDirectories();
 }
 
 describe('capture.ts - memory system toggle', () => {
@@ -122,9 +146,13 @@ describe('capture.ts - memory system toggle', () => {
     expect(result.stderr).toContain('[Memory:Capture] Memory system disabled');
     expect(result.stderr).toContain('exiting');
 
-    // Assert: No queue files created
+    // Assert: Directory may exist (Story 3.6 ensureMemStoreDirectories), but no queue files created
     const queueDir = join(TEST_PAI_DIR, 'mem-store', 'queue');
-    expect(existsSync(queueDir)).toBe(false);
+    if (existsSync(queueDir)) {
+      const fs = require('fs');
+      const files = fs.readdirSync(queueDir).filter((f: string) => f.endsWith('.json'));
+      expect(files.length).toBe(0); // No queue files should be created when disabled
+    }
   });
 
   test('should process normally when memory.enabled = true', async () => {
@@ -245,9 +273,13 @@ describe('capture.ts - hook-specific toggle (Story 3.3)', () => {
     // Assert: Global toggle message should NOT appear
     expect(result.stderr).not.toContain('Memory system disabled');
 
-    // Assert: No queue files created
+    // Assert: Directory may exist (Story 3.6 ensureMemStoreDirectories), but no queue files created
     const queueDir = join(TEST_PAI_DIR, 'mem-store', 'queue');
-    expect(existsSync(queueDir)).toBe(false);
+    if (existsSync(queueDir)) {
+      const fs = require('fs');
+      const files = fs.readdirSync(queueDir).filter((f: string) => f.endsWith('.json'));
+      expect(files.length).toBe(0); // No queue files should be created when disabled
+    }
   });
 
   test('should process normally when memory.hooks.sessionEnd = true', async () => {

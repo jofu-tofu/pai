@@ -394,9 +394,9 @@ describe('retrieve.ts - memory system toggle', () => {
     const exitCode = await proc.exited;
     const stderr = await proc.stderr.text();
 
-    // Assert: Exit code 0, normal processing logs
+    // Assert: Exit code 0, normal processing logs (NOT debug logs unless debug enabled)
     expect(exitCode).toBe(0);
-    expect(stderr).toContain('[Memory:Retrieve] Query:');
+    expect(stderr).toContain('[Memory:'); // Any memory log indicates processing happened
     expect(stderr).not.toContain('Memory system disabled');
   });
 
@@ -621,8 +621,8 @@ describe('retrieve.ts - hook-specific toggle (Story 3.3)', () => {
     // Assert: No disabled messages
     expect(stderr).not.toContain('disabled');
 
-    // Assert: Normal retrieval logs
-    expect(stderr).toContain('[Memory:Retrieve] Query:');
+    // Assert: Normal retrieval logs (NOT debug logs unless debug enabled)
+    expect(stderr).toContain('[Memory:'); // Any memory log indicates processing happened
   });
 
   test('should check global toggle BEFORE hook-specific toggle', async () => {

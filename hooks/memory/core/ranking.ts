@@ -103,10 +103,12 @@ export async function rankResults(
           result.matchCount,
           result.totalQueryTerms
         ),
+        // Story 6.3: Pass lastAccessed for dual-recency scoring
         recencyScore: calculateRecencyScore(
           result.metadata.timestamp,
           currentTime,
-          halfLifeDays
+          halfLifeDays,
+          result.metadata.lastAccessed
         ),
         importanceScore: calculateImportanceScore(
           result.metadata.importanceScore

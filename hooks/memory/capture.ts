@@ -16,6 +16,9 @@ import { homedir } from 'os';
 import { generateSessionId } from './lib/id-generator';
 import { isProcessorRunning } from './lib/lock';
 import { getMemoryConfig } from './core/config';
+import { logMemoryError } from './lib/error-logger';
+import { ensureMemStoreDirectories } from './lib/directory-utils';
+import { updateCaptureStats } from './lib/logging/stats-manager';
 import './core/register-providers'; // Register MVP providers
 
 // Constants
@@ -76,8 +79,18 @@ function spawnProcessor() {
  */
 async function main() {
   const startTime = Date.now();
+  let captureSuccess = false;
 
   try {
+    // === Story 3.6: Graceful Degradation ===
+    // Ensure directories exist before operations (AC: Story 3.6)
+    const dirResult = ensureMemStoreDirectories();
+    if (!dirResult.ok) {
+      logMemoryError('Capture', dirResult.error);
+      process.exit(0); // Graceful exit if directories can't be created
+    }
+    // === End Story 3.6 ===
+
     // LEVEL 1: Check if memory system is globally enabled
     const configResult = await getMemoryConfig();
 
@@ -128,9 +141,8 @@ async function main() {
     }
     const sessionId = sessionIdResult.value;
 
-    // Create queue file
+    // Queue directory already ensured by ensureMemStoreDirectories()
     const queueDir = join(getPaiDir(), 'mem-store', 'queue');
-    await fs.mkdir(queueDir, { recursive: true });
 
     const timestamp = Date.now();
     const queueFile = join(queueDir, `${timestamp}_${sessionId}.json`);
@@ -164,17 +176,61 @@ async function main() {
       console.error('[Memory:Capture] Processor already running, skipping spawn');
     }
 
+    // Mark capture as successful
+    captureSuccess = true;
+
     // Performance monitoring
     const elapsed = Date.now() - startTime;
     if (elapsed > 1000) {
       console.error(`[Memory:Capture] WARNING: Execution took ${elapsed}ms (budget: 1000ms)`);
     }
-
-    process.exit(0);
   } catch (error) {
-    console.error(`[Memory:Capture] Error: ${(error as Error).message}`);
-    process.exit(0); // CRITICAL: Always exit 0
+    captureSuccess = false;
+    // === Story 3.6: Graceful Degradation ===
+    // CRITICAL: Catch all exceptions and exit gracefully
+    // Use enhanced error logger with stack trace (Story 3.6)
+    if (error instanceof Error) {
+      logMemoryError('Capture', error);
+    } else {
+      console.error(`[Memory:Capture] Error: ${String(error)}`);
+    }
+    // === End Story 3.6 ===
+  } finally {
+    // === Story 4.3: Performance Logging ===
+    // Update capture stats (fire-and-forget, never blocks hook)
+    const latencyMs = Date.now() - startTime;
+    try {
+      const statsResult = updateCaptureStats(latencyMs, captureSuccess);
+      if (!statsResult.ok) {
+        console.error(`[Memory:Capture] Stats update failed: ${statsResult.error.message}`);
+      }
+    } catch (statsError) {
+      // Ignore stats errors - never block hook execution
+      console.error(`[Memory:Capture] Stats update exception: ${statsError instanceof Error ? statsError.message : String(statsError)}`);
+    }
+    // === End Story 4.3 ===
   }
+
+  // CRITICAL: Always exit 0 - never block PAI
+  process.exit(0);
 }
 
-main();
+// === Story 3.6: Graceful Degradation ===
+// Handle unhandled rejections
+main().catch((error) => {
+  console.error('[Memory:Capture] Fatal: Unhandled rejection');
+  if (error instanceof Error) {
+    logMemoryError('Capture', error);
+  } else {
+    console.error(error);
+  }
+  process.exit(0);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('[Memory:Capture] Fatal: Uncaught exception');
+  logMemoryError('Capture', error);
+  process.exit(0);
+});
+// === End Story 3.6 ===

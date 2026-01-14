@@ -15,6 +15,25 @@ import { MemorySegment } from '../../types/segment';
 
 const TEST_PAI_DIR = join(homedir(), '.pai-test-file-backend');
 
+/**
+ * Helper to create a test segment with default values.
+ */
+function createTestSegment(overrides: Partial<MemorySegment> = {}): MemorySegment {
+  return {
+    id: `seg_${Date.now()}_test`,
+    sessionId: `mem_${Date.now()}_test`,
+    timestamp: Date.now(),
+    importanceScore: 0,
+    accessCount: 0,
+    lastAccessed: null,
+    tags: ['test'],
+    memoryType: 'episodic',
+    sourceRange: { start: 0, end: 100 },
+    content: 'Test segment content',
+    ...overrides,
+  };
+}
+
 describe('FileBackend', () => {
   let backend: FileBackend;
 
@@ -543,6 +562,135 @@ describe('FileBackend', () => {
         expect(retrieveResult.ok).toBe(true);
         expect(retrieveResult.value).not.toBeNull();
       }
+    });
+  });
+
+  describe('update (Story 4.4)', () => {
+    test('should increment accessCount by 1 when segment is updated', async () => {
+      // Arrange: Create and store a segment with accessCount: 0
+      const segment = createTestSegment({ accessCount: 0, lastAccessed: null });
+      const storeResult = await backend.store(segment);
+      expect(storeResult.ok).toBe(true);
+
+      // Act: Update usage signals
+      const updateResult = await backend.update(segment.id, {
+        accessCount: 1, // Flag to increment by 1
+        lastAccessed: Date.now(),
+      });
+
+      // Assert: Update succeeded and accessCount incremented
+      expect(updateResult.ok).toBe(true);
+      expect(updateResult.value).not.toBeNull();
+      expect(updateResult.value?.accessCount).toBe(1);
+      expect(updateResult.value?.lastAccessed).toBeGreaterThan(0);
+
+      // Verify persisted
+      const retrieveResult = await backend.retrieve(segment.id);
+      expect(retrieveResult.ok).toBe(true);
+      expect(retrieveResult.value?.accessCount).toBe(1);
+      expect(retrieveResult.value?.lastAccessed).toBeGreaterThan(0);
+    });
+
+    test('should increment accessCount multiple times when updated repeatedly', async () => {
+      // Arrange: Create segment
+      const segment = createTestSegment({ accessCount: 0 });
+      await backend.store(segment);
+
+      // Act: Update 3 times
+      await backend.update(segment.id, { accessCount: 1, lastAccessed: Date.now() });
+      await backend.update(segment.id, { accessCount: 1, lastAccessed: Date.now() });
+      const updateResult = await backend.update(segment.id, { accessCount: 1, lastAccessed: Date.now() });
+
+      // Assert: accessCount = 3
+      expect(updateResult.ok).toBe(true);
+      expect(updateResult.value?.accessCount).toBe(3);
+
+      // Verify persisted
+      const retrieveResult = await backend.retrieve(segment.id);
+      expect(retrieveResult.ok).toBe(true);
+      expect(retrieveResult.value?.accessCount).toBe(3);
+    });
+
+    test('should update lastAccessed timestamp when segment is updated', async () => {
+      // Arrange
+      const segment = createTestSegment({ lastAccessed: null });
+      await backend.store(segment);
+
+      const beforeUpdate = Date.now();
+      await new Promise((resolve) => setTimeout(resolve, 10)); // Small delay
+
+      // Act
+      const updateResult = await backend.update(segment.id, {
+        accessCount: 1,
+        lastAccessed: Date.now(),
+      });
+
+      // Assert: lastAccessed updated to recent timestamp
+      expect(updateResult.ok).toBe(true);
+      expect(updateResult.value?.lastAccessed).toBeGreaterThanOrEqual(beforeUpdate);
+    });
+
+    test('should preserve existing metadata during partial update', async () => {
+      // Arrange: Create segment with rich metadata
+      const segment = createTestSegment({
+        tags: ['typescript', 'hooks'],
+        importanceScore: 75,
+        memoryType: 'semantic',
+        content: 'Original content',
+      });
+      await backend.store(segment);
+
+      // Act: Update only usage signals
+      const updateResult = await backend.update(segment.id, {
+        accessCount: 1,
+        lastAccessed: Date.now(),
+      });
+
+      // Assert: All other fields preserved
+      expect(updateResult.ok).toBe(true);
+      const updated = updateResult.value!;
+      expect(updated.tags).toHaveLength(2);
+      expect(updated.tags).toContain('typescript');
+      expect(updated.tags).toContain('hooks');
+      expect(updated.importanceScore).toBe(75);
+      expect(updated.memoryType).toBe('semantic');
+      expect(updated.content).toBe('Original content');
+      expect(updated.accessCount).toBe(1);
+    });
+
+    test('should return error when segment not found', async () => {
+      // Act: Update non-existent segment
+      const updateResult = await backend.update('seg_nonexistent', {
+        accessCount: 1,
+        lastAccessed: Date.now(),
+      });
+
+      // Assert: Error returned
+      expect(updateResult.ok).toBe(false);
+      if (!updateResult.ok) {
+        expect(updateResult.error.code).toBe('STORAGE_NOT_FOUND');
+        expect(updateResult.error.message).toContain('not found');
+      }
+    });
+
+    test('should use atomic write (temp file + rename) to prevent corruption', async () => {
+      // Arrange
+      const segment = createTestSegment({ accessCount: 0 });
+      await backend.store(segment);
+
+      // Act: Update
+      const updateResult = await backend.update(segment.id, {
+        accessCount: 1,
+        lastAccessed: Date.now(),
+      });
+
+      // Assert: File exists and is valid (no temp files left behind)
+      expect(updateResult.ok).toBe(true);
+
+      const segmentsDir = join(TEST_PAI_DIR, 'mem-store', 'segments');
+      const files = await fs.readdir(segmentsDir, { recursive: true });
+      const tempFiles = files.filter((f) => String(f).includes('.tmp'));
+      expect(tempFiles.length).toBe(0); // No temp files left behind
     });
   });
 });

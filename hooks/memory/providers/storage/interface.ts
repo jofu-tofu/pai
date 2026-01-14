@@ -5,11 +5,27 @@
  * All storage providers must implement this interface to ensure consistent
  * behavior across different storage backends (file, SQLite, cloud, etc.).
  *
+ * ## Version Stability Commitment
+ *
+ * This interface follows semantic versioning (SemVer):
+ * - **Major version (X.0.0)**: Breaking changes (method signature changes, removed methods)
+ * - **Minor version (1.X.0)**: Backward-compatible additions (new optional methods/parameters)
+ * - **Patch version (1.0.X)**: Documentation improvements and clarifications
+ *
+ * **Current version: 1.0.0**
+ *
+ * We commit to:
+ * 1. No breaking changes within a major version
+ * 2. Deprecation warnings at least 1 minor version before removal
+ * 3. Migration guides for all breaking changes
+ * 4. Backward compatibility for all minor/patch versions
+ *
  * @module providers/storage/interface
+ * @version 1.0.0
  */
 
-import { Provider, Result } from '../../types/common';
-import { MemorySegment } from '../../types/segment';
+import type { Provider, Result } from '../../types/common';
+import type { MemorySegment } from '../../types/segment';
 
 /**
  * Storage provider interface for persisting memory segments.
@@ -105,18 +121,58 @@ export interface StorageProvider extends Provider {
   /**
    * Delete a memory segment from storage.
    *
+   * **Idempotent behavior**: Calling delete() multiple times with the same ID
+   * is safe and will not cause errors. First call returns true (deleted),
+   * subsequent calls return false (not found).
+   *
    * @param id - The segment ID to delete
    * @returns Result containing true if deleted, false if not found, or error
    *
    * @example
    * ```typescript
-   * const result = await storage.delete('seg_1704912345000_a1b2c3d4');
-   * if (result.ok && result.value) {
+   * // First delete - returns true
+   * const result1 = await storage.delete('seg_1704912345000_a1b2c3d4');
+   * if (result1.ok && result1.value) {
    *   console.log('Segment deleted successfully');
+   * }
+   *
+   * // Second delete - returns false (idempotent)
+   * const result2 = await storage.delete('seg_1704912345000_a1b2c3d4');
+   * if (result2.ok && !result2.value) {
+   *   console.log('Segment was already deleted');
    * }
    * ```
    */
   delete(id: string): Promise<Result<boolean, StorageError>>;
+
+  /**
+   * Update a memory segment with partial updates.
+   * Used for tracking usage signals (accessCount, lastAccessed).
+   *
+   * Special behavior for accessCount:
+   * - If updates.accessCount is provided, it INCREMENTS the current value (not replace)
+   * - This enables atomic increment operations for usage tracking
+   *
+   * @param id - The segment ID to update
+   * @param updates - Partial segment updates to apply
+   * @returns Result containing updated segment or error
+   *
+   * @example
+   * ```typescript
+   * // Increment accessCount by 1 and update lastAccessed
+   * const result = await storage.update('seg_1704912345000_a1b2c3d4', {
+   *   accessCount: 1,  // Will be ADDED to current accessCount
+   *   lastAccessed: Date.now()
+   * });
+   * if (result.ok) {
+   *   console.log(`Updated: accessCount=${result.value.accessCount}`);
+   * }
+   * ```
+   */
+  update(
+    id: string,
+    updates: Partial<MemorySegment>
+  ): Promise<Result<MemorySegment, StorageError>>;
 }
 
 /**
@@ -176,10 +232,21 @@ export interface QueryResult {
  * - STORAGE_SERIALIZE_FAILED: Failed to serialize segment to markdown
  * - STORAGE_PARSE_FAILED: Failed to parse segment from markdown
  * - STORAGE_REGISTRY_UPDATE_FAILED: Failed to update session registry
+ * - STORAGE_UPDATE_FAILED: Failed to update segment
+ * - STORAGE_NOT_FOUND: Segment not found for update/retrieval
  */
 export interface StorageError {
   /** Error code identifying the type of failure */
-  code: string;
+  code:
+    | 'STORAGE_WRITE_FAILED'
+    | 'STORAGE_READ_FAILED'
+    | 'STORAGE_DELETE_FAILED'
+    | 'STORAGE_QUERY_FAILED'
+    | 'STORAGE_SERIALIZE_FAILED'
+    | 'STORAGE_PARSE_FAILED'
+    | 'STORAGE_REGISTRY_UPDATE_FAILED'
+    | 'STORAGE_UPDATE_FAILED'
+    | 'STORAGE_NOT_FOUND';
 
   /** Human-readable error message */
   message: string;
@@ -187,3 +254,33 @@ export interface StorageError {
   /** Original error that caused this failure (if available) */
   cause?: Error;
 }
+
+/**
+ * Storage error code constants.
+ *
+ * Use these constants instead of hardcoding error strings to prevent typos.
+ *
+ * @example
+ * ```typescript
+ * import { STORAGE_ERROR_CODES } from './interface';
+ *
+ * return {
+ *   ok: false,
+ *   error: {
+ *     code: STORAGE_ERROR_CODES.WRITE_FAILED,
+ *     message: 'Failed to write segment'
+ *   }
+ * };
+ * ```
+ */
+export const STORAGE_ERROR_CODES = {
+  WRITE_FAILED: 'STORAGE_WRITE_FAILED' as const,
+  READ_FAILED: 'STORAGE_READ_FAILED' as const,
+  DELETE_FAILED: 'STORAGE_DELETE_FAILED' as const,
+  QUERY_FAILED: 'STORAGE_QUERY_FAILED' as const,
+  SERIALIZE_FAILED: 'STORAGE_SERIALIZE_FAILED' as const,
+  PARSE_FAILED: 'STORAGE_PARSE_FAILED' as const,
+  REGISTRY_UPDATE_FAILED: 'STORAGE_REGISTRY_UPDATE_FAILED' as const,
+  UPDATE_FAILED: 'STORAGE_UPDATE_FAILED' as const,
+  NOT_FOUND: 'STORAGE_NOT_FOUND' as const,
+} as const;
