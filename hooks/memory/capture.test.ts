@@ -53,6 +53,21 @@ describe('capture.ts hook', () => {
     if (existsSync(memStoreDir)) {
       rmSync(memStoreDir, { recursive: true, force: true });
     }
+
+    // Pre-create required directories for Story 3.6 ensureMemStoreDirectories() check
+    const dirs = [
+      join(TEST_PAI_DIR, 'mem-store'),
+      join(TEST_PAI_DIR, 'mem-store', 'segments'),
+      join(TEST_PAI_DIR, 'mem-store', 'structured'),
+      join(TEST_PAI_DIR, 'mem-store', 'indexes', 'keyword'),
+      join(TEST_PAI_DIR, 'mem-store', 'queue'),
+      join(TEST_PAI_DIR, 'mem-store', 'metrics'),
+      join(TEST_PAI_DIR, 'mem-store', 'cache')
+    ];
+    for (const dir of dirs) {
+      mkdirSync(dir, { recursive: true });
+    }
+
     // Ensure settings file exists for each test
     await createDefaultSettings();
   });

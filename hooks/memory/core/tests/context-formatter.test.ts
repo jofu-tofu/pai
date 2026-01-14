@@ -89,6 +89,8 @@ Third segment discussing memory retrieval patterns and context injection.`;
         expect(result.value).toContain('<memory relevance="88"');
         expect(result.value).toContain('age="2d"');
         expect(result.value).toContain('tags="typescript,hooks"');
+        expect(result.value).toContain('importance="80"');
+        expect(result.value).toContain('access-count="5"');
         expect(result.value).toContain('TypeScript hooks');
         expect(result.value).toContain('</memory>');
         expect(result.value).toContain('</retrieved-memories>');

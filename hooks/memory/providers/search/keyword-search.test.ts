@@ -65,7 +65,7 @@ describe('KeywordSearch Provider', () => {
       expect(health.details?.indexSize).toBe(0);
     });
 
-    test('should detect corrupted index file', async () => {
+    test('should handle corrupted index file gracefully (Story 3.6)', async () => {
       const corruptDir = join(TEST_PAI_DIR, 'corrupt');
       const corruptIndexDir = join(corruptDir, 'mem-store', 'indexes', 'keyword');
       mkdirSync(corruptIndexDir, { recursive: true });
@@ -79,9 +79,15 @@ describe('KeywordSearch Provider', () => {
       const corruptProvider = new KeywordSearch({ paiDir: corruptDir });
       const result = await corruptProvider.initialize();
 
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect(result.error.code).toBe('SEARCH_INDEX_CORRUPT');
+      // Story 3.6: Graceful degradation - corrupted index should not fail initialization
+      // Instead, it should create a new empty index
+      expect(result.ok).toBe(true);
+
+      // Verify provider is functional with empty index
+      const searchResult = await corruptProvider.search('test query');
+      expect(searchResult.ok).toBe(true);
+      if (searchResult.ok) {
+        expect(searchResult.value.length).toBe(0); // Empty index, no results
       }
 
       // Cleanup
@@ -300,6 +306,172 @@ describe('KeywordSearch Provider', () => {
         expect(result.error).toHaveProperty('code');
         expect(result.error).toHaveProperty('message');
       }
+    });
+  });
+
+  describe('Debug logging (Story 4.6)', () => {
+    beforeAll(() => {
+      // Create config directory and enable debug mode for these tests
+      const configDir = join(TEST_PAI_DIR, '.claude');
+      mkdirSync(configDir, { recursive: true });
+      writeFileSync(
+        join(configDir, 'settings.json'),
+        JSON.stringify({ memory: { debug: true } })
+      );
+
+      // Set PAI_DIR to use test config
+      process.env.PAI_DIR = TEST_PAI_DIR;
+    });
+
+    test('should output debug logs when debug mode enabled', async () => {
+      // Clear debug cache to pick up new config
+      const { clearDebugCache, initDebugCache } = await import('../../lib/debug-utils');
+      const { clearConfigCache } = await import('../../core/config');
+      clearDebugCache();
+      clearConfigCache();
+      await initDebugCache(); // Initialize with new config
+
+      // Arrange: Capture console.error
+      const originalConsoleError = console.error;
+      const errorLogs: string[] = [];
+      console.error = (...args: any[]) => {
+        errorLogs.push(args.join(' '));
+      };
+
+      // Act: Search with debug enabled
+      const result = await provider.search('typescript hook error', {
+        debug: true
+      });
+
+      // Restore console.error
+      console.error = originalConsoleError;
+
+      // Assert: Debug logs present (Story 4.6.2 format)
+      expect(result.ok).toBe(true);
+      const allLogs = errorLogs.join('\n');
+      expect(allLogs).toContain('[Memory:KeywordSearch:Debug] Terms extracted:');
+      expect(allLogs).toContain('[Memory:KeywordSearch:Debug] Index lookup:');
+      expect(allLogs).toContain('[Memory:KeywordSearch:Debug] Found');
+    });
+
+    test('should not output debug logs when debug mode disabled', async () => {
+      // Create config with debug disabled for this test
+      const configDir = join(TEST_PAI_DIR, '.claude');
+      writeFileSync(
+        join(configDir, 'settings.json'),
+        JSON.stringify({ memory: { debug: false } })
+      );
+
+      // Clear caches to pick up new config
+      const { clearDebugCache, initDebugCache } = await import('../../lib/debug-utils');
+      const { clearConfigCache } = await import('../../core/config');
+      clearDebugCache();
+      clearConfigCache();
+      await initDebugCache(); // Initialize with new config
+
+      // Arrange: Capture console.error
+      const originalConsoleError = console.error;
+      const errorLogs: string[] = [];
+      console.error = (...args: any[]) => {
+        errorLogs.push(args.join(' '));
+      };
+
+      // Act: Search with debug disabled
+      const result = await provider.search('typescript hook error');
+
+      // Restore console.error
+      console.error = originalConsoleError;
+
+      // Restore debug=true config for other tests
+      writeFileSync(
+        join(configDir, 'settings.json'),
+        JSON.stringify({ memory: { debug: true } })
+      );
+
+      // Assert: No debug logs (Story 4.6.2)
+      expect(result.ok).toBe(true);
+      const allLogs = errorLogs.join('\n');
+      expect(allLogs).not.toContain('[Memory:KeywordSearch:Debug]');
+    });
+
+    test('should log extracted terms in debug mode', async () => {
+      // Clear caches
+      const { clearDebugCache, initDebugCache } = await import('../../lib/debug-utils');
+      const { clearConfigCache } = await import('../../core/config');
+      clearDebugCache();
+      clearConfigCache();
+      await initDebugCache(); // Initialize with new config
+
+      // Arrange: Capture console.error
+      const originalConsoleError = console.error;
+      const errorLogs: string[] = [];
+      console.error = (...args: any[]) => {
+        errorLogs.push(args.join(' '));
+      };
+
+      // Act: Search with debug enabled
+      await provider.search('typescript hook', { debug: true });
+
+      // Restore console.error
+      console.error = originalConsoleError;
+
+      // Assert: Terms are logged (Story 4.6.2 format)
+      const allLogs = errorLogs.join('\n');
+      expect(allLogs).toContain('Terms extracted: ["typescript", "hook"]');
+    });
+
+    test('should log index hit counts in debug mode', async () => {
+      // Clear caches
+      const { clearDebugCache, initDebugCache } = await import('../../lib/debug-utils');
+      const { clearConfigCache } = await import('../../core/config');
+      clearDebugCache();
+      clearConfigCache();
+      await initDebugCache(); // Initialize with new config
+
+      // Arrange: Capture console.error
+      const originalConsoleError = console.error;
+      const errorLogs: string[] = [];
+      console.error = (...args: any[]) => {
+        errorLogs.push(args.join(' '));
+      };
+
+      // Act: Search with debug enabled
+      await provider.search('typescript hook', { debug: true });
+
+      // Restore console.error
+      console.error = originalConsoleError;
+
+      // Assert: Index hits logged with counts (Story 4.6.2 format)
+      const allLogs = errorLogs.join('\n');
+      expect(allLogs).toContain('Index lookup:');
+      expect(allLogs).toMatch(/typescript=\d+ hits/);
+      expect(allLogs).toMatch(/hook=\d+ hits/);
+    });
+
+    test('should log candidate count in debug mode', async () => {
+      // Clear caches
+      const { clearDebugCache, initDebugCache } = await import('../../lib/debug-utils');
+      const { clearConfigCache } = await import('../../core/config');
+      clearDebugCache();
+      clearConfigCache();
+      await initDebugCache(); // Initialize with new config
+
+      // Arrange: Capture console.error
+      const originalConsoleError = console.error;
+      const errorLogs: string[] = [];
+      console.error = (...args: any[]) => {
+        errorLogs.push(args.join(' '));
+      };
+
+      // Act: Search with debug enabled
+      await provider.search('typescript', { debug: true });
+
+      // Restore console.error
+      console.error = originalConsoleError;
+
+      // Assert: Candidates count logged (Story 4.6.2 format)
+      const allLogs = errorLogs.join('\n');
+      expect(allLogs).toMatch(/Found \d+ candidate segments/);
     });
   });
 });

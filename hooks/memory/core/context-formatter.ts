@@ -101,6 +101,8 @@ export async function formatMemoryContext(
       if (tagsStr) {
         attrs.push(`tags="${tagsStr}"`);
       }
+      attrs.push(`importance="${result.metadata.importanceScore}"`);
+      attrs.push(`access-count="${result.metadata.accessCount}"`);
 
       const attrsStr = attrs.join(' ');
 

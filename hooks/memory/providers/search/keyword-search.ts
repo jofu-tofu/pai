@@ -11,6 +11,7 @@ import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { DEFAULT_STOP_WORDS } from '../../lib/stop-words';
 import { getPaiDir } from '../../lib/utils';
+import { debugLog } from '../../lib/debug-utils';
 
 /**
  * Type definition for the inverted index
@@ -100,6 +101,7 @@ export class KeywordSearch implements SearchProvider {
       if (!this.initialized || !this.indexCache) {
         const initResult = await this.initialize();
         if (!initResult.ok) {
+          debugLog('KeywordSearch', `ERROR: Index initialization failed - ${initResult.error.message}`);
           return { ok: false, error: initResult.error };
         }
       }
@@ -107,16 +109,25 @@ export class KeywordSearch implements SearchProvider {
       // Extract and filter search terms
       const terms = this.extractTerms(query);
 
+      // Story 4.6.2: Log extracted terms
+      const termsStr = terms.map(t => `"${t}"`).join(', ');
+      debugLog('KeywordSearch', `Terms extracted: [${termsStr}]`);
+
       if (terms.length === 0) {
         // No valid search terms after filtering
+        debugLog('KeywordSearch', 'Zero results - no valid search terms after filtering');
         return { ok: true, value: [] };
       }
 
       // Lookup terms in index and track match counts
       const segmentMatches = new Map<string, { count: number; terms: string[] }>();
 
+      // Story 4.6.2: Track index hits for debug logging
+      const indexHits: Record<string, number> = {};
+
       for (const term of terms) {
         const segmentIds = this.indexCache![term] || [];
+        indexHits[term] = segmentIds.length;
 
         for (const segmentId of segmentIds) {
           const existing = segmentMatches.get(segmentId);
@@ -129,6 +140,12 @@ export class KeywordSearch implements SearchProvider {
         }
       }
 
+      // Story 4.6.2: Log index hits per term
+      const hitsStr = Object.entries(indexHits)
+        .map(([term, count]) => `${term}=${count} hits`)
+        .join(', ');
+      debugLog('KeywordSearch', `Index lookup: ${hitsStr}`);
+
       // Convert to SearchResult array
       const results: SearchResult[] = Array.from(segmentMatches.entries()).map(
         ([segmentId, match]) => ({
@@ -138,6 +155,9 @@ export class KeywordSearch implements SearchProvider {
           totalQueryTerms: terms.length
         })
       );
+
+      // Story 4.6.2: Log candidate count (before filtering)
+      debugLog('KeywordSearch', `Found ${results.length} candidate segments`);
 
       // Apply filters if specified
       let filteredResults = results;
@@ -181,6 +201,10 @@ export class KeywordSearch implements SearchProvider {
    * - Split on whitespace and punctuation
    * - Filter stop words
    * - Remove duplicates
+   *
+   * Note: This method is synchronous but may call async debugLog.
+   * We don't await the debug logging to avoid making this method async,
+   * which would require changes to callers. Debug logs are fire-and-forget.
    */
   private extractTerms(query: string): string[] {
     // Convert to lowercase
@@ -190,10 +214,26 @@ export class KeywordSearch implements SearchProvider {
     // This regex splits but keeps alphanumeric and underscores
     const tokens = normalized.split(/[^\w]+/);
 
+    // Track stopwords for debug logging
+    const stopwordsRemoved: string[] = [];
+
     // Filter out empty strings and stop words
-    const filtered = tokens.filter(
-      token => token && !this.stopWords.has(token)
-    );
+    const filtered = tokens.filter(token => {
+      if (!token) return false;
+
+      if (this.stopWords.has(token)) {
+        stopwordsRemoved.push(token);
+        return false;
+      }
+
+      return true;
+    });
+
+    // Story 4.6.2: Log stopword removal (fire-and-forget)
+    if (stopwordsRemoved.length > 0) {
+      const removedStr = stopwordsRemoved.map(w => `"${w}"`).join(', ');
+      debugLog('KeywordSearch', `Stopwords removed: [${removedStr}]`);
+    }
 
     // Remove duplicates
     return Array.from(new Set(filtered));
@@ -221,16 +261,11 @@ export class KeywordSearch implements SearchProvider {
         return { ok: true, value: {} };
       }
 
-      // Corrupted file IS an error
+      // Corrupted file: return EMPTY index, not error (AC: Story 3.6)
+      // This allows search to continue gracefully with no results
       if (error instanceof SyntaxError) {
-        return {
-          ok: false,
-          error: {
-            code: 'SEARCH_INDEX_CORRUPT',
-            message: `Index file is corrupted: ${error.message}`,
-            cause: error
-          }
-        };
+        console.error('[Memory:Search] Index corrupted, returning empty results');
+        return { ok: true, value: {} }; // Empty index = no results
       }
 
       // Other errors

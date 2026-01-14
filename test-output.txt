@@ -1,0 +1,2557 @@
+bun test v1.3.5 (1e86cebd)
+
+hooks\memory\core\config.test.ts:
+[Memory:Config] No settings file at C:\Users\fujos\.pai-test-config\.claude\settings.json, using defaults
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] No settings file at C:\Users\fujos\.pai-test-config\.claude\settings.json, using defaults
+[Memory:Config] No settings file at C:\Users\fujos\.pai-test-config\.claude\settings.json, using defaults
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] No settings file at C:\Users\fujos\.pai-test-config\.claude\settings.json, using defaults
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] No settings file at C:\Users\fujos\.pai-test-config\.claude\settings.json, using defaults
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+
+hooks\memory\core\experiment-validation.test.ts:
+[Memory:Registry] Registered all MVP providers
+[Memory:KeywordSearch] Index file not found, using empty index
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-experiment-validation\mem-store
+
+hooks\memory\core\pipeline.test.ts:
+[Memory:ProviderRegistry] Warning: Provider segment:per-message already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider extract:frontmatter-gen already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider extract:keyword-tagger already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider summarize:simple-extract already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider storage:file-backend already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider organize:flat-by-date already registered, overwriting
+[Memory:Pipeline] Using segment provider: per-message
+[Memory:Pipeline] Using storage provider: file-backend
+[Memory:Pipeline] Using organize provider: flat-by-date
+[Memory:Pipeline] Using summarize provider: simple-extract
+[Memory:Pipeline] Using extract provider: frontmatter-gen
+[Memory:Pipeline] Using extract provider: keyword-tagger
+[Memory:ProviderRegistry] Warning: Provider segment:per-message already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider storage:file-backend already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider summarize:simple-extract already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider organize:flat-by-date already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider extract:frontmatter-gen already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider extract:keyword-tagger already registered, overwriting
+[Memory:Config] Provider 'advanced-segmenter' not found, using default
+[Memory:Pipeline] Using segment provider: per-message
+[Memory:Config] Provider 'graph-backend' not found, using default
+[Memory:Pipeline] Using storage provider: file-backend
+[Memory:Config] Provider 'tiered-temporal' not found, using default
+[Memory:Pipeline] Using organize provider: flat-by-date
+[Memory:Config] Provider 'llm-summarizer' not found, using default
+[Memory:Pipeline] Using summarize provider: simple-extract
+[Memory:Pipeline] Using extract provider: frontmatter-gen
+[Memory:Pipeline] Using extract provider: keyword-tagger
+[Memory:ProviderRegistry] Warning: Provider segment:per-message already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider summarize:simple-extract already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider storage:file-backend already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider organize:flat-by-date already registered, overwriting
+[Memory:Pipeline] Using segment provider: per-message
+[Memory:Pipeline] Using storage provider: file-backend
+[Memory:Pipeline] Using organize provider: flat-by-date
+[Memory:Pipeline] Using summarize provider: simple-extract
+[Memory:Pipeline] Using extract provider: extractor-1
+[Memory:Pipeline] Using extract provider: extractor-2
+[Memory:ProviderRegistry] Warning: Provider extract:extractor-1 already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider segment:per-message already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider summarize:simple-extract already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider storage:file-backend already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider organize:flat-by-date already registered, overwriting
+[Memory:Pipeline] Using segment provider: per-message
+[Memory:Pipeline] Using storage provider: file-backend
+[Memory:Pipeline] Using organize provider: flat-by-date
+[Memory:Pipeline] Using summarize provider: simple-extract
+[Memory:Pipeline] Using extract provider: extractor-1
+[Memory:Pipeline] Extract provider 'nonexistent' not found, skipping
+[Memory:Pipeline] Using extract provider: extractor-3
+
+hooks\memory\core\provider-registry.test.ts:
+[Memory:ProviderRegistry] Warning: Provider search:test already registered, overwriting
+
+hooks\memory\core\retrieval.test.ts:
+[Memory:ProviderRegistry] Warning: Provider search:keyword-search already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider search:keyword-search already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider search:keyword-search already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider search:keyword-search already registered, overwriting
+[Memory:ProviderRegistry] Warning: Provider search:keyword-search already registered, overwriting
+
+hooks\memory\lib\experiment-lifecycle.test.ts:
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+
+hooks\memory\tests\debug-integration.test.ts:
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] No settings file at C:\Users\fujos\.pai-test-debug-integration\.claude\settings.json, using defaults
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+
+hooks\memory\tests\debug-logging-integration.test.ts:
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:KeywordSearch] Loaded index with 3 keywords
+[Memory:KeywordSearch:Debug] Terms extracted: ["typescript", "hooks"]
+[Memory:KeywordSearch:Debug] Index lookup: typescript=2 hits, hooks=2 hits
+[Memory:KeywordSearch:Debug] Found 3 candidate segments
+[Memory:KeywordSearch] Found 3 matches for 2 terms
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:KeywordSearch] Loaded index with 3 keywords
+[Memory:KeywordSearch] Found 3 matches for 2 terms
+
+hooks\memory\tests\experiment-e2e.test.ts:
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+
+hooks\memory\tests\experiment-performance.test.ts:
+Variant selection average: 0.0004ms per call
+Multi-variant selection average: 0.0010ms per call
+Memory allocation per selection: 0.00 bytes
+Async logging average: 0.4868ms per call
+Experiment overhead statistics:
+  Average: 0.1644ms
+  Max: 0.2749ms
+  P95: 0.2333ms
+Empty experiment check average: 0.000337ms per call
+
+hooks\memory\tests\graceful-degradation.test.ts:
+[Memory:Search] Index corrupted, returning empty results
+[Memory:KeywordSearch] Found 0 matches for 2 terms
+
+hooks\memory\tests\retrieval-integration.test.ts:
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+476 | 
+477 |     // Assert: No experiments, just normal retrieval
+478 |     expect(result.ok).toBe(true);
+479 | 
+480 |     if (result.ok) {
+481 |       expect(result.value.length).toBeGreaterThan(0);
+                                        ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 0
+Received: 0
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\tests\retrieval-integration.test.ts:481:35)
+(fail) Experiment Integration - Story 5.4 > should retrieve normally when no experiments configured (AC5) [16.00ms]
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+542 | 
+543 |     // Validate all required fields (AC2)
+544 |     expect(logEntry.experimentId).toBe('search-comparison');
+545 |     expect(['control', 'treatment']).toContain(logEntry.variant);
+546 |     expect(logEntry.success).toBe(true);
+547 |     expect(logEntry.resultCount).toBeGreaterThan(0);
+                                       ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 0
+Received: 0
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\tests\retrieval-integration.test.ts:547:34)
+(fail) Experiment Integration - Story 5.4 > should select experiment variant and log data (AC1, AC2) [172.00ms]
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Experiment] Provider 'nonexistent-search-provider' not found or invalid: Provider 'nonexistent-search-provider' not found or invalid for type 'search'
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:Retrieval] Using search provider: keyword-search
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+760 |     const controlCount = variants.filter((v) => v === 'control').length;
+761 |     const treatmentACount = variants.filter((v) => v === 'treatment-a').length;
+762 |     const treatmentBCount = variants.filter((v) => v === 'treatment-b').length;
+763 | 
+764 |     // Distribution should be roughly 40/30/30 (allow variance for small sample)
+765 |     expect(controlCount).toBeGreaterThanOrEqual(4); // ~40% of 20
+                               ^
+error: expect(received).toBeGreaterThanOrEqual(expected)
+
+Expected: >= 4
+Received: 2
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\tests\retrieval-integration.test.ts:765:26)
+(fail) Experiment Integration - Story 5.4 > should support multi-variant experiments (AC6) [344.00ms]
+801 |     // Act: Run retrieval and measure total time
+802 |     const startTime = Date.now();
+803 |     const result = await retrieveMemories('experiment performance test');
+804 |     const endTime = Date.now();
+805 | 
+806 |     expect(result.ok).toBe(true);
+                            ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\tests\retrieval-integration.test.ts:806:23)
+(fail) Experiment Integration - Story 5.4 > should measure experiment overhead < 10ms (AC9)
+
+hooks\memory\tests\retrieve.test.ts:
+426 | 
+427 |     const executionTime = Date.now() - startTime;
+428 | 
+429 |     // Assert: Execution time < 100ms (config check + exit is fast)
+430 |     // Note: Using 100ms for test stability on slow CI, actual should be <10ms
+431 |     expect(executionTime).toBeLessThan(100);
+                                ^
+error: expect(received).toBeLessThan(expected)
+
+Expected: < 100
+Received: 106
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\tests\retrieve.test.ts:431:27)
+(fail) retrieve.ts - memory system toggle > should add zero overhead when disabled (<100ms execution) [110.00ms]
+683 |     await proc.exited;
+684 | 
+685 |     const executionTime = Date.now() - startTime;
+686 | 
+687 |     // Assert: Execution time < 100ms (two-level config check + exit is fast)
+688 |     expect(executionTime).toBeLessThan(100);
+                                ^
+error: expect(received).toBeLessThan(expected)
+
+Expected: < 100
+Received: 113
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\tests\retrieve.test.ts:688:27)
+(fail) retrieve.ts - hook-specific toggle (Story 3.3) > should add zero overhead when hook disabled (<100ms execution) [109.00ms]
+
+hooks\memory\api\tests\segment-api.test.ts:
+[Memory:Config] No settings file at C:\Users\fujos\.pai-test-segment-api\.claude\settings.json, using defaults
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Added segment seg_1768343209831_e90ce0fd
+61 |       const result = await api.addSegment(segment);
+62 | 
+63 |       // Assert
+64 |       expect(result.ok).toBe(true);
+65 |       if (result.ok) {
+66 |         expect(result.value.id).toMatch(/^seg_\d+_[a-f0-9]{8}$/);
+                                     ^
+error: expect(received).toMatch(expected)
+
+Expected substring or pattern: /^seg_\d+_[a-f0-9]{8}$/
+Received: "test"
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\api\tests\segment-api.test.ts:66:33)
+[Memory:SegmentApi] API shutdown
+(fail) SegmentApi > addSegment > should add segment with generated ID when ID not provided
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Added segment seg_1704567890123_custom01
+85 |       const result = await api.addSegment(segment);
+86 | 
+87 |       // Assert
+88 |       expect(result.ok).toBe(true);
+89 |       if (result.ok) {
+90 |         expect(result.value.id).toBe(customId);
+                                     ^
+error: expect(received).toBe(expected)
+
+Expected: "seg_1704567890123_custom01"
+Received: "test"
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\api\tests\segment-api.test.ts:90:33)
+[Memory:SegmentApi] API shutdown
+(fail) SegmentApi > addSegment > should add segment with provided ID when ID given
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Added segment seg_1768343209843_a436a607
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Added segment seg_1768343209844_89c5aed9
+262 | 
+263 |         // Act
+264 |         const result = await api.updateSegment(segmentId, updates);
+265 | 
+266 |         // Assert
+267 |         expect(result.ok).toBe(true);
+                                ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\api\tests\segment-api.test.ts:267:27)
+[Memory:SegmentApi] API shutdown
+(fail) SegmentApi > updateSegment > should update segment and merge updates when updating
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+333 |         }
+334 |       };
+335 |     }
+336 | 
+337 |     // Use storage provider's update method
+338 |     const updateResult = await this.storageProvider.update(id, updates);
+                                                          ^
+TypeError: this.storageProvider.update is not a function. (In 'this.storageProvider.update(id, updates)', 'this.storageProvider.update' is undefined)
+      at updateSegment (C:\Users\fujos\.pai-memory-work\hooks\memory\api\segment-api.ts:338:53)
+      at updateSegment (C:\Users\fujos\.pai-memory-work\hooks\memory\api\segment-api.ts:313:5)
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\api\tests\segment-api.test.ts:300:32)
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\api\tests\segment-api.test.ts:294:56)
+[Memory:SegmentApi] API shutdown
+(fail) SegmentApi > updateSegment > should return error when segment not found
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Added segment seg_1768343209850_946dc266
+326 | 
+327 |         // Act
+328 |         const result = await api.deleteSegment(segmentId);
+329 | 
+330 |         // Assert
+331 |         expect(result.ok).toBe(true);
+                                ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\api\tests\segment-api.test.ts:331:27)
+[Memory:SegmentApi] API shutdown
+(fail) SegmentApi > deleteSegment > should delete segment and remove from storage when deleting
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Deleted segment seg_9999999999999_ffffffff
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Summarized 63 chars to segment
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Summarized 28 chars to segment
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Summarized 12 chars to segment
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] splitSegment() is experimental - returning stub data
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Added segment seg_1768343209864_2447e424
+506 | 
+507 |         // Act & Assert: Update
+508 |         const updateResult = await api.updateSegment(segmentId, {
+509 |           importanceScore: 80
+510 |         });
+511 |         expect(updateResult.ok).toBe(true);
+                                      ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\api\tests\segment-api.test.ts:511:33)
+[Memory:SegmentApi] API shutdown
+(fail) SegmentApi > Integration tests > should handle full workflow: add → update → delete
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Summarized 30 chars to segment
+[Memory:SegmentApi] Added segment seg_1768343209867_935a7b30
+534 |         const addResult = await api.addSegment(segment);
+535 |         expect(addResult.ok).toBe(true);
+536 | 
+537 |         if (addResult.ok) {
+538 |           const segmentId = addResult.value.id;
+539 |           expect(segmentId).toBe(segment.id);
+                                  ^
+error: expect(received).toBe(expected)
+
+Expected: "seg_1768343209867_935a7b30"
+Received: "test"
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\api\tests\segment-api.test.ts:539:29)
+[Memory:SegmentApi] API shutdown
+(fail) SegmentApi > Integration tests > should handle workflow: summarize → add → retrieve
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Summarized 64 chars to segment
+552 | 
+553 |       // Assert - AC4: runs configured summarize provider
+554 |       expect(result.ok).toBe(true);
+555 |       if (result.ok) {
+556 |         // Verify provider extracted keywords (simple-extract finds capitalized words)
+557 |         expect(result.value.tags.length).toBeGreaterThan(0);
+                                               ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 0
+Received: 0
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\api\tests\segment-api.test.ts:557:42)
+[Memory:SegmentApi] API shutdown
+(fail) SegmentApi > AC validation tests (Story 5.1) > AC4: should run summarize provider and extract keywords when summarizing
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Added segment seg_1768343209871_9a629f43
+582 |         const updateResult = await api.updateSegment(segmentId, {
+583 |           tags: ['updated', 'newtags', 'changed']
+584 |         });
+585 | 
+586 |         // Assert
+587 |         expect(updateResult.ok).toBe(true);
+                                      ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\api\tests\segment-api.test.ts:587:33)
+[Memory:SegmentApi] API shutdown
+(fail) SegmentApi > AC validation tests (Story 5.1) > AC2: should update keyword index when tags change during update [16.00ms]
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] Added segment seg_1768343209873_1998545a
+614 | 
+615 |         // Act: Delete (AC3: updates session-registry if needed)
+616 |         const deleteResult = await api.deleteSegment(segmentId);
+617 | 
+618 |         // Assert
+619 |         expect(deleteResult.ok).toBe(true);
+                                      ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\api\tests\segment-api.test.ts:619:33)
+[Memory:SegmentApi] API shutdown
+(fail) SegmentApi > AC validation tests (Story 5.1) > AC3: should update session registry when deleting segment
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+[Memory:SegmentApi] API initialized
+[Memory:SegmentApi] API shutdown
+
+hooks\memory\core\tests\content-loader.test.ts:
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-content-loader\mem-store
+[Memory:ContentLoader] Segment seg_nonexistent not found, skipping
+[Memory:ContentLoader] Segment invalid/../path not found, skipping
+
+hooks\memory\core\tests\context-formatter.test.ts:
+[Memory:ContextFormatter] Formatting 1 memories (budget: 2000 tokens)
+[Memory:ContentLoader] Segment seg_fmt_001 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_001 not found, skipping
+[Memory:ContextFormatter] No memories formatted (all failed or budget too small)
+83 | 
+84 |       const result = await formatMemoryContext(rankedResults);
+85 | 
+86 |       expect(result.ok).toBe(true);
+87 |       if (result.ok) {
+88 |         expect(result.value).toContain('<retrieved-memories count="1">');
+                                  ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "<retrieved-memories count=\"1\">"
+Received: ""
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\core\tests\context-formatter.test.ts:88:30)
+(fail) Context Formatter > formatMemoryContext() > should format single memory with all attributes
+[Memory:ContextFormatter] Formatting 2 memories (budget: 2000 tokens)
+[Memory:ContentLoader] Segment seg_fmt_001 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_001 not found, skipping
+[Memory:ContentLoader] Segment seg_fmt_002 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_002 not found, skipping
+[Memory:ContextFormatter] No memories formatted (all failed or budget too small)
+137 | 
+138 |       const result = await formatMemoryContext(rankedResults);
+139 | 
+140 |       expect(result.ok).toBe(true);
+141 |       if (result.ok) {
+142 |         expect(result.value).toContain('<retrieved-memories count="2">');
+                                   ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "<retrieved-memories count=\"2\">"
+Received: ""
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\core\tests\context-formatter.test.ts:142:30)
+(fail) Context Formatter > formatMemoryContext() > should format multiple memories [16.00ms]
+[Memory:ContextFormatter] No results to format, returning empty
+[Memory:ContextFormatter] Formatting 2 memories (budget: 2000 tokens)
+[Memory:ContentLoader] Segment seg_fmt_001 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_001 not found, skipping
+[Memory:ContentLoader] Segment seg_nonexistent not found, skipping
+[Memory:ContextFormatter] Segment seg_nonexistent not found, skipping
+[Memory:ContextFormatter] No memories formatted (all failed or budget too small)
+197 |       const result = await formatMemoryContext(rankedResults);
+198 | 
+199 |       expect(result.ok).toBe(true);
+200 |       if (result.ok) {
+201 |         // Should only include the existing segment
+202 |         expect(result.value).toContain('<retrieved-memories count="1">');
+                                   ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "<retrieved-memories count=\"1\">"
+Received: ""
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\core\tests\context-formatter.test.ts:202:30)
+(fail) Context Formatter > formatMemoryContext() > should skip missing segments gracefully
+[Memory:ContextFormatter] Formatting 2 memories (budget: 2000 tokens)
+[Memory:ContentLoader] Segment seg_fmt_001 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_001 not found, skipping
+[Memory:ContentLoader] Segment seg_fmt_002 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_002 not found, skipping
+[Memory:ContextFormatter] No memories formatted (all failed or budget too small)
+264 |         maxMemories: 2
+265 |       });
+266 | 
+267 |       expect(result.ok).toBe(true);
+268 |       if (result.ok) {
+269 |         expect(result.value).toContain('<retrieved-memories count="2">');
+                                   ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "<retrieved-memories count=\"2\">"
+Received: ""
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\core\tests\context-formatter.test.ts:269:30)
+(fail) Context Formatter > formatMemoryContext() > should respect maxMemories option
+[Memory:ContextFormatter] Formatting 1 memories (budget: 20 tokens)
+[Memory:ContentLoader] Segment seg_fmt_003 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_003 not found, skipping
+[Memory:ContextFormatter] No memories formatted (all failed or budget too small)
+299 |         // Content should be truncated with ... OR memory might not fit at all
+300 |         const contentFits = result.value.includes('segment');
+301 |         if (contentFits) {
+302 |           expect(result.value).toContain('...');
+303 |         }
+304 |         expect(result.value).toContain('<memory');
+                                   ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "<memory"
+Received: ""
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\core\tests\context-formatter.test.ts:304:30)
+(fail) Context Formatter > formatMemoryContext() > should respect token budget by truncating content
+[Memory:ContextFormatter] Formatting 2 memories (budget: 60 tokens)
+[Memory:ContentLoader] Segment seg_fmt_001 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_001 not found, skipping
+[Memory:ContentLoader] Segment seg_fmt_002 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_002 not found, skipping
+[Memory:ContextFormatter] No memories formatted (all failed or budget too small)
+349 |       });
+350 | 
+351 |       expect(result.ok).toBe(true);
+352 |       if (result.ok) {
+353 |         // Should only format first segment
+354 |         expect(result.value).toContain('<retrieved-memories count="1">');
+                                   ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "<retrieved-memories count=\"1\">"
+Received: ""
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\core\tests\context-formatter.test.ts:354:30)
+(fail) Context Formatter > formatMemoryContext() > should stop processing when token budget exhausted
+[Memory:ContextFormatter] Formatting 1 memories (budget: 2000 tokens)
+[Memory:ContentLoader] Segment seg_fmt_003 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_003 not found, skipping
+[Memory:ContextFormatter] No memories formatted (all failed or budget too small)
+376 | 
+377 |       const result = await formatMemoryContext(rankedResults);
+378 | 
+379 |       expect(result.ok).toBe(true);
+380 |       if (result.ok) {
+381 |         expect(result.value).toContain('age="30m"');
+                                   ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "age=\"30m\""
+Received: ""
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\core\tests\context-formatter.test.ts:381:30)
+(fail) Context Formatter > formatMemoryContext() > should format age correctly for recent memories
+[Memory:ContextFormatter] Formatting 1 memories (budget: 2000 tokens)
+[Memory:ContentLoader] Segment seg_fmt_001 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_001 not found, skipping
+[Memory:ContextFormatter] No memories formatted (all failed or budget too small)
+404 |       const result = await formatMemoryContext(rankedResults);
+405 | 
+406 |       expect(result.ok).toBe(true);
+407 |       if (result.ok) {
+408 |         // Should not include empty tags attribute
+409 |         expect(result.value).toContain('<memory');
+                                   ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "<memory"
+Received: ""
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\core\tests\context-formatter.test.ts:409:30)
+(fail) Context Formatter > formatMemoryContext() > should handle memories with no tags
+[Memory:ContextFormatter] Formatting 1 memories (budget: 2000 tokens)
+[Memory:ContentLoader] Segment seg_fmt_001 not found, skipping
+[Memory:ContextFormatter] Segment seg_fmt_001 not found, skipping
+[Memory:ContextFormatter] No memories formatted (all failed or budget too small)
+436 |       });
+437 | 
+438 |       expect(result.ok).toBe(true);
+439 |       if (result.ok) {
+440 |         expect(result.value).not.toContain('relevance=');
+441 |         expect(result.value).toContain('age=');
+                                   ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "age="
+Received: ""
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\core\tests\context-formatter.test.ts:441:30)
+(fail) Context Formatter > formatMemoryContext() > should optionally exclude relevance scores
+
+hooks\memory\core\tests\filters.test.ts:
+[Memory:MetadataLoader] Loaded metadata for 3/3 segments
+[Memory:Filters] After tag filter: 1 candidates
+[Memory:Filters] Final filtered results: 1/3
+[Memory:MetadataLoader] Loaded metadata for 3/3 segments
+[Memory:Filters] After tag filter: 2 candidates
+[Memory:Filters] Final filtered results: 2/3
+[Memory:MetadataLoader] Loaded metadata for 3/3 segments
+[Memory:Filters] After recency filter: 1 candidates
+[Memory:Filters] Final filtered results: 1/3
+[Memory:MetadataLoader] Loaded metadata for 3/3 segments
+[Memory:Filters] After recency filter: 2 candidates
+[Memory:Filters] Final filtered results: 2/3
+[Memory:MetadataLoader] Loaded metadata for 3/3 segments
+[Memory:Filters] After importance filter: 2 candidates
+[Memory:Filters] Final filtered results: 2/3
+[Memory:MetadataLoader] Loaded metadata for 3/3 segments
+[Memory:Filters] After access count filter: 2 candidates
+[Memory:Filters] Final filtered results: 2/3
+[Memory:MetadataLoader] Loaded metadata for 3/3 segments
+[Memory:Filters] After recency filter: 2 candidates
+[Memory:Filters] After importance filter: 2 candidates
+[Memory:Filters] After access count filter: 1 candidates
+[Memory:Filters] Final filtered results: 1/3
+[Memory:MetadataLoader] Loaded metadata for 3/3 segments
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 3/3
+[Memory:MetadataLoader] Loaded metadata for 1/1 segments
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 1/1
+[Memory:MetadataLoader] Loaded metadata for 1/1 segments
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 1/1
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/1
+[Memory:MetadataLoader] Segment seg_000 not found in registry
+[Memory:MetadataLoader] Segment seg_002 not found in registry
+[Memory:MetadataLoader] Segment seg_003 not found in registry
+[Memory:MetadataLoader] Segment seg_004 not found in registry
+[Memory:MetadataLoader] Segment seg_005 not found in registry
+[Memory:MetadataLoader] Segment seg_006 not found in registry
+[Memory:MetadataLoader] Segment seg_007 not found in registry
+[Memory:MetadataLoader] Segment seg_008 not found in registry
+[Memory:MetadataLoader] Segment seg_009 not found in registry
+[Memory:MetadataLoader] Segment seg_010 not found in registry
+[Memory:MetadataLoader] Segment seg_011 not found in registry
+[Memory:MetadataLoader] Segment seg_012 not found in registry
+[Memory:MetadataLoader] Segment seg_013 not found in registry
+[Memory:MetadataLoader] Segment seg_014 not found in registry
+[Memory:MetadataLoader] Segment seg_015 not found in registry
+[Memory:MetadataLoader] Segment seg_016 not found in registry
+[Memory:MetadataLoader] Segment seg_017 not found in registry
+[Memory:MetadataLoader] Segment seg_018 not found in registry
+[Memory:MetadataLoader] Segment seg_019 not found in registry
+[Memory:MetadataLoader] Segment seg_020 not found in registry
+[Memory:MetadataLoader] Segment seg_021 not found in registry
+[Memory:MetadataLoader] Segment seg_022 not found in registry
+[Memory:MetadataLoader] Segment seg_023 not found in registry
+[Memory:MetadataLoader] Segment seg_024 not found in registry
+[Memory:MetadataLoader] Segment seg_025 not found in registry
+[Memory:MetadataLoader] Segment seg_026 not found in registry
+[Memory:MetadataLoader] Segment seg_027 not found in registry
+[Memory:MetadataLoader] Segment seg_028 not found in registry
+[Memory:MetadataLoader] Segment seg_029 not found in registry
+[Memory:MetadataLoader] Segment seg_030 not found in registry
+[Memory:MetadataLoader] Segment seg_031 not found in registry
+[Memory:MetadataLoader] Segment seg_032 not found in registry
+[Memory:MetadataLoader] Segment seg_033 not found in registry
+[Memory:MetadataLoader] Segment seg_034 not found in registry
+[Memory:MetadataLoader] Segment seg_035 not found in registry
+[Memory:MetadataLoader] Segment seg_036 not found in registry
+[Memory:MetadataLoader] Segment seg_037 not found in registry
+[Memory:MetadataLoader] Segment seg_038 not found in registry
+[Memory:MetadataLoader] Segment seg_039 not found in registry
+[Memory:MetadataLoader] Segment seg_040 not found in registry
+[Memory:MetadataLoader] Segment seg_041 not found in registry
+[Memory:MetadataLoader] Segment seg_043 not found in registry
+[Memory:MetadataLoader] Segment seg_044 not found in registry
+[Memory:MetadataLoader] Segment seg_045 not found in registry
+[Memory:MetadataLoader] Segment seg_046 not found in registry
+[Memory:MetadataLoader] Segment seg_047 not found in registry
+[Memory:MetadataLoader] Segment seg_048 not found in registry
+[Memory:MetadataLoader] Segment seg_049 not found in registry
+[Memory:MetadataLoader] Segment seg_050 not found in registry
+[Memory:MetadataLoader] Segment seg_051 not found in registry
+[Memory:MetadataLoader] Segment seg_052 not found in registry
+[Memory:MetadataLoader] Segment seg_053 not found in registry
+[Memory:MetadataLoader] Segment seg_054 not found in registry
+[Memory:MetadataLoader] Segment seg_055 not found in registry
+[Memory:MetadataLoader] Segment seg_056 not found in registry
+[Memory:MetadataLoader] Segment seg_057 not found in registry
+[Memory:MetadataLoader] Segment seg_058 not found in registry
+[Memory:MetadataLoader] Segment seg_059 not found in registry
+[Memory:MetadataLoader] Segment seg_060 not found in registry
+[Memory:MetadataLoader] Segment seg_061 not found in registry
+[Memory:MetadataLoader] Segment seg_062 not found in registry
+[Memory:MetadataLoader] Segment seg_063 not found in registry
+[Memory:MetadataLoader] Segment seg_064 not found in registry
+[Memory:MetadataLoader] Segment seg_065 not found in registry
+[Memory:MetadataLoader] Segment seg_066 not found in registry
+[Memory:MetadataLoader] Segment seg_067 not found in registry
+[Memory:MetadataLoader] Segment seg_068 not found in registry
+[Memory:MetadataLoader] Segment seg_069 not found in registry
+[Memory:MetadataLoader] Segment seg_070 not found in registry
+[Memory:MetadataLoader] Segment seg_071 not found in registry
+[Memory:MetadataLoader] Segment seg_072 not found in registry
+[Memory:MetadataLoader] Segment seg_073 not found in registry
+[Memory:MetadataLoader] Segment seg_074 not found in registry
+[Memory:MetadataLoader] Segment seg_075 not found in registry
+[Memory:MetadataLoader] Segment seg_076 not found in registry
+[Memory:MetadataLoader] Segment seg_077 not found in registry
+[Memory:MetadataLoader] Segment seg_078 not found in registry
+[Memory:MetadataLoader] Segment seg_079 not found in registry
+[Memory:MetadataLoader] Segment seg_080 not found in registry
+[Memory:MetadataLoader] Segment seg_081 not found in registry
+[Memory:MetadataLoader] Segment seg_082 not found in registry
+[Memory:MetadataLoader] Segment seg_083 not found in registry
+[Memory:MetadataLoader] Segment seg_084 not found in registry
+[Memory:MetadataLoader] Segment seg_085 not found in registry
+[Memory:MetadataLoader] Segment seg_086 not found in registry
+[Memory:MetadataLoader] Segment seg_087 not found in registry
+[Memory:MetadataLoader] Segment seg_088 not found in registry
+[Memory:MetadataLoader] Segment seg_090 not found in registry
+[Memory:MetadataLoader] Segment seg_091 not found in registry
+[Memory:MetadataLoader] Segment seg_092 not found in registry
+[Memory:MetadataLoader] Segment seg_093 not found in registry
+[Memory:MetadataLoader] Segment seg_094 not found in registry
+[Memory:MetadataLoader] Segment seg_095 not found in registry
+[Memory:MetadataLoader] Segment seg_096 not found in registry
+[Memory:MetadataLoader] Segment seg_097 not found in registry
+[Memory:MetadataLoader] Segment seg_098 not found in registry
+[Memory:MetadataLoader] Segment seg_099 not found in registry
+[Memory:MetadataLoader] Segment seg_100 not found in registry
+[Memory:MetadataLoader] Segment seg_101 not found in registry
+[Memory:MetadataLoader] Segment seg_102 not found in registry
+[Memory:MetadataLoader] Segment seg_103 not found in registry
+[Memory:MetadataLoader] Segment seg_104 not found in registry
+[Memory:MetadataLoader] Segment seg_105 not found in registry
+[Memory:MetadataLoader] Segment seg_106 not found in registry
+[Memory:MetadataLoader] Segment seg_107 not found in registry
+[Memory:MetadataLoader] Segment seg_108 not found in registry
+[Memory:MetadataLoader] Segment seg_109 not found in registry
+[Memory:MetadataLoader] Segment seg_110 not found in registry
+[Memory:MetadataLoader] Segment seg_111 not found in registry
+[Memory:MetadataLoader] Segment seg_112 not found in registry
+[Memory:MetadataLoader] Segment seg_113 not found in registry
+[Memory:MetadataLoader] Segment seg_114 not found in registry
+[Memory:MetadataLoader] Segment seg_115 not found in registry
+[Memory:MetadataLoader] Segment seg_116 not found in registry
+[Memory:MetadataLoader] Segment seg_117 not found in registry
+[Memory:MetadataLoader] Segment seg_118 not found in registry
+[Memory:MetadataLoader] Segment seg_119 not found in registry
+[Memory:MetadataLoader] Segment seg_120 not found in registry
+[Memory:MetadataLoader] Segment seg_121 not found in registry
+[Memory:MetadataLoader] Segment seg_122 not found in registry
+[Memory:MetadataLoader] Segment seg_123 not found in registry
+[Memory:MetadataLoader] Segment seg_124 not found in registry
+[Memory:MetadataLoader] Segment seg_125 not found in registry
+[Memory:MetadataLoader] Segment seg_126 not found in registry
+[Memory:MetadataLoader] Segment seg_127 not found in registry
+[Memory:MetadataLoader] Segment seg_128 not found in registry
+[Memory:MetadataLoader] Segment seg_129 not found in registry
+[Memory:MetadataLoader] Segment seg_130 not found in registry
+[Memory:MetadataLoader] Segment seg_131 not found in registry
+[Memory:MetadataLoader] Segment seg_132 not found in registry
+[Memory:MetadataLoader] Segment seg_133 not found in registry
+[Memory:MetadataLoader] Segment seg_134 not found in registry
+[Memory:MetadataLoader] Segment seg_135 not found in registry
+[Memory:MetadataLoader] Segment seg_136 not found in registry
+[Memory:MetadataLoader] Segment seg_137 not found in registry
+[Memory:MetadataLoader] Segment seg_138 not found in registry
+[Memory:MetadataLoader] Segment seg_139 not found in registry
+[Memory:MetadataLoader] Segment seg_140 not found in registry
+[Memory:MetadataLoader] Segment seg_141 not found in registry
+[Memory:MetadataLoader] Segment seg_142 not found in registry
+[Memory:MetadataLoader] Segment seg_143 not found in registry
+[Memory:MetadataLoader] Segment seg_144 not found in registry
+[Memory:MetadataLoader] Segment seg_145 not found in registry
+[Memory:MetadataLoader] Segment seg_146 not found in registry
+[Memory:MetadataLoader] Segment seg_147 not found in registry
+[Memory:MetadataLoader] Segment seg_148 not found in registry
+[Memory:MetadataLoader] Segment seg_149 not found in registry
+[Memory:MetadataLoader] Segment seg_150 not found in registry
+[Memory:MetadataLoader] Segment seg_151 not found in registry
+[Memory:MetadataLoader] Segment seg_152 not found in registry
+[Memory:MetadataLoader] Segment seg_153 not found in registry
+[Memory:MetadataLoader] Segment seg_154 not found in registry
+[Memory:MetadataLoader] Segment seg_155 not found in registry
+[Memory:MetadataLoader] Segment seg_156 not found in registry
+[Memory:MetadataLoader] Segment seg_157 not found in registry
+[Memory:MetadataLoader] Segment seg_158 not found in registry
+[Memory:MetadataLoader] Segment seg_159 not found in registry
+[Memory:MetadataLoader] Segment seg_160 not found in registry
+[Memory:MetadataLoader] Segment seg_161 not found in registry
+[Memory:MetadataLoader] Segment seg_162 not found in registry
+[Memory:MetadataLoader] Segment seg_163 not found in registry
+[Memory:MetadataLoader] Segment seg_164 not found in registry
+[Memory:MetadataLoader] Segment seg_165 not found in registry
+[Memory:MetadataLoader] Segment seg_166 not found in registry
+[Memory:MetadataLoader] Segment seg_167 not found in registry
+[Memory:MetadataLoader] Segment seg_168 not found in registry
+[Memory:MetadataLoader] Segment seg_169 not found in registry
+[Memory:MetadataLoader] Segment seg_170 not found in registry
+[Memory:MetadataLoader] Segment seg_171 not found in registry
+[Memory:MetadataLoader] Segment seg_172 not found in registry
+[Memory:MetadataLoader] Segment seg_173 not found in registry
+[Memory:MetadataLoader] Segment seg_174 not found in registry
+[Memory:MetadataLoader] Segment seg_175 not found in registry
+[Memory:MetadataLoader] Segment seg_176 not found in registry
+[Memory:MetadataLoader] Segment seg_177 not found in registry
+[Memory:MetadataLoader] Segment seg_178 not found in registry
+[Memory:MetadataLoader] Segment seg_179 not found in registry
+[Memory:MetadataLoader] Segment seg_180 not found in registry
+[Memory:MetadataLoader] Segment seg_181 not found in registry
+[Memory:MetadataLoader] Segment seg_182 not found in registry
+[Memory:MetadataLoader] Segment seg_183 not found in registry
+[Memory:MetadataLoader] Segment seg_184 not found in registry
+[Memory:MetadataLoader] Segment seg_185 not found in registry
+[Memory:MetadataLoader] Segment seg_186 not found in registry
+[Memory:MetadataLoader] Segment seg_187 not found in registry
+[Memory:MetadataLoader] Segment seg_188 not found in registry
+[Memory:MetadataLoader] Segment seg_189 not found in registry
+[Memory:MetadataLoader] Segment seg_190 not found in registry
+[Memory:MetadataLoader] Segment seg_191 not found in registry
+[Memory:MetadataLoader] Segment seg_192 not found in registry
+[Memory:MetadataLoader] Segment seg_193 not found in registry
+[Memory:MetadataLoader] Segment seg_194 not found in registry
+[Memory:MetadataLoader] Segment seg_195 not found in registry
+[Memory:MetadataLoader] Segment seg_196 not found in registry
+[Memory:MetadataLoader] Segment seg_197 not found in registry
+[Memory:MetadataLoader] Segment seg_198 not found in registry
+[Memory:MetadataLoader] Segment seg_199 not found in registry
+[Memory:MetadataLoader] Segment seg_200 not found in registry
+[Memory:MetadataLoader] Segment seg_201 not found in registry
+[Memory:MetadataLoader] Segment seg_202 not found in registry
+[Memory:MetadataLoader] Segment seg_203 not found in registry
+[Memory:MetadataLoader] Segment seg_204 not found in registry
+[Memory:MetadataLoader] Segment seg_205 not found in registry
+[Memory:MetadataLoader] Segment seg_206 not found in registry
+[Memory:MetadataLoader] Segment seg_207 not found in registry
+[Memory:MetadataLoader] Segment seg_208 not found in registry
+[Memory:MetadataLoader] Segment seg_209 not found in registry
+[Memory:MetadataLoader] Segment seg_210 not found in registry
+[Memory:MetadataLoader] Segment seg_211 not found in registry
+[Memory:MetadataLoader] Segment seg_212 not found in registry
+[Memory:MetadataLoader] Segment seg_213 not found in registry
+[Memory:MetadataLoader] Segment seg_214 not found in registry
+[Memory:MetadataLoader] Segment seg_215 not found in registry
+[Memory:MetadataLoader] Segment seg_216 not found in registry
+[Memory:MetadataLoader] Segment seg_217 not found in registry
+[Memory:MetadataLoader] Segment seg_218 not found in registry
+[Memory:MetadataLoader] Segment seg_219 not found in registry
+[Memory:MetadataLoader] Segment seg_220 not found in registry
+[Memory:MetadataLoader] Segment seg_221 not found in registry
+[Memory:MetadataLoader] Segment seg_222 not found in registry
+[Memory:MetadataLoader] Segment seg_223 not found in registry
+[Memory:MetadataLoader] Segment seg_224 not found in registry
+[Memory:MetadataLoader] Segment seg_225 not found in registry
+[Memory:MetadataLoader] Segment seg_226 not found in registry
+[Memory:MetadataLoader] Segment seg_227 not found in registry
+[Memory:MetadataLoader] Segment seg_228 not found in registry
+[Memory:MetadataLoader] Segment seg_229 not found in registry
+[Memory:MetadataLoader] Segment seg_230 not found in registry
+[Memory:MetadataLoader] Segment seg_231 not found in registry
+[Memory:MetadataLoader] Segment seg_232 not found in registry
+[Memory:MetadataLoader] Segment seg_233 not found in registry
+[Memory:MetadataLoader] Segment seg_234 not found in registry
+[Memory:MetadataLoader] Segment seg_235 not found in registry
+[Memory:MetadataLoader] Segment seg_236 not found in registry
+[Memory:MetadataLoader] Segment seg_237 not found in registry
+[Memory:MetadataLoader] Segment seg_238 not found in registry
+[Memory:MetadataLoader] Segment seg_239 not found in registry
+[Memory:MetadataLoader] Segment seg_240 not found in registry
+[Memory:MetadataLoader] Segment seg_241 not found in registry
+[Memory:MetadataLoader] Segment seg_242 not found in registry
+[Memory:MetadataLoader] Segment seg_243 not found in registry
+[Memory:MetadataLoader] Segment seg_244 not found in registry
+[Memory:MetadataLoader] Segment seg_245 not found in registry
+[Memory:MetadataLoader] Segment seg_246 not found in registry
+[Memory:MetadataLoader] Segment seg_247 not found in registry
+[Memory:MetadataLoader] Segment seg_248 not found in registry
+[Memory:MetadataLoader] Segment seg_249 not found in registry
+[Memory:MetadataLoader] Segment seg_250 not found in registry
+[Memory:MetadataLoader] Segment seg_251 not found in registry
+[Memory:MetadataLoader] Segment seg_252 not found in registry
+[Memory:MetadataLoader] Segment seg_253 not found in registry
+[Memory:MetadataLoader] Segment seg_254 not found in registry
+[Memory:MetadataLoader] Segment seg_255 not found in registry
+[Memory:MetadataLoader] Segment seg_256 not found in registry
+[Memory:MetadataLoader] Segment seg_257 not found in registry
+[Memory:MetadataLoader] Segment seg_258 not found in registry
+[Memory:MetadataLoader] Segment seg_259 not found in registry
+[Memory:MetadataLoader] Segment seg_260 not found in registry
+[Memory:MetadataLoader] Segment seg_261 not found in registry
+[Memory:MetadataLoader] Segment seg_262 not found in registry
+[Memory:MetadataLoader] Segment seg_263 not found in registry
+[Memory:MetadataLoader] Segment seg_264 not found in registry
+[Memory:MetadataLoader] Segment seg_265 not found in registry
+[Memory:MetadataLoader] Segment seg_266 not found in registry
+[Memory:MetadataLoader] Segment seg_267 not found in registry
+[Memory:MetadataLoader] Segment seg_268 not found in registry
+[Memory:MetadataLoader] Segment seg_269 not found in registry
+[Memory:MetadataLoader] Segment seg_270 not found in registry
+[Memory:MetadataLoader] Segment seg_271 not found in registry
+[Memory:MetadataLoader] Segment seg_272 not found in registry
+[Memory:MetadataLoader] Segment seg_273 not found in registry
+[Memory:MetadataLoader] Segment seg_274 not found in registry
+[Memory:MetadataLoader] Segment seg_275 not found in registry
+[Memory:MetadataLoader] Segment seg_276 not found in registry
+[Memory:MetadataLoader] Segment seg_277 not found in registry
+[Memory:MetadataLoader] Segment seg_278 not found in registry
+[Memory:MetadataLoader] Segment seg_279 not found in registry
+[Memory:MetadataLoader] Segment seg_280 not found in registry
+[Memory:MetadataLoader] Segment seg_281 not found in registry
+[Memory:MetadataLoader] Segment seg_282 not found in registry
+[Memory:MetadataLoader] Segment seg_283 not found in registry
+[Memory:MetadataLoader] Segment seg_284 not found in registry
+[Memory:MetadataLoader] Segment seg_285 not found in registry
+[Memory:MetadataLoader] Segment seg_286 not found in registry
+[Memory:MetadataLoader] Segment seg_287 not found in registry
+[Memory:MetadataLoader] Segment seg_288 not found in registry
+[Memory:MetadataLoader] Segment seg_289 not found in registry
+[Memory:MetadataLoader] Segment seg_290 not found in registry
+[Memory:MetadataLoader] Segment seg_291 not found in registry
+[Memory:MetadataLoader] Segment seg_292 not found in registry
+[Memory:MetadataLoader] Segment seg_293 not found in registry
+[Memory:MetadataLoader] Segment seg_294 not found in registry
+[Memory:MetadataLoader] Segment seg_295 not found in registry
+[Memory:MetadataLoader] Segment seg_296 not found in registry
+[Memory:MetadataLoader] Segment seg_297 not found in registry
+[Memory:MetadataLoader] Segment seg_298 not found in registry
+[Memory:MetadataLoader] Segment seg_299 not found in registry
+[Memory:MetadataLoader] Segment seg_300 not found in registry
+[Memory:MetadataLoader] Segment seg_301 not found in registry
+[Memory:MetadataLoader] Segment seg_302 not found in registry
+[Memory:MetadataLoader] Segment seg_303 not found in registry
+[Memory:MetadataLoader] Segment seg_304 not found in registry
+[Memory:MetadataLoader] Segment seg_305 not found in registry
+[Memory:MetadataLoader] Segment seg_306 not found in registry
+[Memory:MetadataLoader] Segment seg_307 not found in registry
+[Memory:MetadataLoader] Segment seg_308 not found in registry
+[Memory:MetadataLoader] Segment seg_309 not found in registry
+[Memory:MetadataLoader] Segment seg_310 not found in registry
+[Memory:MetadataLoader] Segment seg_311 not found in registry
+[Memory:MetadataLoader] Segment seg_312 not found in registry
+[Memory:MetadataLoader] Segment seg_313 not found in registry
+[Memory:MetadataLoader] Segment seg_314 not found in registry
+[Memory:MetadataLoader] Segment seg_315 not found in registry
+[Memory:MetadataLoader] Segment seg_316 not found in registry
+[Memory:MetadataLoader] Segment seg_317 not found in registry
+[Memory:MetadataLoader] Segment seg_318 not found in registry
+[Memory:MetadataLoader] Segment seg_319 not found in registry
+[Memory:MetadataLoader] Segment seg_320 not found in registry
+[Memory:MetadataLoader] Segment seg_321 not found in registry
+[Memory:MetadataLoader] Segment seg_322 not found in registry
+[Memory:MetadataLoader] Segment seg_323 not found in registry
+[Memory:MetadataLoader] Segment seg_324 not found in registry
+[Memory:MetadataLoader] Segment seg_325 not found in registry
+[Memory:MetadataLoader] Segment seg_326 not found in registry
+[Memory:MetadataLoader] Segment seg_327 not found in registry
+[Memory:MetadataLoader] Segment seg_328 not found in registry
+[Memory:MetadataLoader] Segment seg_329 not found in registry
+[Memory:MetadataLoader] Segment seg_330 not found in registry
+[Memory:MetadataLoader] Segment seg_331 not found in registry
+[Memory:MetadataLoader] Segment seg_332 not found in registry
+[Memory:MetadataLoader] Segment seg_333 not found in registry
+[Memory:MetadataLoader] Segment seg_334 not found in registry
+[Memory:MetadataLoader] Segment seg_335 not found in registry
+[Memory:MetadataLoader] Segment seg_336 not found in registry
+[Memory:MetadataLoader] Segment seg_337 not found in registry
+[Memory:MetadataLoader] Segment seg_338 not found in registry
+[Memory:MetadataLoader] Segment seg_339 not found in registry
+[Memory:MetadataLoader] Segment seg_340 not found in registry
+[Memory:MetadataLoader] Segment seg_341 not found in registry
+[Memory:MetadataLoader] Segment seg_342 not found in registry
+[Memory:MetadataLoader] Segment seg_343 not found in registry
+[Memory:MetadataLoader] Segment seg_344 not found in registry
+[Memory:MetadataLoader] Segment seg_345 not found in registry
+[Memory:MetadataLoader] Segment seg_346 not found in registry
+[Memory:MetadataLoader] Segment seg_347 not found in registry
+[Memory:MetadataLoader] Segment seg_348 not found in registry
+[Memory:MetadataLoader] Segment seg_349 not found in registry
+[Memory:MetadataLoader] Segment seg_350 not found in registry
+[Memory:MetadataLoader] Segment seg_351 not found in registry
+[Memory:MetadataLoader] Segment seg_352 not found in registry
+[Memory:MetadataLoader] Segment seg_353 not found in registry
+[Memory:MetadataLoader] Segment seg_354 not found in registry
+[Memory:MetadataLoader] Segment seg_355 not found in registry
+[Memory:MetadataLoader] Segment seg_356 not found in registry
+[Memory:MetadataLoader] Segment seg_357 not found in registry
+[Memory:MetadataLoader] Segment seg_358 not found in registry
+[Memory:MetadataLoader] Segment seg_359 not found in registry
+[Memory:MetadataLoader] Segment seg_360 not found in registry
+[Memory:MetadataLoader] Segment seg_361 not found in registry
+[Memory:MetadataLoader] Segment seg_362 not found in registry
+[Memory:MetadataLoader] Segment seg_363 not found in registry
+[Memory:MetadataLoader] Segment seg_364 not found in registry
+[Memory:MetadataLoader] Segment seg_365 not found in registry
+[Memory:MetadataLoader] Segment seg_366 not found in registry
+[Memory:MetadataLoader] Segment seg_367 not found in registry
+[Memory:MetadataLoader] Segment seg_368 not found in registry
+[Memory:MetadataLoader] Segment seg_369 not found in registry
+[Memory:MetadataLoader] Segment seg_370 not found in registry
+[Memory:MetadataLoader] Segment seg_371 not found in registry
+[Memory:MetadataLoader] Segment seg_372 not found in registry
+[Memory:MetadataLoader] Segment seg_373 not found in registry
+[Memory:MetadataLoader] Segment seg_374 not found in registry
+[Memory:MetadataLoader] Segment seg_375 not found in registry
+[Memory:MetadataLoader] Segment seg_376 not found in registry
+[Memory:MetadataLoader] Segment seg_377 not found in registry
+[Memory:MetadataLoader] Segment seg_378 not found in registry
+[Memory:MetadataLoader] Segment seg_379 not found in registry
+[Memory:MetadataLoader] Segment seg_380 not found in registry
+[Memory:MetadataLoader] Segment seg_381 not found in registry
+[Memory:MetadataLoader] Segment seg_382 not found in registry
+[Memory:MetadataLoader] Segment seg_383 not found in registry
+[Memory:MetadataLoader] Segment seg_384 not found in registry
+[Memory:MetadataLoader] Segment seg_385 not found in registry
+[Memory:MetadataLoader] Segment seg_386 not found in registry
+[Memory:MetadataLoader] Segment seg_387 not found in registry
+[Memory:MetadataLoader] Segment seg_388 not found in registry
+[Memory:MetadataLoader] Segment seg_389 not found in registry
+[Memory:MetadataLoader] Segment seg_390 not found in registry
+[Memory:MetadataLoader] Segment seg_391 not found in registry
+[Memory:MetadataLoader] Segment seg_392 not found in registry
+[Memory:MetadataLoader] Segment seg_393 not found in registry
+[Memory:MetadataLoader] Segment seg_394 not found in registry
+[Memory:MetadataLoader] Segment seg_395 not found in registry
+[Memory:MetadataLoader] Segment seg_396 not found in registry
+[Memory:MetadataLoader] Segment seg_397 not found in registry
+[Memory:MetadataLoader] Segment seg_398 not found in registry
+[Memory:MetadataLoader] Segment seg_399 not found in registry
+[Memory:MetadataLoader] Segment seg_400 not found in registry
+[Memory:MetadataLoader] Segment seg_401 not found in registry
+[Memory:MetadataLoader] Segment seg_402 not found in registry
+[Memory:MetadataLoader] Segment seg_403 not found in registry
+[Memory:MetadataLoader] Segment seg_404 not found in registry
+[Memory:MetadataLoader] Segment seg_405 not found in registry
+[Memory:MetadataLoader] Segment seg_406 not found in registry
+[Memory:MetadataLoader] Segment seg_407 not found in registry
+[Memory:MetadataLoader] Segment seg_408 not found in registry
+[Memory:MetadataLoader] Segment seg_409 not found in registry
+[Memory:MetadataLoader] Segment seg_410 not found in registry
+[Memory:MetadataLoader] Segment seg_411 not found in registry
+[Memory:MetadataLoader] Segment seg_412 not found in registry
+[Memory:MetadataLoader] Segment seg_413 not found in registry
+[Memory:MetadataLoader] Segment seg_414 not found in registry
+[Memory:MetadataLoader] Segment seg_415 not found in registry
+[Memory:MetadataLoader] Segment seg_416 not found in registry
+[Memory:MetadataLoader] Segment seg_417 not found in registry
+[Memory:MetadataLoader] Segment seg_418 not found in registry
+[Memory:MetadataLoader] Segment seg_419 not found in registry
+[Memory:MetadataLoader] Segment seg_420 not found in registry
+[Memory:MetadataLoader] Segment seg_421 not found in registry
+[Memory:MetadataLoader] Segment seg_422 not found in registry
+[Memory:MetadataLoader] Segment seg_423 not found in registry
+[Memory:MetadataLoader] Segment seg_424 not found in registry
+[Memory:MetadataLoader] Segment seg_425 not found in registry
+[Memory:MetadataLoader] Segment seg_426 not found in registry
+[Memory:MetadataLoader] Segment seg_427 not found in registry
+[Memory:MetadataLoader] Segment seg_428 not found in registry
+[Memory:MetadataLoader] Segment seg_429 not found in registry
+[Memory:MetadataLoader] Segment seg_430 not found in registry
+[Memory:MetadataLoader] Segment seg_431 not found in registry
+[Memory:MetadataLoader] Segment seg_432 not found in registry
+[Memory:MetadataLoader] Segment seg_433 not found in registry
+[Memory:MetadataLoader] Segment seg_434 not found in registry
+[Memory:MetadataLoader] Segment seg_435 not found in registry
+[Memory:MetadataLoader] Segment seg_436 not found in registry
+[Memory:MetadataLoader] Segment seg_437 not found in registry
+[Memory:MetadataLoader] Segment seg_438 not found in registry
+[Memory:MetadataLoader] Segment seg_439 not found in registry
+[Memory:MetadataLoader] Segment seg_440 not found in registry
+[Memory:MetadataLoader] Segment seg_441 not found in registry
+[Memory:MetadataLoader] Segment seg_442 not found in registry
+[Memory:MetadataLoader] Segment seg_443 not found in registry
+[Memory:MetadataLoader] Segment seg_444 not found in registry
+[Memory:MetadataLoader] Segment seg_445 not found in registry
+[Memory:MetadataLoader] Segment seg_446 not found in registry
+[Memory:MetadataLoader] Segment seg_447 not found in registry
+[Memory:MetadataLoader] Segment seg_448 not found in registry
+[Memory:MetadataLoader] Segment seg_449 not found in registry
+[Memory:MetadataLoader] Segment seg_450 not found in registry
+[Memory:MetadataLoader] Segment seg_451 not found in registry
+[Memory:MetadataLoader] Segment seg_452 not found in registry
+[Memory:MetadataLoader] Segment seg_453 not found in registry
+[Memory:MetadataLoader] Segment seg_454 not found in registry
+[Memory:MetadataLoader] Segment seg_455 not found in registry
+[Memory:MetadataLoader] Segment seg_456 not found in registry
+[Memory:MetadataLoader] Segment seg_457 not found in registry
+[Memory:MetadataLoader] Segment seg_458 not found in registry
+[Memory:MetadataLoader] Segment seg_459 not found in registry
+[Memory:MetadataLoader] Segment seg_460 not found in registry
+[Memory:MetadataLoader] Segment seg_461 not found in registry
+[Memory:MetadataLoader] Segment seg_462 not found in registry
+[Memory:MetadataLoader] Segment seg_463 not found in registry
+[Memory:MetadataLoader] Segment seg_464 not found in registry
+[Memory:MetadataLoader] Segment seg_465 not found in registry
+[Memory:MetadataLoader] Segment seg_466 not found in registry
+[Memory:MetadataLoader] Segment seg_467 not found in registry
+[Memory:MetadataLoader] Segment seg_468 not found in registry
+[Memory:MetadataLoader] Segment seg_469 not found in registry
+[Memory:MetadataLoader] Segment seg_470 not found in registry
+[Memory:MetadataLoader] Segment seg_471 not found in registry
+[Memory:MetadataLoader] Segment seg_472 not found in registry
+[Memory:MetadataLoader] Segment seg_473 not found in registry
+[Memory:MetadataLoader] Segment seg_474 not found in registry
+[Memory:MetadataLoader] Segment seg_475 not found in registry
+[Memory:MetadataLoader] Segment seg_476 not found in registry
+[Memory:MetadataLoader] Segment seg_477 not found in registry
+[Memory:MetadataLoader] Segment seg_478 not found in registry
+[Memory:MetadataLoader] Segment seg_479 not found in registry
+[Memory:MetadataLoader] Segment seg_480 not found in registry
+[Memory:MetadataLoader] Segment seg_481 not found in registry
+[Memory:MetadataLoader] Segment seg_482 not found in registry
+[Memory:MetadataLoader] Segment seg_483 not found in registry
+[Memory:MetadataLoader] Segment seg_484 not found in registry
+[Memory:MetadataLoader] Segment seg_485 not found in registry
+[Memory:MetadataLoader] Segment seg_486 not found in registry
+[Memory:MetadataLoader] Segment seg_487 not found in registry
+[Memory:MetadataLoader] Segment seg_488 not found in registry
+[Memory:MetadataLoader] Segment seg_489 not found in registry
+[Memory:MetadataLoader] Segment seg_490 not found in registry
+[Memory:MetadataLoader] Segment seg_491 not found in registry
+[Memory:MetadataLoader] Segment seg_492 not found in registry
+[Memory:MetadataLoader] Segment seg_493 not found in registry
+[Memory:MetadataLoader] Segment seg_494 not found in registry
+[Memory:MetadataLoader] Segment seg_495 not found in registry
+[Memory:MetadataLoader] Segment seg_496 not found in registry
+[Memory:MetadataLoader] Segment seg_497 not found in registry
+[Memory:MetadataLoader] Segment seg_498 not found in registry
+[Memory:MetadataLoader] Segment seg_499 not found in registry
+[Memory:MetadataLoader] Segment seg_500 not found in registry
+[Memory:MetadataLoader] Segment seg_501 not found in registry
+[Memory:MetadataLoader] Segment seg_502 not found in registry
+[Memory:MetadataLoader] Segment seg_503 not found in registry
+[Memory:MetadataLoader] Segment seg_504 not found in registry
+[Memory:MetadataLoader] Segment seg_505 not found in registry
+[Memory:MetadataLoader] Segment seg_506 not found in registry
+[Memory:MetadataLoader] Segment seg_507 not found in registry
+[Memory:MetadataLoader] Segment seg_508 not found in registry
+[Memory:MetadataLoader] Segment seg_509 not found in registry
+[Memory:MetadataLoader] Segment seg_510 not found in registry
+[Memory:MetadataLoader] Segment seg_511 not found in registry
+[Memory:MetadataLoader] Segment seg_512 not found in registry
+[Memory:MetadataLoader] Segment seg_513 not found in registry
+[Memory:MetadataLoader] Segment seg_514 not found in registry
+[Memory:MetadataLoader] Segment seg_515 not found in registry
+[Memory:MetadataLoader] Segment seg_516 not found in registry
+[Memory:MetadataLoader] Segment seg_517 not found in registry
+[Memory:MetadataLoader] Segment seg_518 not found in registry
+[Memory:MetadataLoader] Segment seg_519 not found in registry
+[Memory:MetadataLoader] Segment seg_520 not found in registry
+[Memory:MetadataLoader] Segment seg_521 not found in registry
+[Memory:MetadataLoader] Segment seg_522 not found in registry
+[Memory:MetadataLoader] Segment seg_523 not found in registry
+[Memory:MetadataLoader] Segment seg_524 not found in registry
+[Memory:MetadataLoader] Segment seg_525 not found in registry
+[Memory:MetadataLoader] Segment seg_526 not found in registry
+[Memory:MetadataLoader] Segment seg_527 not found in registry
+[Memory:MetadataLoader] Segment seg_528 not found in registry
+[Memory:MetadataLoader] Segment seg_529 not found in registry
+[Memory:MetadataLoader] Segment seg_530 not found in registry
+[Memory:MetadataLoader] Segment seg_531 not found in registry
+[Memory:MetadataLoader] Segment seg_532 not found in registry
+[Memory:MetadataLoader] Segment seg_533 not found in registry
+[Memory:MetadataLoader] Segment seg_534 not found in registry
+[Memory:MetadataLoader] Segment seg_535 not found in registry
+[Memory:MetadataLoader] Segment seg_536 not found in registry
+[Memory:MetadataLoader] Segment seg_537 not found in registry
+[Memory:MetadataLoader] Segment seg_538 not found in registry
+[Memory:MetadataLoader] Segment seg_539 not found in registry
+[Memory:MetadataLoader] Segment seg_540 not found in registry
+[Memory:MetadataLoader] Segment seg_541 not found in registry
+[Memory:MetadataLoader] Segment seg_542 not found in registry
+[Memory:MetadataLoader] Segment seg_543 not found in registry
+[Memory:MetadataLoader] Segment seg_544 not found in registry
+[Memory:MetadataLoader] Segment seg_545 not found in registry
+[Memory:MetadataLoader] Segment seg_546 not found in registry
+[Memory:MetadataLoader] Segment seg_547 not found in registry
+[Memory:MetadataLoader] Segment seg_548 not found in registry
+[Memory:MetadataLoader] Segment seg_549 not found in registry
+[Memory:MetadataLoader] Segment seg_550 not found in registry
+[Memory:MetadataLoader] Segment seg_551 not found in registry
+[Memory:MetadataLoader] Segment seg_552 not found in registry
+[Memory:MetadataLoader] Segment seg_553 not found in registry
+[Memory:MetadataLoader] Segment seg_554 not found in registry
+[Memory:MetadataLoader] Segment seg_555 not found in registry
+[Memory:MetadataLoader] Segment seg_556 not found in registry
+[Memory:MetadataLoader] Segment seg_557 not found in registry
+[Memory:MetadataLoader] Segment seg_558 not found in registry
+[Memory:MetadataLoader] Segment seg_559 not found in registry
+[Memory:MetadataLoader] Segment seg_560 not found in registry
+[Memory:MetadataLoader] Segment seg_561 not found in registry
+[Memory:MetadataLoader] Segment seg_562 not found in registry
+[Memory:MetadataLoader] Segment seg_563 not found in registry
+[Memory:MetadataLoader] Segment seg_564 not found in registry
+[Memory:MetadataLoader] Segment seg_565 not found in registry
+[Memory:MetadataLoader] Segment seg_566 not found in registry
+[Memory:MetadataLoader] Segment seg_567 not found in registry
+[Memory:MetadataLoader] Segment seg_568 not found in registry
+[Memory:MetadataLoader] Segment seg_569 not found in registry
+[Memory:MetadataLoader] Segment seg_570 not found in registry
+[Memory:MetadataLoader] Segment seg_571 not found in registry
+[Memory:MetadataLoader] Segment seg_572 not found in registry
+[Memory:MetadataLoader] Segment seg_573 not found in registry
+[Memory:MetadataLoader] Segment seg_574 not found in registry
+[Memory:MetadataLoader] Segment seg_575 not found in registry
+[Memory:MetadataLoader] Segment seg_576 not found in registry
+[Memory:MetadataLoader] Segment seg_577 not found in registry
+[Memory:MetadataLoader] Segment seg_578 not found in registry
+[Memory:MetadataLoader] Segment seg_579 not found in registry
+[Memory:MetadataLoader] Segment seg_580 not found in registry
+[Memory:MetadataLoader] Segment seg_581 not found in registry
+[Memory:MetadataLoader] Segment seg_582 not found in registry
+[Memory:MetadataLoader] Segment seg_583 not found in registry
+[Memory:MetadataLoader] Segment seg_584 not found in registry
+[Memory:MetadataLoader] Segment seg_585 not found in registry
+[Memory:MetadataLoader] Segment seg_586 not found in registry
+[Memory:MetadataLoader] Segment seg_587 not found in registry
+[Memory:MetadataLoader] Segment seg_588 not found in registry
+[Memory:MetadataLoader] Segment seg_589 not found in registry
+[Memory:MetadataLoader] Segment seg_590 not found in registry
+[Memory:MetadataLoader] Segment seg_591 not found in registry
+[Memory:MetadataLoader] Segment seg_592 not found in registry
+[Memory:MetadataLoader] Segment seg_593 not found in registry
+[Memory:MetadataLoader] Segment seg_594 not found in registry
+[Memory:MetadataLoader] Segment seg_595 not found in registry
+[Memory:MetadataLoader] Segment seg_596 not found in registry
+[Memory:MetadataLoader] Segment seg_597 not found in registry
+[Memory:MetadataLoader] Segment seg_598 not found in registry
+[Memory:MetadataLoader] Segment seg_599 not found in registry
+[Memory:MetadataLoader] Segment seg_600 not found in registry
+[Memory:MetadataLoader] Segment seg_601 not found in registry
+[Memory:MetadataLoader] Segment seg_602 not found in registry
+[Memory:MetadataLoader] Segment seg_603 not found in registry
+[Memory:MetadataLoader] Segment seg_604 not found in registry
+[Memory:MetadataLoader] Segment seg_605 not found in registry
+[Memory:MetadataLoader] Segment seg_606 not found in registry
+[Memory:MetadataLoader] Segment seg_607 not found in registry
+[Memory:MetadataLoader] Segment seg_608 not found in registry
+[Memory:MetadataLoader] Segment seg_609 not found in registry
+[Memory:MetadataLoader] Segment seg_610 not found in registry
+[Memory:MetadataLoader] Segment seg_611 not found in registry
+[Memory:MetadataLoader] Segment seg_612 not found in registry
+[Memory:MetadataLoader] Segment seg_613 not found in registry
+[Memory:MetadataLoader] Segment seg_614 not found in registry
+[Memory:MetadataLoader] Segment seg_615 not found in registry
+[Memory:MetadataLoader] Segment seg_616 not found in registry
+[Memory:MetadataLoader] Segment seg_617 not found in registry
+[Memory:MetadataLoader] Segment seg_618 not found in registry
+[Memory:MetadataLoader] Segment seg_619 not found in registry
+[Memory:MetadataLoader] Segment seg_620 not found in registry
+[Memory:MetadataLoader] Segment seg_621 not found in registry
+[Memory:MetadataLoader] Segment seg_622 not found in registry
+[Memory:MetadataLoader] Segment seg_623 not found in registry
+[Memory:MetadataLoader] Segment seg_624 not found in registry
+[Memory:MetadataLoader] Segment seg_625 not found in registry
+[Memory:MetadataLoader] Segment seg_626 not found in registry
+[Memory:MetadataLoader] Segment seg_627 not found in registry
+[Memory:MetadataLoader] Segment seg_628 not found in registry
+[Memory:MetadataLoader] Segment seg_629 not found in registry
+[Memory:MetadataLoader] Segment seg_630 not found in registry
+[Memory:MetadataLoader] Segment seg_631 not found in registry
+[Memory:MetadataLoader] Segment seg_632 not found in registry
+[Memory:MetadataLoader] Segment seg_633 not found in registry
+[Memory:MetadataLoader] Segment seg_634 not found in registry
+[Memory:MetadataLoader] Segment seg_635 not found in registry
+[Memory:MetadataLoader] Segment seg_636 not found in registry
+[Memory:MetadataLoader] Segment seg_637 not found in registry
+[Memory:MetadataLoader] Segment seg_638 not found in registry
+[Memory:MetadataLoader] Segment seg_639 not found in registry
+[Memory:MetadataLoader] Segment seg_640 not found in registry
+[Memory:MetadataLoader] Segment seg_641 not found in registry
+[Memory:MetadataLoader] Segment seg_642 not found in registry
+[Memory:MetadataLoader] Segment seg_643 not found in registry
+[Memory:MetadataLoader] Segment seg_644 not found in registry
+[Memory:MetadataLoader] Segment seg_645 not found in registry
+[Memory:MetadataLoader] Segment seg_646 not found in registry
+[Memory:MetadataLoader] Segment seg_647 not found in registry
+[Memory:MetadataLoader] Segment seg_648 not found in registry
+[Memory:MetadataLoader] Segment seg_649 not found in registry
+[Memory:MetadataLoader] Segment seg_650 not found in registry
+[Memory:MetadataLoader] Segment seg_651 not found in registry
+[Memory:MetadataLoader] Segment seg_652 not found in registry
+[Memory:MetadataLoader] Segment seg_653 not found in registry
+[Memory:MetadataLoader] Segment seg_654 not found in registry
+[Memory:MetadataLoader] Segment seg_655 not found in registry
+[Memory:MetadataLoader] Segment seg_656 not found in registry
+[Memory:MetadataLoader] Segment seg_657 not found in registry
+[Memory:MetadataLoader] Segment seg_658 not found in registry
+[Memory:MetadataLoader] Segment seg_659 not found in registry
+[Memory:MetadataLoader] Segment seg_660 not found in registry
+[Memory:MetadataLoader] Segment seg_661 not found in registry
+[Memory:MetadataLoader] Segment seg_662 not found in registry
+[Memory:MetadataLoader] Segment seg_663 not found in registry
+[Memory:MetadataLoader] Segment seg_664 not found in registry
+[Memory:MetadataLoader] Segment seg_665 not found in registry
+[Memory:MetadataLoader] Segment seg_666 not found in registry
+[Memory:MetadataLoader] Segment seg_667 not found in registry
+[Memory:MetadataLoader] Segment seg_668 not found in registry
+[Memory:MetadataLoader] Segment seg_669 not found in registry
+[Memory:MetadataLoader] Segment seg_670 not found in registry
+[Memory:MetadataLoader] Segment seg_671 not found in registry
+[Memory:MetadataLoader] Segment seg_672 not found in registry
+[Memory:MetadataLoader] Segment seg_673 not found in registry
+[Memory:MetadataLoader] Segment seg_674 not found in registry
+[Memory:MetadataLoader] Segment seg_675 not found in registry
+[Memory:MetadataLoader] Segment seg_676 not found in registry
+[Memory:MetadataLoader] Segment seg_677 not found in registry
+[Memory:MetadataLoader] Segment seg_678 not found in registry
+[Memory:MetadataLoader] Segment seg_679 not found in registry
+[Memory:MetadataLoader] Segment seg_680 not found in registry
+[Memory:MetadataLoader] Segment seg_681 not found in registry
+[Memory:MetadataLoader] Segment seg_682 not found in registry
+[Memory:MetadataLoader] Segment seg_683 not found in registry
+[Memory:MetadataLoader] Segment seg_684 not found in registry
+[Memory:MetadataLoader] Segment seg_685 not found in registry
+[Memory:MetadataLoader] Segment seg_686 not found in registry
+[Memory:MetadataLoader] Segment seg_687 not found in registry
+[Memory:MetadataLoader] Segment seg_688 not found in registry
+[Memory:MetadataLoader] Segment seg_689 not found in registry
+[Memory:MetadataLoader] Segment seg_690 not found in registry
+[Memory:MetadataLoader] Segment seg_691 not found in registry
+[Memory:MetadataLoader] Segment seg_692 not found in registry
+[Memory:MetadataLoader] Segment seg_693 not found in registry
+[Memory:MetadataLoader] Segment seg_694 not found in registry
+[Memory:MetadataLoader] Segment seg_695 not found in registry
+[Memory:MetadataLoader] Segment seg_696 not found in registry
+[Memory:MetadataLoader] Segment seg_697 not found in registry
+[Memory:MetadataLoader] Segment seg_698 not found in registry
+[Memory:MetadataLoader] Segment seg_699 not found in registry
+[Memory:MetadataLoader] Segment seg_700 not found in registry
+[Memory:MetadataLoader] Segment seg_701 not found in registry
+[Memory:MetadataLoader] Segment seg_702 not found in registry
+[Memory:MetadataLoader] Segment seg_703 not found in registry
+[Memory:MetadataLoader] Segment seg_704 not found in registry
+[Memory:MetadataLoader] Segment seg_705 not found in registry
+[Memory:MetadataLoader] Segment seg_706 not found in registry
+[Memory:MetadataLoader] Segment seg_707 not found in registry
+[Memory:MetadataLoader] Segment seg_708 not found in registry
+[Memory:MetadataLoader] Segment seg_709 not found in registry
+[Memory:MetadataLoader] Segment seg_710 not found in registry
+[Memory:MetadataLoader] Segment seg_711 not found in registry
+[Memory:MetadataLoader] Segment seg_712 not found in registry
+[Memory:MetadataLoader] Segment seg_713 not found in registry
+[Memory:MetadataLoader] Segment seg_714 not found in registry
+[Memory:MetadataLoader] Segment seg_715 not found in registry
+[Memory:MetadataLoader] Segment seg_716 not found in registry
+[Memory:MetadataLoader] Segment seg_717 not found in registry
+[Memory:MetadataLoader] Segment seg_718 not found in registry
+[Memory:MetadataLoader] Segment seg_719 not found in registry
+[Memory:MetadataLoader] Segment seg_720 not found in registry
+[Memory:MetadataLoader] Segment seg_721 not found in registry
+[Memory:MetadataLoader] Segment seg_722 not found in registry
+[Memory:MetadataLoader] Segment seg_723 not found in registry
+[Memory:MetadataLoader] Segment seg_724 not found in registry
+[Memory:MetadataLoader] Segment seg_725 not found in registry
+[Memory:MetadataLoader] Segment seg_726 not found in registry
+[Memory:MetadataLoader] Segment seg_727 not found in registry
+[Memory:MetadataLoader] Segment seg_728 not found in registry
+[Memory:MetadataLoader] Segment seg_729 not found in registry
+[Memory:MetadataLoader] Segment seg_730 not found in registry
+[Memory:MetadataLoader] Segment seg_731 not found in registry
+[Memory:MetadataLoader] Segment seg_732 not found in registry
+[Memory:MetadataLoader] Segment seg_733 not found in registry
+[Memory:MetadataLoader] Segment seg_734 not found in registry
+[Memory:MetadataLoader] Segment seg_735 not found in registry
+[Memory:MetadataLoader] Segment seg_736 not found in registry
+[Memory:MetadataLoader] Segment seg_737 not found in registry
+[Memory:MetadataLoader] Segment seg_738 not found in registry
+[Memory:MetadataLoader] Segment seg_739 not found in registry
+[Memory:MetadataLoader] Segment seg_740 not found in registry
+[Memory:MetadataLoader] Segment seg_741 not found in registry
+[Memory:MetadataLoader] Segment seg_742 not found in registry
+[Memory:MetadataLoader] Segment seg_743 not found in registry
+[Memory:MetadataLoader] Segment seg_744 not found in registry
+[Memory:MetadataLoader] Segment seg_745 not found in registry
+[Memory:MetadataLoader] Segment seg_746 not found in registry
+[Memory:MetadataLoader] Segment seg_747 not found in registry
+[Memory:MetadataLoader] Segment seg_748 not found in registry
+[Memory:MetadataLoader] Segment seg_749 not found in registry
+[Memory:MetadataLoader] Segment seg_750 not found in registry
+[Memory:MetadataLoader] Segment seg_751 not found in registry
+[Memory:MetadataLoader] Segment seg_752 not found in registry
+[Memory:MetadataLoader] Segment seg_753 not found in registry
+[Memory:MetadataLoader] Segment seg_754 not found in registry
+[Memory:MetadataLoader] Segment seg_755 not found in registry
+[Memory:MetadataLoader] Segment seg_756 not found in registry
+[Memory:MetadataLoader] Segment seg_757 not found in registry
+[Memory:MetadataLoader] Segment seg_758 not found in registry
+[Memory:MetadataLoader] Segment seg_759 not found in registry
+[Memory:MetadataLoader] Segment seg_760 not found in registry
+[Memory:MetadataLoader] Segment seg_761 not found in registry
+[Memory:MetadataLoader] Segment seg_762 not found in registry
+[Memory:MetadataLoader] Segment seg_763 not found in registry
+[Memory:MetadataLoader] Segment seg_764 not found in registry
+[Memory:MetadataLoader] Segment seg_765 not found in registry
+[Memory:MetadataLoader] Segment seg_766 not found in registry
+[Memory:MetadataLoader] Segment seg_767 not found in registry
+[Memory:MetadataLoader] Segment seg_768 not found in registry
+[Memory:MetadataLoader] Segment seg_769 not found in registry
+[Memory:MetadataLoader] Segment seg_770 not found in registry
+[Memory:MetadataLoader] Segment seg_771 not found in registry
+[Memory:MetadataLoader] Segment seg_772 not found in registry
+[Memory:MetadataLoader] Segment seg_773 not found in registry
+[Memory:MetadataLoader] Segment seg_774 not found in registry
+[Memory:MetadataLoader] Segment seg_775 not found in registry
+[Memory:MetadataLoader] Segment seg_776 not found in registry
+[Memory:MetadataLoader] Segment seg_777 not found in registry
+[Memory:MetadataLoader] Segment seg_778 not found in registry
+[Memory:MetadataLoader] Segment seg_779 not found in registry
+[Memory:MetadataLoader] Segment seg_780 not found in registry
+[Memory:MetadataLoader] Segment seg_781 not found in registry
+[Memory:MetadataLoader] Segment seg_782 not found in registry
+[Memory:MetadataLoader] Segment seg_783 not found in registry
+[Memory:MetadataLoader] Segment seg_784 not found in registry
+[Memory:MetadataLoader] Segment seg_785 not found in registry
+[Memory:MetadataLoader] Segment seg_786 not found in registry
+[Memory:MetadataLoader] Segment seg_787 not found in registry
+[Memory:MetadataLoader] Segment seg_788 not found in registry
+[Memory:MetadataLoader] Segment seg_789 not found in registry
+[Memory:MetadataLoader] Segment seg_790 not found in registry
+[Memory:MetadataLoader] Segment seg_791 not found in registry
+[Memory:MetadataLoader] Segment seg_792 not found in registry
+[Memory:MetadataLoader] Segment seg_793 not found in registry
+[Memory:MetadataLoader] Segment seg_794 not found in registry
+[Memory:MetadataLoader] Segment seg_795 not found in registry
+[Memory:MetadataLoader] Segment seg_796 not found in registry
+[Memory:MetadataLoader] Segment seg_797 not found in registry
+[Memory:MetadataLoader] Segment seg_798 not found in registry
+[Memory:MetadataLoader] Segment seg_799 not found in registry
+[Memory:MetadataLoader] Segment seg_800 not found in registry
+[Memory:MetadataLoader] Segment seg_801 not found in registry
+[Memory:MetadataLoader] Segment seg_802 not found in registry
+[Memory:MetadataLoader] Segment seg_803 not found in registry
+[Memory:MetadataLoader] Segment seg_804 not found in registry
+[Memory:MetadataLoader] Segment seg_805 not found in registry
+[Memory:MetadataLoader] Segment seg_806 not found in registry
+[Memory:MetadataLoader] Segment seg_807 not found in registry
+[Memory:MetadataLoader] Segment seg_808 not found in registry
+[Memory:MetadataLoader] Segment seg_809 not found in registry
+[Memory:MetadataLoader] Segment seg_810 not found in registry
+[Memory:MetadataLoader] Segment seg_811 not found in registry
+[Memory:MetadataLoader] Segment seg_812 not found in registry
+[Memory:MetadataLoader] Segment seg_813 not found in registry
+[Memory:MetadataLoader] Segment seg_814 not found in registry
+[Memory:MetadataLoader] Segment seg_815 not found in registry
+[Memory:MetadataLoader] Segment seg_816 not found in registry
+[Memory:MetadataLoader] Segment seg_817 not found in registry
+[Memory:MetadataLoader] Segment seg_818 not found in registry
+[Memory:MetadataLoader] Segment seg_819 not found in registry
+[Memory:MetadataLoader] Segment seg_820 not found in registry
+[Memory:MetadataLoader] Segment seg_821 not found in registry
+[Memory:MetadataLoader] Segment seg_822 not found in registry
+[Memory:MetadataLoader] Segment seg_823 not found in registry
+[Memory:MetadataLoader] Segment seg_824 not found in registry
+[Memory:MetadataLoader] Segment seg_825 not found in registry
+[Memory:MetadataLoader] Segment seg_826 not found in registry
+[Memory:MetadataLoader] Segment seg_827 not found in registry
+[Memory:MetadataLoader] Segment seg_828 not found in registry
+[Memory:MetadataLoader] Segment seg_829 not found in registry
+[Memory:MetadataLoader] Segment seg_830 not found in registry
+[Memory:MetadataLoader] Segment seg_831 not found in registry
+[Memory:MetadataLoader] Segment seg_832 not found in registry
+[Memory:MetadataLoader] Segment seg_833 not found in registry
+[Memory:MetadataLoader] Segment seg_834 not found in registry
+[Memory:MetadataLoader] Segment seg_835 not found in registry
+[Memory:MetadataLoader] Segment seg_836 not found in registry
+[Memory:MetadataLoader] Segment seg_837 not found in registry
+[Memory:MetadataLoader] Segment seg_838 not found in registry
+[Memory:MetadataLoader] Segment seg_839 not found in registry
+[Memory:MetadataLoader] Segment seg_840 not found in registry
+[Memory:MetadataLoader] Segment seg_841 not found in registry
+[Memory:MetadataLoader] Segment seg_842 not found in registry
+[Memory:MetadataLoader] Segment seg_843 not found in registry
+[Memory:MetadataLoader] Segment seg_844 not found in registry
+[Memory:MetadataLoader] Segment seg_845 not found in registry
+[Memory:MetadataLoader] Segment seg_846 not found in registry
+[Memory:MetadataLoader] Segment seg_847 not found in registry
+[Memory:MetadataLoader] Segment seg_848 not found in registry
+[Memory:MetadataLoader] Segment seg_849 not found in registry
+[Memory:MetadataLoader] Segment seg_850 not found in registry
+[Memory:MetadataLoader] Segment seg_851 not found in registry
+[Memory:MetadataLoader] Segment seg_852 not found in registry
+[Memory:MetadataLoader] Segment seg_853 not found in registry
+[Memory:MetadataLoader] Segment seg_854 not found in registry
+[Memory:MetadataLoader] Segment seg_855 not found in registry
+[Memory:MetadataLoader] Segment seg_856 not found in registry
+[Memory:MetadataLoader] Segment seg_857 not found in registry
+[Memory:MetadataLoader] Segment seg_858 not found in registry
+[Memory:MetadataLoader] Segment seg_859 not found in registry
+[Memory:MetadataLoader] Segment seg_860 not found in registry
+[Memory:MetadataLoader] Segment seg_861 not found in registry
+[Memory:MetadataLoader] Segment seg_862 not found in registry
+[Memory:MetadataLoader] Segment seg_863 not found in registry
+[Memory:MetadataLoader] Segment seg_864 not found in registry
+[Memory:MetadataLoader] Segment seg_865 not found in registry
+[Memory:MetadataLoader] Segment seg_866 not found in registry
+[Memory:MetadataLoader] Segment seg_867 not found in registry
+[Memory:MetadataLoader] Segment seg_868 not found in registry
+[Memory:MetadataLoader] Segment seg_869 not found in registry
+[Memory:MetadataLoader] Segment seg_870 not found in registry
+[Memory:MetadataLoader] Segment seg_871 not found in registry
+[Memory:MetadataLoader] Segment seg_872 not found in registry
+[Memory:MetadataLoader] Segment seg_873 not found in registry
+[Memory:MetadataLoader] Segment seg_874 not found in registry
+[Memory:MetadataLoader] Segment seg_875 not found in registry
+[Memory:MetadataLoader] Segment seg_876 not found in registry
+[Memory:MetadataLoader] Segment seg_877 not found in registry
+[Memory:MetadataLoader] Segment seg_878 not found in registry
+[Memory:MetadataLoader] Segment seg_879 not found in registry
+[Memory:MetadataLoader] Segment seg_880 not found in registry
+[Memory:MetadataLoader] Segment seg_881 not found in registry
+[Memory:MetadataLoader] Segment seg_882 not found in registry
+[Memory:MetadataLoader] Segment seg_883 not found in registry
+[Memory:MetadataLoader] Segment seg_884 not found in registry
+[Memory:MetadataLoader] Segment seg_885 not found in registry
+[Memory:MetadataLoader] Segment seg_886 not found in registry
+[Memory:MetadataLoader] Segment seg_887 not found in registry
+[Memory:MetadataLoader] Segment seg_888 not found in registry
+[Memory:MetadataLoader] Segment seg_889 not found in registry
+[Memory:MetadataLoader] Segment seg_890 not found in registry
+[Memory:MetadataLoader] Segment seg_891 not found in registry
+[Memory:MetadataLoader] Segment seg_892 not found in registry
+[Memory:MetadataLoader] Segment seg_893 not found in registry
+[Memory:MetadataLoader] Segment seg_894 not found in registry
+[Memory:MetadataLoader] Segment seg_895 not found in registry
+[Memory:MetadataLoader] Segment seg_896 not found in registry
+[Memory:MetadataLoader] Segment seg_897 not found in registry
+[Memory:MetadataLoader] Segment seg_898 not found in registry
+[Memory:MetadataLoader] Segment seg_899 not found in registry
+[Memory:MetadataLoader] Segment seg_900 not found in registry
+[Memory:MetadataLoader] Segment seg_901 not found in registry
+[Memory:MetadataLoader] Segment seg_902 not found in registry
+[Memory:MetadataLoader] Segment seg_903 not found in registry
+[Memory:MetadataLoader] Segment seg_904 not found in registry
+[Memory:MetadataLoader] Segment seg_905 not found in registry
+[Memory:MetadataLoader] Segment seg_906 not found in registry
+[Memory:MetadataLoader] Segment seg_907 not found in registry
+[Memory:MetadataLoader] Segment seg_908 not found in registry
+[Memory:MetadataLoader] Segment seg_909 not found in registry
+[Memory:MetadataLoader] Segment seg_910 not found in registry
+[Memory:MetadataLoader] Segment seg_911 not found in registry
+[Memory:MetadataLoader] Segment seg_912 not found in registry
+[Memory:MetadataLoader] Segment seg_913 not found in registry
+[Memory:MetadataLoader] Segment seg_914 not found in registry
+[Memory:MetadataLoader] Segment seg_915 not found in registry
+[Memory:MetadataLoader] Segment seg_916 not found in registry
+[Memory:MetadataLoader] Segment seg_917 not found in registry
+[Memory:MetadataLoader] Segment seg_918 not found in registry
+[Memory:MetadataLoader] Segment seg_919 not found in registry
+[Memory:MetadataLoader] Segment seg_920 not found in registry
+[Memory:MetadataLoader] Segment seg_921 not found in registry
+[Memory:MetadataLoader] Segment seg_922 not found in registry
+[Memory:MetadataLoader] Segment seg_923 not found in registry
+[Memory:MetadataLoader] Segment seg_924 not found in registry
+[Memory:MetadataLoader] Segment seg_925 not found in registry
+[Memory:MetadataLoader] Segment seg_926 not found in registry
+[Memory:MetadataLoader] Segment seg_927 not found in registry
+[Memory:MetadataLoader] Segment seg_928 not found in registry
+[Memory:MetadataLoader] Segment seg_929 not found in registry
+[Memory:MetadataLoader] Segment seg_930 not found in registry
+[Memory:MetadataLoader] Segment seg_931 not found in registry
+[Memory:MetadataLoader] Segment seg_932 not found in registry
+[Memory:MetadataLoader] Segment seg_933 not found in registry
+[Memory:MetadataLoader] Segment seg_934 not found in registry
+[Memory:MetadataLoader] Segment seg_935 not found in registry
+[Memory:MetadataLoader] Segment seg_936 not found in registry
+[Memory:MetadataLoader] Segment seg_937 not found in registry
+[Memory:MetadataLoader] Segment seg_938 not found in registry
+[Memory:MetadataLoader] Segment seg_939 not found in registry
+[Memory:MetadataLoader] Segment seg_940 not found in registry
+[Memory:MetadataLoader] Segment seg_941 not found in registry
+[Memory:MetadataLoader] Segment seg_942 not found in registry
+[Memory:MetadataLoader] Segment seg_943 not found in registry
+[Memory:MetadataLoader] Segment seg_944 not found in registry
+[Memory:MetadataLoader] Segment seg_945 not found in registry
+[Memory:MetadataLoader] Segment seg_946 not found in registry
+[Memory:MetadataLoader] Segment seg_947 not found in registry
+[Memory:MetadataLoader] Segment seg_948 not found in registry
+[Memory:MetadataLoader] Segment seg_949 not found in registry
+[Memory:MetadataLoader] Segment seg_950 not found in registry
+[Memory:MetadataLoader] Segment seg_951 not found in registry
+[Memory:MetadataLoader] Segment seg_952 not found in registry
+[Memory:MetadataLoader] Segment seg_953 not found in registry
+[Memory:MetadataLoader] Segment seg_954 not found in registry
+[Memory:MetadataLoader] Segment seg_955 not found in registry
+[Memory:MetadataLoader] Segment seg_956 not found in registry
+[Memory:MetadataLoader] Segment seg_957 not found in registry
+[Memory:MetadataLoader] Segment seg_958 not found in registry
+[Memory:MetadataLoader] Segment seg_959 not found in registry
+[Memory:MetadataLoader] Segment seg_960 not found in registry
+[Memory:MetadataLoader] Segment seg_961 not found in registry
+[Memory:MetadataLoader] Segment seg_962 not found in registry
+[Memory:MetadataLoader] Segment seg_963 not found in registry
+[Memory:MetadataLoader] Segment seg_964 not found in registry
+[Memory:MetadataLoader] Segment seg_965 not found in registry
+[Memory:MetadataLoader] Segment seg_966 not found in registry
+[Memory:MetadataLoader] Segment seg_967 not found in registry
+[Memory:MetadataLoader] Segment seg_968 not found in registry
+[Memory:MetadataLoader] Segment seg_969 not found in registry
+[Memory:MetadataLoader] Segment seg_970 not found in registry
+[Memory:MetadataLoader] Segment seg_971 not found in registry
+[Memory:MetadataLoader] Segment seg_972 not found in registry
+[Memory:MetadataLoader] Segment seg_973 not found in registry
+[Memory:MetadataLoader] Segment seg_974 not found in registry
+[Memory:MetadataLoader] Segment seg_975 not found in registry
+[Memory:MetadataLoader] Segment seg_976 not found in registry
+[Memory:MetadataLoader] Segment seg_977 not found in registry
+[Memory:MetadataLoader] Segment seg_978 not found in registry
+[Memory:MetadataLoader] Segment seg_979 not found in registry
+[Memory:MetadataLoader] Segment seg_980 not found in registry
+[Memory:MetadataLoader] Segment seg_981 not found in registry
+[Memory:MetadataLoader] Segment seg_982 not found in registry
+[Memory:MetadataLoader] Segment seg_983 not found in registry
+[Memory:MetadataLoader] Segment seg_984 not found in registry
+[Memory:MetadataLoader] Segment seg_985 not found in registry
+[Memory:MetadataLoader] Segment seg_986 not found in registry
+[Memory:MetadataLoader] Segment seg_987 not found in registry
+[Memory:MetadataLoader] Segment seg_988 not found in registry
+[Memory:MetadataLoader] Segment seg_989 not found in registry
+[Memory:MetadataLoader] Segment seg_990 not found in registry
+[Memory:MetadataLoader] Segment seg_991 not found in registry
+[Memory:MetadataLoader] Segment seg_992 not found in registry
+[Memory:MetadataLoader] Segment seg_993 not found in registry
+[Memory:MetadataLoader] Segment seg_994 not found in registry
+[Memory:MetadataLoader] Segment seg_995 not found in registry
+[Memory:MetadataLoader] Segment seg_996 not found in registry
+[Memory:MetadataLoader] Segment seg_997 not found in registry
+[Memory:MetadataLoader] Segment seg_998 not found in registry
+[Memory:MetadataLoader] Segment seg_999 not found in registry
+[Memory:MetadataLoader] Loaded metadata for 3/1000 segments
+[Memory:Filters] After recency filter: 2 candidates
+[Memory:Filters] After importance filter: 2 candidates
+[Memory:Filters] Final filtered results: 2/1000
+
+hooks\memory\core\tests\pipeline.test.ts:
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-pipeline\mem-store
+[Memory:PerMessage] Created 1 segments from transcript
+[Memory:Pipeline] Segmented into 1 segments
+[Memory:KeywordTagger] Extracted 6 keywords for segment seg_1768343210001_a46e0fd7, total tags: 6
+[Memory:Pipeline] Extracted metadata for 1 segments
+[Memory:Pipeline] Summarized 1 segments
+[Memory:KeywordIndex] Added segment seg_1768343210001_a46e0fd7 to index for 7 tags
+[Memory:FileBackend] Stored segment seg_1768343210001_a46e0fd7 at C:\Users\fujos\.pai-test-pipeline\mem-store\segments\2026-01\seg_1768343210001_a46e0fd7.md
+[Memory:Pipeline] Stored 1 segments
+[Memory:Pipeline] Updated session-registry.json for session mem_test_session
+[Memory:Pipeline] Pipeline complete for session mem_test_session
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-pipeline\mem-store
+[Memory:PerMessage] Empty transcript - returning 0 segments
+[Memory:Pipeline] Segmented into 0 segments
+[Memory:Pipeline] No segments created from empty transcript - pipeline complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-pipeline\mem-store
+[Memory:PerMessage] Created 1 segments from transcript
+[Memory:Pipeline] Segmented into 1 segments
+[Memory:KeywordTagger] Extracted 7 keywords for segment seg_1768343210051_ac57206b, total tags: 7
+[Memory:Pipeline] Extracted metadata for 1 segments
+[Memory:Pipeline] Summarized 1 segments
+[Memory:KeywordIndex] Added segment seg_1768343210051_ac57206b to index for 10 tags
+[Memory:FileBackend] Stored segment seg_1768343210051_ac57206b at C:\Users\fujos\.pai-test-pipeline\mem-store\segments\2026-01\seg_1768343210051_ac57206b.md
+[Memory:Pipeline] Stored 1 segments
+[Memory:Pipeline] Updated session-registry.json for session mem_test_tags
+[Memory:Pipeline] Pipeline complete for session mem_test_tags
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-pipeline\mem-store
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-pipeline\mem-store
+[Memory:PerMessage] Created 2 segments from transcript
+[Memory:Pipeline] Segmented into 2 segments
+[Memory:KeywordTagger] Extracted 4 keywords for segment seg_1768343210092_d27ffb6c, total tags: 4
+[Memory:KeywordTagger] Extracted 4 keywords for segment seg_1768343210092_61fec545, total tags: 4
+[Memory:Pipeline] Extracted metadata for 2 segments
+[Memory:Pipeline] Summarized 2 segments
+[Memory:KeywordIndex] Added segment seg_1768343210092_d27ffb6c to index for 4 tags
+[Memory:FileBackend] Stored segment seg_1768343210092_d27ffb6c at C:\Users\fujos\.pai-test-pipeline\mem-store\segments\2026-01\seg_1768343210092_d27ffb6c.md
+[Memory:KeywordIndex] Added segment seg_1768343210092_61fec545 to index for 4 tags
+[Memory:FileBackend] Stored segment seg_1768343210092_61fec545 at C:\Users\fujos\.pai-test-pipeline\mem-store\segments\2026-01\seg_1768343210092_61fec545.md
+[Memory:Pipeline] Stored 2 segments
+[Memory:Pipeline] Updated session-registry.json for session mem_test_multi
+[Memory:Pipeline] Pipeline complete for session mem_test_multi
+
+hooks\memory\core\tests\ranking.test.ts:
+[Memory:Ranking] Ranked 2 results to 2 in 0ms
+[Memory:Ranking] Ranked 2 results to 2 in 0ms
+[Memory:Ranking] Ranked 1 results to 1 in 0ms
+[Memory:Ranking] Ranked 2 results to 2 in 0ms
+[Memory:Ranking] Ranked 2 results to 2 in 0ms
+[Memory:Ranking] Ranked 1 results to 1 in 0ms
+[Memory:Ranking] Ranked 1 results to 1 in 0ms
+[Memory:Ranking] Ranked 3 results to 3 in 0ms
+[Memory:Ranking] Ranked 2 results to 2 in 0ms
+[Memory:Ranking] Ranked 20 results to 5 in 0ms
+[Memory:Ranking] Ranked 2 results to 1 in 0ms
+[Memory:Ranking] Ranked 20 results to 10 in 0ms
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Ranking] Ranked 1 results to 1 in 0ms
+[Memory:Ranking] Ranked 1 results to 1 in 0ms
+[Memory:Ranking] Ranked 100 results to 10 in 0ms
+[Memory:Ranking] Ranked 1 results to 1 in 0ms
+
+hooks\memory\core\tests\retrieval.test.ts:
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+[Memory:MetadataLoader] Registry not found, returning empty
+[Memory:Filters] No filters specified, returning all candidates
+[Memory:Filters] Final filtered results: 0/0
+[Memory:Retrieval] Filtered to 0 candidates
+[Memory:Ranking] No results to rank, returning empty
+[Memory:Retrieval] Ranked to top 0 results
+
+hooks\memory\lib\logging\stats-manager.test.ts:
+[Memory:StatsManager] Failed to parse stats.json, using defaults: JSON Parse error: Expected '}'
+
+hooks\memory\lib\tests\debug-utils.test.ts:
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:TestComponent:Debug] Test message
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Retrieve:Debug] Query: "test"
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:Config] Loaded configuration with 6 providers
+
+hooks\memory\lib\tests\metadata-browser.test.ts:
+[Memory:MetadataBrowser] Listed 2 sessions
+[Memory:MetadataBrowser] Listed 0 sessions
+[Memory:MetadataBrowser] Listed 1 sessions
+[Memory:MetadataBrowser] Retrieved session mem_1704900000000_a1b2c3d4
+[Memory:MetadataBrowser] Listed 1 sessions
+[Memory:MetadataBrowser] Retrieved segment seg_1704900000000_f1e2d3c4
+[Memory:MetadataBrowser] Retrieved segment seg_1704900000000_abcdef123456
+[Memory:MetadataBrowser] Retrieved segment seg_1704900000000_abc12345
+[Memory:MetadataBrowser] Found 3 segments with tag 'typescript'
+[Memory:MetadataBrowser] Found 0 segments with tag 'nonexistent'
+[Memory:MetadataBrowser] Retrieved tag index with 3 tags
+[Memory:MetadataBrowser] Listed 1 sessions
+[Memory:MetadataBrowser] Listed 1 sessions
+[Memory:MetadataBrowser] Retrieved session mem_1704900000000_a1b2c3d4
+[Memory:MetadataBrowser] Retrieved segment seg_1704900000000_f1e2d3c4
+[Memory:MetadataBrowser] Found 1 segments with tag 'typescript'
+[Memory:MetadataBrowser] Retrieved tag index with 2 tags
+
+hooks\memory\lib\tests\query-integration.test.ts:
+[Memory:RegistryQuery] Loaded registry with 2 sessions
+[Memory:RegistryQuery] Found 1 sessions matching tag(s): typescript (any)
+[Memory:SegmentReader] Found 2 segments for session mem_1768867200000_abcdef12
+[Memory:SegmentSearch] Loaded keyword index with 5 keywords
+[Memory:SegmentSearch] Keyword 'typescript' matched 2 segments
+[Memory:SegmentReader] Loaded segment seg_1768867200000_a1b2c3d4 from 2026-01/seg_1768867200000_a1b2c3d4.md
+[Memory:RegistryQuery] Found 1 sessions from 2026-01-01 to 2026-01-31
+[Memory:SegmentSearch] Keyword 'typescript' matched 2 segments
+[Memory:SegmentReader] Loaded segment seg_1768867200000_a1b2c3d4 from 2026-01/seg_1768867200000_a1b2c3d4.md
+[Memory:SegmentReader] Loaded segment seg_1769126400000_e5f6abcd from 2026-01/seg_1769126400000_e5f6abcd.md
+[Memory:SegmentSearch] Keywords [typescript, hooks] matched 2 segments
+[Memory:SegmentReader] Loaded segment seg_1768867200000_a1b2c3d4 from 2026-01/seg_1768867200000_a1b2c3d4.md
+[Memory:RegistryQuery] Found 2 sessions matching tag(s): typescript, auth (any)
+[Memory:SegmentReader] Found 2 segments for session mem_1768867200000_abcdef12
+[Memory:SegmentReader] Found 1 segments for session mem_1770777600000_12345678
+[Memory:SegmentSearch] Keyword 'auth' matched 1 segments
+[Memory:SegmentReader] Loaded segment seg_1770777600000_99999999 from 2026-02/seg_1770777600000_99999999.md
+[Memory:RegistryQuery] Found 2 sessions from 2026-01-01 to 2026-12-31
+[Memory:SegmentSearch] Keyword 'nonexistent' matched 0 segments
+[Memory:RegistryQuery] Found 0 sessions matching tag(s): nonexistent (any)
+[Memory:RegistryQuery] Found 1 sessions from 2026-01-01 to 2026-12-31
+[Memory:RegistryQuery] Found 1 sessions from 2026-01-01 to 2026-12-31
+[Memory:SegmentReader] Found 2 segments for session mem_1768867200000_abcdef12
+[Memory:SegmentReader] Found 1 segments for session mem_1770777600000_12345678
+[Memory:SegmentSearch] Keyword 'typescript' matched 2 segments
+
+hooks\memory\lib\tests\registry-query.test.ts:
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 2 sessions from 2026-01-01 to 2026-01-31
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 0 sessions from 2025-01-01 to 2025-12-31
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 0 sessions from 2026-03-01 to 2026-03-31
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 1 sessions from 2026-03-01 to 2026-03-31
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 1 sessions from 2026-01-01 to 2026-12-31
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 2 sessions from 2026-01-01 to 2026-12-31
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 2 sessions matching tag(s): typescript (any)
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 3 sessions matching tag(s): typescript, auth (any)
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 1 sessions matching tag(s): typescript, hooks (all)
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 0 sessions matching tag(s): nonexistent (any)
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 0 sessions matching tag(s): testing (any)
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 1 sessions matching tag(s): testing (any)
+[Memory:RegistryQuery] Loaded registry with 4 sessions
+[Memory:RegistryQuery] Found 1 sessions matching tag(s): typescript (any)
+
+hooks\memory\lib\tests\retention-policy.test.ts:
+[Memory:Lifecycle] Marked 1 sessions as archived
+
+hooks\memory\lib\tests\segment-reader.test.ts:
+[Memory:SegmentReader] Loaded segment seg_1768867200000_a1b2c3d4 from 2026-01/seg_1768867200000_a1b2c3d4.md
+[Memory:SegmentReader] Loaded segment seg_1769126400000_e5f6abcd from 2026-01/seg_1769126400000_e5f6abcd.md
+[Memory:SegmentReader] Found 2 segments for session mem_1768867200000_abcdef12
+[Memory:SegmentReader] Found 0 segments for session mem_1999999999999_99999999
+[Memory:SegmentReader] Found 1 segments for session mem_1770777600000_abcd1234
+[Memory:SegmentReader] Found 2 segments for session mem_1768867200000_abcdef12
+
+hooks\memory\lib\tests\segment-search.test.ts:
+[Memory:SegmentSearch] Loaded keyword index with 5 keywords
+[Memory:SegmentSearch] Loaded keyword index with 5 keywords
+[Memory:SegmentSearch] Keyword 'typescript' matched 3 segments
+[Memory:SegmentSearch] Loaded keyword index with 5 keywords
+[Memory:SegmentSearch] Keyword 'nonexistent' matched 0 segments
+[Memory:SegmentSearch] Loaded keyword index with 5 keywords
+[Memory:SegmentSearch] Keyword 'TypeScript' matched 3 segments
+[Memory:SegmentSearch] Loaded keyword index with 5 keywords
+[Memory:SegmentSearch] Keywords [typescript, memory] matched 4 segments
+[Memory:SegmentSearch] Loaded keyword index with 5 keywords
+[Memory:SegmentSearch] Keywords [typescript, memory, hooks] matched 5 segments
+[Memory:SegmentSearch] Loaded keyword index with 5 keywords
+[Memory:SegmentSearch] Keywords [nonexistent1, nonexistent2] matched 0 segments
+[Memory:SegmentSearch] Loaded keyword index with 5 keywords
+[Memory:SegmentSearch] Keywords [auth, security] matched 3 segments
+[Memory:SegmentSearch] Loaded keyword index with 5 keywords
+[Memory:SegmentSearch] Keywords [typescript, hooks] matched 4 segments
+
+hooks\memory\lib\tests\usage-tracker.test.ts:
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-usage-tracker\mem-store
+[Memory:KeywordIndex] Added segment seg_1768343211839_test to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1768343211839_test at C:\Users\fujos\.pai-test-usage-tracker\mem-store\segments\2026-01\seg_1768343211839_test.md
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-usage-tracker\mem-store
+[Memory:FileBackend] Updated segment seg_1768343211839_test
+[Memory:UsageTracker] Updated usage signals for 1 segments
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-usage-tracker\mem-store
+[Memory:KeywordIndex] Added segment seg_1768343211874_test to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1768343211874_test at C:\Users\fujos\.pai-test-usage-tracker\mem-store\segments\2026-01\seg_1768343211874_test.md
+[Memory:FileBackend] Updated segment seg_1768343211874_test
+[Memory:UsageTracker] Updated usage signals for 1 segments
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-usage-tracker\mem-store
+[Memory:KeywordIndex] Added segment seg_batch_1 to index for 1 tags
+[Memory:FileBackend] Stored segment seg_batch_1 at C:\Users\fujos\.pai-test-usage-tracker\mem-store\segments\2026-01\seg_batch_1.md
+[Memory:KeywordIndex] Added segment seg_batch_2 to index for 1 tags
+[Memory:FileBackend] Stored segment seg_batch_2 at C:\Users\fujos\.pai-test-usage-tracker\mem-store\segments\2026-01\seg_batch_2.md
+[Memory:KeywordIndex] Added segment seg_batch_3 to index for 1 tags
+[Memory:FileBackend] Stored segment seg_batch_3 at C:\Users\fujos\.pai-test-usage-tracker\mem-store\segments\2026-01\seg_batch_3.md
+[Memory:FileBackend] Updated segment seg_batch_1
+[Memory:FileBackend] Updated segment seg_batch_2
+[Memory:FileBackend] Updated segment seg_batch_3
+[Memory:UsageTracker] Updated usage signals for 3 segments
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-usage-tracker\mem-store
+[Memory:KeywordIndex] Added segment seg_partial_1 to index for 1 tags
+[Memory:FileBackend] Stored segment seg_partial_1 at C:\Users\fujos\.pai-test-usage-tracker\mem-store\segments\2026-01\seg_partial_1.md
+[Memory:KeywordIndex] Added segment seg_partial_2 to index for 1 tags
+[Memory:FileBackend] Stored segment seg_partial_2 at C:\Users\fujos\.pai-test-usage-tracker\mem-store\segments\2026-01\seg_partial_2.md
+[Memory:FileBackend] Updated segment seg_partial_1
+[Memory:UsageTracker] Failed to update seg_nonexistent: Segment seg_nonexistent not found
+[Memory:FileBackend] Updated segment seg_partial_2
+[Memory:UsageTracker] Partial failure: 1/3 updates failed
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-usage-tracker\mem-store
+[Memory:UsageTracker] Failed to update seg_none_1: Segment seg_none_1 not found
+[Memory:UsageTracker] Failed to update seg_none_2: Segment seg_none_2 not found
+[Memory:UsageTracker] Failed to update seg_none_3: Segment seg_none_3 not found
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-usage-tracker\mem-store
+
+hooks\memory\providers\search\keyword-search.test.ts:
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Index file not found, using empty index
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:Search] Index corrupted, returning empty results
+[Memory:KeywordSearch] Found 0 matches for 2 terms
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Found 3 matches for 1 terms
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Found 6 matches for 4 terms
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Found 4 matches for 2 terms
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Found 6 matches for 3 terms
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Found 0 matches for 3 terms
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Found 2 matches for 3 terms
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Found 1 matches for 3 terms
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Loaded index with 20 keywords
+[Memory:KeywordSearch] Found 5290 matches for 4 terms
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Found 0 matches for 2 terms
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:KeywordSearch] Found 0 matches for 1 terms
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:Config] Loaded configuration with 6 providers
+[Memory:KeywordSearch] Loaded index with 6 keywords
+[Memory:Config] Loaded configuration with 6 providers
+
+hooks\memory\providers\storage\file-backend.test.ts:
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-file-backend\mem-store
+[Memory:KeywordIndex] Added segment seg_1704912345000_a1b2c3d4 to index for 2 tags
+[Memory:FileBackend] Stored segment seg_1704912345000_a1b2c3d4 at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345000_a1b2c3d4.md
+[Memory:FileBackend] Stored segment seg_2025060012345_x1y2z3 at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2025-06\seg_2025060012345_x1y2z3.md
+[Memory:KeywordIndex] Added segment seg_1704912345001_frontmatter to index for 2 tags
+[Memory:FileBackend] Stored segment seg_1704912345001_frontmatter at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345001_frontmatter.md
+[Memory:FileBackend] Stored segment seg_1704912345002_result at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345002_result.md
+[Memory:KeywordIndex] Added segment seg_1704912345003_retrieve to index for 2 tags
+[Memory:FileBackend] Stored segment seg_1704912345003_retrieve at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345003_retrieve.md
+[Memory:KeywordIndex] Added segment seg_1704912345004_fields to index for 3 tags
+[Memory:FileBackend] Stored segment seg_1704912345004_fields at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345004_fields.md
+[Memory:KeywordIndex] Added segment seg_1704912345010_query1 to index for 2 tags
+[Memory:FileBackend] Stored segment seg_1704912345010_query1 at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345010_query1.md
+[Memory:KeywordIndex] Added segment seg_1704912345011_query2 to index for 2 tags
+[Memory:FileBackend] Stored segment seg_1704912345011_query2 at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345011_query2.md
+[Memory:KeywordIndex] Added segment seg_1704912345012_query3 to index for 2 tags
+[Memory:FileBackend] Stored segment seg_1704912345012_query3 at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345012_query3.md
+[Memory:KeywordIndex] Added segment seg_1704912345020_delete to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1704912345020_delete at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345020_delete.md
+[Memory:KeywordIndex] Removed segment seg_1704912345020_delete from index
+[Memory:FileBackend] Deleted segment seg_1704912345020_delete
+[Memory:FileBackend] Stored segment seg_1704912345021_delete2 at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345021_delete2.md
+[Memory:FileBackend] Deleted segment seg_1704912345021_delete2
+[Memory:FileBackend] Stored segment seg_invalid_timestamp at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2026-01\seg_invalid_timestamp.md
+[Memory:KeywordIndex] Added segment seg_1704912345030_registry to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1704912345030_registry at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345030_registry.md
+[Memory:KeywordIndex] Added segment seg_1704912345040_concurrent0 to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1704912345040_concurrent0 at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345040_concurrent0.md
+[Memory:KeywordIndex] Added segment seg_1704912345040_concurrent2 to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1704912345040_concurrent2 at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345040_concurrent2.md
+[Memory:KeywordIndex] Failed to save index: ENOENT: no such file or directory, rename 'C:\Users\fujos\.pai-test-file-backend\mem-store\indexes\keyword\index.json.tmp' -> 'C:\Users\fujos\.pai-test-file-backend\mem-store\indexes\keyword\index.json'
+[Memory:KeywordIndex] Added segment seg_1704912345040_concurrent1 to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1704912345040_concurrent1 at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345040_concurrent1.md
+[Memory:KeywordIndex] Failed to save index: ENOENT: no such file or directory, rename 'C:\Users\fujos\.pai-test-file-backend\mem-store\indexes\keyword\index.json.tmp' -> 'C:\Users\fujos\.pai-test-file-backend\mem-store\indexes\keyword\index.json'
+[Memory:KeywordIndex] Added segment seg_1704912345040_concurrent4 to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1704912345040_concurrent4 at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345040_concurrent4.md
+[Memory:KeywordIndex] Added segment seg_1704912345040_concurrent3 to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1704912345040_concurrent3 at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2024-01\seg_1704912345040_concurrent3.md
+[Memory:KeywordIndex] Added segment seg_1768343212605_test to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1768343212605_test at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2026-01\seg_1768343212605_test.md
+[Memory:FileBackend] Updated segment seg_1768343212605_test
+[Memory:KeywordIndex] Added segment seg_1768343212629_test to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1768343212629_test at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2026-01\seg_1768343212629_test.md
+[Memory:FileBackend] Updated segment seg_1768343212629_test
+[Memory:FileBackend] Updated segment seg_1768343212629_test
+[Memory:FileBackend] Updated segment seg_1768343212629_test
+[Memory:KeywordIndex] Added segment seg_1768343212678_test to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1768343212678_test at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2026-01\seg_1768343212678_test.md
+[Memory:FileBackend] Updated segment seg_1768343212678_test
+[Memory:KeywordIndex] Added segment seg_1768343212716_test to index for 2 tags
+[Memory:FileBackend] Stored segment seg_1768343212716_test at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2026-01\seg_1768343212716_test.md
+[Memory:FileBackend] Updated segment seg_1768343212716_test
+[Memory:KeywordIndex] Added segment seg_1768343212734_test to index for 1 tags
+[Memory:FileBackend] Stored segment seg_1768343212734_test at C:\Users\fujos\.pai-test-file-backend\mem-store\segments\2026-01\seg_1768343212734_test.md
+[Memory:FileBackend] Updated segment seg_1768343212734_test
+[Memory:FileBackend] Shutdown complete
+
+hooks\memory\providers\test-harness\extract-harness.test.ts:
+[Memory:KeywordTagger] Extracted 6 keywords for segment seg_test_1768343212771_pkq6g2fv, total tags: 7
+[Memory:KeywordTagger] Extracted 7 keywords for segment seg_test_1768343212771_8h6gir1k, total tags: 7
+[Memory:KeywordTagger] Extracted 4 keywords for segment seg_test_1768343212771_usn0i389, total tags: 6
+[Memory:KeywordTagger] Extracted 4 keywords for segment seg_test_1768343212771_6sfbd74m, total tags: 6
+[Memory:KeywordTagger] Extracted 4 keywords for segment seg_test_1768343212771_78lou4ds, total tags: 5
+
+hooks\memory\providers\test-harness\segment-harness.test.ts:
+[Memory:PerMessage] Created 1 segments from transcript
+[Memory:PerMessage] Created 1 segments from transcript
+[Memory:PerMessage] Empty transcript - returning 0 segments
+[Memory:PerMessage] Empty transcript - returning 0 segments
+[Memory:PerMessage] Created 2 segments from transcript
+[Memory:PerMessage] Created 2 segments from transcript
+[Memory:PerMessage] Created 1 segments from transcript
+[Memory:PerMessage] Created 1 segments from transcript
+
+hooks\memory\lib\formatting\tests\age-formatter.test.ts:
+[Memory:AgeFormatter] Future timestamp: 1768343215744, using "0s"
+
+hooks\memory\lib\logging\tests\retrieval-logger.test.ts:
+[Memory:RetrievalLogger] Rotated log file
+
+hooks\memory\lib\ranking\tests\access-scorer.test.ts:
+[Memory:AccessScorer] Negative access count (-5), using 0
+
+hooks\memory\lib\ranking\tests\importance-scorer.test.ts:
+[Memory:ImportanceScorer] Importance > 100 (150), capping at 1.0
+[Memory:ImportanceScorer] Negative importance (-10), using 0
+[Memory:ImportanceScorer] Importance > 100 (99999), capping at 1.0
+
+hooks\memory\lib\ranking\tests\recency-scorer.test.ts:
+[Memory:RecencyScorer] Future timestamp detected: -5.00 days. Using score 1.0
+
+hooks\memory\lib\ranking\tests\term-match-scorer.test.ts:
+[Memory:TermMatchScorer] No search terms provided, returning 0
+[Memory:TermMatchScorer] Negative matchCount (-1), using 0
+
+hooks\memory\providers\extract\tests\keyword-tagger.test.ts:
+[Memory:KeywordTagger] Extracted 6 keywords for segment seg_test_001, total tags: 6
+[Memory:KeywordTagger] Extracted 3 keywords for segment seg_test_002, total tags: 5
+[Memory:KeywordTagger] Extracted 10 keywords for segment seg_test_003, total tags: 10
+[Memory:KeywordTagger] Extracted 4 keywords for segment seg_test_006, total tags: 4
+[Memory:KeywordTagger] Extracted 4 keywords for segment seg_test_007, total tags: 4
+[Memory:KeywordTagger] Extracted 6 keywords for segment seg_test_008, total tags: 6
+220 |   test('should handle shutdown gracefully', async () => {
+221 |     const shutdownProvider = new KeywordTaggerProvider();
+222 |     await shutdownProvider.initialize();
+223 | 
+224 |     // Should not throw
+225 |     await expect(shutdownProvider.shutdown()).resolves.toBeUndefined();
+                                                             ^
+error: expect(received).toBeUndefined()
+
+Received: {
+  ok: true,
+  value: undefined,
+}
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\providers\extract\tests\keyword-tagger.test.ts:225:56)
+(fail) providers/extract/keyword-tagger.ts > should handle shutdown gracefully
+[Memory:KeywordTagger] Extracted 4 keywords for segment seg_test_009, total tags: 4
+
+hooks\memory\providers\organize\tests\flat-by-date.test.ts:
+155 |     expect(health.healthy).toBe(true);
+156 |     expect(health.message).toBeDefined();
+157 |   });
+158 | 
+159 |   test('should shutdown gracefully', async () => {
+160 |     await expect(provider.shutdown()).resolves.toBeUndefined();
+                                                     ^
+error: expect(received).toBeUndefined()
+
+Received: {
+  ok: true,
+  value: undefined,
+}
+
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\providers\organize\tests\flat-by-date.test.ts:160:48)
+      at <anonymous> (C:\Users\fujos\.pai-memory-work\hooks\memory\providers\organize\tests\flat-by-date.test.ts:159:38)
+(fail) providers/organize/flat-by-date.ts > should shutdown gracefully
+
+hooks\memory\providers\segment\tests\per-message.test.ts:
+[Memory:PerMessage] Created 2 segments from transcript
+[Memory:PerMessage] Created 1 segments from transcript
+[Memory:PerMessage] Empty transcript - returning 0 segments
+[Memory:PerMessage] Empty transcript - returning 0 segments
+[Memory:PerMessage] Created 2 segments from transcript
+[Memory:PerMessage] Created 1 segments from transcript
+[Memory:PerMessage] Created 1 segments from transcript
+[Memory:PerMessage] Created 1 segments from transcript
+
+hooks\memory\providers\storage\tests\keyword-index.test.ts:
+[Memory:KeywordIndex] Added segment seg_001 to index for 2 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 3 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 1 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 1 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 1 tags
+[Memory:KeywordIndex] Added segment seg_002 to index for 1 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 2 tags
+[Memory:KeywordIndex] Removed segment seg_001 from index
+[Memory:KeywordIndex] Added segment seg_001 to index for 1 tags
+[Memory:KeywordIndex] Added segment seg_002 to index for 1 tags
+[Memory:KeywordIndex] Removed segment seg_001 from index
+[Memory:KeywordIndex] Removed segment seg_002 from index
+[Memory:KeywordIndex] Added segment seg_001 to index for 1 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 0 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 4 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 2 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 1 tags
+[Memory:KeywordIndex] Removed segment seg_002 from index
+[Memory:KeywordIndex] Added segment seg_001 to index for 1 tags
+[Memory:KeywordIndex] Removed segment seg_001 from index
+[Memory:KeywordIndex] Added segment seg_001 to index for 1 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 2 tags
+[Memory:KeywordIndex] Added segment seg_002 to index for 2 tags
+[Memory:KeywordIndex] Added segment seg_003 to index for 2 tags
+[Memory:KeywordIndex] Added segment seg_003 to index for 1 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 1 tags
+[Memory:KeywordIndex] Added segment seg_002 to index for 1 tags
+[Memory:KeywordIndex] Failed to load index, creating new: JSON Parse error: Expected '}'
+[Memory:KeywordIndex] Failed to load index, creating new: JSON Parse error: Expected '}'
+[Memory:KeywordIndex] Added segment seg_001 to index for 1 tags
+[Memory:KeywordIndex] Added segment seg_001 to index for 2 tags
+
+hooks\memory\providers\test-harness\tests\search-harness.test.ts:
+[Memory:KeywordSearch] Loaded index with 14 keywords
+[Memory:KeywordSearch] Loaded index with 14 keywords
+[Memory:KeywordSearch] Loaded index with 14 keywords
+[Memory:KeywordSearch:Debug] Terms extracted: ["test", "query"]
+[Memory:KeywordSearch:Debug] Index lookup: test=95 hits, query=0 hits
+[Memory:KeywordSearch:Debug] Found 95 candidate segments
+[Memory:KeywordSearch] Found 95 matches for 2 terms
+[Memory:KeywordSearch] Loaded index with 14 keywords
+[Memory:KeywordSearch:Debug] Terms extracted: ["test"]
+[Memory:KeywordSearch:Debug] Index lookup: test=95 hits
+[Memory:KeywordSearch:Debug] Found 95 candidate segments
+[Memory:KeywordSearch] Found 5 matches for 1 terms
+[Memory:KeywordSearch] Loaded index with 14 keywords
+[Memory:KeywordSearch:Debug] Terms extracted: ["test", "query"]
+[Memory:KeywordSearch:Debug] Index lookup: test=95 hits, query=0 hits
+[Memory:KeywordSearch:Debug] Found 95 candidate segments
+[Memory:KeywordSearch] Found 0 matches for 2 terms
+[Memory:KeywordSearch] Loaded index with 14 keywords
+[Memory:KeywordSearch:Debug] Terms extracted: []
+[Memory:KeywordSearch:Debug] Zero results - no valid search terms after filtering
+[Memory:KeywordSearch] Loaded index with 14 keywords
+[Memory:KeywordSearch:Debug] Terms extracted: ["xyznonexistentquery123"]
+[Memory:KeywordSearch:Debug] Index lookup: xyznonexistentquery123=0 hits
+[Memory:KeywordSearch:Debug] Found 0 candidate segments
+[Memory:KeywordSearch] Found 0 matches for 1 terms
+[Memory:KeywordSearch] Loaded index with 14 keywords
+[Memory:KeywordSearch:Debug] Terms extracted: ["test"]
+[Memory:KeywordSearch:Debug] Index lookup: test=95 hits
+[Memory:KeywordSearch:Debug] Found 95 candidate segments
+[Memory:KeywordSearch] Found 95 matches for 1 terms
+[Memory:KeywordSearch] Loaded index with 14 keywords
+[Memory:KeywordSearch] Loaded index with 14 keywords
+[Memory:KeywordSearch:Debug] Terms extracted: ["test"]
+[Memory:KeywordSearch:Debug] Index lookup: test=95 hits
+[Memory:KeywordSearch:Debug] Found 95 candidate segments
+[Memory:KeywordSearch] Found 95 matches for 1 terms
+[Memory:KeywordSearch] Loaded index with 14 keywords
+[Memory:KeywordSearch:Debug] Terms extracted: ["test"]
+[Memory:KeywordSearch:Debug] Index lookup: test=95 hits
+[Memory:KeywordSearch:Debug] Found 95 candidate segments
+[Memory:KeywordSearch] Found 95 matches for 1 terms
+
+hooks\memory\providers\test-harness\tests\storage-harness.test.ts:
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:KeywordIndex] Added segment seg_test_1768343215198_4bz2y2kw to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215198_4bz2y2kw at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215198_4bz2y2kw.md
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:KeywordIndex] Added segment seg_test_1768343215212_91tr85k4 to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215212_91tr85k4 at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215212_91tr85k4.md
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:KeywordIndex] Added segment seg_test_1768343215243_ebmxiaf5 to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215243_ebmxiaf5 at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215243_ebmxiaf5.md
+[Memory:KeywordIndex] Added segment seg_test_1768343215243_x81n6npg to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215243_x81n6npg at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215243_x81n6npg.md
+[Memory:KeywordIndex] Added segment seg_test_1768343215243_gvwse2oi to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215243_gvwse2oi at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215243_gvwse2oi.md
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:KeywordIndex] Added segment seg_test_1768343215290_7lh93t3j to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215290_7lh93t3j at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2025-12\seg_test_1768343215290_7lh93t3j.md
+[Memory:KeywordIndex] Added segment seg_test_1768343215290_ordbej74 to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215290_ordbej74 at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215290_ordbej74.md
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:KeywordIndex] Added segment seg_test_1768343215324_7ntnd5g8 to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215324_7ntnd5g8 at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215324_7ntnd5g8.md
+[Memory:KeywordIndex] Added segment seg_test_1768343215324_eu2gjn6j to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215324_eu2gjn6j at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215324_eu2gjn6j.md
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:KeywordIndex] Added segment seg_test_1768343215360_9gx9lxvi to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215360_9gx9lxvi at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215360_9gx9lxvi.md
+[Memory:KeywordIndex] Added segment seg_test_1768343215360_nq5ilafq to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215360_nq5ilafq at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215360_nq5ilafq.md
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:KeywordIndex] Added segment seg_test_1768343215394_uees34ms to index for 1 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215394_uees34ms at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215394_uees34ms.md
+[Memory:KeywordIndex] Removed segment seg_test_1768343215394_uees34ms from index
+[Memory:KeywordIndex] Added segment seg_test_1768343215394_uees34ms to index for 2 tags
+[Memory:FileBackend] Updated segment seg_test_1768343215394_uees34ms
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:KeywordIndex] Added segment seg_test_1768343215423_f7cm0iho to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215423_f7cm0iho at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215423_f7cm0iho.md
+[Memory:FileBackend] Updated segment seg_test_1768343215423_f7cm0iho
+[Memory:FileBackend] Updated segment seg_test_1768343215423_f7cm0iho
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:KeywordIndex] Added segment seg_test_1768343215456_q3ssldi4 to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215456_q3ssldi4 at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215456_q3ssldi4.md
+[Memory:KeywordIndex] Removed segment seg_test_1768343215456_q3ssldi4 from index
+[Memory:FileBackend] Deleted segment seg_test_1768343215456_q3ssldi4
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:KeywordIndex] Added segment seg_test_1768343215492_b74mk8ie to index for 2 tags
+[Memory:FileBackend] Stored segment seg_test_1768343215492_b74mk8ie at C:\Users\fujos\.pai-test-filebackend\mem-store\segments\2026-01\seg_test_1768343215492_b74mk8ie.md
+[Memory:KeywordIndex] Removed segment seg_test_1768343215492_b74mk8ie from index
+[Memory:FileBackend] Deleted segment seg_test_1768343215492_b74mk8ie
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:FileBackend] Shutdown complete
+[Memory:FileBackend] Initialized at C:\Users\fujos\.pai-test-filebackend\mem-store
+[Memory:FileBackend] Shutdown complete
+
+ 947 pass
+ 27 fail
+ 13997 expect() calls
+Ran 974 tests across 76 files. [19.89s]

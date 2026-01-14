@@ -87,6 +87,62 @@ export interface PerformanceConfig {
 }
 
 /**
+ * Experiment configuration for A/B testing (Story 5.4)
+ *
+ * Enables running A/B tests comparing different provider implementations.
+ * Traffic is deterministically split across variants based on request hash.
+ *
+ * @example Simple 50/50 split
+ * ```typescript
+ * {
+ *   enabled: true,
+ *   variants: {
+ *     control: 'keyword-search',
+ *     treatment: 'semantic-search'
+ *   },
+ *   splitPercent: 50
+ * }
+ * ```
+ *
+ * @example Multi-variant split
+ * ```typescript
+ * {
+ *   enabled: true,
+ *   variants: {
+ *     control: 'default-ranking',
+ *     'treatment-a': 'importance-boost',
+ *     'treatment-b': 'recency-boost'
+ *   },
+ *   splitPercent: {
+ *     control: 60,
+ *     'treatment-a': 20,
+ *     'treatment-b': 20
+ *   }
+ * }
+ * ```
+ */
+export interface ExperimentConfig {
+  /** Whether this experiment is currently active */
+  enabled: boolean;
+
+  /** Map of variant names to provider names */
+  variants: Record<string, string>;
+
+  /**
+   * Traffic split configuration
+   * - number: Simple split (e.g., 50 = 50% control, 50% treatment)
+   * - object: Per-variant percentages (must sum to 100)
+   */
+  splitPercent: number | Record<string, number>;
+
+  /** Unix timestamp when experiment was started (optional) */
+  startedAt?: number;
+
+  /** Unix timestamp when experiment was stopped (optional) */
+  stoppedAt?: number;
+}
+
+/**
  * Performance defaults - aligned with NFR-P1 requirements
  */
 const PERFORMANCE_DEFAULTS = {
@@ -105,6 +161,9 @@ export interface MemoryConfig {
   /** Master enable/disable switch for entire memory system */
   enabled: boolean;
 
+  /** Enable verbose retrieval diagnostics (AC5: Story 4.6.1) */
+  debug?: boolean;
+
   /** Hook enablement configuration */
   hooks: HookConfig;
 
@@ -116,6 +175,9 @@ export interface MemoryConfig {
 
   /** Performance tuning configuration */
   performance: PerformanceConfig;
+
+  /** A/B testing experiments configuration (Story 5.4) */
+  experiments?: Record<string, ExperimentConfig>;
 }
 
 /**
@@ -137,6 +199,7 @@ export interface ConfigError {
  */
 const DEFAULT_CONFIG: MemoryConfig = {
   enabled: true,
+  debug: false, // Disable verbose diagnostics by default (Story 4.6.1, AC5)
   hooks: {
     sessionEnd: true,
     userPromptSubmit: true,
@@ -160,6 +223,7 @@ const DEFAULT_CONFIG: MemoryConfig = {
     maxInjectionTokens: PERFORMANCE_DEFAULTS.MAX_INJECTION_TOKENS,
     maxResultCount: PERFORMANCE_DEFAULTS.MAX_RESULT_COUNT,
   },
+  experiments: {}, // No experiments by default (Story 5.4)
 };
 
 /**
@@ -236,6 +300,17 @@ function deepMerge<T extends Record<string, any>>(
 function validateConfig(
   config: MemoryConfig
 ): Result<MemoryConfig, ConfigError> {
+  // Validate debug field type if present (Story 4.6.1, AC5)
+  if (config.debug !== undefined && typeof config.debug !== 'boolean') {
+    return {
+      ok: false,
+      error: {
+        code: 'CONFIG_INVALID',
+        message: `Invalid debug value: ${config.debug} (expected boolean, got ${typeof config.debug})`,
+      },
+    };
+  }
+
   // Validate retention numbers are positive
   if (
     config.retention.shortTermMaxSessions <= 0 ||
@@ -274,6 +349,54 @@ function validateConfig(
         message: 'providers.extract must be an array',
       },
     };
+  }
+
+  // Validate experiments configuration (Story 5.4)
+  if (config.experiments) {
+    for (const [experimentId, expConfig] of Object.entries(config.experiments)) {
+      // Validate at least 2 variants
+      const variantCount = Object.keys(expConfig.variants).length;
+      if (variantCount < 2) {
+        return {
+          ok: false,
+          error: {
+            code: 'CONFIG_INVALID',
+            message: `Experiment '${experimentId}' must have at least 2 variants (found ${variantCount})`,
+          },
+        };
+      }
+
+      // Validate splitPercent
+      if (typeof expConfig.splitPercent === 'number') {
+        // Simple split: must be between 0 and 100
+        if (expConfig.splitPercent < 0 || expConfig.splitPercent > 100) {
+          return {
+            ok: false,
+            error: {
+              code: 'CONFIG_INVALID',
+              message: `Experiment '${experimentId}': splitPercent must be between 0 and 100 (got ${expConfig.splitPercent})`,
+            },
+          };
+        }
+      } else if (typeof expConfig.splitPercent === 'object') {
+        // Multi-variant split: percentages must sum to 100
+        const total = Object.values(expConfig.splitPercent).reduce(
+          (sum, pct) => sum + pct,
+          0
+        );
+
+        if (Math.abs(total - 100) > 0.01) {
+          // Allow tiny floating point error
+          return {
+            ok: false,
+            error: {
+              code: 'CONFIG_INVALID',
+              message: `Experiment '${experimentId}': split percentages must sum to 100 (got ${total})`,
+            },
+          };
+        }
+      }
+    }
   }
 
   return { ok: true, value: config };
@@ -358,6 +481,34 @@ async function loadConfig(): Promise<Result<MemoryConfig, ConfigError>> {
  */
 export function clearConfigCache(): void {
   cachedConfig = null;
+}
+
+/**
+ * Get debug mode setting from configuration
+ *
+ * Returns the current debug mode setting, defaulting to false if not configured.
+ * Debug mode enables verbose retrieval diagnostics for troubleshooting.
+ *
+ * @returns true if debug mode is enabled, false otherwise
+ *
+ * @example
+ * ```typescript
+ * const debugEnabled = await getDebugMode();
+ * if (debugEnabled) {
+ *   console.error('[Memory:Retrieve:Debug] Detailed diagnostic info...');
+ * }
+ * ```
+ */
+export async function getDebugMode(): Promise<boolean> {
+  const configResult = await getMemoryConfig();
+
+  if (!configResult.ok) {
+    // If config loading fails, default to false (don't enable debug)
+    return false;
+  }
+
+  // Return debug setting, defaulting to false if undefined
+  return configResult.value.debug ?? false;
 }
 
 /**

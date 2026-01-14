@@ -49,6 +49,7 @@ The PAI system uses `PAI_DIR` as the root path for all resource location:
 
 **Code locations:**
 - `$PAI_DIR/hooks/` - Git hooks and automation
+- `$PAI_DIR/hooks/memory/` - Memory system code
 - `$PAI_DIR/scripts/` - Utility scripts
 - `$PAI_DIR/skills/` - Skill definitions
 
@@ -154,40 +155,50 @@ Each hook serves a specific purpose in the PAI System:
 
 #### UserPromptSubmit Hooks
 
-5. **cleanup-temp-files.ts** - Temporary file cleanup
+5. **memory/retrieve.ts** - Memory retrieval
+   - Retrieves relevant memory context based on user prompt
+   - Injects context into Claude's conversation
+   - PAI Memory System component
+
+6. **cleanup-temp-files.ts** - Temporary file cleanup
    - Recursively scans working directory for temporary Claude files
    - Deletes files and directories matching `tmpclaude-*` pattern
    - Runs silently to avoid cluttering output
    - Prevents accumulation of temporary files during sessions
 
-6. **update-tab-titles.ts** - UI updates
+7. **update-tab-titles.ts** - UI updates
    - Updates terminal tab title based on user prompt
    - Extracts keywords from prompt
    - Sets dynamic tab title (e.g., "🤖 Fix authentication bug")
 
-#### Stop Hooks
-
-7. **stop-hook.ts** - Main session capture
-   - Captures main agent work summaries
-   - Detects learnings vs regular sessions
-   - Routes to: `history/learnings/` or `history/sessions/`
-   - Extracts summary from final response
-
-8. **subagent-stop-hook.ts** - Subagent output capture
-   - Captures Task tool outputs
-   - Routes by agent type:
-     - `researcher` → `history/research/`
-     - `architect` → `history/decisions/`
-     - `engineer`, `designer` → `history/execution/features/`
-   - Extracts completion message
-
 #### SessionEnd Hooks
+
+8. **memory/capture.ts** - Memory system capture
+   - Captures session learnings to semantic memory
+   - Processes conversation for extractable knowledge
+   - Routes to appropriate memory segments
 
 9. **capture-session-summary.ts** - Final session summary
    - Analyzes entire session from raw events
    - Determines session focus (blog-work, hook-development, etc.)
    - Lists files changed, commands executed, tools used
    - Creates comprehensive session summary
+
+#### Stop Hooks
+
+10. **stop-hook.ts** - Main session capture
+    - Captures main agent work summaries
+    - Detects learnings vs regular sessions
+    - Routes to: `history/learnings/` or `history/sessions/`
+    - Extracts summary from final response
+
+11. **subagent-stop-hook.ts** - Subagent output capture
+    - Captures Task tool outputs
+    - Routes by agent type:
+      - `researcher` → `history/research/`
+      - `architect` → `history/decisions/`
+      - `engineer`, `designer` → `history/execution/features/`
+    - Extracts completion message
 
 ### Hook Development Best Practices
 
@@ -211,13 +222,22 @@ Each hook serves a specific purpose in the PAI System:
 bun test
 
 # Specific file
-bun test path/to/test-file.test.ts
+bun test hooks/memory/types/common.test.ts
 
 # Watch mode
 bun test --watch
 
 # With coverage (if configured)
 bun test --coverage
+```
+
+## Project Structure
+
+```
+<repo-root>/                         ← SET PAI_DIR HERE (use $PWD or $(pwd))
+├── hooks/memory/                    ← Memory system code
+├── mem-store/                       ← Memory system data (development)
+└── _bmad-output/                    ← BMM artifacts
 ```
 
 ## Standard Development Workflow
@@ -294,8 +314,8 @@ Complete all items before deploying to production:
 - [ ] Verify production PAI_DIR: `echo $env:PAI_DIR` (PowerShell) or `echo $PAI_DIR` (Bash)
 
 **Deployment Steps:**
-- [ ] Copy code to production location
-- [ ] Create required data directories (mem-store, MEMORY, etc.)
+- [ ] Copy code to production location: `cp -r hooks/memory $PAI_DIR/hooks/`
+- [ ] Create required data directories: `mkdir -p $PAI_DIR/mem-store/{segments,structured,indexes/keyword,queue,metrics,cache}`
 - [ ] Update `.claude/settings.json` with new hooks/configurations
 - [ ] Run production smoke tests
 - [ ] Verify all features work in production environment

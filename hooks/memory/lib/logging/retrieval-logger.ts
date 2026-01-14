@@ -114,7 +114,7 @@ export function createLogEntry(
 ): RetrievalLogEntry {
   return {
     timestamp: Date.now(),
-    query: query.length > 200 ? query.slice(0, 200) + '...' : query,
+    query: query.length > 200 ? query.slice(0, 197) + '...' : query,
     retrieved: results.map(r => r.segmentId),
     scores: results.map(r => Math.round(r.relevanceScore)),
     latencyMs,
