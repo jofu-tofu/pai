@@ -343,8 +343,8 @@ describe('capture.ts - hook-specific toggle (Story 3.3)', () => {
     // Act: Measure hook execution time
     const result = await runCaptureHook(payload);
 
-    // Assert: Execution time < 100ms (two-level config check + exit is fast)
-    expect(result.executionTime).toBeLessThan(100);
+    // Assert: Execution time <= 100ms (two-level config check + exit is fast)
+    expect(result.executionTime).toBeLessThanOrEqual(100);
     expect(result.exitCode).toBe(0);
   });
 

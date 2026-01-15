@@ -53,6 +53,14 @@ const SEGMENT_ID_PATTERN = /^seg_\d+_[a-f0-9]+$|^seg_\d+_test$|^seg_[a-z0-9_]+$/
 let storageInstance: FileBackend | null = null;
 
 /**
+ * Reset the storage instance singleton.
+ * Required for testing when PAI_DIR changes between tests.
+ */
+export function resetStorageInstance(): void {
+  storageInstance = null;
+}
+
+/**
  * Update usage signals for a list of memory segments.
  * Increments accessCount by 1 and updates lastAccessed to current timestamp.
  *

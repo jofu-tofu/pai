@@ -166,11 +166,11 @@ JWT tokens, session management, and RBAC setup.`;
       expect(firstSegment?.content).toContain('TypeScript hooks pattern');
     });
 
-    test('should find segments by keyword and read their content', () => {
+    test('should find segments by keyword and read their content', async () => {
       // Workflow: Search by keyword "typescript" → Read matching segments
 
       // Step 1: Find segments by keyword
-      const searchResult = findSegmentsByKeyword('typescript');
+      const searchResult = await findSegmentsByKeyword('typescript');
       expect(searchResult.ok).toBe(true);
       if (!searchResult.ok) return;
 
@@ -189,7 +189,7 @@ JWT tokens, session management, and RBAC setup.`;
       expect(segmentResult.value.accessCount).toBe(10);
     });
 
-    test('should find sessions by date, then find segments by keyword within date range', () => {
+    test('should find sessions by date, then find segments by keyword within date range', async () => {
       // Workflow: Find Jan 2026 sessions → Find typescript segments → Verify overlap
 
       // Step 1: Find sessions in January 2026
@@ -203,7 +203,7 @@ JWT tokens, session management, and RBAC setup.`;
       expect(sessionsResult.value[0].sessionId).toBe('mem_1768867200000_abcdef12');
 
       // Step 2: Find segments by keyword
-      const searchResult = findSegmentsByKeyword('typescript');
+      const searchResult = await findSegmentsByKeyword('typescript');
       expect(searchResult.ok).toBe(true);
       if (!searchResult.ok) return;
 
@@ -220,11 +220,11 @@ JWT tokens, session management, and RBAC setup.`;
       }
     });
 
-    test('should find segments by multiple keywords with scoring and read highest scored', () => {
+    test('should find segments by multiple keywords with scoring and read highest scored', async () => {
       // Workflow: Multi-keyword search → Sort by score → Read top result
 
       // Step 1: Find segments matching multiple keywords
-      const searchResult = findSegmentsByKeywords(['typescript', 'hooks']);
+      const searchResult = await findSegmentsByKeywords(['typescript', 'hooks']);
       expect(searchResult.ok).toBe(true);
       if (!searchResult.ok) return;
 
@@ -275,11 +275,11 @@ JWT tokens, session management, and RBAC setup.`;
       expect(totalSegments).toBe(3); // 2 from typescript session, 1 from auth session
     });
 
-    test('should correlate keyword search results with session metadata', () => {
+    test('should correlate keyword search results with session metadata', async () => {
       // Workflow: Find segments by keyword → Look up parent sessions → Verify tags
 
       // Step 1: Find segments by keyword "auth"
-      const searchResult = findSegmentsByKeyword('auth');
+      const searchResult = await findSegmentsByKeyword('auth');
       expect(searchResult.ok).toBe(true);
       if (!searchResult.ok) return;
 
@@ -306,11 +306,11 @@ JWT tokens, session management, and RBAC setup.`;
       expect(segment.tags).toContain('auth');
     });
 
-    test('should handle empty result sets gracefully in workflows', () => {
+    test('should handle empty result sets gracefully in workflows', async () => {
       // Workflow: Search for non-existent keyword → Verify empty but successful results
 
       // Step 1: Search for keyword that doesn't exist
-      const searchResult = findSegmentsByKeyword('nonexistent');
+      const searchResult = await findSegmentsByKeyword('nonexistent');
       expect(searchResult.ok).toBe(true);
       if (!searchResult.ok) return;
 
@@ -358,11 +358,11 @@ JWT tokens, session management, and RBAC setup.`;
   });
 
   describe('Error Handling in Workflows', () => {
-    test('should gracefully handle segment not found during workflow', () => {
+    test('should gracefully handle segment not found during workflow', async () => {
       // Workflow: Search finds segment ID → Segment file deleted → Read fails gracefully
 
       // Step 1: Find segments by keyword
-      const searchResult = findSegmentsByKeyword('typescript');
+      const searchResult = await findSegmentsByKeyword('typescript');
       expect(searchResult.ok).toBe(true);
       if (!searchResult.ok) return;
 
@@ -399,7 +399,7 @@ JWT tokens, session management, and RBAC setup.`;
       expect(sessionsResult.error.code).toBe('QUERY_REGISTRY_NOT_FOUND');
     });
 
-    test('should handle missing keyword index during workflow', () => {
+    test('should handle missing keyword index during workflow', async () => {
       // Workflow: Delete index → Search fails gracefully
 
       // Step 1: Delete keyword index
@@ -410,13 +410,13 @@ JWT tokens, session management, and RBAC setup.`;
       clearKeywordIndexCache();
 
       // Step 3: Try to search
-      const searchResult = findSegmentsByKeyword('typescript');
+      const searchResult = await findSegmentsByKeyword('typescript');
 
       // Should fail gracefully
       expect(searchResult.ok).toBe(false);
       if (searchResult.ok) return;
 
-      expect(searchResult.error.code).toBe('QUERY_INDEX_NOT_FOUND');
+      expect(searchResult.error.code).toBe('SEGMENT_SEARCH_INDEX_NOT_FOUND');
     });
   });
 });

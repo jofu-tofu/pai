@@ -10,9 +10,12 @@ import { describe, test, expect, beforeAll, afterAll } from 'bun:test';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 import { existsSync } from 'fs';
-import { retrieveMemories } from '../core/retrieval';
+import { retrieveMemories, resetSearchProvider } from '../core/retrieval';
 import { FileBackend } from '../providers/storage/file-backend';
-import { getUsageStats } from '../lib/usage-tracker';
+import { getUsageStats, resetStorageInstance } from '../lib/usage-tracker';
+import { clearConfigCache } from '../core/config';
+import { globalProviderRegistry } from '../core/provider-registry';
+import { registerMVPProviders, resetProvidersRegistered } from '../core/register-providers';
 import type { MemorySegment } from '../types/segment';
 
 const testPaiDir = join(
@@ -28,6 +31,16 @@ describe('Usage Tracking Integration', () => {
     // Create isolated test directory
     await fs.mkdir(testPaiDir, { recursive: true });
     process.env.PAI_DIR = testPaiDir;
+
+    // Reset all caches to ensure fresh provider initialization with new PAI_DIR
+    clearConfigCache();
+    resetSearchProvider();
+    resetStorageInstance();
+
+    // Re-register providers after any previous test file's clearAll()
+    globalProviderRegistry.clearCache();
+    resetProvidersRegistered();
+    registerMVPProviders();
 
     // Initialize storage
     storage = new FileBackend({ storePath: testPaiDir });
@@ -88,6 +101,11 @@ describe('Usage Tracking Integration', () => {
   });
 
   afterAll(async () => {
+    // Reset all caches for cleanup (prevents pollution of subsequent tests)
+    clearConfigCache();
+    resetSearchProvider();
+    resetStorageInstance();
+
     // Clean up test directory
     if (existsSync(testPaiDir)) {
       await fs.rm(testPaiDir, { recursive: true, force: true });
@@ -177,6 +195,11 @@ describe('Usage Tracking Integration', () => {
     const oldPaiDir = process.env.PAI_DIR;
     process.env.PAI_DIR = freshPaiDir;
 
+    // Reset all caches to ensure fresh provider initialization with new PAI_DIR
+    clearConfigCache();
+    resetSearchProvider();
+    resetStorageInstance();
+
     const freshStorage = new FileBackend({ storePath: freshPaiDir });
     await freshStorage.initialize();
 
@@ -240,8 +263,11 @@ describe('Usage Tracking Integration', () => {
       }
     }
 
-    // Cleanup
+    // Cleanup - reset PAI_DIR and all caches to original state
     process.env.PAI_DIR = oldPaiDir;
+    clearConfigCache();
+    resetSearchProvider();
+    resetStorageInstance();
     await fs.rm(freshPaiDir, { recursive: true, force: true });
   });
 

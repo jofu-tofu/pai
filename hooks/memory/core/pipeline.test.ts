@@ -7,9 +7,10 @@
  * - Config changes
  */
 
-import { describe, test, expect, beforeEach, afterEach } from 'bun:test';
+import { describe, test, expect, beforeEach, afterEach, afterAll } from 'bun:test';
 import { loadPipelineProviders } from './pipeline';
 import { globalProviderRegistry } from './provider-registry';
+import { resetProvidersRegistered, registerMVPProviders } from './register-providers';
 import type { MemoryConfig } from './config';
 import type { Result } from '../types/result';
 
@@ -30,6 +31,20 @@ describe('Pipeline - Provider Selection', () => {
   beforeEach(() => {
     // Clear provider cache
     globalProviderRegistry.clearCache();
+  });
+
+  afterEach(() => {
+    // Clear provider cache to avoid test interference
+    // Note: This doesn't restore original providers, but clears mock state
+    globalProviderRegistry.clearCache();
+  });
+
+  afterAll(() => {
+    // Completely clear all mock registrations and restore MVP providers
+    // This prevents mock providers from polluting other test files
+    globalProviderRegistry.clearAll();
+    resetProvidersRegistered();
+    registerMVPProviders();
   });
 
   test('should load all providers when configured', async () => {
@@ -91,7 +106,7 @@ describe('Pipeline - Provider Selection', () => {
       value: {
         ...createMockProvider('file-backend', 'storage'),
         async store(segment: any) {
-          return { ok: true as const, value: { id: 'test' } };
+          return { ok: true as const, value: { id: 'seg_1704567890123_abcd1234' } };
         },
         async retrieve(id: string) {
           return { ok: true as const, value: null };
@@ -101,6 +116,9 @@ describe('Pipeline - Provider Selection', () => {
         },
         async delete(id: string) {
           return { ok: true as const, value: true };
+        },
+        async update(id: string, updates: any) {
+          return { ok: true as const, value: { id, ...updates } };
         },
       },
     }));
@@ -169,7 +187,7 @@ describe('Pipeline - Provider Selection', () => {
       value: {
         ...createMockProvider('file-backend', 'storage'),
         async store(segment: any) {
-          return { ok: true as const, value: { id: 'test' } };
+          return { ok: true as const, value: { id: 'seg_1704567890123_abcd1234' } };
         },
         async retrieve(id: string) {
           return { ok: true as const, value: null };
@@ -179,6 +197,9 @@ describe('Pipeline - Provider Selection', () => {
         },
         async delete(id: string) {
           return { ok: true as const, value: true };
+        },
+        async update(id: string, updates: any) {
+          return { ok: true as const, value: { id, ...updates } };
         },
       },
     }));
@@ -334,7 +355,7 @@ describe('Pipeline - Provider Selection', () => {
       value: {
         ...createMockProvider('file-backend', 'storage'),
         async store() {
-          return { ok: true as const, value: { id: 'test' } };
+          return { ok: true as const, value: { id: 'seg_1704567890123_abcd1234' } };
         },
         async retrieve() {
           return { ok: true as const, value: null };
@@ -344,6 +365,9 @@ describe('Pipeline - Provider Selection', () => {
         },
         async delete() {
           return { ok: true as const, value: true };
+        },
+        async update(id: string, updates: any) {
+          return { ok: true as const, value: { id, ...updates } };
         },
       },
     }));
@@ -450,7 +474,7 @@ describe('Pipeline - Provider Selection', () => {
       value: {
         ...createMockProvider('file-backend', 'storage'),
         async store() {
-          return { ok: true as const, value: { id: 'test' } };
+          return { ok: true as const, value: { id: 'seg_1704567890123_abcd1234' } };
         },
         async retrieve() {
           return { ok: true as const, value: null };
@@ -460,6 +484,9 @@ describe('Pipeline - Provider Selection', () => {
         },
         async delete() {
           return { ok: true as const, value: true };
+        },
+        async update(id: string, updates: any) {
+          return { ok: true as const, value: { id, ...updates } };
         },
       },
     }));

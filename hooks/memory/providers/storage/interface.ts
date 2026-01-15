@@ -236,6 +236,9 @@ export interface QueryResult {
  * - STORAGE_NOT_FOUND: Segment not found for update/retrieval
  */
 export interface StorageError {
+  /** Error name for Error interface compatibility (default: 'StorageError') */
+  name: string;
+
   /** Error code identifying the type of failure */
   code:
     | 'STORAGE_WRITE_FAILED'

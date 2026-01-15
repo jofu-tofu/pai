@@ -10,6 +10,10 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { existsSync, mkdirSync, rmSync, writeFileSync, readFileSync } from 'fs';
 import { RetrievalLogEntry } from '../lib/logging/retrieval-logger';
+import { resetSearchProvider } from '../core/retrieval';
+import { clearConfigCache } from '../core/config';
+import { globalProviderRegistry } from '../core/provider-registry';
+import { registerMVPProviders, resetProvidersRegistered } from '../core/register-providers';
 
 const TEST_PAI_DIR = join(homedir(), '.pai-test-retrieval-integration');
 const METRICS_DIR = join(TEST_PAI_DIR, 'mem-store/metrics');
@@ -23,6 +27,10 @@ describe('Retrieval Integration - Story 4.1', () => {
   beforeAll(() => {
     // Set up test environment
     process.env.PAI_DIR = TEST_PAI_DIR;
+
+    // Reset caches to ensure fresh provider initialization with new PAI_DIR
+    clearConfigCache();
+    resetSearchProvider();
 
     // Create directory structure
     mkdirSync(SEGMENTS_DIR, { recursive: true });
@@ -210,6 +218,11 @@ describe('Debug Mode Integration - Story 4.6', () => {
   beforeAll(() => {
     // Create test directory structure
     process.env.PAI_DIR = TEST_DEBUG_DIR;
+
+    // Reset caches to ensure fresh provider initialization with new PAI_DIR
+    clearConfigCache();
+    resetSearchProvider();
+
     mkdirSync(join(TEST_DEBUG_DIR, '.claude'), { recursive: true });
     mkdirSync(join(TEST_DEBUG_DIR, 'mem-store/segments/2026-01'), { recursive: true });
     mkdirSync(join(TEST_DEBUG_DIR, 'mem-store/indexes/keyword'), { recursive: true });
@@ -394,11 +407,20 @@ describe('Experiment Integration - Story 5.4', () => {
   const TEST_EXP_DIR = join(homedir(), '.pai-test-experiment-integration');
   const EXP_METRICS_DIR = join(TEST_EXP_DIR, 'mem-store/metrics/experiments');
   const SEGMENTS_DIR = join(TEST_EXP_DIR, 'mem-store/segments/2026-01'); // Year-month format required
-  const INDEX_PATH = join(TEST_EXP_DIR, 'mem-store/indexes/keyword/keyword-index.json'); // Correct index path
+  const INDEX_PATH = join(TEST_EXP_DIR, 'mem-store/indexes/keyword/index.json'); // Must match keyword-search.ts
 
   beforeAll(() => {
     // Set up test environment
     process.env.PAI_DIR = TEST_EXP_DIR;
+
+    // Reset caches to ensure fresh provider initialization with new PAI_DIR
+    clearConfigCache();
+    resetSearchProvider();
+
+    // Re-register providers after any previous test file's clearAll()
+    globalProviderRegistry.clearCache();
+    resetProvidersRegistered();
+    registerMVPProviders();
 
     // Create directory structure
     mkdirSync(SEGMENTS_DIR, { recursive: true });
@@ -428,40 +450,49 @@ Another test segment for validating experiment functionality.`;
     writeFileSync(join(SEGMENTS_DIR, 'seg_exp_001.md'), segment1, 'utf-8');
     writeFileSync(join(SEGMENTS_DIR, 'seg_exp_002.md'), segment2, 'utf-8');
 
-    // Create session registry
+    // Create session registry (must be at mem-store/structured/session-registry.json)
+    const now = Date.now();
     const registry = {
-      mem_exp_session: {
-        segments: [
-          {
-            id: 'seg_exp_001',
-            createdAt: Date.now() - 86400000,
-            tags: ['experiment', 'test', 'search'],
-            importanceScore: 75,
-            accessCount: 0,
-          },
-          {
-            id: 'seg_exp_002',
-            createdAt: Date.now() - 172800000,
-            tags: ['experiment', 'validation'],
-            importanceScore: 60,
-            accessCount: 0,
-          },
-        ],
+      sessions: {
+        mem_exp_session: {
+          sessionId: 'mem_exp_session',
+          capturedAt: now,
+          segmentCount: 2,
+          segments: [
+            {
+              id: 'seg_exp_001',
+              sessionId: 'mem_exp_session',
+              timestamp: now - 86400000,
+              tags: ['experiment', 'test', 'search'],
+              importanceScore: 75,
+              accessCount: 0,
+              memoryType: 'episodic',
+            },
+            {
+              id: 'seg_exp_002',
+              sessionId: 'mem_exp_session',
+              timestamp: now - 172800000,
+              tags: ['experiment', 'validation'],
+              importanceScore: 60,
+              accessCount: 0,
+              memoryType: 'episodic',
+            },
+          ],
+          tags: ['experiment', 'test', 'search', 'validation'],
+        },
       },
     };
 
-    const registryPath = join(TEST_EXP_DIR, 'mem-store/registry/sessions.json');
-    mkdirSync(join(TEST_EXP_DIR, 'mem-store/registry'), { recursive: true });
+    const registryPath = join(TEST_EXP_DIR, 'mem-store/structured/session-registry.json');
+    mkdirSync(join(TEST_EXP_DIR, 'mem-store/structured'), { recursive: true });
     writeFileSync(registryPath, JSON.stringify(registry, null, 2), 'utf-8');
 
-    // Create keyword index
+    // Create keyword index (simple format: keyword -> array of segment IDs)
     const index = {
-      experiment: [
-        { segmentId: 'seg_exp_001', positions: [0] },
-        { segmentId: 'seg_exp_002', positions: [0] },
-      ],
-      test: [{ segmentId: 'seg_exp_001', positions: [1] }],
-      validation: [{ segmentId: 'seg_exp_002', positions: [1] }],
+      experiment: ['seg_exp_001', 'seg_exp_002'],
+      test: ['seg_exp_001'],
+      search: ['seg_exp_001'],
+      validation: ['seg_exp_002'],
     };
 
     writeFileSync(INDEX_PATH, JSON.stringify(index, null, 2), 'utf-8');
@@ -493,9 +524,9 @@ Another test segment for validating experiment functionality.`;
     // Import modules
     await import('../core/register-providers');
     const { clearConfigCache } = await import('../core/config');
+    const { retrieveMemories, resetSearchProvider } = await import('../core/retrieval');
     clearConfigCache();
-
-    const { retrieveMemories } = await import('../core/retrieval');
+    resetSearchProvider();
 
     // Act: Run retrieval
     const result = await retrieveMemories('experiment test');
@@ -542,9 +573,9 @@ Another test segment for validating experiment functionality.`;
     // Import modules
     await import('../core/register-providers');
     const { clearConfigCache } = await import('../core/config');
+    const { retrieveMemories, resetSearchProvider } = await import('../core/retrieval');
     clearConfigCache();
-
-    const { retrieveMemories } = await import('../core/retrieval');
+    resetSearchProvider();
 
     // Act: Run retrieval
     const result = await retrieveMemories('experiment test');
@@ -605,9 +636,9 @@ Another test segment for validating experiment functionality.`;
     // Import modules
     await import('../core/register-providers');
     const { clearConfigCache } = await import('../core/config');
+    const { retrieveMemories, resetSearchProvider } = await import('../core/retrieval');
     clearConfigCache();
-
-    const { retrieveMemories } = await import('../core/retrieval');
+    resetSearchProvider();
 
     // Act: Run retrieval (should fallback to default)
     const result = await retrieveMemories('experiment test fallback');
@@ -657,9 +688,9 @@ Another test segment for validating experiment functionality.`;
     // Import modules
     await import('../core/register-providers');
     const { clearConfigCache } = await import('../core/config');
+    const { retrieveMemories, resetSearchProvider } = await import('../core/retrieval');
     clearConfigCache();
-
-    const { retrieveMemories } = await import('../core/retrieval');
+    resetSearchProvider();
 
     // Act: Run multiple retrievals with different queries
     const queries = [
@@ -746,15 +777,27 @@ Another test segment for validating experiment functionality.`;
     const configPath = join(TEST_EXP_DIR, '.claude', 'settings.json');
     writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
 
+    // Clean up any existing experiment log file from previous test runs
+    const expLogPath = join(EXP_METRICS_DIR, 'search-multi-variant.jsonl');
+    if (existsSync(expLogPath)) {
+      rmSync(expLogPath);
+    }
+
     // Import modules
     await import('../core/register-providers');
     const { clearConfigCache } = await import('../core/config');
+    const { retrieveMemories, resetSearchProvider } = await import('../core/retrieval');
     clearConfigCache();
+    resetSearchProvider();
 
-    const { retrieveMemories } = await import('../core/retrieval');
-
-    // Act: Run multiple retrievals
-    const queries = Array.from({ length: 20 }, (_, i) => `multi variant query ${i}`);
+    // Act: Run multiple retrievals with queries that match the index
+    // The index has: experiment, test, search, validation
+    // Use combinations of these keywords to get varied but matching queries
+    const queries = Array.from({ length: 20 }, (_, i) => {
+      const keywords = ['experiment', 'test', 'search', 'validation'];
+      // Use different keyword combinations for variety
+      return `${keywords[i % 4]} ${keywords[(i + 1) % 4]} query ${i}`;
+    });
 
     for (const query of queries) {
       await retrieveMemories(query);
@@ -764,7 +807,7 @@ Another test segment for validating experiment functionality.`;
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     // Assert: Verify all three variants are used
-    const expLogPath = join(EXP_METRICS_DIR, 'search-multi-variant.jsonl');
+    // Note: expLogPath was defined earlier for cleanup
     expect(existsSync(expLogPath)).toBe(true);
 
     const logContent = readFileSync(expLogPath, 'utf-8');
@@ -795,6 +838,7 @@ Another test segment for validating experiment functionality.`;
 
   test('should measure experiment overhead < 10ms (AC9)', async () => {
     // Arrange: Config with experiment
+    // Note: Config validation requires at least 2 variants
     const config = {
       memory: {
         enabled: true,
@@ -807,8 +851,9 @@ Another test segment for validating experiment functionality.`;
             enabled: true,
             variants: {
               control: 'keyword-search',
+              treatment: 'keyword-search', // Required: at least 2 variants
             },
-            splitPercent: 100,
+            splitPercent: 50,
           },
         },
       },
@@ -817,16 +862,23 @@ Another test segment for validating experiment functionality.`;
     const configPath = join(TEST_EXP_DIR, '.claude', 'settings.json');
     writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
 
+    // Clean up any existing experiment log file from previous test runs
+    const expLogPath = join(EXP_METRICS_DIR, 'search-perf-test.jsonl');
+    if (existsSync(expLogPath)) {
+      rmSync(expLogPath);
+    }
+
     // Import modules
     await import('../core/register-providers');
     const { clearConfigCache } = await import('../core/config');
+    const { retrieveMemories, resetSearchProvider } = await import('../core/retrieval');
     clearConfigCache();
-
-    const { retrieveMemories } = await import('../core/retrieval');
+    resetSearchProvider();
 
     // Act: Run retrieval and measure total time
+    // Use query with keywords that exist in the index: experiment, test, search, validation
     const startTime = Date.now();
-    const result = await retrieveMemories('experiment performance test');
+    const result = await retrieveMemories('experiment test search');
     const endTime = Date.now();
 
     expect(result.ok).toBe(true);
@@ -837,7 +889,7 @@ Another test segment for validating experiment functionality.`;
     await new Promise((resolve) => setTimeout(resolve, 150));
 
     // Assert: Experiment overhead should be minimal
-    const expLogPath = join(EXP_METRICS_DIR, 'search-perf-test.jsonl');
+    // Note: expLogPath was defined earlier for cleanup
     const logContent = readFileSync(expLogPath, 'utf-8');
     const logEntry = JSON.parse(logContent.trim());
 

@@ -43,7 +43,7 @@ class MockStorageProvider {
   async shutdown(): Promise<void> {}
 
   async store(data: any): Promise<Result<any, any>> {
-    return { ok: true, value: { id: 'test' } };
+    return { ok: true, value: { id: 'seg_1704567890123_abcd1234' } };
   }
 }
 

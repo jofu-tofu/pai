@@ -17,6 +17,24 @@ import type { ProviderError } from './provider-registry';
 let providersRegistered = false;
 
 /**
+ * Reset the registration guard
+ *
+ * Used in testing to allow re-registration of providers after clearAll().
+ * Must be called before registerMVPProviders() to allow re-registration.
+ *
+ * @example
+ * ```typescript
+ * // In test file afterAll
+ * globalProviderRegistry.clearAll();
+ * resetProvidersRegistered();
+ * registerMVPProviders();
+ * ```
+ */
+export function resetProvidersRegistered(): void {
+  providersRegistered = false;
+}
+
+/**
  * Helper function to create a generic provider factory
  *
  * Reduces code duplication by providing a standard factory pattern.

@@ -6,7 +6,7 @@
 import type { ExtractProvider, ExtractError } from './interface';
 import type { MemorySegment } from '../../types/segment';
 import type { Result } from '../../types/result';
-import type { HealthStatus, ProviderError } from '../../types/provider';
+import type { HealthStatus } from '../../types/provider';
 import { extractKeywords } from '../../lib/keyword-extractor';
 
 export class KeywordTaggerProvider implements ExtractProvider {
@@ -21,8 +21,8 @@ export class KeywordTaggerProvider implements ExtractProvider {
     return { healthy: true, message: 'Keyword tagger is operational' };
   }
 
-  async shutdown(): Promise<Result<void, ProviderError>> {
-    return { ok: true, value: undefined };
+  async shutdown(): Promise<void> {
+    // No cleanup needed for this provider
   }
 
   async extract(segment: MemorySegment): Promise<Result<MemorySegment, ExtractError>> {

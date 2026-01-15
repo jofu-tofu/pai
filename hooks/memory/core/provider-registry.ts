@@ -314,6 +314,27 @@ export class ProviderRegistry {
   clearCache(): void {
     this.cache.clear();
   }
+
+  /**
+   * Clear all registrations and cache
+   *
+   * Completely resets the registry to initial state.
+   * Useful for:
+   * - Testing: Ensure complete isolation between test files
+   * - Hot reload: Clear all providers before re-registration
+   *
+   * @example
+   * ```typescript
+   * // In test file afterAll/beforeAll
+   * globalProviderRegistry.clearAll();
+   * // Re-register providers
+   * registerMVPProviders();
+   * ```
+   */
+  clearAll(): void {
+    this.cache.clear();
+    this.providers.clear();
+  }
 }
 
 /**

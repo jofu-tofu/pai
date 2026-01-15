@@ -186,7 +186,7 @@ function execSessionsCommand(options: Record<string, string | boolean>): void {
 /**
  * Execute segments command
  */
-function execSegmentsCommand(options: Record<string, string | boolean>): void {
+async function execSegmentsCommand(options: Record<string, string | boolean>): Promise<void> {
   const format = options.format as string || 'table';
 
   // Multi-keyword search with scoring
@@ -194,7 +194,7 @@ function execSegmentsCommand(options: Record<string, string | boolean>): void {
     const keywordsStr = options.keywords as string;
     const keywords = keywordsStr.split(',').map(k => k.trim());
 
-    const result = findSegmentsByKeywords(keywords);
+    const result = await findSegmentsByKeywords(keywords);
 
     if (!result.ok) {
       console.error(`Error: ${result.error.message}`);
@@ -219,7 +219,7 @@ function execSegmentsCommand(options: Record<string, string | boolean>): void {
   // Single keyword search
   if (options.keyword) {
     const keyword = options.keyword as string;
-    const result = findSegmentsByKeyword(keyword);
+    const result = await findSegmentsByKeyword(keyword);
 
     if (!result.ok) {
       console.error(`Error: ${result.error.message}`);
@@ -376,7 +376,7 @@ EXAMPLES:
 /**
  * Main entry point
  */
-function main(): void {
+async function main(): Promise<void> {
   const { command, options } = parseArgs();
 
   try {
@@ -386,7 +386,7 @@ function main(): void {
         break;
 
       case 'segments':
-        execSegmentsCommand(options);
+        await execSegmentsCommand(options);
         break;
 
       case 'read':
