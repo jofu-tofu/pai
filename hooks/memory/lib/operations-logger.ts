@@ -49,11 +49,28 @@ export interface OperationsLogError {
 }
 
 /**
+ * Per-provider timing information for capture pipeline.
+ *
+ * Story 6.4: Enables performance monitoring at provider level.
+ */
+export interface ProviderTiming {
+  /** Provider name */
+  provider: string;
+
+  /** Latency in milliseconds */
+  latencyMs: number;
+}
+
+/**
  * Metadata collected during session capture operations.
  *
  * Tracks processing performance, provider usage, and output metrics.
  *
- * @example
+ * Story 6.4: Extended with per-provider timing for performance monitoring.
+ * Supports both old schema (providers + processingMs) and new schema
+ * (providerTiming + totalProcessingMs) for backward compatibility.
+ *
+ * @example Old schema (Story 6.1):
  * ```typescript
  * const metadata: CaptureOperationMetadata = {
  *   sessionId: 'mem_123_abc',
@@ -68,6 +85,25 @@ export interface OperationsLogError {
  *   }
  * };
  * ```
+ *
+ * @example New schema (Story 6.4):
+ * ```typescript
+ * const metadata: CaptureOperationMetadata = {
+ *   sessionId: 'mem_123_abc',
+ *   capturedAt: 1704912345000,
+ *   segmentsCreated: 8,
+ *   totalProcessingMs: 2100,
+ *   providerTiming: {
+ *     segment: { provider: 'per-message', latencyMs: 450 },
+ *     extract: [
+ *       { provider: 'frontmatter-gen', latencyMs: 320 },
+ *       { provider: 'keyword-tagger', latencyMs: 180 }
+ *     ],
+ *     summarize: { provider: 'simple-extract', latencyMs: 280 },
+ *     storage: { provider: 'file-backend', latencyMs: 870 }
+ *   }
+ * };
+ * ```
  */
 export interface CaptureOperationMetadata {
   /** Session identifier */
@@ -79,11 +115,14 @@ export interface CaptureOperationMetadata {
   /** Number of segments created from session */
   segmentsCreated: number;
 
-  /** Processing time in milliseconds */
-  processingMs: number;
+  /** Processing time in milliseconds (OLD SCHEMA - Story 6.1) */
+  processingMs?: number;
 
-  /** Providers used during capture */
-  providers: {
+  /** Total processing time in milliseconds (NEW SCHEMA - Story 6.4) */
+  totalProcessingMs?: number;
+
+  /** Providers used during capture (OLD SCHEMA - Story 6.1) */
+  providers?: {
     /** Segment provider name */
     segment: string;
 
@@ -96,6 +135,44 @@ export interface CaptureOperationMetadata {
     /** Storage provider name */
     storage: string;
   };
+
+  /** Per-provider timing breakdown (NEW SCHEMA - Story 6.4) */
+  providerTiming?: {
+    /** Segment provider timing */
+    segment: ProviderTiming;
+
+    /** Extract providers timing (array - multiple providers) */
+    extract: ProviderTiming[];
+
+    /** Summarize provider timing */
+    summarize: ProviderTiming;
+
+    /** Storage provider timing */
+    storage: ProviderTiming;
+  };
+}
+
+/**
+ * Layer timing information (for layers without provider variation).
+ *
+ * Story 6.4: Filter, rank, and inject layers use fixed implementations.
+ */
+export interface LayerTiming {
+  /** Latency in milliseconds */
+  latencyMs: number;
+}
+
+/**
+ * Search layer timing information (includes provider name).
+ *
+ * Story 6.4: Search layer can use different providers.
+ */
+export interface SearchLayerTiming {
+  /** Search provider name */
+  provider: string;
+
+  /** Latency in milliseconds */
+  latencyMs: number;
 }
 
 /**
@@ -103,7 +180,11 @@ export interface CaptureOperationMetadata {
  *
  * Tracks query characteristics, result metrics, and performance.
  *
- * @example
+ * Story 6.4: Extended with per-layer timing for performance monitoring.
+ * Supports both old schema (latencyMs + provider) and new schema
+ * (totalLatencyMs + layerTiming) for backward compatibility.
+ *
+ * @example Old schema (Story 6.1):
  * ```typescript
  * const metadata: RetrievalOperationMetadata = {
  *   timestamp: 1704912345000,
@@ -115,6 +196,26 @@ export interface CaptureOperationMetadata {
  *   latencyMs: 180,
  *   success: true,
  *   provider: 'keyword-search'
+ * };
+ * ```
+ *
+ * @example New schema (Story 6.4):
+ * ```typescript
+ * const metadata: RetrievalOperationMetadata = {
+ *   timestamp: 1704912345000,
+ *   queryLength: 45,
+ *   termsExtracted: 4,
+ *   candidatesFound: 23,
+ *   resultsReturned: 5,
+ *   tokensInjected: 920,
+ *   totalLatencyMs: 280,
+ *   success: true,
+ *   layerTiming: {
+ *     search: { provider: 'keyword-search', latencyMs: 180 },
+ *     filter: { latencyMs: 35 },
+ *     rank: { latencyMs: 40 },
+ *     inject: { latencyMs: 25 }
+ *   }
  * };
  * ```
  */
@@ -137,8 +238,11 @@ export interface RetrievalOperationMetadata {
   /** Total tokens injected into context */
   tokensInjected: number;
 
-  /** Retrieval latency in milliseconds */
-  latencyMs: number;
+  /** Retrieval latency in milliseconds (OLD SCHEMA - Story 6.1) */
+  latencyMs?: number;
+
+  /** Total retrieval latency in milliseconds (NEW SCHEMA - Story 6.4) */
+  totalLatencyMs?: number;
 
   /** Whether retrieval was successful (results returned) */
   success: boolean;
@@ -146,8 +250,23 @@ export interface RetrievalOperationMetadata {
   /** Reason for failure (when success=false) */
   reason?: 'no_matches' | 'filtered_all';
 
-  /** Search provider name used */
-  provider: string;
+  /** Search provider name used (OLD SCHEMA - Story 6.1) */
+  provider?: string;
+
+  /** Per-layer timing breakdown (NEW SCHEMA - Story 6.4) */
+  layerTiming?: {
+    /** Search layer timing (includes provider) */
+    search: SearchLayerTiming;
+
+    /** Filter layer timing */
+    filter: LayerTiming;
+
+    /** Rank layer timing */
+    rank: LayerTiming;
+
+    /** Inject layer timing */
+    inject: LayerTiming;
+  };
 }
 
 /**

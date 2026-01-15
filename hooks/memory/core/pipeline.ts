@@ -12,6 +12,7 @@ import type { Result } from '../types/result';
 import type { ProviderError } from '../types/provider';
 import { globalProviderRegistry } from './provider-registry';
 import { getMemoryConfig, MemoryConfig } from './config';
+import { logCaptureOperation, type CaptureOperationMetadata, type ProviderTiming } from '../lib/operations-logger';
 
 /**
  * PipelineError - Errors during pipeline execution
@@ -316,6 +317,8 @@ async function updateSessionRegistry(
  * 5. Storage: persist segments to disk
  * 6. Registry: update session registry
  *
+ * Story 6.4: Now captures per-provider timing for performance monitoring.
+ *
  * @param item - Queue item to process
  * @param config - Pipeline provider configuration
  * @returns Result indicating success or failure
@@ -324,9 +327,17 @@ export async function processPipeline(
   item: QueueItem,
   config: PipelineConfig
 ): Promise<Result<ProcessingMetadata, PipelineError>> {
+  const pipelineStartTime = Date.now();
+
   try {
+    // Initialize provider timing tracking (Story 6.4)
+    const extractTimings: ProviderTiming[] = [];
+
     // 1. Segment: transcript → segments
+    const segmentStart = Date.now();
     const segmentResult = await config.segmentProvider.segment(item.transcript, item.sessionId);
+    const segmentLatency = Date.now() - segmentStart;
+
     if (!segmentResult.ok) {
       return {
         ok: false,
@@ -344,12 +355,36 @@ export async function processPipeline(
     // If no segments (empty transcript), still succeed but skip remaining stages
     if (segments.length === 0) {
       console.error(`[Memory:Pipeline] No segments created from empty transcript - pipeline complete`);
+
+      // Log capture operation even for empty sessions (Story 6.4)
+      const totalProcessingMs = Date.now() - pipelineStartTime;
+      const captureMetadata: CaptureOperationMetadata = {
+        sessionId: item.sessionId,
+        capturedAt: item.capturedAt,
+        segmentsCreated: 0,
+        totalProcessingMs,
+        providerTiming: {
+          segment: { provider: config.segmentProvider.name, latencyMs: segmentLatency },
+          extract: [],
+          summarize: { provider: config.summarizeProvider.name, latencyMs: 0 },
+          storage: { provider: config.storageProvider.name, latencyMs: 0 },
+        },
+      };
+
+      const logResult = await logCaptureOperation(captureMetadata);
+      if (!logResult.ok) {
+        console.error(`[Memory:Pipeline] Failed to log capture metadata: ${logResult.error.message}`);
+        // Continue - don't fail pipeline on logging error
+      }
+
       return { ok: true, value: { segmentsCreated: 0 } };
     }
 
     // 2. Extract: apply all extract providers (frontmatter, keywords, etc.)
     for (const extractProvider of config.extractProviders) {
+      const extractStart = Date.now();
       const enrichedSegments: MemorySegment[] = [];
+
       for (const segment of segments) {
         const extractResult = await extractProvider.extract(segment);
         if (!extractResult.ok) {
@@ -361,13 +396,22 @@ export async function processPipeline(
           enrichedSegments.push(extractResult.value);
         }
       }
+
+      const extractLatency = Date.now() - extractStart;
+      extractTimings.push({
+        provider: extractProvider.name,
+        latencyMs: extractLatency,
+      });
+
       segments = enrichedSegments;
     }
 
     console.error(`[Memory:Pipeline] Extracted metadata for ${segments.length} segments`);
 
     // 3. Summarize: apply summarization
+    const summarizeStart = Date.now();
     const summarizedSegments: MemorySegment[] = [];
+
     for (const segment of segments) {
       const summarizeResult = await config.summarizeProvider.summarize(segment);
       if (!summarizeResult.ok) {
@@ -379,6 +423,8 @@ export async function processPipeline(
         summarizedSegments.push(summarizeResult.value);
       }
     }
+
+    const summarizeLatency = Date.now() - summarizeStart;
     segments = summarizedSegments;
 
     console.error(`[Memory:Pipeline] Summarized ${segments.length} segments`);
@@ -401,6 +447,8 @@ export async function processPipeline(
     }
 
     // 5. Storage: persist segments
+    const storageStart = Date.now();
+
     for (const { segment } of organizedSegments) {
       const storeResult = await config.storageProvider.store(segment);
       if (!storeResult.ok) {
@@ -411,12 +459,38 @@ export async function processPipeline(
       }
     }
 
+    const storageLatency = Date.now() - storageStart;
+
     console.error(`[Memory:Pipeline] Stored ${segments.length} segments`);
 
     // 6. Update session-registry
     await updateSessionRegistry(item.sessionId, segments, item.capturedAt);
 
     console.error(`[Memory:Pipeline] Pipeline complete for session ${item.sessionId}`);
+
+    // === Story 6.4: Log capture operation with per-provider timing ===
+    const totalProcessingMs = Date.now() - pipelineStartTime;
+
+    const captureMetadata: CaptureOperationMetadata = {
+      sessionId: item.sessionId,
+      capturedAt: item.capturedAt,
+      segmentsCreated: segments.length,
+      totalProcessingMs,
+      providerTiming: {
+        segment: { provider: config.segmentProvider.name, latencyMs: segmentLatency },
+        extract: extractTimings,
+        summarize: { provider: config.summarizeProvider.name, latencyMs: summarizeLatency },
+        storage: { provider: config.storageProvider.name, latencyMs: storageLatency },
+      },
+    };
+
+    const logResult = await logCaptureOperation(captureMetadata);
+    if (!logResult.ok) {
+      console.error(`[Memory:Pipeline] Failed to log capture metadata: ${logResult.error.message}`);
+      // Continue - don't fail pipeline on logging error
+    }
+    // === End Story 6.4 ===
+
     return { ok: true, value: { segmentsCreated: segments.length } };
   } catch (error) {
     return {
