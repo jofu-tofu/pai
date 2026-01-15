@@ -665,13 +665,17 @@ export class FileBackend implements StorageProvider {
         const organizeResult = await this.organizer.organize(segment);
         const relativePath = organizeResult.ok ? organizeResult.value : `segments/${getYearMonth(segment.timestamp)}`;
 
-        // Add segment metadata
+        // Add segment metadata (Story 6.2: must include accessCount for ranking)
         const segmentMeta = {
           id: segment.id,
+          sessionId: segment.sessionId,
           path: `${relativePath}/${segment.id}.md`,
           tags: segment.tags,
           timestamp: segment.timestamp,
           importanceScore: segment.importanceScore,
+          accessCount: segment.accessCount,
+          lastAccessed: segment.lastAccessed,
+          memoryType: segment.memoryType,
         };
 
         session.segments.push(segmentMeta);
