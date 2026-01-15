@@ -67,7 +67,7 @@ The script outputs a single-line string displayed in the status bar:
 
 ## Requirements
 
-1. **Environment Variable:** `PAI_DIR` must be set (default: `C:\Users\<username>\.pai`)
+1. **Environment Variable:** `PAI_DIR` must be set (default: `C:\Users\<username>\pai`)
 2. **Script Exists:** `$env:PAI_DIR\scripts\statusline.ps1` must exist
 3. **PowerShell:** PowerShell 5.1+ (included in Windows 10/11)
 4. **Settings:** `.claude/settings.json` configured in PAI directory (created by PAI installation)
@@ -79,7 +79,7 @@ The script outputs a single-line string displayed in the status bar:
 1. **Verify PAI_DIR is set:**
    ```powershell
    echo $env:PAI_DIR
-   # Should output: C:\Users\<username>\.pai
+   # Should output: C:\Users\<username>\pai
    ```
 
 2. **Check script exists:**
@@ -123,12 +123,12 @@ The script outputs a single-line string displayed in the status bar:
 1. **Verify PAI_DIR is set:**
    ```powershell
    [System.Environment]::GetEnvironmentVariable('PAI_DIR', 'User')
-   # Should output: C:\Users\<username>\.pai
+   # Should output: C:\Users\<username>\pai
    ```
 
    If not set, run:
    ```powershell
-   [System.Environment]::SetEnvironmentVariable('PAI_DIR', "$env:USERPROFILE\.pai", 'User')
+   [System.Environment]::SetEnvironmentVariable('PAI_DIR', "$env:USERPROFILE\pai", 'User')
    ```
 
 2. **Ensure settings are configured:**
@@ -159,13 +159,13 @@ The script outputs a single-line string displayed in the status bar:
 **Setting up PAI_DIR environment variable:**
 ```powershell
 # Option 1: Set for current session
-$env:PAI_DIR = "$env:USERPROFILE\.pai"
+$env:PAI_DIR = "$env:USERPROFILE\pai"
 
 # Option 2: Set permanently (user level)
-[System.Environment]::SetEnvironmentVariable('PAI_DIR', "$env:USERPROFILE\.pai", 'User')
+[System.Environment]::SetEnvironmentVariable('PAI_DIR', "$env:USERPROFILE\pai", 'User')
 
 # Option 3: Set permanently (system level - requires admin)
-[System.Environment]::SetEnvironmentVariable('PAI_DIR', "$env:USERPROFILE\.pai", 'Machine')
+[System.Environment]::SetEnvironmentVariable('PAI_DIR', "$env:USERPROFILE\pai", 'Machine')
 ```
 
 ### macOS/Linux (Future)

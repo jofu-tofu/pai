@@ -6,7 +6,7 @@ import { promises as fs } from 'fs';
 import { spawn } from 'bun';
 
 // Use process.pid for test isolation
-const TEST_PAI_DIR = join(homedir(), `.pai-test-capture-${process.pid}`);
+const TEST_PAI_DIR = join(homedir(), `pai-test-capture-${process.pid}`);
 const HOOK_PATH = join(process.cwd(), 'hooks', 'memory', 'capture.ts');
 
 /**

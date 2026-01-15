@@ -15,7 +15,7 @@ import { clearConfigCache } from '../core/config';
 import { globalProviderRegistry } from '../core/provider-registry';
 import { registerMVPProviders, resetProvidersRegistered } from '../core/register-providers';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-retrieval-integration');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-retrieval-integration');
 const METRICS_DIR = join(TEST_PAI_DIR, 'mem-store/metrics');
 const LOG_PATH = join(METRICS_DIR, 'retrieval-log.jsonl');
 const SEGMENTS_DIR = join(TEST_PAI_DIR, 'mem-store/segments/2026-01');
@@ -212,7 +212,7 @@ This is a test segment for integration testing of retrieval logging.`;
  * - No-results diagnostic appears when appropriate
  */
 describe('Debug Mode Integration - Story 4.6', () => {
-  const TEST_DEBUG_DIR = join(homedir(), '.pai-test-debug-integration');
+  const TEST_DEBUG_DIR = join(homedir(), 'pai-test-debug-integration');
   const TEST_SETTINGS_PATH = join(TEST_DEBUG_DIR, '.claude', 'settings.json');
 
   beforeAll(() => {
@@ -404,7 +404,7 @@ Debug mode integration test segment.`;
  * - Performance overhead validation (<10ms)
  */
 describe('Experiment Integration - Story 5.4', () => {
-  const TEST_EXP_DIR = join(homedir(), '.pai-test-experiment-integration');
+  const TEST_EXP_DIR = join(homedir(), 'pai-test-experiment-integration');
   const EXP_METRICS_DIR = join(TEST_EXP_DIR, 'mem-store/metrics/experiments');
   const SEGMENTS_DIR = join(TEST_EXP_DIR, 'mem-store/segments/2026-01'); // Year-month format required
   const INDEX_PATH = join(TEST_EXP_DIR, 'mem-store/indexes/keyword/index.json'); // Must match keyword-search.ts

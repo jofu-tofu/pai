@@ -13,7 +13,7 @@ import type { MemorySegment } from '../../types/segment';
 import { globalProviderRegistry } from '../../core/provider-registry';
 import { resetProvidersRegistered, registerMVPProviders } from '../../core/register-providers';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-segment-api');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-segment-api');
 
 describe('SegmentApi', () => {
   let api: SegmentApi;

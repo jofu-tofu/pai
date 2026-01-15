@@ -23,7 +23,7 @@ describe('SegmentSearch', () => {
     clearKeywordIndexCache();
 
     // Create isolated test directory
-    testPaiDir = join(homedir(), '.pai-test-segment-search');
+    testPaiDir = join(homedir(), 'pai-test-segment-search');
     mkdirSync(testPaiDir, { recursive: true });
     process.env.PAI_DIR = testPaiDir;
 

@@ -4,7 +4,7 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { spawn } from 'bun';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-session-summary');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-session-summary');
 const hookPath = join(homedir(), '.pai', 'hooks', 'capture-session-summary.ts');
 
 describe('capture-session-summary', () => {
@@ -82,7 +82,7 @@ describe('capture-session-summary', () => {
       payload: {
         tool_name: 'Edit',
         tool_input: {
-          file_path: 'C:/Users/test/.pai/hooks/test-hook.ts'
+          file_path: 'C:/Users/test/pai/hooks/test-hook.ts'
         }
       }
     };

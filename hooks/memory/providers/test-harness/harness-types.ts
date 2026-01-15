@@ -32,7 +32,7 @@ export interface HarnessOptions {
    * Custom test data directory path.
    *
    * If not specified, harness creates unique directory:
-   * `~/.pai-test-{providerName}`
+   * `~/pai-test-{providerName}`
    *
    * Example: `./.test-data` for project-local test data
    */

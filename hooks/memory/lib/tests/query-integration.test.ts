@@ -19,7 +19,7 @@ describe('Query Integration Tests', () => {
 
   beforeEach(() => {
     // Create isolated test directory
-    testPaiDir = join(homedir(), '.pai-test-query-integration');
+    testPaiDir = join(homedir(), 'pai-test-query-integration');
     mkdirSync(testPaiDir, { recursive: true });
     process.env.PAI_DIR = testPaiDir;
 

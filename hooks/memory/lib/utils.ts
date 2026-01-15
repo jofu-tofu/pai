@@ -7,7 +7,7 @@ import { homedir } from 'os';
 
 /**
  * Get the PAI directory path.
- * Uses PAI_DIR environment variable if set, otherwise defaults to ~/.pai
+ * Uses PAI_DIR environment variable if set, otherwise defaults to ~/pai
  *
  * @returns Absolute path to PAI directory
  *

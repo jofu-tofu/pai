@@ -29,7 +29,7 @@ export interface SegmentHarnessOptions {
   cleanupBeforeEach?: boolean;
 
   /**
-   * Custom test data path (default: ~/.pai-test-{provider-name}).
+   * Custom test data path (default: ~/pai-test-{provider-name}).
    */
   testDataPath?: string;
 }
@@ -60,7 +60,7 @@ export function runSegmentProviderTests(
 
     beforeAll(() => {
       const providerName = ProviderClass.name.toLowerCase().replace(/provider$/, '');
-      testDir = options.testDataPath || join(homedir(), `.pai-test-${providerName}`);
+      testDir = options.testDataPath || join(homedir(), `pai-test-${providerName}`);
     });
 
     afterAll(() => {

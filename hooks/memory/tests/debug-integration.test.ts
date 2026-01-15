@@ -18,7 +18,7 @@ import { mkdirSync, rmSync, writeFileSync, existsSync } from 'fs';
 import { homedir } from 'os';
 import { getDebugMode, clearConfigCache, getMemoryConfig } from '../core/config';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-debug-integration');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-debug-integration');
 const TEST_SETTINGS_PATH = join(TEST_PAI_DIR, '.claude', 'settings.json');
 
 describe('Debug Mode Configuration Integration (Story 4.6.1)', () => {

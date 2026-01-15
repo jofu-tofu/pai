@@ -4,7 +4,7 @@ import { homedir } from 'os';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
 import { loadSegmentContent } from '../content-loader';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-content-loader');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-content-loader');
 const TEST_SEGMENTS_DIR = join(TEST_PAI_DIR, 'mem-store/segments/2026-01');
 
 describe('Content Loader', () => {

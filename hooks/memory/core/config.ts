@@ -234,7 +234,7 @@ let cachedConfig: MemoryConfig | null = null;
 /**
  * Get PAI directory path
  *
- * Respects PAI_DIR environment variable, falls back to ~/.pai
+ * Respects PAI_DIR environment variable, falls back to ~/pai
  */
 function getPaiDir(): string {
   return process.env.PAI_DIR || join(homedir(), '.pai');

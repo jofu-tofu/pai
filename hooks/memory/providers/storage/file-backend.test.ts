@@ -13,7 +13,7 @@ import { promises as fs } from 'fs';
 import { FileBackend } from './file-backend';
 import { MemorySegment } from '../../types/segment';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-file-backend');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-file-backend');
 
 /**
  * Helper to create a test segment with default values.

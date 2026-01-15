@@ -11,7 +11,7 @@ import {
   type ExperimentDataPoint,
 } from './experiment-logger';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-experiment-logger');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-experiment-logger');
 
 describe('experiment-logger', () => {
   beforeAll(() => {

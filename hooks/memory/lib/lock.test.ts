@@ -5,7 +5,7 @@ import { homedir } from 'os';
 import { acquireLock, releaseLock, isProcessorRunning } from './lock';
 
 // Use process.pid for test isolation (prevents conflicts when running tests in parallel)
-const TEST_PAI_DIR = join(homedir(), `.pai-test-lock-${process.pid}`);
+const TEST_PAI_DIR = join(homedir(), `pai-test-lock-${process.pid}`);
 const TEST_LOCK_PATH = join(TEST_PAI_DIR, '.test.lock');
 
 describe('Lock utilities', () => {

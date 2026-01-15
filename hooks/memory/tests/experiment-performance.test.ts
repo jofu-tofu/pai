@@ -15,7 +15,7 @@ import { selectVariant } from '../core/experiment';
 import { logExperimentResult } from '../lib/logging/experiment-logger';
 import type { ExperimentConfig } from '../core/config';
 
-const TEST_DIR = join(homedir(), '.pai-test-experiment-performance');
+const TEST_DIR = join(homedir(), 'pai-test-experiment-performance');
 const METRICS_DIR = join(TEST_DIR, 'mem-store/metrics/experiments');
 
 beforeAll(() => {

@@ -4,7 +4,7 @@ import { homedir } from 'os';
 import { existsSync, mkdirSync, writeFileSync, rmSync } from 'fs';
 import { KeywordSearch } from './keyword-search';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-keyword-search');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-keyword-search');
 const TEST_INDEX_DIR = join(TEST_PAI_DIR, 'mem-store', 'indexes', 'keyword');
 const TEST_INDEX_FILE = join(TEST_INDEX_DIR, 'index.json');
 

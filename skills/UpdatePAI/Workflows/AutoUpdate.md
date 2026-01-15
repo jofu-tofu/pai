@@ -70,7 +70,7 @@ Proceed? (y/n)
 
 ```bash
 NEW_PAI_DIR="/c/EpicSource/pai-v2-$(date +%Y%m%d)"
-BACKUP_DIR="$HOME/.pai-backups/pai-backup-$(date +%Y%m%d-%H%M%S)"
+BACKUP_DIR="$HOME/pai-backups/pai-backup-$(date +%Y%m%d-%H%M%S)"
 
 # Step 1: Backup
 mkdir -p "$BACKUP_DIR"

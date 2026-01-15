@@ -13,7 +13,7 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-retrieval');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-retrieval');
 
 // Mock search provider
 class MockSearchProvider {

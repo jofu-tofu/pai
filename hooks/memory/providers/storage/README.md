@@ -382,7 +382,7 @@ async delete(id: string): Promise<Result<boolean, StorageError>> {
 
 **Directory Structure:**
 ```
-~/.pai-memory-work/
+~/pai-memory-work/
 ├── sessions/
 │   └── mem_1704912340000_a1b2c3d4/
 │       ├── seg_1704912345000_b2c3d4e5.md

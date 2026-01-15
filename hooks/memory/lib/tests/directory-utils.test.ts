@@ -4,7 +4,7 @@ import { join } from 'path';
 import { existsSync, rmSync, mkdirSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-directory-utils');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-directory-utils');
 
 describe('ensureMemStoreDirectories', () => {
   beforeAll(() => {
@@ -79,6 +79,6 @@ describe('ensureMemStoreDirectories', () => {
     const result = ensureMemStoreDirectories();
 
     expect(result.ok).toBe(true);
-    // Should use ~/.pai by default
+    // Should use ~/pai by default
   });
 });

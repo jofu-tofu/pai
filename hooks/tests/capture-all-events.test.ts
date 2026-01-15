@@ -4,7 +4,7 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { spawn } from 'bun';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-history');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-history');
 const hookPath = join(homedir(), '.pai', 'hooks', 'capture-all-events.ts');
 
 describe('capture-all-events', () => {

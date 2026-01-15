@@ -5,7 +5,7 @@ import { existsSync, rmSync, mkdirSync } from 'fs';
 import { promises as fs } from 'fs';
 import { RetentionPolicyChecker } from '../retention-policy';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-retention');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-retention');
 
 describe('lib/retention-policy.ts', () => {
   let checker: RetentionPolicyChecker;

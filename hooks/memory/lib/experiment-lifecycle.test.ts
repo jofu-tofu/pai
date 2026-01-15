@@ -14,7 +14,7 @@ import {
 } from './experiment-lifecycle';
 import type { ExperimentDataPoint } from './logging/experiment-logger';
 
-const TEST_DIR = join(homedir(), '.pai-test-experiment-lifecycle');
+const TEST_DIR = join(homedir(), 'pai-test-experiment-lifecycle');
 const METRICS_DIR = join(TEST_DIR, 'mem-store/metrics/experiments');
 
 beforeAll(() => {

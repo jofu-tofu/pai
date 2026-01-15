@@ -19,7 +19,7 @@ import { parseFrontmatter } from './frontmatter';
 
 /**
  * Get the PAI directory path.
- * Uses PAI_DIR environment variable if set, otherwise defaults to ~/.pai
+ * Uses PAI_DIR environment variable if set, otherwise defaults to ~/pai
  */
 function getPaiDir(): string {
   return process.env.PAI_DIR || join(homedir(), '.pai');

@@ -6,7 +6,7 @@ import { homedir } from 'os';
 import { acquireLock } from '../lib/lock';
 import { KeywordSearch } from '../providers/search/keyword-search';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-graceful-degradation');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-graceful-degradation');
 
 /**
  * Helper: Create required directories and settings for tests

@@ -4,7 +4,7 @@ import { homedir } from 'os';
 import { mkdirSync, rmSync, existsSync, writeFileSync } from 'fs';
 import { spawn } from 'child_process';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-capture-toggle');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-capture-toggle');
 
 /**
  * Helper: Execute capture.ts hook and return exit code + stderr

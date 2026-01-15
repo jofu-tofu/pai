@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, rmSync, readFileSync, writeFileSync } from 'fs';
 import { logRetrieval, createLogEntry } from '../retrieval-logger';
 import { RankedResult } from '../../../types/ranking';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-retrieval-logger');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-retrieval-logger');
 const METRICS_DIR = join(TEST_PAI_DIR, 'mem-store/metrics');
 const LOG_PATH = join(METRICS_DIR, 'retrieval-log.jsonl');
 

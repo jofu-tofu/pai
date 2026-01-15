@@ -16,7 +16,7 @@ import {
   type ExperimentConfig,
 } from './config';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-config');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-config');
 const TEST_SETTINGS_PATH = join(TEST_PAI_DIR, '.claude', 'settings.json');
 
 describe('config', () => {
@@ -213,7 +213,7 @@ describe('config', () => {
 
     test('should use PAI_DIR environment variable if set', async () => {
       // Arrange: Set custom PAI_DIR and create config there
-      const customPaiDir = join(homedir(), '.pai-test-custom');
+      const customPaiDir = join(homedir(), 'pai-test-custom');
       const customSettingsPath = join(customPaiDir, '.claude', 'settings.json');
 
       mkdirSync(join(customPaiDir, '.claude'), { recursive: true });

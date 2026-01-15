@@ -9,7 +9,7 @@ import { mkdirSync, rmSync, existsSync } from 'fs';
 import { validateExperimentProvider } from './experiment-validation';
 import './register-providers'; // Ensure providers are registered
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-experiment-validation');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-experiment-validation');
 
 describe('experiment-validation', () => {
   beforeAll(() => {

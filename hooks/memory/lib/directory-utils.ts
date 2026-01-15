@@ -28,7 +28,7 @@ export interface StorageError {
 }
 
 /**
- * Get PAI directory from env or fallback to ~/.pai
+ * Get PAI directory from env or fallback to ~/pai
  */
 export function getPaiDir(): string {
   return process.env.PAI_DIR || join(homedir(), '.pai');

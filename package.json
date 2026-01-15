@@ -1,5 +1,5 @@
 {
-  "name": ".pai-memory-work",
+  "name": "pai-memory-work",
   "version": "0.1.0",
   "description": "PAI Memory System - Long-term memory for Claude Code sessions",
   "type": "module",

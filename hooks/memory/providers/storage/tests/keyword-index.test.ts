@@ -5,7 +5,7 @@ import { existsSync, rmSync, mkdirSync } from 'fs';
 import { promises as fs } from 'fs';
 import { KeywordIndexManager } from '../keyword-index';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-keyword-index');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-keyword-index');
 
 describe('providers/storage/keyword-index.ts', () => {
   let indexManager: KeywordIndexManager;
@@ -235,7 +235,7 @@ describe('providers/storage/keyword-index.ts', () => {
     // Don't pass paiDir to constructor
     const envManager = new KeywordIndexManager();
 
-    // Should use process.env.PAI_DIR or fallback to ~/.pai
+    // Should use process.env.PAI_DIR or fallback to ~/pai
     expect(envManager).toBeDefined();
   });
 

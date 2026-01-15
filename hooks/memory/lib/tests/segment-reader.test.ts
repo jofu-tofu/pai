@@ -14,7 +14,7 @@ describe('SegmentReader', () => {
 
   beforeEach(() => {
     // Create isolated test directory
-    testPaiDir = join(homedir(), '.pai-test-segment-reader');
+    testPaiDir = join(homedir(), 'pai-test-segment-reader');
     mkdirSync(testPaiDir, { recursive: true });
     process.env.PAI_DIR = testPaiDir;
 

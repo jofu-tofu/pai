@@ -9,7 +9,7 @@ import {
   type RetrievalOperationMetadata,
 } from '../operations-logger';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-operations-logger');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-operations-logger');
 
 describe('operations-logger', () => {
   beforeAll(() => {

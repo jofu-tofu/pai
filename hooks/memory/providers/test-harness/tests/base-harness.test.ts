@@ -16,7 +16,7 @@ import {
 } from '../base-harness';
 import type { Result } from '../../../types/common';
 
-const TEST_DIR = join(homedir(), '.pai-test-base-harness');
+const TEST_DIR = join(homedir(), 'pai-test-base-harness');
 
 describe('base-harness utilities', () => {
   beforeAll(() => {

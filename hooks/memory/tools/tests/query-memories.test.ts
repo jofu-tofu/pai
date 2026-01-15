@@ -10,7 +10,7 @@ describe('QueryMemories CLI', () => {
 
   beforeEach(() => {
     // Create isolated test directory
-    testPaiDir = join(homedir(), '.pai-test-cli');
+    testPaiDir = join(homedir(), 'pai-test-cli');
     mkdirSync(testPaiDir, { recursive: true });
 
     // Create test data structure

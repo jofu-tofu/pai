@@ -149,7 +149,7 @@ describe('ExampleStorageBackend', () => {
    */
   runStorageProviderTests(ExampleStorageBackend, {
     cleanupBeforeEach: true,
-    testDataPath: join(homedir(), '.pai-test-example-storage')
+    testDataPath: join(homedir(), 'pai-test-example-storage')
   });
 
   /**

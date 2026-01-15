@@ -20,7 +20,7 @@ import { SemanticSearchProvider } from './semantic-search.example';
 import { SEARCH_ERROR_CODES } from './interface';
 
 // Test directory setup
-const TEST_DIR = join(homedir(), '.pai-test-semantic-search');
+const TEST_DIR = join(homedir(), 'pai-test-semantic-search');
 
 beforeAll(() => {
   // Create test directory

@@ -11,7 +11,7 @@ import {
   type Stats,
 } from './stats-manager';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-stats-manager');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-stats-manager');
 
 describe('StatsManager', () => {
   let testDir: string;

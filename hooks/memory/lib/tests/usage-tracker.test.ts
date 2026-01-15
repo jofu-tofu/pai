@@ -13,7 +13,7 @@ import { updateUsageSignals, resetStorageInstance } from '../usage-tracker';
 import { FileBackend } from '../../providers/storage/file-backend';
 import { MemorySegment } from '../../types/segment';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-usage-tracker');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-usage-tracker');
 
 /**
  * Helper to create a test segment with default values.

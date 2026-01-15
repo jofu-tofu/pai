@@ -561,7 +561,7 @@ memory:
 
 ```bash
 # View experiment results
-cat ~/.pai-memory-work/experiments/semantic-search-trial/results.json
+cat ~/pai-memory-work/experiments/semantic-search-trial/results.json
 
 # Check performance metrics
 {

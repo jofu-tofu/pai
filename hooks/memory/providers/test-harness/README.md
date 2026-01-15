@@ -194,7 +194,7 @@ interface HarnessOptions {
   cleanupBeforeEach?: boolean;
 
   /**
-   * Custom test data path (default: ~/.pai-test-{provider-name})
+   * Custom test data path (default: ~/pai-test-{provider-name})
    */
   testDataPath?: string;
 }

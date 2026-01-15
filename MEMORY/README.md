@@ -512,7 +512,7 @@ Based on the architecture, here's what the structure suggests for future develop
 
 ### Hook Verification
 
-All hooks verified in `C:\Users\fujos\.pai\hooks\`:
+All hooks verified in `C:\Users\fujos\pai\hooks\`:
 - capture-all-events.ts
 - capture-session-summary.ts (writes to history/raw-outputs and history/sessions)
 - cleanup-temp-files.ts

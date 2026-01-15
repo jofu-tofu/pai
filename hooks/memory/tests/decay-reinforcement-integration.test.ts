@@ -20,7 +20,7 @@ describe('Decay + Reinforcement Integration (Use-It-Or-Lose-It)', () => {
 
   beforeEach(() => {
     // Create isolated test directory
-    testPaiDir = join(homedir(), '.pai-test-decay-reinforcement');
+    testPaiDir = join(homedir(), 'pai-test-decay-reinforcement');
     mkdirSync(testPaiDir, { recursive: true });
     process.env.PAI_DIR = testPaiDir;
 

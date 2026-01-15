@@ -10,7 +10,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-queue-processor');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-queue-processor');
 
 describe('process-queue.ts', () => {
   beforeEach(async () => {

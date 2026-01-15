@@ -23,7 +23,7 @@ export function runSearchProviderTests(
     let testDir: string;
 
     beforeAll(() => {
-      testDir = options?.testDataPath || join(homedir(), `.pai-test-${ProviderClass.name.toLowerCase()}`);
+      testDir = options?.testDataPath || join(homedir(), `pai-test-${ProviderClass.name.toLowerCase()}`);
       cleanTestDirectory(testDir);
     });
 

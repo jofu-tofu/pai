@@ -5,7 +5,7 @@ import { existsSync, rmSync, mkdirSync, writeFileSync } from 'fs';
 import { spawn } from 'bun';
 import { fileURLToPath } from 'url';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-retrieve');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-retrieve');
 
 // Get the directory containing this test file
 const __filename = fileURLToPath(import.meta.url);
@@ -220,7 +220,7 @@ describe('retrieve.ts hook', () => {
   });
 
   test('should support PAI_DIR environment variable', async () => {
-    const customPaiDir = join(homedir(), '.pai-test-custom');
+    const customPaiDir = join(homedir(), 'pai-test-custom');
     mkdirSync(customPaiDir, { recursive: true });
 
     try {
@@ -323,7 +323,7 @@ function createHookSettings(paiDir: string, config: {
 }
 
 describe('retrieve.ts - memory system toggle', () => {
-  const TOGGLE_TEST_DIR = join(homedir(), '.pai-test-retrieve-toggle');
+  const TOGGLE_TEST_DIR = join(homedir(), 'pai-test-retrieve-toggle');
 
   beforeAll(() => {
     // Clean slate for toggle tests
@@ -465,7 +465,7 @@ describe('retrieve.ts - memory system toggle', () => {
     // Arrange: No settings.json (triggers default behavior)
     // Create PAI dir but don't create settings.json
 
-    const noSettingsDir = join(homedir(), '.pai-test-retrieve-no-settings');
+    const noSettingsDir = join(homedir(), 'pai-test-retrieve-no-settings');
     if (existsSync(noSettingsDir)) {
       rmSync(noSettingsDir, { recursive: true, force: true });
     }
@@ -527,7 +527,7 @@ describe('retrieve.ts - memory system toggle', () => {
 });
 
 describe('retrieve.ts - hook-specific toggle (Story 3.3)', () => {
-  const HOOK_TOGGLE_TEST_DIR = join(homedir(), '.pai-test-retrieve-hook-toggle');
+  const HOOK_TOGGLE_TEST_DIR = join(homedir(), 'pai-test-retrieve-hook-toggle');
 
   beforeAll(() => {
     // Clean slate

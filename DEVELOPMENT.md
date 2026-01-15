@@ -60,14 +60,14 @@ The PAI system uses `PAI_DIR` as the root path for all resource location:
 
 **Environment isolation:**
 - **Development:** `PAI_DIR=$(pwd)` - Your worktree (isolated testing)
-- **Production:** `PAI_DIR=~/.pai` - Global installation (live system)
+- **Production:** `PAI_DIR=~/pai` - Global installation (live system)
 
 ## Development vs Production
 
 | Environment | PAI_DIR Value | Purpose |
 |-------------|---------------|---------|
 | **Development** | `$(pwd)` (worktree root) | Isolated testing in development branch |
-| **Production** | `~/.pai` or `$HOME/.pai` | Deployed global PAI system |
+| **Production** | `~/pai` or `$HOME/pai` | Deployed global PAI system |
 
 ## Working with Hooks
 
@@ -76,8 +76,8 @@ Claude Code uses a **per-directory** hook system. Hooks are only active when Cla
 ### Hook Architecture
 
 **Production PAI System:**
-- Location: `$HOME/.pai/.claude/settings.json`
-- Active when: Working in `~/.pai` directory
+- Location: `$HOME/pai/.claude/settings.json`
+- Active when: Working in `~/pai` directory
 - Purpose: Full PAI System hooks (memory, security, context loading)
 
 **Development (this repository):**
@@ -114,7 +114,7 @@ When working on hook code in this repository:
 4. **Verify hook behavior**:
    - Check terminal output for hook execution messages
    - Verify files are written to `$PAI_DIR/history/` (your worktree)
-   - Not writing to production `~/.pai/history/`
+   - Not writing to production `~/pai/history/`
 
 5. **When done**, remove `.claude/settings.json` to disable hooks:
    ```powershell
@@ -309,8 +309,8 @@ Complete all items before deploying to production:
 
 **Environment Configuration:**
 - [ ] Set PAI_DIR to production path
-  - PowerShell: `$env:PAI_DIR = "$HOME/.pai"`
-  - Bash: `export PAI_DIR="$HOME/.pai"`
+  - PowerShell: `$env:PAI_DIR = "$HOME/pai"`
+  - Bash: `export PAI_DIR="$HOME/pai"`
 - [ ] Verify production PAI_DIR: `echo $env:PAI_DIR` (PowerShell) or `echo $PAI_DIR` (Bash)
 
 **Deployment Steps:**

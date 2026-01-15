@@ -18,7 +18,7 @@ import {
   analyzeProviderQuality,
 } from '../insights';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-insights');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-insights');
 
 describe('insights', () => {
   beforeAll(() => {
@@ -103,7 +103,7 @@ describe('insights', () => {
     });
 
     test('should return empty array when no segments exist', async () => {
-      const testDir = join(homedir(), '.pai-test-insights-empty');
+      const testDir = join(homedir(), 'pai-test-insights-empty');
       process.env.PAI_DIR = testDir;
       mkdirSync(join(testDir, 'mem-store', 'segments'), { recursive: true });
 
@@ -118,7 +118,7 @@ describe('insights', () => {
     });
 
     test('should handle missing segments directory gracefully', async () => {
-      const testDir = join(homedir(), '.pai-test-insights-no-segments');
+      const testDir = join(homedir(), 'pai-test-insights-no-segments');
       process.env.PAI_DIR = testDir;
       mkdirSync(testDir, { recursive: true });
 
@@ -178,7 +178,7 @@ describe('insights', () => {
     });
 
     test('should return empty array when all segments are fresh', async () => {
-      const testDir = join(homedir(), '.pai-test-insights-fresh');
+      const testDir = join(homedir(), 'pai-test-insights-fresh');
       process.env.PAI_DIR = testDir;
       mkdirSync(join(testDir, 'mem-store', 'segments', '2026-01'), { recursive: true });
 
@@ -240,7 +240,7 @@ describe('insights', () => {
     });
 
     test('should return zero metrics when no operations exist', async () => {
-      const testDir = join(homedir(), '.pai-test-insights-no-ops');
+      const testDir = join(homedir(), 'pai-test-insights-no-ops');
       process.env.PAI_DIR = testDir;
       mkdirSync(join(testDir, 'mem-store', 'metrics'), { recursive: true });
 
@@ -257,7 +257,7 @@ describe('insights', () => {
     });
 
     test('should handle missing operations log gracefully', async () => {
-      const testDir = join(homedir(), '.pai-test-insights-no-log');
+      const testDir = join(homedir(), 'pai-test-insights-no-log');
       process.env.PAI_DIR = testDir;
       mkdirSync(testDir, { recursive: true });
 
@@ -272,7 +272,7 @@ describe('insights', () => {
     });
 
     test('should handle both old and new schema totalLatencyMs field', async () => {
-      const testDir = join(homedir(), '.pai-test-insights-schema');
+      const testDir = join(homedir(), 'pai-test-insights-schema');
       process.env.PAI_DIR = testDir;
       mkdirSync(join(testDir, 'mem-store', 'metrics'), { recursive: true });
 
@@ -364,7 +364,7 @@ describe('insights', () => {
     });
 
     test('should detect low success rate issues', async () => {
-      const testDir = join(homedir(), '.pai-test-insights-low-success');
+      const testDir = join(homedir(), 'pai-test-insights-low-success');
       process.env.PAI_DIR = testDir;
       mkdirSync(join(testDir, 'mem-store', 'metrics'), { recursive: true });
       mkdirSync(join(testDir, 'mem-store', 'segments', '2026-01'), { recursive: true });
@@ -446,7 +446,7 @@ describe('insights', () => {
     });
 
     test('should handle missing data sources gracefully', async () => {
-      const testDir = join(homedir(), '.pai-test-insights-minimal');
+      const testDir = join(homedir(), 'pai-test-insights-minimal');
       process.env.PAI_DIR = testDir;
       mkdirSync(testDir, { recursive: true });
 

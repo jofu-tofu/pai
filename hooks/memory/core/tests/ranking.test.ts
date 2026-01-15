@@ -6,7 +6,7 @@ import { rankResults } from '../ranking';
 import { FilterResult } from '../../types/filters';
 import { RankingOptions } from '../../types/ranking';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-ranking');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-ranking');
 
 describe('Ranking Pipeline', () => {
   beforeAll(() => {

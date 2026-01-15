@@ -20,7 +20,7 @@ import { selectVariant } from '../core/experiment';
 import type { ExperimentConfig } from '../core/config';
 import type { ExperimentDataPoint } from '../lib/logging/experiment-logger';
 
-const TEST_DIR = join(homedir(), '.pai-test-experiment-e2e');
+const TEST_DIR = join(homedir(), 'pai-test-experiment-e2e');
 const METRICS_DIR = join(TEST_DIR, 'mem-store/metrics/experiments');
 const CLAUDE_DIR = join(TEST_DIR, '.claude');
 

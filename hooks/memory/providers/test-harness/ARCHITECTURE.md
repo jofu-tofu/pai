@@ -82,7 +82,7 @@ interface HarnessOptions {
 **Per-test cleanup**:
 ```typescript
 beforeAll(() => {
-  testDir = join(homedir(), `.pai-test-${ProviderClass.name.toLowerCase()}`);
+  testDir = join(homedir(), `pai-test-${ProviderClass.name.toLowerCase()}`);
   mkdirSync(testDir, { recursive: true });
 });
 

@@ -21,7 +21,7 @@ describe('RegistryQuery', () => {
     clearRegistryCache();
 
     // Create isolated test directory
-    testPaiDir = join(homedir(), '.pai-test-registry-query');
+    testPaiDir = join(homedir(), 'pai-test-registry-query');
     mkdirSync(testPaiDir, { recursive: true });
     process.env.PAI_DIR = testPaiDir;
 

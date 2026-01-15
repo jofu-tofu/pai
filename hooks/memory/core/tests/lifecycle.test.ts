@@ -12,7 +12,7 @@ describe('Lifecycle Module - Decay Detection', () => {
 
   beforeEach(() => {
     // Create isolated test directory
-    testPaiDir = join(homedir(), '.pai-test-lifecycle');
+    testPaiDir = join(homedir(), 'pai-test-lifecycle');
     mkdirSync(testPaiDir, { recursive: true });
     process.env.PAI_DIR = testPaiDir;
 

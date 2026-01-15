@@ -15,7 +15,7 @@ import {
 } from '../performance-metrics';
 import type { CaptureOperationMetadata, RetrievalOperationMetadata } from '../operations-logger';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-performance-metrics');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-performance-metrics');
 const TEST_METRICS_DIR = join(TEST_PAI_DIR, 'mem-store', 'metrics');
 const TEST_LOG_PATH = join(TEST_METRICS_DIR, 'operations.jsonl');
 

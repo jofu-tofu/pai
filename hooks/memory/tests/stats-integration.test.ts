@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
 import { spawn } from 'bun';
 import { getStats } from '../lib/logging/stats-manager';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-stats-integration');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-stats-integration');
 
 describe('Stats Integration Tests (Story 4.3)', () => {
   beforeEach(() => {

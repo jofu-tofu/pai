@@ -41,7 +41,7 @@ Say "Update PAI" to start. The AutoUpdate workflow handles everything automatica
 
 If issues occur after update:
 ```bash
-~/.pai-backups/pai-backup-YYYYMMDD-HHMMSS/rollback.sh
+~/pai-backups/pai-backup-YYYYMMDD-HHMMSS/rollback.sh
 ```
 
 ## Support

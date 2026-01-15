@@ -13,7 +13,7 @@ Understanding the structural gap between your customized PAI installation and th
 Scan the local installation to build a comprehensive structural map.
 
 ```bash
-PAI_DIR="${PAI_DIR:-$HOME/.pai}"
+PAI_DIR="${PAI_DIR:-$HOME/pai}"
 echo "=== Current PAI Architecture Discovery ==="
 
 # Core structure

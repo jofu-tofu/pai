@@ -27,7 +27,7 @@ describe('MetadataBrowser', () => {
 
   beforeEach(() => {
     // Create isolated test directory
-    testPaiDir = join(homedir(), '.pai-test-metadata-browser');
+    testPaiDir = join(homedir(), 'pai-test-metadata-browser');
     testMemStore = join(testPaiDir, 'mem-store');
 
     mkdirSync(join(testMemStore, 'structured'), { recursive: true });

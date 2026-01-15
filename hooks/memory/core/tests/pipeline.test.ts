@@ -11,7 +11,7 @@ import { SimpleExtractProvider } from '../../providers/summarize/simple-extract'
 import { FlatByDateOrganizeProvider } from '../../providers/organize/flat-by-date';
 import { FileBackend } from '../../providers/storage/file-backend';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-pipeline');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-pipeline');
 
 describe('core/pipeline.ts', () => {
   let pipelineConfig: PipelineConfig;

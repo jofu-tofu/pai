@@ -21,10 +21,10 @@ This is the **Memory System Development Worktree** (`pai-memory-work` branch).
 
 ```bash
 # Clone the repository
-git clone https://github.com/jofu-tofu/pai.git ~/.pai
+git clone https://github.com/jofu-tofu/pai.git ~/pai
 
 # Run setup
-cd ~/.pai && bun run scripts/setup.ts
+cd ~/pai && bun run scripts/setup.ts
 ```
 
 ## Prerequisites
@@ -43,23 +43,23 @@ Add `PAI_DIR` to your shell profile:
 
 **Bash/Zsh (~/.bashrc or ~/.zshrc):**
 ```bash
-export PAI_DIR="$HOME/.pai"
+export PAI_DIR="$HOME/pai"
 ```
 
 **PowerShell ($PROFILE):**
 ```powershell
-$env:PAI_DIR = "$HOME\.pai"
+$env:PAI_DIR = "$HOME\pai"
 ```
 
 **Windows (System Environment Variables):**
 - Search "Environment Variables" in Start menu
-- Add `PAI_DIR` with value `C:\Users\<YOUR_USERNAME>\.pai`
+- Add `PAI_DIR` with value `C:\Users\<YOUR_USERNAME>\pai`
 
 ### 2. Install Dependencies
 
 ```bash
-cd ~/.pai/hooks && bun install
-cd ~/.pai/skills/Prompting/Tools && bun install
+cd ~/pai/hooks && bun install
+cd ~/pai/skills/Prompting/Tools && bun install
 ```
 
 ### 3. Configure Claude Code Hooks
@@ -69,7 +69,7 @@ cd ~/.pai/skills/Prompting/Tools && bun install
 Claude Code automatically uses `.claude/settings.json` when you run from the PAI directory:
 
 ```bash
-cd ~/.pai && claude
+cd ~/pai && claude
 ```
 
 **Option B: Copy hooks to global settings**
@@ -99,7 +99,7 @@ bun run scripts/setup.ts doctor
 ## Directory Structure
 
 ```
-~/.pai/
+~/pai/
 ├── .claude/           # Claude Code project settings (hooks config)
 ├── hooks/             # Hook scripts (security, session tracking, etc.)
 ├── skills/            # AI skills and workflows
@@ -149,7 +149,7 @@ bun run scripts/setup.ts doctor
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `PAI_DIR` | PAI installation directory | `~/.pai` |
+| `PAI_DIR` | PAI installation directory | `~/pai` |
 | `TIME_ZONE` | Local timezone | System default |
 | `DA` | Assistant name | `Tofu` |
 
@@ -167,7 +167,7 @@ Edit `skills/CORE/SKILL.md` to customize:
 
 1. Ensure `PAI_DIR` is set: `echo $PAI_DIR`
 2. Run doctor: `bun run scripts/setup.ts doctor`
-3. Check Claude is using project settings (run from `~/.pai`)
+3. Check Claude is using project settings (run from `~/pai`)
 
 ### Permission errors on Windows
 
@@ -179,7 +179,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ### Tests failing
 
 ```bash
-cd ~/.pai/hooks && bun test
+cd ~/pai/hooks && bun test
 ```
 
 ## Contributing

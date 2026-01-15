@@ -7,7 +7,7 @@ import { globalProviderRegistry } from '../provider-registry';
 import { registerMVPProviders, resetProvidersRegistered } from '../register-providers';
 import { clearConfigCache } from '../config';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-retrieval');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-retrieval');
 const TEST_INDEX_DIR = join(TEST_PAI_DIR, 'mem-store', 'indexes', 'keyword');
 const TEST_INDEX_FILE = join(TEST_INDEX_DIR, 'index.json');
 

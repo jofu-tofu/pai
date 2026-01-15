@@ -96,7 +96,7 @@ Files are always named `task_plan.md`, `findings.md`, `progress.md` with no name
 
 ```
 Problem:
-C:\Users\fujos\.pai\
+C:\Users\fujos\pai\
 ├── task_plan.md       ← Task A
 ├── findings.md
 └── progress.md
@@ -259,7 +259,7 @@ ISC row:                         Story 2.3: Logout Button
 
 **Storage Architecture:**
 ```
-C:\Users\fujos\.pai\MEMORY\Work\
+C:\Users\fujos\pai\MEMORY\Work\
 ├── current-isc.json          ← Active work (single file)
 ├── archive-1736123456.json   ← Completed work (timestamped)
 └── archive-1736234567.json

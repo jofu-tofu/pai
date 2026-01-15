@@ -54,7 +54,7 @@ export function runSummarizeProviderTests(
     beforeAll(() => {
       testDir = join(
         homedir(),
-        `.pai-test-summarize-${ProviderClass.name.toLowerCase()}-${Date.now()}`
+        `pai-test-summarize-${ProviderClass.name.toLowerCase()}-${Date.now()}`
       );
       cleanTestDirectory(testDir);
     });

@@ -12,7 +12,7 @@ import {
   type ExperimentDataPoint,
 } from './experiment-analyzer';
 
-const TEST_DIR = join(homedir(), '.pai-test-experiment-analyzer');
+const TEST_DIR = join(homedir(), 'pai-test-experiment-analyzer');
 const METRICS_DIR = join(TEST_DIR, 'mem-store/metrics/experiments');
 
 beforeAll(() => {

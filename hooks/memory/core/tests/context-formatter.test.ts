@@ -6,7 +6,7 @@ import { formatMemoryContext } from '../context-formatter';
 import { resetStorageProvider } from '../content-loader';
 import { RankedResult } from '../../types/ranking';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-context-formatter');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-context-formatter');
 const TEST_SEGMENTS_DIR = join(TEST_PAI_DIR, 'mem-store/segments/2026-01');
 
 describe('Context Formatter', () => {

@@ -6,7 +6,7 @@ import { applyFilters } from '../filters';
 import { SearchResult } from '../../providers/search/interface';
 import { FilterOptions } from '../../types/filters';
 
-const TEST_PAI_DIR = join(homedir(), '.pai-test-filters');
+const TEST_PAI_DIR = join(homedir(), 'pai-test-filters');
 const TEST_REGISTRY_DIR = join(TEST_PAI_DIR, 'mem-store', 'structured');
 const TEST_REGISTRY_FILE = join(TEST_REGISTRY_DIR, 'session-registry.json');
 
