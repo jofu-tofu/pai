@@ -52,9 +52,9 @@ describe('SegmentSearch', () => {
   });
 
   describe('loadKeywordIndex', () => {
-    test('should return index when file exists and is valid', () => {
+    test('should return index when file exists and is valid', async () => {
       // Act
-      const result = loadKeywordIndex();
+      const result = await loadKeywordIndex();
 
       // Assert
       expect(result.ok).toBe(true);
@@ -64,42 +64,42 @@ describe('SegmentSearch', () => {
       }
     });
 
-    test('should return error when index file does not exist', () => {
+    test('should return error when index file does not exist', async () => {
       // Arrange
       rmSync(indexPath, { force: true });
 
       // Act
-      const result = loadKeywordIndex();
+      const result = await loadKeywordIndex();
 
       // Assert
       expect(result.ok).toBe(false);
       if (!result.ok) {
-        expect(result.error.code).toBe('QUERY_INDEX_NOT_FOUND');
+        expect(result.error.code).toBe('SEGMENT_SEARCH_INDEX_NOT_FOUND');
       }
     });
 
-    test('should return error when index file is corrupted', () => {
+    test('should return error when index file is corrupted', async () => {
       // Arrange
       writeFileSync(indexPath, 'invalid json {{{');
 
       // Act
-      const result = loadKeywordIndex();
+      const result = await loadKeywordIndex();
 
       // Assert
       expect(result.ok).toBe(false);
       if (!result.ok) {
-        expect(result.error.code).toBe('QUERY_INDEX_CORRUPT');
+        expect(result.error.code).toBe('SEGMENT_SEARCH_INDEX_CORRUPT');
       }
     });
   });
 
   describe('findSegmentsByKeyword', () => {
-    test('should return segment IDs when keyword exists in index', () => {
+    test('should return segment IDs when keyword exists in index', async () => {
       // Arrange
       const keyword = 'typescript';
 
       // Act
-      const result = findSegmentsByKeyword(keyword);
+      const result = await findSegmentsByKeyword(keyword);
 
       // Assert
       expect(result.ok).toBe(true);
@@ -109,12 +109,12 @@ describe('SegmentSearch', () => {
       }
     });
 
-    test('should return empty array when keyword does not exist', () => {
+    test('should return empty array when keyword does not exist', async () => {
       // Arrange
       const keyword = 'nonexistent';
 
       // Act
-      const result = findSegmentsByKeyword(keyword);
+      const result = await findSegmentsByKeyword(keyword);
 
       // Assert
       expect(result.ok).toBe(true);
@@ -123,12 +123,12 @@ describe('SegmentSearch', () => {
       }
     });
 
-    test('should support case-insensitive keyword matching', () => {
+    test('should support case-insensitive keyword matching', async () => {
       // Arrange
       const keyword = 'TypeScript';
 
       // Act
-      const result = findSegmentsByKeyword(keyword);
+      const result = await findSegmentsByKeyword(keyword);
 
       // Assert
       expect(result.ok).toBe(true);
@@ -137,44 +137,44 @@ describe('SegmentSearch', () => {
       }
     });
 
-    test('should handle missing index gracefully when searching', () => {
+    test('should handle missing index gracefully when searching', async () => {
       // Arrange
       rmSync(indexPath, { force: true });
       const keyword = 'typescript';
 
       // Act
-      const result = findSegmentsByKeyword(keyword);
+      const result = await findSegmentsByKeyword(keyword);
 
       // Assert
       expect(result.ok).toBe(false);
       if (!result.ok) {
-        expect(result.error.code).toBe('QUERY_INDEX_NOT_FOUND');
+        expect(result.error.code).toBe('SEGMENT_SEARCH_INDEX_NOT_FOUND');
       }
     });
 
-    test('should handle corrupted index gracefully when searching', () => {
+    test('should handle corrupted index gracefully when searching', async () => {
       // Arrange
       writeFileSync(indexPath, 'invalid json');
       const keyword = 'typescript';
 
       // Act
-      const result = findSegmentsByKeyword(keyword);
+      const result = await findSegmentsByKeyword(keyword);
 
       // Assert
       expect(result.ok).toBe(false);
       if (!result.ok) {
-        expect(result.error.code).toBe('QUERY_INDEX_CORRUPT');
+        expect(result.error.code).toBe('SEGMENT_SEARCH_INDEX_CORRUPT');
       }
     });
   });
 
   describe('findSegmentsByKeywords', () => {
-    test('should return segment matches with scores for multiple keywords', () => {
+    test('should return segment matches with scores for multiple keywords', async () => {
       // Arrange
       const keywords = ['typescript', 'memory'];
 
       // Act
-      const result = findSegmentsByKeywords(keywords);
+      const result = await findSegmentsByKeywords(keywords);
 
       // Assert
       expect(result.ok).toBe(true);
@@ -189,12 +189,12 @@ describe('SegmentSearch', () => {
       }
     });
 
-    test('should sort results by match score descending', () => {
+    test('should sort results by match score descending', async () => {
       // Arrange
       const keywords = ['typescript', 'memory', 'hooks'];
 
       // Act
-      const result = findSegmentsByKeywords(keywords);
+      const result = await findSegmentsByKeywords(keywords);
 
       // Assert
       expect(result.ok).toBe(true);
@@ -211,12 +211,12 @@ describe('SegmentSearch', () => {
       }
     });
 
-    test('should return empty array when no keywords match', () => {
+    test('should return empty array when no keywords match', async () => {
       // Arrange
       const keywords = ['nonexistent1', 'nonexistent2'];
 
       // Act
-      const result = findSegmentsByKeywords(keywords);
+      const result = await findSegmentsByKeywords(keywords);
 
       // Assert
       expect(result.ok).toBe(true);
@@ -225,12 +225,12 @@ describe('SegmentSearch', () => {
       }
     });
 
-    test('should include matched keywords in result', () => {
+    test('should include matched keywords in result', async () => {
       // Arrange
       const keywords = ['auth', 'security'];
 
       // Act
-      const result = findSegmentsByKeywords(keywords);
+      const result = await findSegmentsByKeywords(keywords);
 
       // Assert
       expect(result.ok).toBe(true);
@@ -244,12 +244,12 @@ describe('SegmentSearch', () => {
       }
     });
 
-    test('should deduplicate segment IDs across keywords', () => {
+    test('should deduplicate segment IDs across keywords', async () => {
       // Arrange
       const keywords = ['typescript', 'hooks'];
 
       // Act
-      const result = findSegmentsByKeywords(keywords);
+      const result = await findSegmentsByKeywords(keywords);
 
       // Assert
       expect(result.ok).toBe(true);
