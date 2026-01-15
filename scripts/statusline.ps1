@@ -18,13 +18,14 @@ try {
 
     # Calculate token usage
     $usage = $data.context_window.current_usage
+    $cwd = Get-Location | Select-Object -ExpandProperty Path
     if ($usage) {
         $currentTokens = $usage.input_tokens + $usage.cache_creation_input_tokens + $usage.cache_read_input_tokens
         $windowSize = $data.context_window.context_window_size
         $percent = [math]::Floor(($currentTokens * 100) / $windowSize)
-        Write-Output "[$modelShort] $currentTokens tokens ($percent%)"
+        Write-Output "[$modelShort] $currentTokens tokens ($percent%) | $cwd"
     } else {
-        Write-Output "[$modelShort] 0 tokens (0%)"
+        Write-Output "[$modelShort] 0 tokens (0%) | $cwd"
     }
 } catch {
     Write-Output "Error: $_"
