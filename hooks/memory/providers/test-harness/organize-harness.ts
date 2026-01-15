@@ -206,11 +206,8 @@ export function runOrganizeProviderTests(
       provider = new ProviderClass();
       await provider.initialize();
 
-      const result = await provider.shutdown();
-
-      // shutdown() should return Result<void, ProviderError>
-      expectOk(result);
-      expect(result.value).toBeUndefined();
+      // shutdown() should return Promise<void> - never throws, handles errors internally
+      await expect(provider.shutdown()).resolves.toBeUndefined();
     });
 
     test('should return Result errors for error cases, not throw exceptions', async () => {

@@ -9,7 +9,7 @@ import { describe, test, expect, beforeEach, afterEach } from 'bun:test';
 import { join } from 'path';
 import { homedir } from 'os';
 import { existsSync, rmSync, mkdirSync } from 'fs';
-import { updateUsageSignals } from '../usage-tracker';
+import { updateUsageSignals, resetStorageInstance } from '../usage-tracker';
 import { FileBackend } from '../../providers/storage/file-backend';
 import { MemorySegment } from '../../types/segment';
 
@@ -41,6 +41,9 @@ describe('UsageTracker', () => {
     // Create isolated test directory
     mkdirSync(TEST_PAI_DIR, { recursive: true });
     process.env.PAI_DIR = TEST_PAI_DIR;
+
+    // Reset the usage-tracker's singleton so it uses the new PAI_DIR
+    resetStorageInstance();
 
     // Initialize storage provider
     storage = new FileBackend();

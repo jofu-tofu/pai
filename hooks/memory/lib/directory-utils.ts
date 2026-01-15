@@ -20,6 +20,8 @@ export interface ResultError<E> {
 export type ResultType<T, E> = Result<T, E> | ResultError<E>;
 
 export interface StorageError {
+  /** Error name for Error interface compatibility (default: 'StorageError') */
+  name: string;
   code: string;
   message: string;
   cause?: Error;
@@ -69,6 +71,7 @@ export function ensureMemStoreDirectories(
     return {
       ok: false,
       error: {
+        name: 'StorageError',
         code: 'STORAGE_INIT_FAILED',
         message: `Failed to create memory directories: ${error instanceof Error ? error.message : String(error)}`,
         cause: error instanceof Error ? error : undefined

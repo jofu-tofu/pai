@@ -73,6 +73,17 @@ let searchProvider: SearchProvider | null = null;
 let providerLoadInProgress = false;
 
 /**
+ * Reset the cached search provider.
+ * Used for testing when PAI_DIR changes between tests.
+ * Also clears the provider registry cache to ensure fresh provider initialization.
+ */
+export function resetSearchProvider(): void {
+  searchProvider = null;
+  providerLoadInProgress = false;
+  globalProviderRegistry.clearCache();
+}
+
+/**
  * Hash query for privacy-preserving experiment logging
  *
  * Creates deterministic hash of query text for experiment data.

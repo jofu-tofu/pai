@@ -29,6 +29,14 @@ async function getStorageProvider(): Promise<StorageProvider> {
 }
 
 /**
+ * Reset the cached storage provider.
+ * Used for testing when PAI_DIR changes between tests.
+ */
+export function resetStorageProvider(): void {
+  storageProvider = null;
+}
+
+/**
  * Load full content for a segment from storage.
  *
  * @param segmentId - Segment ID to load

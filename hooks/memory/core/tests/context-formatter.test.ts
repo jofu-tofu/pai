@@ -3,6 +3,7 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
 import { formatMemoryContext } from '../context-formatter';
+import { resetStorageProvider } from '../content-loader';
 import { RankedResult } from '../../types/ranking';
 
 const TEST_PAI_DIR = join(homedir(), '.pai-test-context-formatter');
@@ -14,6 +15,8 @@ describe('Context Formatter', () => {
   beforeAll(() => {
     mkdirSync(TEST_SEGMENTS_DIR, { recursive: true });
     process.env.PAI_DIR = TEST_PAI_DIR;
+    // Reset the storage provider to use the test directory
+    resetStorageProvider();
 
     // Create test segment files
     const segment1 = `---
@@ -59,6 +62,8 @@ Third segment discussing memory retrieval patterns and context injection.`;
       rmSync(TEST_PAI_DIR, { recursive: true, force: true });
     }
     delete process.env.PAI_DIR;
+    // Reset storage provider so other tests get fresh instance
+    resetStorageProvider();
   });
 
   describe('formatMemoryContext()', () => {

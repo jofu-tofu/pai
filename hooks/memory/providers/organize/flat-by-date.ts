@@ -1,7 +1,7 @@
 import type { OrganizeProvider, OrganizeError } from './interface';
 import type { MemorySegment } from '../../types/segment';
 import type { Result } from '../../types/result';
-import type { ProviderError, HealthStatus } from '../../types/provider';
+import type { HealthStatus } from '../../types/provider';
 
 /**
  * FlatByDateOrganizeProvider - Organizes segments by date in flat structure
@@ -25,8 +25,8 @@ export class FlatByDateOrganizeProvider implements OrganizeProvider {
     return { healthy: true, message: 'Flat-by-date organizer operational' };
   }
 
-  async shutdown(): Promise<Result<void, ProviderError>> {
-    return { ok: true, value: undefined };
+  async shutdown(): Promise<void> {
+    // No cleanup needed for this provider
   }
 
   /**

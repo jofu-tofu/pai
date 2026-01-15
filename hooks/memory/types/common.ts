@@ -57,6 +57,9 @@ export type Result<T, E = Error> =
  * ```
  */
 export interface ProviderError {
+  /** Error name for Error interface compatibility (default: 'ProviderError') */
+  name: string;
+
   /** Namespaced error code (e.g., 'STORAGE_WRITE_FAILED', 'SEARCH_INDEX_CORRUPT') */
   code: string;
 

@@ -2,7 +2,10 @@ import { describe, test, expect, beforeAll, afterAll } from 'bun:test';
 import { join } from 'path';
 import { homedir } from 'os';
 import { existsSync, mkdirSync, writeFileSync, rmSync } from 'fs';
-import { retrieveMemories } from '../retrieval';
+import { retrieveMemories, resetSearchProvider } from '../retrieval';
+import { globalProviderRegistry } from '../provider-registry';
+import { registerMVPProviders, resetProvidersRegistered } from '../register-providers';
+import { clearConfigCache } from '../config';
 
 const TEST_PAI_DIR = join(homedir(), '.pai-test-retrieval');
 const TEST_INDEX_DIR = join(TEST_PAI_DIR, 'mem-store', 'indexes', 'keyword');
@@ -27,6 +30,13 @@ describe('Retrieval Pipeline Integration', () => {
 
     // Set PAI_DIR for tests
     process.env.PAI_DIR = TEST_PAI_DIR;
+
+    // Reset and register providers fresh for this test
+    globalProviderRegistry.clearCache();
+    resetProvidersRegistered();
+    registerMVPProviders();
+    resetSearchProvider();
+    clearConfigCache();
   });
 
   afterAll(() => {

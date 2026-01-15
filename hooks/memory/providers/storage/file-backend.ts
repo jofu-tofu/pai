@@ -119,6 +119,7 @@ export class FileBackend implements StorageProvider {
       return {
         ok: false,
         error: {
+          name: 'StorageError',
           code: 'STORAGE_INIT_FAILED',
           message: `Failed to initialize file backend: ${(error as Error).message}`,
           cause: error as Error,
@@ -159,6 +160,7 @@ export class FileBackend implements StorageProvider {
         return {
           ok: false,
           error: {
+            name: 'StorageError',
             code: 'STORAGE_SERIALIZE_FAILED',
             message: `Failed to serialize segment ${segment.id}`,
             cause: markdownResult.error,
@@ -204,6 +206,7 @@ export class FileBackend implements StorageProvider {
       return {
         ok: false,
         error: {
+          name: 'StorageError',
           code: 'STORAGE_WRITE_FAILED',
           message: `Failed to write segment ${segment.id}: ${(error as Error).message}`,
           cause: error as Error,
@@ -238,6 +241,7 @@ export class FileBackend implements StorageProvider {
                 return {
                   ok: false,
                   error: {
+                    name: 'StorageError',
                     code: 'STORAGE_PARSE_FAILED',
                     message: `Failed to parse segment ${id}`,
                     cause: parseResult.error,
@@ -296,6 +300,7 @@ export class FileBackend implements StorageProvider {
       return {
         ok: false,
         error: {
+          name: 'StorageError',
           code: 'STORAGE_READ_FAILED',
           message: `Failed to retrieve segment ${id}: ${(error as Error).message}`,
           cause: error as Error,
@@ -378,6 +383,7 @@ export class FileBackend implements StorageProvider {
       return {
         ok: false,
         error: {
+          name: 'StorageError',
           code: 'STORAGE_QUERY_FAILED',
           message: `Query failed: ${(error as Error).message}`,
           cause: error as Error,
@@ -409,6 +415,7 @@ export class FileBackend implements StorageProvider {
         return {
           ok: false,
           error: {
+            name: 'StorageError',
             code: 'STORAGE_NOT_FOUND',
             message: `Segment ${id} not found`,
           },
@@ -444,6 +451,7 @@ export class FileBackend implements StorageProvider {
         return {
           ok: false,
           error: {
+            name: 'StorageError',
             code: 'STORAGE_SERIALIZE_FAILED',
             message: `Failed to serialize updated segment ${id}`,
             cause: markdownResult.error,
@@ -491,6 +499,7 @@ export class FileBackend implements StorageProvider {
               return {
                 ok: false,
                 error: {
+                  name: 'StorageError',
                   code: 'STORAGE_INDEX_CORRUPTION',
                   message: `Failed to update keyword index and rollback failed for segment ${id}`,
                   cause: indexError as Error,
@@ -508,6 +517,7 @@ export class FileBackend implements StorageProvider {
       return {
         ok: false,
         error: {
+          name: 'StorageError',
           code: 'STORAGE_UPDATE_FAILED',
           message: `Failed to update segment ${id}: ${(error as Error).message}`,
           cause: error as Error,
@@ -574,6 +584,7 @@ export class FileBackend implements StorageProvider {
       return {
         ok: false,
         error: {
+          name: 'StorageError',
           code: 'STORAGE_DELETE_FAILED',
           message: `Failed to delete segment ${id}: ${(error as Error).message}`,
           cause: error as Error,
@@ -600,6 +611,7 @@ export class FileBackend implements StorageProvider {
         return {
           ok: false,
           error: {
+            name: 'StorageError',
             code: 'STORAGE_HEALTH_CHECK_FAILED',
             message: 'Required directories do not exist',
           },
@@ -611,6 +623,7 @@ export class FileBackend implements StorageProvider {
       return {
         ok: false,
         error: {
+          name: 'StorageError',
           code: 'STORAGE_HEALTH_CHECK_FAILED',
           message: `Health check failed: ${(error as Error).message}`,
           cause: error as Error,
@@ -630,6 +643,7 @@ export class FileBackend implements StorageProvider {
       return {
         ok: false,
         error: {
+          name: 'StorageError',
           code: 'STORAGE_SHUTDOWN_FAILED',
           message: `Shutdown failed: ${(error as Error).message}`,
           cause: error as Error,
@@ -771,6 +785,7 @@ export class FileBackend implements StorageProvider {
       return {
         ok: false,
         error: {
+          name: 'StorageError',
           code: 'STORAGE_REGISTRY_UPDATE_FAILED',
           message: `Failed to update session registry: ${(error as Error).message}`,
           cause: error as Error,

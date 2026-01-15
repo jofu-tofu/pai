@@ -200,8 +200,8 @@ describe('TypeScript Strict Mode Compatibility', () => {
     expect(segment).toBeNull();
 
     const definedSegment: MemorySegment = {
-      id: 'test',
-      sessionId: 'test',
+      id: 'seg_1704567890123_abcd1234',
+      sessionId: 'mem_1704567890123_test0001',
       timestamp: Date.now(),
       content: 'test',
       tags: [],

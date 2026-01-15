@@ -10,8 +10,8 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { SegmentApi } from '../segment-api';
 import type { MemorySegment } from '../../types/segment';
-// Ensure providers are registered
-import '../../core/register-providers';
+import { globalProviderRegistry } from '../../core/provider-registry';
+import { resetProvidersRegistered, registerMVPProviders } from '../../core/register-providers';
 
 const TEST_PAI_DIR = join(homedir(), '.pai-test-segment-api');
 
@@ -26,6 +26,12 @@ describe('SegmentApi', () => {
     mkdirSync(TEST_PAI_DIR, { recursive: true });
     process.env.PAI_DIR = TEST_PAI_DIR;
 
+    // Clear ALL provider registrations and cache, then re-register MVP providers
+    // This ensures we're using real providers, not mocks from other test files
+    globalProviderRegistry.clearAll();
+    resetProvidersRegistered();
+    registerMVPProviders();
+
     // Initialize API
     api = new SegmentApi();
     const initResult = await api.initialize();
@@ -38,6 +44,10 @@ describe('SegmentApi', () => {
   afterEach(async () => {
     // Shutdown API
     await api.shutdown();
+
+    // Clear ALL provider registrations and cache so other tests get fresh state
+    globalProviderRegistry.clearAll();
+    resetProvidersRegistered();
 
     // ALWAYS clean up
     if (existsSync(TEST_PAI_DIR)) {
