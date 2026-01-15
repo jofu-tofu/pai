@@ -17,8 +17,6 @@ import type { MemorySegment } from '../types/segment';
 
 const testPaiDir = join(
   process.cwd(),
-  'hooks',
-  'memory',
   'tests',
   `usage-integration-${Date.now()}`
 );
@@ -171,8 +169,6 @@ describe('Usage Tracking Integration', () => {
     // Clear test data and create new segments with known access patterns
     const freshPaiDir = join(
       process.cwd(),
-      'hooks',
-      'memory',
       'tests',
       `usage-ranking-${Date.now()}`
     );
@@ -254,8 +250,8 @@ describe('Usage Tracking Integration', () => {
     const before = await getUsageStats();
     const beforeTotal = before.ok ? before.value.usageStats.totalRetrievals : 0;
 
-    // Perform known number of retrievals
-    await retrieveMemories('test', { maxResults: 2 });
+    // Perform known number of retrievals (use query that will match existing segments)
+    await retrieveMemories('typescript', { maxResults: 2 });
     await new Promise((resolve) => setTimeout(resolve, 200));
 
     // Get updated stats
