@@ -6,6 +6,10 @@
 
 Modify the content of an existing skill's SKILL.md file, including frontmatter, description, routing table, or examples section.
 
+## Context & Motivation
+
+Skills evolve as usage patterns emerge. When frontmatter becomes stale, routing tables drift from actual workflows, or examples no longer match real usage, the skill loses effectiveness. This workflow provides a structured approach to content updates that preserves skill integrity while enabling necessary evolution.
+
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`

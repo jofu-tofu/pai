@@ -6,6 +6,10 @@
 
 Perform major restructuring of an existing skill while preserving functionality. Use this for significant changes that affect multiple files or the overall skill architecture.
 
+## Context & Motivation
+
+Skills accumulate technical debt over time: naming conventions drift, workflows become disorganized, and structure diverges from SkillSystem.md requirements. Refactoring restores compliance and improves usability, but requires careful planning because changes affect multiple files and may break existing workflows. The structured approach here minimizes risk while enabling meaningful improvements.
+
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
