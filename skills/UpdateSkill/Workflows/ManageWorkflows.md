@@ -6,6 +6,10 @@
 
 Add, remove, or rename workflow files within an existing skill, and update the SKILL.md routing table accordingly.
 
+## Context & Motivation
+
+Skills grow and change as new capabilities are needed or existing workflows become obsolete. Adding workflows extends skill functionality; removing workflows reduces clutter; renaming workflows improves discoverability. All changes must keep the SKILL.md routing table synchronized with actual workflow files to prevent broken references.
+
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
@@ -94,7 +98,7 @@ Add row to `## Workflow Routing` table in SKILL.md:
 
 ### Step R1: Confirm Deletion
 
-**CRITICAL: Require explicit user confirmation before deletion.**
+Request user confirmation before deletion to prevent accidental loss of workflow logic.
 
 ```
 WARNING: This will permanently delete:
@@ -153,7 +157,7 @@ Update the workflow name and file path in SKILL.md routing table.
 ## Constraints
 
 - **TitleCase mandatory** - All workflow names must use TitleCase
-- **Confirmation for deletions** - Never delete without explicit confirmation
+- **Confirmation for deletions** - Always obtain explicit user confirmation before deleting workflows
 - **Atomic operations** - Complete all steps or report failure point
 - **Routing sync** - SKILL.md routing table must always match actual files
 
