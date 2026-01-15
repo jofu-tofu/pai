@@ -137,14 +137,17 @@ export async function identifyDecayCandidates(): Promise<Result<DecayReport, Lif
     // Process stale segments (previously accessed)
     for (const stale of staleResult.value) {
       // Only include segments that HAVE been accessed before
+      // ageDays !== null means segment was accessed at least once
       if (stale.accessCount > 0 && stale.ageDays !== null) {
         // Check if not already in candidates (from never-accessed)
         const alreadyIncluded = candidates.some(c => c.segmentId === stale.id);
         if (!alreadyIncluded) {
+          // ageDays is guaranteed non-null here due to check above
+          const ageDaysValue = stale.ageDays;
           candidates.push({
             segmentId: stale.id,
             reason: 'stale_previously_used',
-            ageDays: stale.ageDays,
+            ageDays: ageDaysValue,
             accessCount: stale.accessCount,
             recommendation: 'archive',
             priority: 'low'
@@ -160,6 +163,7 @@ export async function identifyDecayCandidates(): Promise<Result<DecayReport, Lif
 
     const report: DecayReport = {
       timestamp: now,
+      timestampFormatted: new Date(now).toISOString(),
       totalCandidates: candidates.length,
       highPriority,
       mediumPriority,
