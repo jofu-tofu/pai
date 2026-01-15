@@ -298,7 +298,8 @@ function calculateVariantStats(
     };
   }
 
-  const latencies = dataPoints.map(p => p.latencyMs);
+  // Story 6.4: Handle both new (totalLatencyMs) and old (latencyMs) schema
+  const latencies = dataPoints.map(p => p.totalLatencyMs ?? p.latencyMs ?? 0);
   const sortedLatencies = latencies.slice().sort((a, b) => a - b);
 
   const errorCount = dataPoints.filter(p => !p.success).length;
@@ -389,8 +390,9 @@ export async function aggregateExperimentData(
   let comparison: VariantComparison | undefined;
   if (variantNames.length === 2) {
     const [variant1, variant2] = variantNames;
-    const latencies1 = grouped[variant1].map(p => p.latencyMs);
-    const latencies2 = grouped[variant2].map(p => p.latencyMs);
+    // Story 6.4: Handle both new (totalLatencyMs) and old (latencyMs) schema
+    const latencies1 = grouped[variant1].map(p => p.totalLatencyMs ?? p.latencyMs ?? 0);
+    const latencies2 = grouped[variant2].map(p => p.totalLatencyMs ?? p.latencyMs ?? 0);
 
     const testResult = welchTTest(latencies1, latencies2);
     const significant = testResult.pValue < 0.05;
@@ -486,7 +488,8 @@ export async function exportExperimentResults(
       p.experimentId,
       p.variant,
       p.timestamp.toString(),
-      p.latencyMs.toString(),
+      // Story 6.4: Handle both new (totalLatencyMs) and old (latencyMs) schema
+      (p.totalLatencyMs ?? p.latencyMs ?? 0).toString(),
       p.resultCount.toString(),
       p.injectedTokens.toString(),
       p.queryHash,

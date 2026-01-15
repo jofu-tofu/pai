@@ -567,4 +567,226 @@ describe('operations-logger', () => {
       process.env.PAI_DIR = oldPaiDir;
     });
   });
+
+  // Story 6.4: Per-provider timing tests
+  describe('Story 6.4: Per-provider timing extensions', () => {
+    describe('CaptureOperationMetadata with providerTiming', () => {
+      test('should accept and log per-provider timing breakdown', async () => {
+        const oldPaiDir = process.env.PAI_DIR;
+        const isolatedDir = join(TEST_PAI_DIR, 'provider-timing-test');
+        process.env.PAI_DIR = isolatedDir;
+
+        const metadata: CaptureOperationMetadata = {
+          sessionId: 'mem_timing_123',
+          capturedAt: Date.now(),
+          segmentsCreated: 5,
+          totalProcessingMs: 2100,
+          providerTiming: {
+            segment: { provider: 'per-message', latencyMs: 450 },
+            extract: [
+              { provider: 'frontmatter-gen', latencyMs: 320 },
+              { provider: 'keyword-tagger', latencyMs: 180 },
+            ],
+            summarize: { provider: 'simple-extract', latencyMs: 280 },
+            storage: { provider: 'file-backend', latencyMs: 870 },
+          },
+        };
+
+        const result = await logCaptureOperation(metadata);
+
+        expect(result.ok).toBe(true);
+
+        // Verify JSONL file exists
+        const logPath = join(isolatedDir, 'mem-store', 'metrics', 'operations.jsonl');
+        expect(existsSync(logPath)).toBe(true);
+
+        // Read and parse JSONL
+        const content = readFileSync(logPath, 'utf-8');
+        const lines = content.trim().split('\n');
+        expect(lines.length).toBeGreaterThanOrEqual(1);
+
+        const logged = JSON.parse(lines[lines.length - 1]);
+        expect(logged.sessionId).toBe('mem_timing_123');
+        expect(logged.totalProcessingMs).toBe(2100);
+        expect(logged.providerTiming).toBeDefined();
+        expect(logged.providerTiming.segment.provider).toBe('per-message');
+        expect(logged.providerTiming.segment.latencyMs).toBe(450);
+        expect(logged.providerTiming.extract).toHaveLength(2);
+        expect(logged.providerTiming.extract[0].provider).toBe('frontmatter-gen');
+        expect(logged.providerTiming.extract[0].latencyMs).toBe(320);
+        expect(logged.providerTiming.extract[1].provider).toBe('keyword-tagger');
+        expect(logged.providerTiming.extract[1].latencyMs).toBe(180);
+        expect(logged.providerTiming.summarize.provider).toBe('simple-extract');
+        expect(logged.providerTiming.summarize.latencyMs).toBe(280);
+        expect(logged.providerTiming.storage.provider).toBe('file-backend');
+        expect(logged.providerTiming.storage.latencyMs).toBe(870);
+
+        process.env.PAI_DIR = oldPaiDir;
+      });
+
+      test('should support backward compatibility with old schema (no providerTiming)', async () => {
+        const oldPaiDir = process.env.PAI_DIR;
+        const isolatedDir = join(TEST_PAI_DIR, 'backward-compat-capture');
+        process.env.PAI_DIR = isolatedDir;
+
+        // Old schema without providerTiming
+        const metadata: CaptureOperationMetadata = {
+          sessionId: 'mem_old_456',
+          capturedAt: Date.now(),
+          segmentsCreated: 3,
+          processingMs: 1500,
+          providers: {
+            segment: 'per-message',
+            extract: ['frontmatter-gen'],
+            summarize: 'simple-extract',
+            storage: 'file-backend',
+          },
+        };
+
+        const result = await logCaptureOperation(metadata);
+
+        expect(result.ok).toBe(true);
+
+        // Should still log successfully
+        const logPath = join(isolatedDir, 'mem-store', 'metrics', 'operations.jsonl');
+        const content = readFileSync(logPath, 'utf-8');
+        const logged = JSON.parse(content.trim());
+        expect(logged.sessionId).toBe('mem_old_456');
+        expect(logged.providers).toBeDefined();
+        expect(logged.processingMs).toBe(1500);
+
+        process.env.PAI_DIR = oldPaiDir;
+      });
+    });
+
+    describe('RetrievalOperationMetadata with layerTiming', () => {
+      test('should accept and log per-layer timing breakdown', async () => {
+        const oldPaiDir = process.env.PAI_DIR;
+        const isolatedDir = join(TEST_PAI_DIR, 'layer-timing-test');
+        process.env.PAI_DIR = isolatedDir;
+
+        const metadata: RetrievalOperationMetadata = {
+          timestamp: Date.now(),
+          queryLength: 45,
+          termsExtracted: 4,
+          candidatesFound: 23,
+          resultsReturned: 5,
+          tokensInjected: 920,
+          totalLatencyMs: 280,
+          success: true,
+          layerTiming: {
+            search: { provider: 'keyword-search', latencyMs: 180 },
+            filter: { latencyMs: 35 },
+            rank: { latencyMs: 40 },
+            inject: { latencyMs: 25 },
+          },
+        };
+
+        const result = await logRetrievalOperation(metadata);
+
+        expect(result.ok).toBe(true);
+
+        // Read and parse JSONL
+        const logPath = join(isolatedDir, 'mem-store', 'metrics', 'operations.jsonl');
+        const content = readFileSync(logPath, 'utf-8');
+        const logged = JSON.parse(content.trim());
+        expect(logged.totalLatencyMs).toBe(280);
+        expect(logged.layerTiming).toBeDefined();
+        expect(logged.layerTiming.search.provider).toBe('keyword-search');
+        expect(logged.layerTiming.search.latencyMs).toBe(180);
+        expect(logged.layerTiming.filter.latencyMs).toBe(35);
+        expect(logged.layerTiming.rank.latencyMs).toBe(40);
+        expect(logged.layerTiming.inject.latencyMs).toBe(25);
+
+        process.env.PAI_DIR = oldPaiDir;
+      });
+
+      test('should support backward compatibility with old schema (no layerTiming)', async () => {
+        const oldPaiDir = process.env.PAI_DIR;
+        const isolatedDir = join(TEST_PAI_DIR, 'backward-compat-retrieval');
+        process.env.PAI_DIR = isolatedDir;
+
+        // Old schema without layerTiming
+        const metadata: RetrievalOperationMetadata = {
+          timestamp: Date.now(),
+          queryLength: 30,
+          termsExtracted: 3,
+          candidatesFound: 10,
+          resultsReturned: 3,
+          tokensInjected: 500,
+          latencyMs: 150,
+          success: true,
+          provider: 'keyword-search',
+        };
+
+        const result = await logRetrievalOperation(metadata);
+
+        expect(result.ok).toBe(true);
+
+        // Should still log successfully
+        const logPath = join(isolatedDir, 'mem-store', 'metrics', 'operations.jsonl');
+        const content = readFileSync(logPath, 'utf-8');
+        const logged = JSON.parse(content.trim());
+        expect(logged.latencyMs).toBe(150);
+        expect(logged.provider).toBe('keyword-search');
+
+        process.env.PAI_DIR = oldPaiDir;
+      });
+    });
+
+    describe('Mixed schema entries', () => {
+      test('should handle both old and new schemas in same JSONL file', async () => {
+        const oldPaiDir = process.env.PAI_DIR;
+        const isolatedDir = join(TEST_PAI_DIR, 'mixed-schema-test');
+        process.env.PAI_DIR = isolatedDir;
+
+        // Log with old schema
+        await logCaptureOperation({
+          sessionId: 'mem_old',
+          capturedAt: Date.now(),
+          segmentsCreated: 2,
+          processingMs: 1000,
+          providers: {
+            segment: 'per-message',
+            extract: ['keyword-tagger'],
+            summarize: 'simple-extract',
+            storage: 'file-backend',
+          },
+        });
+
+        // Log with new schema
+        await logCaptureOperation({
+          sessionId: 'mem_new',
+          capturedAt: Date.now(),
+          segmentsCreated: 3,
+          totalProcessingMs: 1500,
+          providerTiming: {
+            segment: { provider: 'per-message', latencyMs: 300 },
+            extract: [{ provider: 'keyword-tagger', latencyMs: 200 }],
+            summarize: { provider: 'simple-extract', latencyMs: 400 },
+            storage: { provider: 'file-backend', latencyMs: 600 },
+          },
+        });
+
+        // Read file
+        const logPath = join(isolatedDir, 'mem-store', 'metrics', 'operations.jsonl');
+        const content = readFileSync(logPath, 'utf-8');
+        const lines = content.trim().split('\n');
+        expect(lines.length).toBe(2);
+
+        const oldEntry = JSON.parse(lines[0]);
+        const newEntry = JSON.parse(lines[1]);
+
+        expect(oldEntry.sessionId).toBe('mem_old');
+        expect(oldEntry.providers).toBeDefined();
+        expect(oldEntry.processingMs).toBe(1000);
+
+        expect(newEntry.sessionId).toBe('mem_new');
+        expect(newEntry.providerTiming).toBeDefined();
+        expect(newEntry.totalProcessingMs).toBe(1500);
+
+        process.env.PAI_DIR = oldPaiDir;
+      });
+    });
+  });
 });

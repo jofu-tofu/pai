@@ -10,7 +10,12 @@ import { formatAge, formatTags } from '../lib/formatters';
 import { getActiveExperiment, selectVariant, hashCode } from './experiment';
 import { validateExperimentProvider } from './experiment-validation';
 import { logExperimentResult } from '../lib/logging/experiment-logger';
-import { logRetrievalOperation, type RetrievalOperationMetadata } from '../lib/operations-logger';
+import {
+  logRetrievalOperation,
+  type RetrievalOperationMetadata,
+  type LayerTiming,
+  type SearchLayerTiming,
+} from '../lib/operations-logger';
 import { extractKeywords } from '../lib/keyword-extractor';
 import { updateUsageSignals } from '../lib/usage-tracker';
 import './register-providers'; // Ensure providers are registered
@@ -323,13 +328,20 @@ export async function retrieveMemories(
 
     const provider = providerResult.value;
 
+    // Story 6.4: Track per-layer timing
+    let searchLatency = 0;
+    let filterLatency = 0;
+    let rankLatency = 0;
+
     // Execute keyword search
     // Pass debug flag to search provider (Story 4.6, Task 2.1-2.3)
+    const searchStart = Date.now();
     const searchResult = await provider.search(query, {
       maxResults: options?.maxResults || 100, // Increase for filtering
       minMatchCount: 1,  // At least one term must match
       debug: options?.debug  // Enable debug logging if configured
     });
+    searchLatency = Date.now() - searchStart;
 
     if (!searchResult.ok) {
       debugLog('Retrieve', `ERROR: Search failed - ${searchResult.error.message}`);
@@ -348,10 +360,12 @@ export async function retrieveMemories(
     debugLog('Retrieve', `Total candidates before filtering: ${candidatesBeforeFilter} segments`);
 
     // Apply filters to search results (Story 2.3)
+    const filterStart = Date.now();
     const filterResult = await applyFilters(
       searchResult.value,
       options?.filters
     );
+    filterLatency = Date.now() - filterStart;
 
     if (!filterResult.ok) {
       debugLog('Retrieve', `ERROR: Filter failed - ${filterResult.error.message}`);
@@ -387,6 +401,7 @@ export async function retrieveMemories(
     );
 
     // Story 2.4: Rank results by relevance
+    const rankStart = Date.now();
     const rankingResult = await rankResults(
       filterResult.value,
       {
@@ -395,6 +410,7 @@ export async function retrieveMemories(
         ...options?.ranking
       }
     );
+    rankLatency = Date.now() - rankStart;
 
     if (!rankingResult.ok) {
       debugLog('Retrieve', `ERROR: Ranking failed - ${rankingResult.error.message}`);
@@ -459,9 +475,9 @@ export async function retrieveMemories(
       });
     }
 
-    // === Story 6.1: Log retrieval operation metadata ===
+    // === Story 6.4: Log retrieval operation with per-layer timing ===
     const endTime = Date.now();
-    const latencyMs = endTime - startTime;
+    const totalLatencyMs = endTime - startTime;
 
     // Extract keywords from query
     const extractedTerms = extractKeywords(query);
@@ -476,6 +492,9 @@ export async function retrieveMemories(
       reason = candidatesBeforeFilter === 0 ? 'no_matches' : 'filtered_all';
     }
 
+    // Calculate inject latency (remainder after search, filter, rank)
+    const injectLatency = Math.max(0, totalLatencyMs - searchLatency - filterLatency - rankLatency);
+
     const retrievalMetadata: RetrievalOperationMetadata = {
       timestamp: startTime,
       queryLength: query.length,
@@ -483,10 +502,15 @@ export async function retrieveMemories(
       candidatesFound: candidatesBeforeFilter,
       resultsReturned: rankingResult.value.length,
       tokensInjected: tokensInjected,
-      latencyMs: latencyMs,
+      totalLatencyMs: totalLatencyMs,
       success: success,
       reason: reason,
-      provider: provider.name,
+      layerTiming: {
+        search: { provider: provider.name, latencyMs: searchLatency },
+        filter: { latencyMs: filterLatency },
+        rank: { latencyMs: rankLatency },
+        inject: { latencyMs: injectLatency },
+      },
     };
 
     const logResult = await logRetrievalOperation(retrievalMetadata);
@@ -494,7 +518,7 @@ export async function retrieveMemories(
       console.error(`[Memory:Retrieval] Failed to log retrieval metadata: ${logResult.error.message}`);
       // Continue - don't fail on logging error
     }
-    // === End Story 6.1 ===
+    // === End Story 6.4 ===
 
     // === Story 6.2: Track usage for all retrieved segments ===
     if (rankingResult.value.length > 0) {
