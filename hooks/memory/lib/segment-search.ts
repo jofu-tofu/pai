@@ -1,4 +1,5 @@
-import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
+import { existsSync } from 'fs';
+import { readdir, stat, readFile } from 'fs/promises';
 import { join } from 'path';
 import { homedir } from 'os';
 import type { Result } from '../types';
@@ -94,7 +95,7 @@ export function clearKeywordIndexCache(): void {
 /**
  * Load keyword index from disk
  */
-function loadKeywordIndexFromDisk(): Result<KeywordIndex, QueryError> {
+async function loadKeywordIndexFromDisk(): Promise<Result<KeywordIndex, QueryError>> {
   try {
     const indexPath = join(getPaiDir(), 'mem-store', 'indexes', 'keyword', 'index.json');
 
@@ -102,13 +103,13 @@ function loadKeywordIndexFromDisk(): Result<KeywordIndex, QueryError> {
       return {
         ok: false,
         error: {
-          code: 'QUERY_INDEX_NOT_FOUND',
+          code: 'SEGMENT_SEARCH_INDEX_NOT_FOUND',
           message: `Keyword index not found: ${indexPath}`
         }
       };
     }
 
-    const content = readFileSync(indexPath, 'utf-8');
+    const content = await readFile(indexPath, 'utf-8');
     const index = JSON.parse(content) as KeywordIndex;
 
     return { ok: true, value: index };
@@ -117,7 +118,7 @@ function loadKeywordIndexFromDisk(): Result<KeywordIndex, QueryError> {
       return {
         ok: false,
         error: {
-          code: 'QUERY_INDEX_CORRUPT',
+          code: 'SEGMENT_SEARCH_INDEX_CORRUPT',
           message: 'Failed to parse keyword index JSON',
           cause: error
         }
@@ -127,7 +128,7 @@ function loadKeywordIndexFromDisk(): Result<KeywordIndex, QueryError> {
     return {
       ok: false,
       error: {
-        code: 'QUERY_FAILED',
+        code: 'SEGMENT_SEARCH_FAILED',
         message: error instanceof Error ? error.message : 'Unknown error loading keyword index',
         cause: error instanceof Error ? error : undefined
       }
@@ -138,12 +139,12 @@ function loadKeywordIndexFromDisk(): Result<KeywordIndex, QueryError> {
 /**
  * Load keyword index with caching
  */
-export function loadKeywordIndex(): Result<KeywordIndex, QueryError> {
+export async function loadKeywordIndex(): Promise<Result<KeywordIndex, QueryError>> {
   if (cachedIndex) {
     return { ok: true, value: cachedIndex };
   }
 
-  const result = loadKeywordIndexFromDisk();
+  const result = await loadKeywordIndexFromDisk();
   if (result.ok) {
     cachedIndex = result.value;
     console.error(`[Memory:SegmentSearch] Loaded keyword index with ${Object.keys(result.value).length} keywords`);
@@ -158,9 +159,9 @@ export function loadKeywordIndex(): Result<KeywordIndex, QueryError> {
  * @param keyword Keyword to search for (case-insensitive)
  * @returns Segment IDs matching the keyword
  */
-export function findSegmentsByKeyword(keyword: string): Result<string[], QueryError> {
+export async function findSegmentsByKeyword(keyword: string): Promise<Result<string[], QueryError>> {
   try {
-    const indexResult = loadKeywordIndex();
+    const indexResult = await loadKeywordIndex();
     if (!indexResult.ok) {
       return { ok: false, error: indexResult.error };
     }
@@ -176,7 +177,7 @@ export function findSegmentsByKeyword(keyword: string): Result<string[], QueryEr
     return {
       ok: false,
       error: {
-        code: 'QUERY_FAILED',
+        code: 'SEGMENT_SEARCH_FAILED',
         message: error instanceof Error ? error.message : 'Unknown error searching by keyword',
         cause: error instanceof Error ? error : undefined
       }
@@ -190,9 +191,9 @@ export function findSegmentsByKeyword(keyword: string): Result<string[], QueryEr
  * @param keywords Array of keywords to search for
  * @returns Segment matches with scores, sorted by score descending
  */
-export function findSegmentsByKeywords(keywords: string[]): Result<SegmentMatch[], QueryError> {
+export async function findSegmentsByKeywords(keywords: string[]): Promise<Result<SegmentMatch[], QueryError>> {
   try {
-    const indexResult = loadKeywordIndex();
+    const indexResult = await loadKeywordIndex();
     if (!indexResult.ok) {
       return { ok: false, error: indexResult.error };
     }
@@ -232,7 +233,7 @@ export function findSegmentsByKeywords(keywords: string[]): Result<SegmentMatch[
     return {
       ok: false,
       error: {
-        code: 'QUERY_FAILED',
+        code: 'SEGMENT_SEARCH_FAILED',
         message: error instanceof Error ? error.message : 'Unknown error searching by keywords',
         cause: error instanceof Error ? error : undefined
       }
@@ -255,23 +256,28 @@ async function scanAllSegments(): Promise<MemorySegment[]> {
     return segments;
   }
 
+  let parseFailures = 0;
+  let totalFiles = 0;
+
   // Scan year-month directories (format: YYYY-MM)
-  const monthDirs = readdirSync(segmentsDir).filter(dir => {
-    const fullPath = join(segmentsDir, dir);
-    return statSync(fullPath).isDirectory() && /^\d{4}-\d{2}$/.test(dir);
-  });
+  const allEntries = await readdir(segmentsDir, { withFileTypes: true });
+  const monthDirs = allEntries
+    .filter(entry => entry.isDirectory() && /^\d{4}-\d{2}$/.test(entry.name))
+    .map(entry => entry.name);
 
   for (const monthDir of monthDirs) {
     const monthPath = join(segmentsDir, monthDir);
-    const files = readdirSync(monthPath).filter(f => f.endsWith('.md'));
+    const files = (await readdir(monthPath)).filter(f => f.endsWith('.md'));
+    totalFiles += files.length;
 
     for (const file of files) {
       try {
         const filePath = join(monthPath, file);
-        const content = readFileSync(filePath, 'utf-8');
+        const content = await readFile(filePath, 'utf-8');
         const parseResult = parseFrontmatter(content);
 
         if (!parseResult.ok) {
+          parseFailures++;
           console.error(`[Memory:SegmentSearch] Failed to parse ${file}: ${parseResult.error.message}`);
           continue;
         }
@@ -294,10 +300,17 @@ async function scanAllSegments(): Promise<MemorySegment[]> {
 
         segments.push(segment);
       } catch (error) {
+        parseFailures++;
         console.error(`[Memory:SegmentSearch] Failed to load ${file}: ${(error as Error).message}`);
         // Continue scanning other files
       }
     }
+  }
+
+  if (parseFailures > 0) {
+    console.warn(
+      `[Memory:SegmentSearch] Loaded ${segments.length}/${totalFiles} segments (${parseFailures} parse failures)`
+    );
   }
 
   return segments;
@@ -307,16 +320,24 @@ async function scanAllSegments(): Promise<MemorySegment[]> {
  * Find segments that haven't been accessed in N days.
  * Story 6.3 AC3: Query for stale memories.
  *
- * @param daysUnused - Number of days without access to qualify as stale
+ * **Important:** Segments with `lastAccessed === null` (never accessed) are ALWAYS
+ * considered stale, regardless of the `daysUnused` threshold. This means calling
+ * `findStaleSegments(1)` will include never-accessed segments even if created today.
+ *
+ * @param daysUnused - Number of days without access to qualify as stale (must be >= 0)
  * @returns Array of stale segments with decay metrics
  *
  * @example
  * ```typescript
- * // Find segments not accessed in 90+ days
+ * // Find segments not accessed in 90+ days (includes never-accessed)
  * const result = await findStaleSegments(90);
  * if (result.ok) {
  *   result.value.forEach(stale => {
- *     console.log(`${stale.id}: ${stale.ageDays} days since last access`);
+ *     if (stale.ageDays === null) {
+ *       console.log(`${stale.id}: Never accessed`);
+ *     } else {
+ *       console.log(`${stale.id}: ${stale.ageDays.toFixed(1)} days since last access`);
+ *     }
  *   });
  * }
  * ```
@@ -325,6 +346,17 @@ export async function findStaleSegments(
   daysUnused: number
 ): Promise<Result<StaleSegment[], QueryError>> {
   try {
+    // Validate input
+    if (daysUnused < 0) {
+      return {
+        ok: false,
+        error: {
+          code: 'SEGMENT_SEARCH_INVALID_PARAMETER',
+          message: `daysUnused must be >= 0, got ${daysUnused}`
+        }
+      };
+    }
+
     const segments = await scanAllSegments();
     const now = Date.now();
     const thresholdMs = now - (daysUnused * 24 * 60 * 60 * 1000);
@@ -360,7 +392,7 @@ export async function findStaleSegments(
     return {
       ok: false,
       error: {
-        code: 'SEARCH_STALE_FAILED',
+        code: 'SEGMENT_SEARCH_STALE_FAILED',
         message: `Failed to find stale segments: ${(error as Error).message}`,
         cause: error as Error
       }
@@ -399,7 +431,7 @@ export async function findNeverAccessedSegments(): Promise<Result<MemorySegment[
     return {
       ok: false,
       error: {
-        code: 'SEARCH_NEVER_ACCESSED_FAILED',
+        code: 'SEGMENT_SEARCH_NEVER_ACCESSED_FAILED',
         message: `Failed to find never-accessed segments: ${(error as Error).message}`,
         cause: error as Error
       }
@@ -477,7 +509,7 @@ export async function findStaleSessions(
     return {
       ok: false,
       error: {
-        code: 'SEARCH_STALE_SESSIONS_FAILED',
+        code: 'SEGMENT_SEARCH_STALE_SESSIONS_FAILED',
         message: `Failed to find stale sessions: ${(error as Error).message}`,
         cause: error as Error
       }
