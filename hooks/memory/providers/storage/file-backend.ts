@@ -462,10 +462,12 @@ export class FileBackend implements StorageProvider {
       const tagsChanged = JSON.stringify(oldTags.sort()) !== JSON.stringify(newTags.sort());
 
       if (tagsChanged) {
+        let removalSucceeded = false;
         try {
           // Remove from old tags
           if (oldTags.length > 0) {
             await this.keywordIndex.removeFromIndex(id, oldTags);
+            removalSucceeded = true;
           }
           // Add to new tags
           if (newTags.length > 0) {
@@ -475,7 +477,27 @@ export class FileBackend implements StorageProvider {
           console.error(
             `[Memory:FileBackend] Failed to update keyword index on tag change: ${(indexError as Error).message}`
           );
-          // Index update failure should not fail update operation (graceful degradation)
+
+          // Attempt rollback if removal succeeded but addition failed
+          if (removalSucceeded && oldTags.length > 0) {
+            try {
+              await this.keywordIndex.addToIndex(id, oldTags);
+              console.log(`[Memory:FileBackend] Successfully rolled back index to old tags for segment ${id}`);
+            } catch (rollbackError) {
+              console.error(
+                `[Memory:FileBackend] CRITICAL: Failed to rollback index for segment ${id}: ${(rollbackError as Error).message}`
+              );
+              // Rollback failed - index is now corrupted, must return error
+              return {
+                ok: false,
+                error: {
+                  code: 'STORAGE_INDEX_CORRUPTION',
+                  message: `Failed to update keyword index and rollback failed for segment ${id}`,
+                  cause: indexError as Error,
+                },
+              };
+            }
+          }
         }
       }
 
