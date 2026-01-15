@@ -58,8 +58,11 @@ export interface DecayCandidate {
  * Story 6.3 AC4: Lifecycle module generates decay reports.
  */
 export interface DecayReport {
-  /** When this report was generated */
+  /** When this report was generated (Unix milliseconds) */
   timestamp: number;
+
+  /** Human-readable timestamp (ISO 8601 format) */
+  timestampFormatted: string;
 
   /** Total number of decay candidates identified */
   totalCandidates: number;
