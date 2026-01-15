@@ -6,6 +6,10 @@
 
 Analyze the current session to identify skills that were invoked, evaluate their performance, and suggest improvements to the skill based on observed usage patterns, gaps, or issues encountered during execution.
 
+## Context & Motivation
+
+Skills improve through real-world usage feedback. When a skill requires multiple iterations, fails to match user intent, or lacks coverage for common use cases, that signals improvement opportunities. This workflow captures session insights while they are fresh, translating observed friction into concrete skill enhancements that benefit future users.
+
 ## Prerequisites
 
 - A completed session where at least one skill was invoked
@@ -94,7 +98,7 @@ Document current capabilities:
 | **Additive** - New workflows, trigger phrases, examples | Low | Optional |
 | **Enhancement** - Clarify steps, add validation, improve docs | Low | Optional |
 | **Modification** - Change existing workflow logic or steps | Medium | Required |
-| **Destructive** - Remove workflows, change structure, delete content | High | **MANDATORY** |
+| **Destructive** - Remove workflows, change structure, delete content | High | Required |
 
 ### Step 6: Present Findings
 
@@ -144,7 +148,7 @@ Options:
 
 **For Medium/High-Risk Changes (Modification/Destructive):**
 ```
-MANDATORY: Present each change individually with:
+For medium/high-risk changes, present each change individually with:
 - Current content/behavior
 - Proposed new content/behavior
 - Risk assessment
@@ -219,7 +223,7 @@ Removed:
 
 - **Non-destructive by default** - Prefer adding over modifying, modifying over deleting
 - **Explicit confirmation required** - All medium/high-risk changes need user approval
-- **Preserve functionality** - Never remove workflows or capabilities without confirmation
+- **Preserve functionality** - Always confirm with user before removing workflows or capabilities
 - **Session-based improvements** - All suggestions must be grounded in observed session behavior
 - **Validation mandatory** - All changes must pass validation before completion
 - **Rollback awareness** - Document original state for potential rollback

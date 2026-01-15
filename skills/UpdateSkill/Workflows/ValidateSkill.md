@@ -6,6 +6,10 @@
 
 Run comprehensive validation checks on a skill to ensure it complies with the SkillSystem.md specification. Reports all issues found with specific remediation guidance.
 
+## Context & Motivation
+
+Skills must follow SkillSystem.md conventions for the PAI system to route commands correctly, display accurate descriptions, and maintain consistent behavior. Validation catches structural issues (missing sections, broken references), naming violations (TitleCase requirements), and compliance gaps (missing USE WHEN clauses) before they cause runtime problems or user confusion.
+
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
@@ -25,11 +29,15 @@ User specifies: "[SkillName]"
 
 #### Check 1: SKILL.md Exists
 
+The SKILL.md file is the entry point for all skill routing. Without it, the PAI system cannot discover or invoke the skill.
+
 ```
 [ ] $PAI_DIR/skills/[SkillName]/SKILL.md exists
 ```
 
 #### Check 2: Valid Frontmatter
+
+Frontmatter provides metadata for skill routing and display. The USE WHEN clause enables accurate command matching; TitleCase ensures consistent naming across the system.
 
 ```yaml
 ---
@@ -48,6 +56,8 @@ Validate:
 
 #### Check 3: TitleCase Naming
 
+TitleCase naming enforces consistency across all skills, making them predictable for users and enabling reliable programmatic access.
+
 - [ ] Skill directory name is TitleCase
 - [ ] YAML `name` matches directory name
 - [ ] All workflow files use TitleCase
@@ -55,17 +65,23 @@ Validate:
 
 #### Check 4: Required Sections
 
+Required sections ensure skills are discoverable and usable. The routing table maps user intents to workflows; examples demonstrate real usage patterns.
+
 - [ ] `## Workflow Routing` section exists (if workflows present)
 - [ ] `## Examples` section exists
 - [ ] Routing table uses correct format
 
 #### Check 5: Workflow References Resolve
 
+Broken references cause runtime failures when users trigger workflows that point to missing files.
+
 For each entry in routing table:
 - [ ] Referenced file path exists
 - [ ] File path uses correct format: `Workflows/Name.md`
 
 #### Check 6: Directory Structure
+
+The standard directory structure (Tools/, Workflows/) enables consistent organization and automated tooling across all skills.
 
 ```
 - [ ] Tools/ directory exists
