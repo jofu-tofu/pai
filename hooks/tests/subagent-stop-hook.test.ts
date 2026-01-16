@@ -5,7 +5,7 @@ import { homedir } from 'os';
 import { spawn } from 'bun';
 
 const TEST_PAI_DIR = join(homedir(), 'pai-test-subagent');
-const hookPath = join(homedir(), '.pai', 'hooks', 'subagent-stop-hook.ts');
+const hookPath = join(homedir(), 'pai', 'hooks', 'subagent-stop-hook.ts');
 
 describe('subagent-stop-hook', () => {
   beforeAll(() => {

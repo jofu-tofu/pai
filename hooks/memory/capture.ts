@@ -28,7 +28,7 @@ const STALE_LOCK_TIMEOUT_MS = 60000; // 60 seconds
  * Gets PAI directory path from environment or uses default.
  */
 function getPaiDir(): string {
-  return process.env.PAI_DIR || join(homedir(), '.pai');
+  return process.env.PAI_DIR || join(homedir(), 'pai');
 }
 
 /**

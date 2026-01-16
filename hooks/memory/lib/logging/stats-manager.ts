@@ -77,7 +77,7 @@ const STATS_FILE_NAME = 'stats.json';
 // ============================================================================
 
 function getPaiDir(): string {
-  return process.env.PAI_DIR || join(homedir(), '.pai');
+  return process.env.PAI_DIR || join(homedir(), 'pai');
 }
 
 function getMetricsDir(): string {

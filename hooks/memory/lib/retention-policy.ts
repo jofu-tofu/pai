@@ -71,7 +71,7 @@ export class RetentionPolicyChecker {
   private registryPath: string;
 
   constructor(paiDir?: string) {
-    this.paiDir = paiDir || process.env.PAI_DIR || join(homedir(), '.pai');
+    this.paiDir = paiDir || process.env.PAI_DIR || join(homedir(), 'pai');
     this.registryPath = join(this.paiDir, 'mem-store', 'structured', 'session-registry.json');
   }
 

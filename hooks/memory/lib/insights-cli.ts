@@ -262,7 +262,7 @@ async function exportReport(
   data: unknown,
   reportType: string
 ) {
-  const paiDir = process.env.PAI_DIR || join(homedir(), '.pai');
+  const paiDir = process.env.PAI_DIR || join(homedir(), 'pai');
   const reportsDir = join(paiDir, 'mem-store', 'reports');
 
   if (!existsSync(reportsDir)) {

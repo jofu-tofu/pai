@@ -8,7 +8,7 @@ import type { MemorySegment, Result } from '../types';
  * Get PAI directory from environment or default
  */
 function getPaiDir(): string {
-  return process.env.PAI_DIR || join(homedir(), '.pai');
+  return process.env.PAI_DIR || join(homedir(), 'pai');
 }
 
 /**

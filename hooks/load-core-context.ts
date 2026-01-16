@@ -66,7 +66,7 @@ async function main() {
     }
 
     const payload: SessionStartPayload = JSON.parse(stdinData);
-    const paiDir = process.env.PAI_DIR || join(homedir(), '.config', 'pai');
+    const paiDir = process.env.PAI_DIR || join(homedir(), 'pai');
 
     // Look for CORE skill to load
     // The CORE skill contains identity, response format, and operating principles

@@ -305,7 +305,7 @@ async function checkClaudeSettings(): Promise<CheckResult> {
             status: 'pass',
             message: 'Global settings use $PAI_DIR variable',
           };
-        } else if (settingsStr.includes('.pai/hooks') || settingsStr.includes('.pai\\hooks')) {
+        } else if (settingsStr.includes('pai/hooks') || settingsStr.includes('pai\\hooks')) {
           return {
             name: 'Claude Hook Settings',
             status: 'warn',

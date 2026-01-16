@@ -18,7 +18,7 @@ export class KeywordIndexManager {
   private index: InvertedIndex | null = null;
 
   constructor(paiDir?: string) {
-    const basePath = paiDir || process.env.PAI_DIR || join(homedir(), '.pai');
+    const basePath = paiDir || process.env.PAI_DIR || join(homedir(), 'pai');
     this.indexPath = join(basePath, 'mem-store', 'indexes', 'keyword', 'index.json');
   }
 

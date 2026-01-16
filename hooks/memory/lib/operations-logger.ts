@@ -275,7 +275,7 @@ export interface RetrievalOperationMetadata {
  * @returns Absolute path to operations.jsonl
  */
 function getOperationsLogPath(): string {
-  const paiDir = process.env.PAI_DIR || join(homedir(), '.pai');
+  const paiDir = process.env.PAI_DIR || join(homedir(), 'pai');
   return join(paiDir, 'mem-store', 'metrics', 'operations.jsonl');
 }
 

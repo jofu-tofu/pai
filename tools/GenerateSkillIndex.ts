@@ -13,7 +13,7 @@ import { existsSync } from 'fs';
 
 import { homedir } from 'os';
 
-const PAI_DIR = process.env.PAI_DIR || process.env.PAI_HOME || join(homedir(), '.pai');
+const PAI_DIR = process.env.PAI_DIR || process.env.PAI_HOME || join(homedir(), 'pai');
 const SKILLS_DIR = join(PAI_DIR, 'skills');
 const OUTPUT_FILE = join(SKILLS_DIR, 'skill-index.json');
 

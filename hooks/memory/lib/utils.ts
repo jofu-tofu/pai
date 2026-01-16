@@ -14,9 +14,9 @@ import { homedir } from 'os';
  * @example
  * ```typescript
  * const paiDir = getPaiDir();
- * // Returns: /home/user/.pai (or value of PAI_DIR env var)
+ * // Returns: /home/user/pai (or value of PAI_DIR env var)
  * ```
  */
 export function getPaiDir(): string {
-  return process.env.PAI_DIR || join(homedir(), '.pai');
+  return process.env.PAI_DIR || join(homedir(), 'pai');
 }

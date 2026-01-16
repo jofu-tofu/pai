@@ -331,7 +331,7 @@ Development environment is correctly configured when:
 
 ✅ PAI_DIR environment variable is set and verified
 ✅ `bun test` runs without path-related errors
-✅ Files are created in worktree, not in global .pai directory
+✅ Files are created in worktree, not in global pai directory
 ✅ Changes can be made without affecting production environment
 ✅ All tests pass consistently
 

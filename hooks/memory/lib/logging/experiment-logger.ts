@@ -59,7 +59,7 @@ export interface ExperimentLogError {
  * Get PAI directory path
  */
 function getPaiDir(): string {
-  return process.env.PAI_DIR || join(homedir(), '.pai');
+  return process.env.PAI_DIR || join(homedir(), 'pai');
 }
 
 /**

@@ -61,8 +61,8 @@ function getPaiDir(): string {
     console.error('');
     console.error('Please set PAI_DIR to your PAI System installation directory:');
     console.error('');
-    console.error('  PowerShell:  $env:PAI_DIR = "C:\\Users\\YourName\\.pai"');
-    console.error('  Bash:        export PAI_DIR="/home/yourname/.pai"');
+    console.error('  PowerShell:  $env:PAI_DIR = "C:\\Users\\YourName\\pai"');
+    console.error('  Bash:        export PAI_DIR="/home/yourname/pai"');
     console.error('');
     process.exit(1);
   }

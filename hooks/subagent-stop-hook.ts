@@ -24,7 +24,7 @@ function getLocalTimestamp(): string {
 
 function getPaiDir(): string {
   // Windows-compatible: check PAI_DIR env var, fallback to ~/pai
-  return process.env.PAI_DIR || join(homedir(), '.pai');
+  return process.env.PAI_DIR || join(homedir(), 'pai');
 }
 
 async function delay(ms: number): Promise<void> {

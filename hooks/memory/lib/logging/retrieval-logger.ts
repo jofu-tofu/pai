@@ -19,7 +19,7 @@ export interface RetrievalLogEntry {
 }
 
 function getPaiDir(): string {
-  return process.env.PAI_DIR || join(homedir(), '.pai');
+  return process.env.PAI_DIR || join(homedir(), 'pai');
 }
 
 const LOG_PATH = 'mem-store/metrics/retrieval-log.jsonl';

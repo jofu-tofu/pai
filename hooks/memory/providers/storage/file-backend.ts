@@ -38,7 +38,7 @@ import { FlatByDateOrganizeProvider } from '../organize/flat-by-date';
  * Uses PAI_DIR environment variable if set, otherwise defaults to ~/pai
  */
 function getPaiDir(): string {
-  return process.env.PAI_DIR || join(homedir(), '.pai');
+  return process.env.PAI_DIR || join(homedir(), 'pai');
 }
 
 /**

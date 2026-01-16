@@ -68,7 +68,7 @@ const SUCCESS_RATE_THRESHOLD = 70; // Flag if success rate < 70%
  * @returns Absolute path to operations.jsonl
  */
 function getOperationsLogPath(): string {
-  const paiDir = process.env.PAI_DIR || join(homedir(), '.pai');
+  const paiDir = process.env.PAI_DIR || join(homedir(), 'pai');
   return join(paiDir, 'mem-store', 'metrics', 'operations.jsonl');
 }
 

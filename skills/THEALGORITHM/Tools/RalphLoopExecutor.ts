@@ -35,15 +35,15 @@ interface RalphLoopState {
 }
 
 // PAI_DIR configurable via environment variable
-const PAI_DIR = process.env.PAI_DIR || join(process.env.HOME || "~", ".config/pai");
+const PAI_DIR = process.env.PAI_DIR || join(process.env.HOME || "~", "pai");
 const STATE_FILE_NAME = "ralph-loop.local.md";
 
 function getStatePath(): string {
-  // First check for project-local .pai directory
+  // First check for project-local pai directory
   let dir = process.cwd();
   while (dir !== "/") {
-    if (existsSync(join(dir, ".pai"))) {
-      return join(dir, ".pai", STATE_FILE_NAME);
+    if (existsSync(join(dir, "pai"))) {
+      return join(dir, "pai", STATE_FILE_NAME);
     }
     dir = dirname(dir);
   }

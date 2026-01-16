@@ -16,7 +16,7 @@ const MAX_RUNTIME_MS = 30_000;       // Hard timeout: 30 seconds
 const STALE_LOCK_MS = 60_000;        // Consider lock stale after 60s
 
 function getPaiDir(): string {
-  return process.env.PAI_DIR || join(homedir(), '.pai');
+  return process.env.PAI_DIR || join(homedir(), 'pai');
 }
 
 interface QueueItem {

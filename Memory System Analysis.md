@@ -105,7 +105,7 @@ New Task B overwrites Task A files!
 ```
 
 **Works for:** Different projects in different directories
-**Fails for:** Multiple tasks in same directory (like `.pai/`)
+**Fails for:** Multiple tasks in same directory (like `pai/`)
 
 #### **No Cleanup/Archival Mechanism**
 
@@ -529,7 +529,7 @@ Simple tasks:            → TodoWrite
 Consider building lightweight session context for non-ALGORITHM work:
 
 ```yaml
-# .pai/active-sessions.yaml
+# pai/active-sessions.yaml
 sessions:
   - id: "hooks-refactor"
     type: "thealgorithm"

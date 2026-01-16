@@ -18,7 +18,7 @@ import { existsSync } from 'fs';
 
 import { homedir } from 'os';
 
-const PAI_DIR = process.env.PAI_DIR || process.env.PAI_HOME || join(homedir(), '.pai');
+const PAI_DIR = process.env.PAI_DIR || process.env.PAI_HOME || join(homedir(), 'pai');
 const ARCHITECTURE_FILE = join(PAI_DIR, 'skills', 'CORE', 'PaiArchitecture.md');
 const BUNDLES_FILE = join(PAI_DIR, '.installed-bundles.json');
 const UPGRADES_FILE = join(PAI_DIR, 'history', 'Upgrades.jsonl');

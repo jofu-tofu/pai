@@ -74,7 +74,7 @@ cd ~/pai && claude
 
 **Option B: Copy hooks to global settings**
 
-Merge the hooks from `.pai/.claude/settings.json` into your `~/.claude/settings.json`.
+Merge the hooks from `pai/.claude/settings.json` into your `~/.claude/settings.json`.
 
 ### 4. Verify Installation
 
