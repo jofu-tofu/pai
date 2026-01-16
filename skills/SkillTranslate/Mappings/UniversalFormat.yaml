@@ -1,0 +1,429 @@
+format: universal-intermediate-format
+version: 1.0
+description: Platform-agnostic intermediate representation for AI assistant skills/cascades
+
+# DESIGN PRINCIPLE: Hub-and-Spoke Architecture
+# Instead of N*(N-1)/2 direct mappings between platforms, we have:
+# - N mappings from each platform to UIF
+# - N mappings from UIF to each platform
+# Total: 2N mappings (linear growth, not quadratic)
+
+# ============================================================================
+# CORE METADATA
+# ============================================================================
+metadata:
+  name:
+    type: string
+    required: true
+    description: "Skill/cascade name (platform will apply naming conventions)"
+
+  description:
+    type: string
+    required: true
+    description: "What this skill does"
+
+  version:
+    type: string
+    required: false
+    description: "Semantic version (e.g., 1.0.0)"
+
+  author:
+    type: string
+    required: false
+    description: "Author name or organization"
+
+  tags:
+    type: array
+    required: false
+    description: "Categorization tags"
+    items:
+      type: string
+
+  triggers:
+    type: array
+    required: false
+    description: "Patterns that invoke this skill (extracted from 'USE WHEN' or explicit)"
+    items:
+      type: string
+      example: "translate skill"
+
+# ============================================================================
+# WORKFLOWS/FLOWS
+# ============================================================================
+workflows:
+  type: array
+  description: "Executable sequences of steps"
+  items:
+    type: object
+    properties:
+      name:
+        type: string
+        required: true
+        description: "Workflow identifier"
+
+      description:
+        type: string
+        required: false
+        description: "What this workflow does"
+
+      purpose:
+        type: string
+        required: false
+        description: "Why this workflow exists"
+
+      steps:
+        type: array
+        required: true
+        description: "Execution steps in order"
+        items:
+          type: object
+          properties:
+            action:
+              type: string
+              description: "What to do"
+            description:
+              type: string
+              description: "Context for this step"
+            condition:
+              type: string
+              description: "Optional: when to execute this step"
+
+      examples:
+        type: array
+        required: false
+        description: "Usage examples"
+
+      error_handling:
+        type: object
+        required: false
+        description: "How to handle failures"
+
+# ============================================================================
+# TOOLS/COMMANDS
+# ============================================================================
+tools:
+  type: array
+  description: "Executable utilities (TypeScript, Python, etc.)"
+  items:
+    type: object
+    properties:
+      name:
+        type: string
+        required: true
+        description: "Tool name"
+
+      file:
+        type: string
+        required: true
+        description: "Filename (e.g., TranslateSkill.ts)"
+
+      runtime:
+        type: string
+        required: true
+        description: "Execution runtime (bun, node, python, etc.)"
+        enum: [bun, node, python, bash, deno]
+
+      cli_support:
+        type: boolean
+        description: "Supports command-line arguments"
+        default: true
+
+      parameters:
+        type: array
+        description: "CLI parameters"
+        items:
+          type: object
+          properties:
+            name: string
+            type: string
+            required: boolean
+            description: string
+
+# ============================================================================
+# TEMPLATES
+# ============================================================================
+templates:
+  type: array
+  description: "Dynamic content generation templates"
+  items:
+    type: object
+    properties:
+      name:
+        type: string
+        required: true
+
+      file:
+        type: string
+        required: true
+        description: "Template filename"
+
+      format:
+        type: string
+        required: true
+        description: "Template engine"
+        enum: [handlebars, jinja, ejs, mustache]
+
+      purpose:
+        type: string
+        description: "What this template generates"
+
+# ============================================================================
+# DATA/CONFIGURATION
+# ============================================================================
+data:
+  type: array
+  description: "Configuration and data files"
+  items:
+    type: object
+    properties:
+      name:
+        type: string
+        required: true
+
+      file:
+        type: string
+        required: true
+
+      format:
+        type: string
+        required: true
+        enum: [yaml, json, toml, ini]
+
+      purpose:
+        type: string
+        description: "What this data is for"
+
+# ============================================================================
+# HOOKS (NEW!)
+# ============================================================================
+hooks:
+  type: array
+  description: "Lifecycle hooks (platform-agnostic event types)"
+  items:
+    type: object
+    properties:
+      event:
+        type: string
+        required: true
+        description: "Generic hook event type"
+        enum:
+          # Session lifecycle
+          - session_start
+          - session_end
+
+          # User interaction
+          - user_prompt_submit
+          - user_prompt_pre
+
+          # Tool/action lifecycle
+          - pre_tool_use
+          - post_tool_use
+
+          # File operations
+          - pre_file_read
+          - post_file_read
+          - pre_file_write
+          - post_file_write
+
+          # Command execution
+          - pre_command
+          - post_command
+
+          # MCP integration
+          - pre_mcp_tool
+          - post_mcp_tool
+
+          # Agent lifecycle
+          - agent_stop
+          - agent_response_complete
+
+      matcher:
+        type: string
+        required: false
+        description: "Filter for specific tools/files (e.g., 'Bash', '*.ts', '*')"
+
+      command:
+        type: string
+        required: true
+        description: "Shell command to execute"
+
+      working_directory:
+        type: string
+        required: false
+        description: "Directory to run command in"
+
+      show_output:
+        type: boolean
+        required: false
+        description: "Display hook output to user"
+        default: true
+
+      can_block:
+        type: boolean
+        required: false
+        description: "Whether this hook can prevent action (pre-hooks only)"
+        default: true
+
+      description:
+        type: string
+        required: false
+        description: "What this hook does"
+
+# ============================================================================
+# AGENTS
+# ============================================================================
+agents:
+  type: array
+  description: "Agent definitions and personalities"
+  items:
+    type: object
+    properties:
+      name:
+        type: string
+        required: true
+
+      file:
+        type: string
+        required: true
+
+      format:
+        type: string
+        enum: [markdown, yaml]
+
+      purpose:
+        type: string
+        description: "What this agent does"
+
+# ============================================================================
+# HOOK EVENT MAPPINGS
+# ============================================================================
+hook_event_equivalencies:
+  description: "How UIF hook events map to platform-specific hooks"
+
+  session_start:
+    claude_code: SessionStart
+    windsurf: null  # No equivalent
+    cursor: null    # TBD
+
+  session_end:
+    claude_code: SessionEnd
+    windsurf: null  # No equivalent
+    cursor: null    # TBD
+
+  user_prompt_pre:
+    claude_code: null
+    windsurf: pre_user_prompt
+    cursor: null    # TBD
+
+  user_prompt_submit:
+    claude_code: UserPromptSubmit
+    windsurf: null  # post_user_prompt doesn't exist
+    cursor: null    # TBD
+
+  pre_tool_use:
+    claude_code: PreToolUse
+    windsurf: pre_mcp_tool_use
+    cursor: null    # TBD
+
+  post_tool_use:
+    claude_code: PostToolUse
+    windsurf: post_mcp_tool_use
+    cursor: null    # TBD
+
+  pre_file_read:
+    claude_code: "PreToolUse (matcher: Read)"
+    windsurf: pre_read_code
+    cursor: null    # TBD
+
+  post_file_read:
+    claude_code: "PostToolUse (matcher: Read)"
+    windsurf: post_read_code
+    cursor: null    # TBD
+
+  pre_file_write:
+    claude_code: "PreToolUse (matcher: Edit|Write)"
+    windsurf: pre_write_code
+    cursor: null    # TBD
+
+  post_file_write:
+    claude_code: "PostToolUse (matcher: Edit|Write)"
+    windsurf: post_write_code
+    cursor: null    # TBD
+
+  pre_command:
+    claude_code: "PreToolUse (matcher: Bash)"
+    windsurf: pre_run_command
+    cursor: null    # TBD
+
+  post_command:
+    claude_code: "PostToolUse (matcher: Bash)"
+    windsurf: post_run_command
+    cursor: null    # TBD
+
+  agent_response_complete:
+    claude_code: Stop
+    windsurf: post_cascade_response
+    cursor: null    # TBD
+
+  agent_stop:
+    claude_code: SubagentStop
+    windsurf: null  # No equivalent
+    cursor: null    # TBD
+
+# ============================================================================
+# NAMING CONVENTIONS
+# ============================================================================
+naming_conventions:
+  uif:
+    description: "UIF uses snake_case for all identifiers to be platform-neutral"
+    skills: snake_case
+    workflows: snake_case
+    tools: snake_case
+    hooks: snake_case_events
+
+# ============================================================================
+# EXTENSIBILITY
+# ============================================================================
+extensibility:
+  description: "How to extend UIF for new concepts"
+
+  adding_new_component_type:
+    - "Add new top-level key (e.g., 'pipelines')"
+    - "Define schema with type, description, items"
+    - "Update platform mappings to include new component"
+    - "All platforms benefit from single UIF update"
+
+  adding_new_hook_event:
+    - "Add to hooks.items.properties.event.enum"
+    - "Add to hook_event_equivalencies with platform mappings"
+    - "Existing platforms show null for unsupported events"
+    - "Validation warns about unsupported hook translations"
+
+  adding_new_platform:
+    - "Create Platforms/{platform}.yaml schema"
+    - "Create Mappings/Translations/{platform}-uif.yaml (bidirectional)"
+    - "Map platform concepts to UIF concepts"
+    - "No changes needed to existing platform mappings!"
+
+# ============================================================================
+# VALIDATION RULES
+# ============================================================================
+validation:
+  required_in_uif:
+    - "metadata.name must exist"
+    - "metadata.description must exist"
+    - "At least one of: workflows, tools, templates, data, hooks, agents"
+
+  hook_validation:
+    - "Hook event must be in enum list"
+    - "Hook command must be non-empty string"
+    - "pre_ hooks can set can_block: true"
+    - "post_ hooks cannot block actions"
+
+  naming_validation:
+    - "UIF uses snake_case consistently"
+    - "Platform mappings handle case conversion"
+
+  completeness_validation:
+    - "All platform-specific hooks map to UIF events (or null)"
+    - "All UIF concepts have platform equivalents (or documented as unsupported)"

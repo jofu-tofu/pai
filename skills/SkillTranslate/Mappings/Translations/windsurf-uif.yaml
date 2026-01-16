@@ -1,0 +1,328 @@
+mapping_version: "1.0"
+source: windsurf
+target: universal-intermediate-format
+bidirectional: true
+description: Hub-and-spoke mapping between Windsurf and UIF
+
+# ============================================================================
+# COMPONENT MAPPINGS
+# ============================================================================
+component_mappings:
+  cascade:
+    windsurf: "Cascade (cascade.yaml)"
+    uif: "metadata"
+    description: "Windsurf cascade metadata maps to UIF metadata"
+
+  flow:
+    windsurf: "Flow (flows/*.yaml)"
+    uif: "workflows[]"
+    description: "Windsurf YAML flows map to UIF workflows array"
+
+  command:
+    windsurf: "Command (commands/*.ts)"
+    uif: "tools[]"
+    description: "Windsurf TypeScript commands map to UIF tools array"
+
+  template:
+    windsurf: "Template (templates/*.hbs)"
+    uif: "templates[]"
+    description: "Handlebars templates map directly"
+
+  config:
+    windsurf: "Config (config/*)"
+    uif: "data[]"
+    description: "Config files map to UIF data array"
+
+  hooks:
+    windsurf: "hooks in .windsurf/hooks.json"
+    uif: "hooks[]"
+    description: "Windsurf hooks map to UIF hooks with event translation"
+
+  agents:
+    windsurf: "agents/*.yaml"
+    uif: "agents[]"
+    description: "Agent definitions"
+
+# ============================================================================
+# FIELD MAPPINGS - METADATA
+# ============================================================================
+field_mappings:
+  metadata:
+    - source_field: cascadeName
+      target_field: name
+      transform: to_snake_case
+      description: "kebab-case cascade name → snake_case"
+
+    - source_field: summary
+      target_field: description
+      transform: none
+      description: "Summary maps to description"
+
+    - source_field: triggers
+      target_field: triggers
+      transform: none
+      description: "Triggers array maps directly"
+
+    - source_field: version
+      target_field: version
+      transform: none
+
+    - source_field: author
+      target_field: author
+      transform: none
+
+# ============================================================================
+# FIELD MAPPINGS - FLOWS/WORKFLOWS
+# ============================================================================
+  workflows:
+    - source_field: flowName
+      target_field: name
+      transform: none
+      description: "kebab-case flow name → snake_case name"
+
+    - source_field: description
+      target_field: description
+      transform: none
+
+    - source_field: description
+      target_field: purpose
+      transform: none
+      description: "Use description as purpose if no explicit purpose field"
+
+    - source_field: steps
+      target_field: steps
+      transform: yaml_steps_to_uif_steps
+      description: "Convert Windsurf YAML steps to UIF step objects"
+
+    - source_field: onError
+      target_field: error_handling
+      transform: none
+
+# ============================================================================
+# FIELD MAPPINGS - COMMANDS/TOOLS
+# ============================================================================
+  tools:
+    - source_field: filename
+      target_field: name
+      transform: remove_extension
+      description: "detect-version.ts → detect-version"
+
+    - source_field: filename
+      target_field: file
+      transform: none
+
+    - source_field: runtime
+      target_field: runtime
+      default: node
+      description: "Windsurf uses node by default"
+
+    - source_field: cli_args
+      target_field: parameters
+      transform: extract_cli_params
+
+# ============================================================================
+# HOOK EVENT MAPPINGS (Windsurf → UIF)
+# ============================================================================
+hook_event_mappings:
+  pre_read_code: pre_file_read
+  post_read_code: post_file_read
+  pre_write_code: pre_file_write
+  post_write_code: post_file_write
+  pre_run_command: pre_command
+  post_run_command: post_command
+  pre_mcp_tool_use: pre_tool_use
+  post_mcp_tool_use: post_tool_use
+  pre_user_prompt: user_prompt_pre
+  post_cascade_response: agent_response_complete
+
+# ============================================================================
+# HOOK FIELD MAPPINGS
+# ============================================================================
+hook_field_mappings:
+  - source_field: command
+    target_field: command
+    transform: none
+
+  - source_field: show_output
+    target_field: show_output
+    transform: none
+
+  - source_field: working_directory
+    target_field: working_directory
+    transform: none
+
+  - source_field: null
+    target_field: matcher
+    default: "*"
+    description: "Windsurf hooks don't have matchers, default to '*'"
+
+  - source_field: hook_type
+    target_field: can_block
+    transform: infer_from_pre_post
+    description: "pre_ hooks can block, post_ hooks cannot"
+
+# ============================================================================
+# DIRECTORY MAPPINGS
+# ============================================================================
+directory_mappings:
+  - source: "/"
+    target: "/"
+    description: "Root cascade directory"
+
+  - source: "cascade.yaml"
+    target: "metadata"
+    description: "Parse YAML metadata"
+
+  - source: "flows/"
+    target: "workflows[]"
+    description: "Each .yaml file → workflow object"
+
+  - source: "commands/"
+    target: "tools[]"
+    description: "Each .ts file → tool object"
+
+  - source: "templates/"
+    target: "templates[]"
+
+  - source: "config/"
+    target: "data[]"
+
+  - source: "agents/"
+    target: "agents[]"
+
+  - source: ".windsurf/hooks.json"
+    target: "hooks[]"
+    description: "Extract hooks from .windsurf/hooks.json"
+
+# ============================================================================
+# TRANSFORM FUNCTIONS
+# ============================================================================
+transforms:
+  to_snake_case:
+    description: "kebab-case → snake_case"
+    example: "update-pai → update_pai"
+
+  yaml_steps_to_uif_steps:
+    description: "Convert Windsurf YAML step format to UIF step objects"
+    input:
+      - action: load_schemas
+        params:
+          platform: windsurf
+      - action: parse_skill
+        condition: "schemas_loaded"
+    output:
+      - action: "load_schemas"
+        description: "Load schemas with platform: windsurf"
+      - action: "parse_skill"
+        condition: "schemas_loaded"
+
+  remove_extension:
+    description: "Remove file extension"
+    example: "command.ts → command"
+
+  infer_from_pre_post:
+    description: "Infer can_block from hook type (pre_ vs post_)"
+    logic: |
+      if hook_type.startswith('pre_'):
+        can_block = true
+      else:
+        can_block = false
+
+# ============================================================================
+# SPECIAL HANDLING RULES
+# ============================================================================
+special_cases:
+  - name: "Hooks location"
+    description: "Windsurf hooks are in .windsurf/hooks.json, NOT in cascade.yaml"
+    handling: "Read from .windsurf/hooks.json in cascade directory"
+
+  - name: "No hook matchers"
+    description: "Windsurf hooks apply globally (no tool-specific filtering)"
+    handling: "Set matcher to '*' in UIF representation"
+
+  - name: "Hook blocking"
+    description: "Windsurf pre-hooks can block with exit code 2"
+    handling: "Set can_block: true for all pre_ hooks"
+
+# ============================================================================
+# VALIDATION RULES
+# ============================================================================
+validation:
+  required_in_windsurf:
+    - "cascade.yaml must exist"
+    - "cascadeName and summary must be present"
+    - "At least one of: flows/, commands/, templates/, config/"
+
+  hooks_validation:
+    - "If .windsurf/hooks.json exists, parse hooks"
+    - "Validate hook types are in allowed list"
+    - "All hooks must have command field"
+
+  naming_validation:
+    - "Cascade name should be kebab-case"
+    - "Flow files should be kebab-case.yaml"
+    - "Command files should be kebab-case.ts"
+
+# ============================================================================
+# EXAMPLES
+# ============================================================================
+examples:
+  - name: "Cascade metadata translation"
+    input:
+      platform: windsurf
+      file: cascade.yaml
+      content:
+        cascadeName: update-pai
+        summary: "Update PAI system"
+        triggers:
+          - "update pai"
+          - "upgrade system"
+    output:
+      platform: uif
+      metadata:
+        name: update_pai
+        description: "Update PAI system"
+        triggers:
+          - "update pai"
+          - "upgrade system"
+
+  - name: "Hook translation"
+    input:
+      platform: windsurf
+      hook:
+        event: pre_write_code
+        command: "bun run validate-code.ts"
+        show_output: true
+    output:
+      platform: uif
+      hook:
+        event: pre_file_write
+        matcher: "*"
+        command: "bun run validate-code.ts"
+        show_output: true
+        can_block: true
+
+  - name: "Flow to workflow translation"
+    input:
+      platform: windsurf
+      file: flows/translate-skill.yaml
+      content:
+        flowName: translate-skill
+        description: "Translate skill to another platform"
+        steps:
+          - action: load_schemas
+            params:
+              platform: windsurf
+          - action: parse_skill
+          - action: apply_mappings
+    output:
+      platform: uif
+      workflow:
+        name: translate_skill
+        description: "Translate skill to another platform"
+        purpose: "Translate skill to another platform"
+        steps:
+          - action: "load_schemas"
+            description: "Load schemas with platform: windsurf"
+          - action: "parse_skill"
+          - action: "apply_mappings"

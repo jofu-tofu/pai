@@ -1,0 +1,185 @@
+platform: claude-code
+version: 1.0
+description: Claude Code CLI skill system structure
+
+# Directory structure definition
+structure:
+  skill_root:
+    required:
+      - SKILL.md
+    optional:
+      - Workflows/
+      - Tools/
+      - Templates/
+      - Data/
+      - Agents/
+      - Phases/
+      - Reference/
+
+  skill_metadata:
+    file: SKILL.md
+    format: markdown-frontmatter
+    required_fields:
+      - name
+      - description
+    optional_fields:
+      - version
+      - author
+      - tags
+
+  workflows:
+    location: Workflows/
+    format: markdown
+    extension: .md
+    naming: TitleCase
+    structure:
+      - heading_level_1: Workflow name
+      - heading_level_2: Sections (Purpose, Steps, etc)
+
+  tools:
+    location: Tools/
+    format: typescript
+    extension: .ts
+    runtime: bun
+    structure:
+      - exports: TypeScript functions
+      - cli_support: Command-line execution
+
+  templates:
+    location: Templates/
+    format: handlebars
+    extension: .hbs
+    purpose: Programmatic prompt generation
+
+  data:
+    location: Data/
+    formats:
+      - yaml
+      - json
+    purpose: Configuration and mapping data
+
+  agents:
+    location: Agents/
+    format: markdown
+    purpose: Agent definitions and personalities
+
+# Component metadata
+components:
+  skill:
+    identifier: "Skill"
+    definition_file: SKILL.md
+    discovery: "Skills registered via SKILL.md frontmatter"
+    invocation: "Skill tool with skill name"
+
+  workflow:
+    identifier: "Workflow"
+    definition_file: "Workflows/*.md"
+    discovery: "Referenced in SKILL.md workflow routing table"
+    invocation: "Triggered by patterns or explicit user request"
+
+  tool:
+    identifier: "Tool"
+    definition_file: "Tools/*.ts"
+    discovery: "TypeScript files in Tools/"
+    invocation: "bun run path/to/tool.ts [args]"
+
+# Field mappings within SKILL.md
+skill_frontmatter:
+  name:
+    type: string
+    required: true
+    description: "Skill name (TitleCase)"
+
+  description:
+    type: string
+    required: true
+    description: "Brief description with USE WHEN triggers"
+
+  version:
+    type: string
+    required: false
+    description: "Semantic version"
+
+  author:
+    type: string
+    required: false
+    description: "Skill author"
+
+# Workflow structure
+workflow_sections:
+  - name: Purpose
+    required: false
+    description: "What this workflow does"
+
+  - name: Steps
+    required: true
+    description: "Execution steps"
+
+  - name: Examples
+    required: false
+    description: "Usage examples"
+
+  - name: References
+    required: false
+    description: "Related files or documentation"
+
+# Tool structure
+tool_requirements:
+  - name: CLI arguments
+    description: "Support command-line arguments"
+
+  - name: Error handling
+    description: "Proper error codes and messages"
+
+  - name: Documentation
+    description: "Usage comments at top of file"
+
+# Hooks configuration (NOT in SKILL.md frontmatter, but in settings.json)
+hooks:
+  location: "settings.json or .claude/settings.json"
+  format: json
+  description: "Lifecycle hooks defined in Claude Code settings"
+  hook_types:
+    - SessionStart
+    - SessionEnd
+    - PreToolUse
+    - PostToolUse
+    - UserPromptSubmit
+    - Stop
+    - SubagentStop
+    - PermissionRequest
+    - Notification
+
+  hook_structure:
+    matcher:
+      type: string
+      required: false
+      description: "Tool matcher (e.g., 'Bash', 'Edit', '*')"
+    hooks:
+      type: array
+      items:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [command]
+          command:
+            type: string
+            description: "Shell command to execute"
+          description:
+            type: string
+            required: false
+
+  features:
+    - "Matchers allow filtering by tool type"
+    - "Pre-hooks can block or modify tool inputs"
+    - "Post-hooks run after tool execution"
+    - "Session hooks for lifecycle events"
+
+# Naming conventions
+naming_conventions:
+  skills: TitleCase
+  workflows: TitleCase
+  tools: TitleCase.ts
+  templates: TitleCase.hbs
+  data: kebab-case or TitleCase

@@ -1,0 +1,196 @@
+platform: windsurf
+version: 1.0
+description: Windsurf Cascade system structure
+
+# Note: This schema is based on common patterns in AI coding assistants
+# Adjust based on actual Windsurf documentation
+
+# Directory structure definition
+structure:
+  cascade_root:
+    required:
+      - cascade.yaml
+    optional:
+      - flows/
+      - commands/
+      - templates/
+      - config/
+      - agents/
+
+  cascade_metadata:
+    file: cascade.yaml
+    format: yaml
+    required_fields:
+      - cascadeName
+      - summary
+    optional_fields:
+      - version
+      - author
+      - tags
+
+  flows:
+    location: flows/
+    format: yaml
+    extension: .yaml
+    naming: kebab-case
+    structure:
+      - flowName: Flow identifier
+      - description: What the flow does
+      - steps: Array of execution steps
+
+  commands:
+    location: commands/
+    format: typescript
+    extension: .ts
+    runtime: node
+    structure:
+      - exports: Command functions
+      - cli_support: Command-line execution
+
+  templates:
+    location: templates/
+    format: handlebars
+    extension: .hbs
+    purpose: Dynamic content generation
+
+  config:
+    location: config/
+    formats:
+      - yaml
+      - json
+    purpose: Configuration data
+
+  agents:
+    location: agents/
+    format: yaml
+    purpose: Agent definitions
+
+# Component metadata
+components:
+  cascade:
+    identifier: "Cascade"
+    definition_file: cascade.yaml
+    discovery: "Cascades registered via cascade.yaml"
+    invocation: "Cascade command with cascade name"
+
+  flow:
+    identifier: "Flow"
+    definition_file: "flows/*.yaml"
+    discovery: "YAML files in flows/"
+    invocation: "Triggered by flow triggers or commands"
+
+  command:
+    identifier: "Command"
+    definition_file: "commands/*.ts"
+    discovery: "TypeScript files in commands/"
+    invocation: "windsurf run path/to/command.ts [args]"
+
+# Field mappings within cascade.yaml
+cascade_metadata_fields:
+  cascadeName:
+    type: string
+    required: true
+    description: "Cascade name (kebab-case)"
+
+  summary:
+    type: string
+    required: true
+    description: "Brief description with trigger patterns"
+
+  version:
+    type: string
+    required: false
+    description: "Semantic version"
+
+  author:
+    type: string
+    required: false
+    description: "Cascade author"
+
+  triggers:
+    type: array
+    required: false
+    description: "Patterns that invoke this cascade"
+
+# Flow structure
+flow_structure:
+  flowName:
+    type: string
+    required: true
+    description: "Unique flow identifier"
+
+  description:
+    type: string
+    required: false
+    description: "What this flow does"
+
+  steps:
+    type: array
+    required: true
+    description: "Execution steps"
+    item_structure:
+      - action: "Step action type"
+      - params: "Step parameters"
+      - condition: "Optional execution condition"
+
+  onError:
+    type: object
+    required: false
+    description: "Error handling strategy"
+
+# Command structure
+command_requirements:
+  - name: CLI arguments
+    description: "Support command-line arguments"
+
+  - name: Error handling
+    description: "Proper error codes and messages"
+
+  - name: Documentation
+    description: "JSDoc comments"
+
+# Hooks configuration (NOT in cascade.yaml frontmatter, but in .windsurf/hooks.json)
+hooks:
+  location: ".windsurf/hooks.json"
+  format: json
+  description: "Lifecycle hooks defined in Windsurf hooks configuration"
+  hook_types:
+    - pre_read_code
+    - post_read_code
+    - pre_write_code
+    - post_write_code
+    - pre_run_command
+    - post_run_command
+    - pre_mcp_tool_use
+    - post_mcp_tool_use
+    - pre_user_prompt
+    - post_cascade_response
+
+  hook_structure:
+    command:
+      type: string
+      required: true
+      description: "Shell command to execute"
+    show_output:
+      type: boolean
+      required: false
+      default: true
+      description: "Display hook output to user"
+    working_directory:
+      type: string
+      required: false
+      description: "Directory to run command in"
+
+  features:
+    - "Pre-hooks can block actions (exit code 2)"
+    - "Post-hooks run after actions complete"
+    - "No matchers (hooks apply globally)"
+    - "Three-level configuration: system/user/workspace"
+
+# Naming conventions
+naming_conventions:
+  cascades: kebab-case
+  flows: kebab-case
+  commands: kebab-case.ts
+  templates: kebab-case.hbs
+  config: kebab-case

@@ -1,0 +1,215 @@
+mapping_version: "1.0"
+source: claude-code
+target: windsurf
+bidirectional: true
+description: Bidirectional mapping between Claude Code skills and Windsurf cascades
+
+# High-level component mappings
+component_mappings:
+  skill:
+    claude: "Skill (SKILL.md)"
+    windsurf: "Cascade (cascade.yaml)"
+    description: "A skill in Claude Code maps to a cascade in Windsurf"
+
+  workflow:
+    claude: "Workflow (Workflows/*.md)"
+    windsurf: "Flow (flows/*.yaml)"
+    description: "Claude markdown workflows become Windsurf YAML flows"
+
+  tool:
+    claude: "Tool (Tools/*.ts)"
+    windsurf: "Command (commands/*.ts)"
+    description: "Tools map to commands with similar CLI patterns"
+
+  template:
+    claude: "Template (Templates/*.hbs)"
+    windsurf: "Template (templates/*.hbs)"
+    description: "Handlebars templates are compatible"
+
+  data:
+    claude: "Data (Data/*.yaml)"
+    windsurf: "Config (config/*.yaml)"
+    description: "Data files map to config files"
+
+# Field-level mappings for skill/cascade metadata
+field_mappings:
+  skill_metadata:
+    - source_field: name
+      target_field: cascadeName
+      transform: to_kebab_case
+      description: "Skill name (TitleCase) → cascade name (kebab-case)"
+      example:
+        claude: "UpdatePAI"
+        windsurf: "update-pai"
+
+    - source_field: description
+      target_field: summary
+      transform: none
+      description: "Description maps directly to summary"
+
+    - source_field: description
+      target_field: triggers
+      transform: extract_trigger_patterns
+      description: "Extract 'USE WHEN' patterns from description"
+      example:
+        claude: "USE WHEN translate skill, convert workflow"
+        windsurf: ["translate skill", "convert workflow"]
+
+  workflow_to_flow:
+    - source_field: "# Workflow Name"
+      target_field: flowName
+      transform: to_kebab_case
+      description: "H1 heading becomes flow name"
+
+    - source_field: "## Purpose"
+      target_field: description
+      transform: extract_content
+      description: "Purpose section becomes description"
+
+    - source_field: "## Steps"
+      target_field: steps
+      transform: markdown_list_to_yaml_array
+      description: "Markdown steps become YAML step array"
+
+# Directory structure mappings
+directory_mappings:
+  - source: "/"
+    target: "/"
+    description: "Root skill directory"
+
+  - source: "SKILL.md"
+    target: "cascade.yaml"
+    description: "Main metadata file"
+    transform: frontmatter_to_yaml
+
+  - source: "Workflows/"
+    target: "flows/"
+    description: "Workflow/flow definitions"
+
+  - source: "Tools/"
+    target: "commands/"
+    description: "Executable utilities"
+
+  - source: "Templates/"
+    target: "templates/"
+    description: "Template files (compatible)"
+
+  - source: "Data/"
+    target: "config/"
+    description: "Configuration/data files"
+
+# Transform functions needed
+transforms:
+  to_kebab_case:
+    description: "Convert TitleCase to kebab-case"
+    example: "UpdatePAI → update-pai"
+
+  extract_trigger_patterns:
+    description: "Extract patterns after 'USE WHEN' from description"
+    pattern: 'USE WHEN (.+?)(?:\\.|\$)'
+    output: array
+
+  extract_content:
+    description: "Extract content under markdown heading"
+
+  markdown_list_to_yaml_array:
+    description: "Convert markdown list items to YAML array"
+    input: |
+      - Step 1: Do this
+      - Step 2: Do that
+    output:
+      - action: "Do this"
+        description: "Step 1"
+      - action: "Do that"
+        description: "Step 2"
+
+  frontmatter_to_yaml:
+    description: "Convert markdown frontmatter to standalone YAML"
+    preserve_fields: true
+
+# Semantic concept mappings
+semantic_mappings:
+  skill_invocation:
+    claude: "Skill tool with skill parameter"
+    windsurf: "Cascade command with cascade name"
+
+  workflow_trigger:
+    claude: "Pattern matching in workflow routing table"
+    windsurf: "Trigger patterns in cascade.yaml"
+
+  tool_execution:
+    claude: "bun run $PAI_DIR/path/to/tool.ts"
+    windsurf: "windsurf run path/to/command.ts"
+
+# Special handling rules
+special_cases:
+  - name: "USE WHEN patterns"
+    description: "Claude uses 'USE WHEN' in description, Windsurf uses triggers array"
+    handling: "Extract patterns after 'USE WHEN' into separate triggers field"
+
+  - name: "Agent definitions"
+    description: "Claude may have Agents/ directory, Windsurf has agents/"
+    handling: "Map Agents/*.md to agents/*.yaml, convert markdown to YAML structure"
+
+  - name: "Multi-file workflows"
+    description: "Claude workflows can reference other files"
+    handling: "Preserve references, update paths to new structure"
+
+# Validation rules
+validation:
+  required_components:
+    - "Metadata file must exist (SKILL.md or cascade.yaml)"
+    - "At least one workflow/flow or tool/command"
+
+  naming_conventions:
+    - "Claude: TitleCase for skills, workflows, tools"
+    - "Windsurf: kebab-case for cascades, flows, commands"
+
+  content_preservation:
+    - "All workflow steps must be preserved"
+    - "Tool functionality must be maintained"
+    - "Trigger patterns must be captured"
+
+# Example translations
+examples:
+  - name: "Simple skill translation"
+    input:
+      platform: claude-code
+      skill: UpdatePAI
+      files:
+        - SKILL.md
+        - Workflows/AutoUpdate.md
+        - Tools/DetectVersion.ts
+    output:
+      platform: windsurf
+      cascade: update-pai
+      files:
+        - cascade.yaml
+        - flows/auto-update.yaml
+        - commands/detect-version.ts
+
+  - name: "Workflow to flow"
+    input:
+      file: Workflows/TranslateSkill.md
+      content: |
+        # Translate Skill
+
+        ## Purpose
+        Translate skill to another platform
+
+        ## Steps
+        - Load platform schemas
+        - Parse source skill
+        - Apply mappings
+    output:
+      file: flows/translate-skill.yaml
+      content:
+        flowName: translate-skill
+        description: Translate skill to another platform
+        steps:
+          - action: load_schemas
+            description: Load platform schemas
+          - action: parse_skill
+            description: Parse source skill
+          - action: apply_mappings
+            description: Apply mappings

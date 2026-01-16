@@ -1,0 +1,320 @@
+mapping_version: "1.0"
+source: claude-code
+target: universal-intermediate-format
+bidirectional: true
+description: Hub-and-spoke mapping between Claude Code and UIF
+
+# ============================================================================
+# COMPONENT MAPPINGS
+# ============================================================================
+component_mappings:
+  skill:
+    claude: "Skill (SKILL.md)"
+    uif: "metadata"
+    description: "Claude Code skill metadata maps to UIF metadata"
+
+  workflow:
+    claude: "Workflow (Workflows/*.md)"
+    uif: "workflows[]"
+    description: "Claude markdown workflows map to UIF workflows array"
+
+  tool:
+    claude: "Tool (Tools/*.ts)"
+    uif: "tools[]"
+    description: "Claude TypeScript tools map to UIF tools array"
+
+  template:
+    claude: "Template (Templates/*.hbs)"
+    uif: "templates[]"
+    description: "Handlebars templates map directly"
+
+  data:
+    claude: "Data (Data/*)"
+    uif: "data[]"
+    description: "Data files map to UIF data array"
+
+  hooks:
+    claude: "hooks in settings.json"
+    uif: "hooks[]"
+    description: "Claude hooks map to UIF hooks with event translation"
+
+  agents:
+    claude: "Agents/*.md"
+    uif: "agents[]"
+    description: "Agent definitions"
+
+# ============================================================================
+# FIELD MAPPINGS - METADATA
+# ============================================================================
+field_mappings:
+  metadata:
+    - source_field: name
+      target_field: name
+      transform: none
+      description: "Skill name preserved"
+
+    - source_field: description
+      target_field: description
+      transform: none
+      description: "Description preserved"
+
+    - source_field: description
+      target_field: triggers
+      transform: extract_use_when_patterns
+      description: "Extract 'USE WHEN' patterns to triggers array"
+
+    - source_field: version
+      target_field: version
+      transform: none
+
+    - source_field: author
+      target_field: author
+      transform: none
+
+# ============================================================================
+# FIELD MAPPINGS - WORKFLOWS
+# ============================================================================
+  workflows:
+    - source_field: "# Workflow Name"
+      target_field: name
+      transform: to_snake_case
+      description: "H1 heading → snake_case name"
+
+    - source_field: "## Purpose"
+      target_field: purpose
+      transform: extract_content
+
+    - source_field: "content under ## Purpose"
+      target_field: description
+      transform: extract_content
+
+    - source_field: "## Steps"
+      target_field: steps
+      transform: markdown_list_to_step_objects
+      description: "Convert markdown list to step objects"
+
+    - source_field: "## Examples"
+      target_field: examples
+      transform: extract_examples
+
+# ============================================================================
+# FIELD MAPPINGS - TOOLS
+# ============================================================================
+  tools:
+    - source_field: filename
+      target_field: name
+      transform: remove_extension
+      description: "TranslateSkill.ts → TranslateSkill"
+
+    - source_field: filename
+      target_field: file
+      transform: none
+
+    - source_field: runtime
+      target_field: runtime
+      default: bun
+      description: "Claude uses bun by default"
+
+    - source_field: cli_args
+      target_field: parameters
+      transform: extract_cli_params
+      description: "Parse CLI parameters from code"
+
+# ============================================================================
+# HOOK EVENT MAPPINGS (Claude → UIF)
+# ============================================================================
+hook_event_mappings:
+  SessionStart: session_start
+  SessionEnd: session_end
+  UserPromptSubmit: user_prompt_submit
+  PreToolUse: pre_tool_use  # Generic, needs matcher analysis
+  PostToolUse: post_tool_use  # Generic, needs matcher analysis
+  Stop: agent_response_complete
+  SubagentStop: agent_stop
+  PermissionRequest: null  # No UIF equivalent
+  Notification: null  # No UIF equivalent
+
+# ============================================================================
+# HOOK MATCHER MAPPINGS (PreToolUse/PostToolUse → specific UIF events)
+# ============================================================================
+hook_matcher_mappings:
+  description: "Map Claude PreToolUse/PostToolUse with matchers to specific UIF events"
+
+  PreToolUse:
+    Read: pre_file_read
+    Edit: pre_file_write
+    Write: pre_file_write
+    Bash: pre_command
+    "*": pre_tool_use  # Generic
+
+  PostToolUse:
+    Read: post_file_read
+    Edit: post_file_write
+    Write: post_file_write
+    Bash: post_command
+    "*": post_tool_use  # Generic
+
+# ============================================================================
+# HOOK FIELD MAPPINGS
+# ============================================================================
+hook_field_mappings:
+  - source_field: type
+    target_field: null
+    description: "Claude always uses 'command', UIF infers from context"
+
+  - source_field: command
+    target_field: command
+    transform: none
+
+  - source_field: description
+    target_field: description
+    transform: none
+
+  - source_field: matcher
+    target_field: matcher
+    transform: convert_matcher_to_uif
+    description: "Convert Claude tool matcher to UIF matcher format"
+
+# ============================================================================
+# DIRECTORY MAPPINGS
+# ============================================================================
+directory_mappings:
+  - source: "/"
+    target: "/"
+    description: "Root skill directory"
+
+  - source: "SKILL.md"
+    target: "metadata + workflows (if embedded)"
+    description: "Parse frontmatter and content"
+
+  - source: "Workflows/"
+    target: "workflows[]"
+    description: "Each .md file → workflow object"
+
+  - source: "Tools/"
+    target: "tools[]"
+    description: "Each .ts file → tool object"
+
+  - source: "Templates/"
+    target: "templates[]"
+
+  - source: "Data/"
+    target: "data[]"
+
+  - source: "Agents/"
+    target: "agents[]"
+
+  - source: "settings.json (hooks section)"
+    target: "hooks[]"
+    description: "Extract hooks from settings.json"
+
+# ============================================================================
+# TRANSFORM FUNCTIONS
+# ============================================================================
+transforms:
+  to_snake_case:
+    description: "Convert TitleCase to snake_case"
+    example: "UpdatePAI → update_pai"
+
+  extract_use_when_patterns:
+    description: "Extract patterns after 'USE WHEN' from description"
+    pattern: 'USE WHEN (.+?)(?:\\.|\$)'
+    output: array
+
+  extract_content:
+    description: "Extract content under markdown heading"
+
+  markdown_list_to_step_objects:
+    description: "Convert markdown list items to step objects with action and description"
+    input: |
+      - Step 1: Do this
+      - Step 2: Do that
+    output:
+      - action: "Do this"
+        description: "Step 1"
+      - action: "Do that"
+        description: "Step 2"
+
+  remove_extension:
+    description: "Remove file extension"
+    example: "tool.ts → tool"
+
+  convert_matcher_to_uif:
+    description: "Convert Claude matcher format to UIF matcher format"
+    mappings:
+      Bash: "command:*"
+      Read: "file_read:*"
+      Edit: "file_write:*"
+      Write: "file_write:*"
+      "*": "*"
+
+# ============================================================================
+# SPECIAL HANDLING RULES
+# ============================================================================
+special_cases:
+  - name: "Hooks location"
+    description: "Claude hooks are in settings.json, NOT in SKILL.md frontmatter"
+    handling: "Read from .claude/settings.json or settings.json in project root"
+
+  - name: "Hook matchers"
+    description: "Claude PreToolUse/PostToolUse use matchers to target specific tools"
+    handling: "Convert matcher to appropriate UIF event type + UIF matcher"
+
+  - name: "Workflows in SKILL.md"
+    description: "Some skills embed workflow documentation in SKILL.md"
+    handling: "Parse both Workflows/ directory and SKILL.md content"
+
+# ============================================================================
+# VALIDATION RULES
+# ============================================================================
+validation:
+  required_in_claude:
+    - "SKILL.md must exist"
+    - "SKILL.md must have frontmatter with name and description"
+    - "At least one of: Workflows/, Tools/, Templates/, Data/"
+
+  hooks_validation:
+    - "If settings.json exists, parse hooks section"
+    - "Validate hook types are in allowed list"
+    - "Warn about unmapped hook types (PermissionRequest, Notification)"
+
+  naming_validation:
+    - "Skill name should be TitleCase"
+    - "Workflow files should be TitleCase.md"
+    - "Tool files should be TitleCase.ts"
+
+# ============================================================================
+# EXAMPLES
+# ============================================================================
+examples:
+  - name: "Skill metadata translation"
+    input:
+      platform: claude-code
+      file: SKILL.md
+      frontmatter:
+        name: UpdatePAI
+        description: "Update PAI system. USE WHEN update pai, upgrade system"
+    output:
+      platform: uif
+      metadata:
+        name: UpdatePAI
+        description: "Update PAI system. USE WHEN update pai, upgrade system"
+        triggers:
+          - "update pai"
+          - "upgrade system"
+
+  - name: "Hook translation with matcher"
+    input:
+      platform: claude-code
+      hook:
+        event: PreToolUse
+        matcher: Bash
+        hooks:
+          - type: command
+            command: "validate-command.sh"
+    output:
+      platform: uif
+      hook:
+        event: pre_command
+        matcher: "command:*"
+        command: "validate-command.sh"

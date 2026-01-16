@@ -1,0 +1,19 @@
+{
+  "name": "@pai/skill-translate-tools",
+  "version": "1.0.0",
+  "description": "Tools for translating skills between platforms",
+  "type": "module",
+  "scripts": {
+    "translate": "bun run TranslateSkill.ts",
+    "show-mappings": "bun run ShowMappings.ts",
+    "validate": "bun run ValidateMappings.ts"
+  },
+  "dependencies": {
+    "yaml": "^2.3.4",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "bun-types": "latest"
+  }
+}
