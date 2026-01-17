@@ -3,62 +3,73 @@ name: CreateSkill
 description: Create and validate skills. USE WHEN create skill, new skill, skill structure, canonicalize. SkillSearch('createskill') for docs.
 ---
 
+## Customization
+
+**Before executing, check for user customizations at:**
+`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/CreateSkill/`
+
+If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
+
 # CreateSkill
 
 MANDATORY skill creation framework for ALL skill creation requests.
 
 ## Authoritative Source
 
-**Before creating ANY skill, READ:** `$PAI_DIR/skills/CORE/SkillSystem.md`
+**Before creating ANY skill, READ:** `$PAI_DIR/skills/CORE/SYSTEM/SKILLSYSTEM.md`
 
-This document contains the complete specification for:
-- Skill directory structure
-- SKILL.md format and required sections
-- Workflow file conventions
-- Naming conventions (TitleCase)
-- Examples section requirements
+**Canonical example to follow:** `$PAI_DIR/skills/_BLOGGING/SKILL.md`
 
-## How to Create a Skill
+## Workflow Routing
 
-1. **Read the spec:** `$PAI_DIR/skills/CORE/SkillSystem.md`
-2. **Create directory:** `$PAI_DIR/skills/SkillName/`
-3. **Create SKILL.md** with required frontmatter and sections
-4. **Add Workflows/** directory if needed
-5. **Validate** by checking all workflow references resolve
+| Workflow | Trigger | File |
+|----------|---------|------|
+| **CreateSkill** | "create a new skill" | `Workflows/CreateSkill.md` |
+| **ValidateSkill** | "validate skill", "check skill" | `Workflows/ValidateSkill.md` |
+| **UpdateSkill** | "update skill", "add workflow" | `Workflows/UpdateSkill.md` |
+| **CanonicalizeSkill** | "canonicalize", "fix skill structure" | `Workflows/CanonicalizeSkill.md` |
 
-## How to Validate a Skill
+## Quick Reference
 
-Run the skill validator:
-```bash
-bun run $PAI_DIR/skills/UpdateSkill/Tools/ValidateSkill.ts [SkillName]
-```
+- **TitleCase naming required** for all directories, files, and workflows
+- **Flat structure only**: maximum 2 levels deep (SkillName/Category/)
+- **Context files belong in skill root**, not in subdirectories
+- **Dynamic loading** for SKILL.md files exceeding 100 lines
+- **Voice notifications** required when executing workflows
 
-Or manually check:
-- SKILL.md exists with valid frontmatter
-- All workflow references in SKILL.md exist
-- Examples section is present
+## Key Guidelines
 
-## How to Canonicalize a Skill
-
-1. Rename files/directories to TitleCase
-2. Ensure SKILL.md has required sections
-3. Verify workflow references resolve
-4. Add Examples section if missing
+**Naming:** TitleCase only (PascalCase) for skills, workflows, and tools
+**Structure:** Flat folders with only Workflows/ and Tools/ subdirectories allowed
+**Context files:** Documentation lives in skill root, not nested subdirectories
+**Dynamic loading:** Use for large skills to reduce context overhead
+**Notifications:** Send both voice and text notifications during execution
 
 ## Examples
 
 **Example 1: Create a new skill**
 ```
 User: "Create a skill for managing my recipes"
-→ Read SkillSystem.md for structure
-→ Create $PAI_DIR/skills/Recipes/SKILL.md
-→ Use TitleCase naming throughout
+-> Invokes CreateSkill workflow
+-> Reads SKILLSYSTEM.md for structure
+-> Creates $PAI_DIR/skills/Recipes/SKILL.md
+-> Uses TitleCase naming throughout
 ```
 
-**Example 2: Fix an existing skill**
+**Example 2: Validate an existing skill**
 ```
-User: "Canonicalize the daemon skill"
-→ Rename files to TitleCase
-→ Ensure Examples section exists
-→ Validate workflow references
+User: "Validate the Daemon skill"
+-> Invokes ValidateSkill workflow
+-> Checks TitleCase naming
+-> Verifies YAML frontmatter format
+-> Reports compliance status
+```
+
+**Example 3: Fix skill structure**
+```
+User: "Canonicalize the research skill"
+-> Invokes CanonicalizeSkill workflow
+-> Renames files to TitleCase
+-> Ensures Examples section exists
+-> Validates workflow references
 ```
