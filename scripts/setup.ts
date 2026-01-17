@@ -351,8 +351,8 @@ async function checkSkillsJunction(): Promise<CheckResult> {
       fix: async () => {
         log('🔧', `Creating junction: ${paiClaudeSkills} -> ${paiSkills}`);
         try {
-          // Use PowerShell to create junction (works without admin)
-          await $`powershell -Command "New-Item -ItemType Junction -Path '${paiClaudeSkills}' -Target '${paiSkills}'"`.quiet();
+          // Use PowerShell 7 to create junction (works without admin)
+          await $`pwsh -Command "New-Item -ItemType Junction -Path '${paiClaudeSkills}' -Target '${paiSkills}'"`.quiet();
           log('✅', 'Skills junction created');
         } catch (e) {
           // Fallback to mklink

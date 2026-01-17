@@ -26,8 +26,8 @@ Personal knowledge base for your AI assistant. This directory contains informati
 | REMINDERS.md | Active reminders and recurring items |
 | ALGOPREFS.md | AI behavior customizations |
 | ART.md | Visual style and branding guidelines |
-| IDENTITY.md | AI identity configuration (name, personality) |
-| SECURITYSYSTEM.md | Security protocols and policies |
+| DAIDENTITY.md | AI identity configuration (name, personality) |
+| PAISECURITYSYSTEM/ | Security protocols and policies (directory) |
 
 ## Usage
 
@@ -43,7 +43,7 @@ This is your AI's knowledge base about you - keep it updated.
 
 1. Start with BASICINFO.md - your contact information
 2. Add CONTACTS.md - people you work with
-3. Create IDENTITY.md - name and configure your AI
+3. Configure DAIDENTITY.md - name and configure your AI
 4. Fill in other files as needed for your workflows
 
 ## Privacy
@@ -51,4 +51,4 @@ This is your AI's knowledge base about you - keep it updated.
 This directory contains sensitive personal information. In your private installation:
 - Keep it in your private repo (never public)
 - Use .gitignore for extremely sensitive subdirectories
-- Reference SECURITYSYSTEM.md for security protocols
+- Reference PAISECURITYSYSTEM/ for security protocols

@@ -77,13 +77,11 @@ $PAI_DIR/
 ├── .claude/settings.json     ← Hook configuration
 ├── hooks/                    ← Hook system (*.hook.ts)
 │   ├── handlers/             ← Handler modules
-│   ├── lib/                  ← Shared utilities
-│   └── memory/               ← Custom memory system
+│   └── lib/                  ← Shared utilities
 ├── skills/                   ← Skill definitions (CORE, etc.)
 ├── tools/                    ← Linters, generators
 ├── scripts/                  ← Setup scripts
 ├── MEMORY/                   ← Session history, state, learnings
-├── mem-store/                ← Memory system data
 └── agentic_logs/             ← Agent execution logs
 ```
 
@@ -119,7 +117,6 @@ Hooks execute at Claude Code lifecycle events. They are only active when `.claud
 - **SetQuestionTab.hook.ts** — Detects question-type prompts.
 - **AutoWorkCreation.hook.ts** — Creates WORK/ items with Work.md, IdealState.jsonl, TRACE.jsonl.
 - **FormatEnforcer.hook.ts** — Response format reminders, tracks compliance streaks.
-- **memory/retrieve.ts** — Retrieves relevant memory context for injection.
 
 **Stop:**
 - **StopOrchestrator.hook.ts** — Single entry point, reads transcript once, distributes to handlers:
@@ -179,43 +176,11 @@ PowerShell hook commands require triple backslash-quote (`\\\"`) for paths:
 
 ---
 
-## Memory Systems
-
-PAI uses two complementary memory systems:
-
-| System | Location | Purpose |
-|--------|----------|---------|
-| Claude Code (CLAUDE.md) | `~/.claude/`, `PROJECT_DIR/` | User prefs, project instructions |
-| PAI Memory | `$PAI_DIR/hooks/memory/`, `$PAI_DIR/mem-store/` | Semantic retrieval, session history |
-
-### PAI Memory Architecture
-
-```
-hooks/memory/
-├── core/           # Retrieval pipeline, ranking, filters, decay
-├── providers/      # Pluggable: search, segment, storage, extract, organize, summarize
-├── lib/            # Ranking implementations, output formatters
-├── api/            # Programmatic API
-└── tools/          # Diagnostic and query tools
-```
-
-**When to use which:**
-
-| Need | System |
-|------|--------|
-| Persistent user preferences | Claude Code (CLAUDE.md) |
-| Project-specific instructions | Claude Code (project CLAUDE.md) |
-| Semantic memory retrieval | PAI Memory |
-| Historical session context | PAI Memory |
-| Learning from past sessions | PAI Memory |
-
----
-
 ## Testing
 
 ```bash
 bun test                              # All tests
-bun test hooks/memory/types/common.test.ts  # Specific file
+bun test hooks/lib/paths.test.ts      # Specific file
 bun test --watch                      # Watch mode
 ```
 

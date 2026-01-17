@@ -16,8 +16,6 @@
 .current-session
 agent-sessions.json
 
-# Memory system runtime data (segments, indexes, metrics)
-mem-store/
 
 # ============================================
 # LOGS & HISTORY
@@ -32,9 +30,7 @@ history/
 # Local memory, state, and work tracking - never commit contents
 # But preserve folder structure
 MEMORY/**/*
-mem-store/**/*
 !MEMORY/**/.gitkeep
-!mem-store/**/.gitkeep
 
 # ============================================
 # DEPENDENCIES
@@ -111,6 +107,11 @@ Thumbs.db
 desktop.ini
 
 # ============================================
+# BACKUPS
+# ============================================
+backups/
+
+# ============================================
 # TEMP FILES
 # ============================================
 *.tmp
@@ -123,3 +124,5 @@ tmpclaude-*
 nul
 NUL
 _bmad-output/
+bin/trufflehog.exe
+hooks/subagent-stop-debug.log

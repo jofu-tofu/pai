@@ -209,4 +209,7 @@ Examples:
   }
 }
 
-main().catch(console.error);
+// Only run CLI when executed directly, not when imported
+if (import.meta.main) {
+  main().catch(console.error);
+}

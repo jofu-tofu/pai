@@ -195,11 +195,8 @@ References below use:
 
 | Trigger | Description | Location |
 |---------|-------------|----------|
-| GIT | Push changes to remote repository with proper commit messages | `Workflows/GitPush.md` |
+| GIT | Push changes to remote repository with proper commit messages | `skills/System/Workflows/GitPush.md` |
 | DELEGATION | Spawn parallel agents to divide and conquer complex tasks | `Workflows/Delegation.md` |
-| BACKGROUNDDELEGATION | Launch non-blocking agents that run independently while you continue | `Workflows/BackgroundDelegation.md` |
-| TREEOFTHOUGHT | Structured decision-making for complex architectural choices | `Workflows/TreeOfThought.md` |
-| HOMEBRIDGE | Smart home device management and automation configuration | `Workflows/HomeBridgeManagement.md` |
 
 ### Agent & Skill Triggers
 
@@ -207,10 +204,7 @@ References below use:
 |---------|-------------|----------|
 | CUSTOMAGENTS | User says "custom agents" → Invoke Agents skill for unique personalities/voices via AgentFactory | `SYSTEM/PAIAGENTSYSTEM.md` → `skills/Agents/SKILL.md` |
 | INTERNS | Spawn generic parallel agents for grunt work (no unique voices) | `SYSTEM/PAIAGENTSYSTEM.md` → `Task({ subagent_type: "Intern" })` |
-| BLOG | {principal.name}'s blog and website content creation, editing, and deployment | `skills/_BLOGGING/SKILL.md` |
-| BROWSER | Web validation, screenshots, UI testing, and visual verification of changes | `skills/Browser/SKILL.md` |
-| PAI | Public PAI repository management, packs, releases, and community contributions | `skills/PAI/SKILL.md` |
-| SYSTEM | System validation, integrity audits, documentation updates, secret scanning, work context recall ("we just worked on", "remember when we") | `skills/System/SKILL.md`
+| SYSTEM | System validation, integrity audits, documentation updates, secret scanning, work context recall ("we just worked on", "remember when we") | `skills/System/SKILL.md` |
 
 ### Resource Lookups
 
@@ -350,13 +344,13 @@ When creating functionality that requires AI model inference, **never use direct
 **Usage:**
 ```bash
 # Fast inference (Haiku)
-echo "Your prompt here" | bun ~/.claude/tools/Inference.ts fast
+echo "Your prompt here" | bun $PAI_DIR/skills/CORE/tools/Inference.ts fast
 
 # Standard inference (Sonnet)
-echo "Your prompt here" | bun ~/.claude/tools/Inference.ts standard
+echo "Your prompt here" | bun $PAI_DIR/skills/CORE/tools/Inference.ts standard
 
 # Smart inference (Opus)
-echo "Your prompt here" | bun ~/.claude/tools/Inference.ts smart
+echo "Your prompt here" | bun $PAI_DIR/skills/CORE/tools/Inference.ts smart
 ```
 
 **Why this matters:**

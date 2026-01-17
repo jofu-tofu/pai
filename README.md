@@ -58,8 +58,8 @@ $env:PAI_DIR = "$HOME\pai"
 ### 2. Install Dependencies
 
 ```bash
-cd ~/pai/hooks && bun install
-cd ~/pai/skills/Prompting/Tools && bun install
+cd $PAI_DIR/hooks && bun install
+cd $PAI_DIR/skills/Prompting/Tools && bun install
 ```
 
 ### 3. Configure Claude Code Hooks
@@ -74,7 +74,7 @@ cd ~/pai && claude
 
 **Option B: Copy hooks to global settings**
 
-Merge the hooks from `pai/.claude/settings.json` into your `~/.claude/settings.json`.
+Merge the hooks from `pai/.claude/settings.json` into your global Claude settings.
 
 ### 4. Verify Installation
 
@@ -99,7 +99,7 @@ bun run scripts/setup.ts doctor
 ## Directory Structure
 
 ```
-~/pai/
+$PAI_DIR/
 ├── .claude/           # Claude Code project settings (hooks config)
 ├── hooks/             # Hook scripts (security, session tracking, etc.)
 ├── skills/            # AI skills and workflows
@@ -113,7 +113,6 @@ bun run scripts/setup.ts doctor
 │   └── Agents/        # Dynamic agent composition
 ├── tools/             # MCP tools and utilities
 ├── MEMORY/            # Memory system storage (gitignored)
-├── mem-store/         # Additional memory storage (gitignored)
 ├── history/           # Session history and learnings (gitignored)
 ├── agentic_logs/      # Success/error logs (gitignored)
 ├── voice/             # Voice/audio output (gitignored)
@@ -149,7 +148,7 @@ bun run scripts/setup.ts doctor
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `PAI_DIR` | PAI installation directory | `~/pai` |
+| `PAI_DIR` | PAI installation directory | `$HOME/pai` |
 | `TIME_ZONE` | Local timezone | System default |
 | `DA` | Assistant name | `Tofu` |
 
@@ -167,7 +166,7 @@ Edit `skills/CORE/SKILL.md` to customize:
 
 1. Ensure `PAI_DIR` is set: `echo $PAI_DIR`
 2. Run doctor: `bun run scripts/setup.ts doctor`
-3. Check Claude is using project settings (run from `~/pai`)
+3. Check Claude is using project settings (run from `$PAI_DIR`)
 
 ### Permission errors on Windows
 
@@ -179,7 +178,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ### Tests failing
 
 ```bash
-cd ~/pai/hooks && bun test
+cd $PAI_DIR/hooks && bun test
 ```
 
 ## Contributing

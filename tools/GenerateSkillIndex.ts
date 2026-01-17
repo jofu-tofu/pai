@@ -11,33 +11,20 @@ import { readdir, readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
 
-import { homedir } from 'os';
-
-const PAI_DIR = process.env.PAI_DIR || process.env.PAI_HOME || join(homedir(), 'pai');
+const PAI_DIR = process.env.PAI_DIR || process.env.PAI_HOME || join(process.env.HOME || '', '.claude');
 const SKILLS_DIR = join(PAI_DIR, 'skills');
 const OUTPUT_FILE = join(SKILLS_DIR, 'skill-index.json');
 
-const ALWAYS_LOADED_SKILLS = ['CORE', 'Development', 'Research'];
+const ALWAYS_LOADED_SKILLS = ['CORE'];
 
 async function findSkillFiles(dir: string): Promise<string[]> {
   const skillFiles: string[] = [];
   const entries = await readdir(dir, { withFileTypes: true });
 
   for (const entry of entries) {
-    if (!entry.isDirectory() || entry.name.startsWith('.') || entry.name === 'node_modules') {
-      continue;
-    }
-
-    const fullPath = join(dir, entry.name);
-    const skillMdPath = join(fullPath, 'SKILL.md');
-
-    if (existsSync(skillMdPath)) {
-      // This directory contains a SKILL.md - it's a skill
-      skillFiles.push(skillMdPath);
-    } else {
-      // No SKILL.md here - recurse to find nested skills
-      const nestedSkills = await findSkillFiles(fullPath);
-      skillFiles.push(...nestedSkills);
+    if (entry.isDirectory() && !entry.name.startsWith('.')) {
+      const skillMdPath = join(dir, entry.name, 'SKILL.md');
+      if (existsSync(skillMdPath)) skillFiles.push(skillMdPath);
     }
   }
   return skillFiles;
@@ -71,27 +58,6 @@ function extractTriggers(description: string): string[] {
   return [...new Set(triggers)];
 }
 
-function extractWorkflows(content: string): string[] {
-  const workflows: string[] = [];
-
-  // Find the Workflow Routing section (until next ## heading or end of file)
-  const sectionMatch = content.match(/## Workflow Routing\s*\n([\s\S]*?)(?=\n## |\n---|\Z|$)/);
-  if (!sectionMatch) return workflows;
-
-  const section = sectionMatch[1];
-
-  // Extract workflow names from table rows: | **WorkflowName** | ... |
-  const rowMatches = section.matchAll(/\|\s*\*\*([^*]+)\*\*\s*\|/g);
-  for (const match of rowMatches) {
-    const name = match[1].trim();
-    if (name && name !== 'Workflow') {
-      workflows.push(name);
-    }
-  }
-
-  return workflows;
-}
-
 async function main() {
   console.log('Generating skill index...\n');
 
@@ -114,10 +80,10 @@ async function main() {
 
     index.skills[key] = {
       name: fm.name,
-      path: filePath.replace(SKILLS_DIR, '').replace(/^[\/\\]/, ''),
+      path: filePath.replace(SKILLS_DIR, '').replace(/^\//, ''),
       fullDescription: fm.description,
       triggers: extractTriggers(fm.description),
-      workflows: extractWorkflows(content),
+      workflows: [],
       tier
     };
 
