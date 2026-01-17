@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/PAISECURITYSYSTEM/ARCHITECTURE.md
-================================================================================
-
-PURPOSE:
-Documents the three-layer security model, trust hierarchy, and permission system.
-This is the foundational security architecture for PAI.
-
-LOCATION:
-- Private Installation: ${PAI_DIR}/skills/CORE/USER/PAISECURITYSYSTEM/ARCHITECTURE.md
-- PAI Pack: Packs/kai-core-install/src/skills/CORE/USER/PAISECURITYSYSTEM/ARCHITECTURE.md
-
-CUSTOMIZATION:
-- [ ] Adapt trust hierarchy to your organization
-- [ ] Configure permission levels in settings.json
-- [ ] Adjust "What's Allowed" based on your risk tolerance
-
-RELATED FILES:
-- README.md - Security overview
-- patterns.yaml - Security rules
-- PROMPTINJECTION.md - Prompt injection defense
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.2.0
-================================================================================
--->
-
 # Security Architecture
 
 **Philosophy: Native Permissions + patterns.yaml Validation**

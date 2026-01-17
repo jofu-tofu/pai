@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/CORECONTENT.md
-================================================================================
-
-PURPOSE:
-Your most important content organized by theme. Your AI uses this to reference
-your canonical work, maintain consistency, and find relevant material.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/USER/CORECONTENT.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/CORECONTENT.md
-
-CUSTOMIZATION:
-- [ ] Replace example entries with your actual content
-- [ ] Organize by topic areas relevant to your work
-- [ ] Include links to canonical pieces
-- [ ] Add style guidelines for your voice
-
-RELATED FILES:
-- DEFINITIONS.md - Your canonical definitions
-- RESUME.md - Professional background
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Essential Content
 
 Your most important content organized by theme. The AI uses this to reference your canonical work.

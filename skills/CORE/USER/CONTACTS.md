@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/CONTACTS.md
-================================================================================
-
-PURPOSE:
-Directory of personal and professional contacts. Your AI uses this to help with
-communication tasks, contact lookups, and relationship context.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/USER/CONTACTS.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/CONTACTS.md
-
-CUSTOMIZATION:
-- [ ] Replace example entries with your actual contacts
-- [ ] Add categories that match your needs (Family, Clients, etc.)
-- [ ] Include relationship context for better AI assistance
-- [ ] This file contains sensitive data - keep in private repo only
-
-RELATED FILES:
-- BASICINFO.md - Your own contact information
-- ASSETMANAGEMENT.md - Business and digital assets
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Contacts Directory
 
 This file contains your personal and professional contacts. Replace the examples below with your own contacts.

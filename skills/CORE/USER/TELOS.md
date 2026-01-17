@@ -1,33 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/TELOS.md
-================================================================================
-
-PURPOSE:
-Life operating system - goals, projects, and dependencies. Your AI uses this
-to understand your priorities and help you stay aligned with what matters most.
-
-TELOS (Greek: τέλος) means "end, purpose, goal" - the ultimate aim of something.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/USER/TELOS.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/TELOS.md
-
-CUSTOMIZATION:
-- [ ] Define your life areas
-- [ ] Set goals for each area
-- [ ] Track projects and dependencies
-- [ ] Review and update regularly
-
-RELATED FILES:
-- ABOUTME.md - Personal philosophy
-- REMINDERS.md - Time-sensitive items
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # TELOS - Life Operating System
 
 Your goals, projects, and what you're working toward.

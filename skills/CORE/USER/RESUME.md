@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/RESUME.md
-================================================================================
-
-PURPOSE:
-Your professional background for generating bios, speaker introductions, and
-professional communications.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/USER/RESUME.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/RESUME.md
-
-CUSTOMIZATION:
-- [ ] Replace all placeholder values with your actual information
-- [ ] Add/remove sections based on your background
-- [ ] Include links to your online presence
-- [ ] Update regularly as your career evolves
-
-RELATED FILES:
-- BASICINFO.md - Contact information
-- CORECONTENT.md - Your content registry
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Professional Resume
 
 ## Contact & Online Presence

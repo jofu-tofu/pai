@@ -1,28 +1,3 @@
-<!--
-================================================================================
-PAI CORE - SYSTEM/BACKUPS.md
-================================================================================
-
-PURPOSE:
-Backup system documentation. Where backups go, naming conventions, and when
-to create them.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/SYSTEM/BACKUPS.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/SYSTEM/BACKUPS.md
-
-CUSTOMIZATION:
-- Adjust paths to match your PAI_DIR
-- These patterns are generic and apply to all implementations
-
-RELATED FILES:
-- MEMORYSYSTEM.md - Overall memory architecture
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Backup System
 
 All backups go to `${PAI_DIR}/MEMORY/Backups/` - never inside skill directories.

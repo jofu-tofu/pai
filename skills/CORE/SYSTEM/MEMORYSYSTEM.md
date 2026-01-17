@@ -1,30 +1,3 @@
-<!--
-================================================================================
-PAI CORE - SYSTEM/MEMORYSYSTEM.md
-================================================================================
-
-PURPOSE:
-The unified memory system - what happened, what we learned, what we're working
-on. Combines historical archives, learning artifacts, operational state, and
-per-task work directories.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/SYSTEM/MEMORYSYSTEM.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/SYSTEM/MEMORYSYSTEM.md
-
-CUSTOMIZATION:
-- Paths use ${PAI_DIR} - replace with your installation directory
-- Directory structure is standard, but you can add categories
-
-RELATED FILES:
-- BACKUPS.md - Backup strategies
-- PAISYSTEMARCHITECTURE.md - Core architecture
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Memory System
 
 **The unified system memory - what happened, what we learned, what we're working on.**

@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/PAISECURITYSYSTEM/PROMPTINJECTION.md
-================================================================================
-
-PURPOSE:
-Comprehensive guide to defending against prompt injection attacks. This is a
-MANDATORY protocol for all PAI agents and should be followed without exception.
-
-LOCATION:
-- Private Installation: ${PAI_DIR}/skills/CORE/USER/PAISECURITYSYSTEM/PROMPTINJECTION.md
-- PAI Pack: Packs/kai-core-install/src/skills/CORE/USER/PAISECURITYSYSTEM/PROMPTINJECTION.md
-
-CUSTOMIZATION:
-- [ ] Update log paths to match your installation
-- [ ] Configure incident reporting to your preferred channel
-- [ ] Add organization-specific threat examples
-
-RELATED FILES:
-- ARCHITECTURE.md - Trust hierarchy
-- COMMANDINJECTION.md - Shell safety
-- patterns.yaml - Security rules
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.2.0
-================================================================================
--->
-
 # Prompt Injection Defense
 
 **MANDATORY FOR ALL PAI AGENTS**

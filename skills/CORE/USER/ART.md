@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/ART.md
-================================================================================
-
-PURPOSE:
-Visual style guidelines for your AI assistant when creating images, diagrams,
-or other visual content. Defines your aesthetic preferences and branding.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/USER/ART.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/ART.md
-
-CUSTOMIZATION:
-- [ ] Define your visual style preferences
-- [ ] Include character specifications if applicable
-- [ ] Add color palettes and branding guidelines
-- [ ] Specify tool preferences (Figma, DALL-E, etc.)
-
-RELATED FILES:
-- CORECONTENT.md - Content style guidelines
-- SYSTEM/BROWSERAUTOMATION.md - Visual testing patterns
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Art & Visual Style Guide
 
 Guidelines for visual content creation. Your AI uses this when generating images, diagrams, or visual elements.

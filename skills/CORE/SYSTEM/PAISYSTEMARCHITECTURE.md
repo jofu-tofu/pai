@@ -1,32 +1,3 @@
-<!--
-================================================================================
-PAI CORE - SYSTEM/PAISYSTEMARCHITECTURE.md
-================================================================================
-
-PURPOSE:
-The Fifteen Founding Principles and Universal Architecture Patterns for Personal
-AI Infrastructure. This defines the foundational philosophy and patterns that
-apply to ALL PAI implementations.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/SYSTEM/PAISYSTEMARCHITECTURE.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/SYSTEM/PAISYSTEMARCHITECTURE.md
-
-CUSTOMIZATION:
-- This file is GENERIC - it applies to all PAI implementations
-- User-specific customizations go in USER/ARCHITECTURE.md
-- These principles are foundational - customize cautiously
-
-RELATED FILES:
-- USER/ARCHITECTURE.md - User-specific implementation details
-- SKILLSYSTEM.md - How skills are structured
-- THEHOOKSYSTEM.md - Event-driven automation
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # PAI SYSTEM ARCHITECTURE
 
 **The Fifteen Founding Principles and Universal Architecture Patterns for Personal AI Infrastructure**

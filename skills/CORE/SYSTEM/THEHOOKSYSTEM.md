@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - SYSTEM/THEHOOKSYSTEM.md
-================================================================================
-
-PURPOSE:
-Hook system documentation. Event-driven automation that fires at key lifecycle
-points - session start, tool use, session end.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/SYSTEM/THEHOOKSYSTEM.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/SYSTEM/THEHOOKSYSTEM.md
-
-CUSTOMIZATION:
-- [ ] Configure your hooks in settings.json
-- [ ] Add voice server URL if using voice notifications
-- [ ] Adjust hook implementations for your needs
-
-RELATED FILES:
-- PAISYSTEMARCHITECTURE.md - Core architecture
-- THENOTIFICATIONSYSTEM.md - Notification channels
-- MEMORYSYSTEM.md - Memory system integration
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Hook System
 
 Event-driven automation for AI coding assistants.

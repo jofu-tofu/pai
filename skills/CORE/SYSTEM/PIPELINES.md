@@ -1,32 +1,3 @@
-<!--
-================================================================================
-PAI CORE - SYSTEM/PIPELINES.md
-================================================================================
-
-PURPOSE:
-Orchestrating sequences of Actions with verification gates. Pipelines chain
-multiple Actions together into cohesive workflows with mandatory verification
-between each step.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/SYSTEM/PIPELINES.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/SYSTEM/PIPELINES.md
-
-CUSTOMIZATION:
-- Create new pipelines in ${PAI_DIR}/PIPELINES/
-- Follow Domain_Pipeline-Name naming convention
-- Define verification gates between each step
-
-RELATED FILES:
-- ACTIONS.md - Individual action definitions
-- SKILLSYSTEM.md - Skills vs Actions vs Pipelines
-- PAISYSTEMARCHITECTURE.md - Core architecture
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Pipelines
 
 **Orchestrating Sequences of Actions with Verification Gates**

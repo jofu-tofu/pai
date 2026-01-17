@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/PAISECURITYSYSTEM/PROJECTRULES.md
-================================================================================
-
-PURPOSE:
-Template for defining project-specific security rules. Some projects have unique
-requirements (deployment methods, access restrictions) that need explicit rules.
-
-LOCATION:
-- Private Installation: ${PAI_DIR}/skills/CORE/USER/PAISECURITYSYSTEM/PROJECTRULES.md
-- PAI Pack: Packs/kai-core-install/src/skills/CORE/USER/PAISECURITYSYSTEM/PROJECTRULES.md
-
-CUSTOMIZATION:
-- [ ] Add sections for your projects with special rules
-- [ ] Document incidents that led to each rule
-- [ ] Update patterns.yaml with corresponding patterns
-
-RELATED FILES:
-- patterns.yaml - Security rules (projects section)
-- REPOSITORIES.md - Repository separation
-- ARCHITECTURE.md - Security layers
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.2.0
-================================================================================
--->
-
 # Project-Specific Rules
 
 **Special security rules for specific projects**

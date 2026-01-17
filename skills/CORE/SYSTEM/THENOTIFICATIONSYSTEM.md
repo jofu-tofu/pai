@@ -1,33 +1,3 @@
-<!--
-================================================================================
-PAI CORE - SYSTEM/THENOTIFICATIONSYSTEM.md
-================================================================================
-
-PURPOSE:
-Notification system documentation. How to send notifications through various
-channels - voice, push, desktop, webhooks.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/SYSTEM/THENOTIFICATIONSYSTEM.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/SYSTEM/THENOTIFICATIONSYSTEM.md
-
-CUSTOMIZATION:
-- [ ] Configure your notification channels
-- [ ] Set up voice server if using TTS
-- [ ] Add webhook URLs for your services
-- [ ] Customize routing rules
-
-RELATED FILES:
-- THEHOOKSYSTEM.md - Hook integration
-- USER/DAIDENTITY.md - AI name and voice ID
-- AGENTS.md - Agent voice personalities
-- pai-voice-system pack - Full voice server implementation
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.4.0
-================================================================================
--->
-
 # Notification System
 
 How PAI sends notifications across various channels.

@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - SYSTEM/SKILLSYSTEM.md
-================================================================================
-
-PURPOSE:
-The mandatory configuration system for ALL PAI skills. Defines required structure,
-naming conventions, and patterns for creating and organizing skills.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/SYSTEM/SKILLSYSTEM.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/SYSTEM/SKILLSYSTEM.md
-
-CUSTOMIZATION:
-- This file defines system standards - modify carefully
-- Follow these patterns when creating new skills
-- Use "canonicalize a skill" to restructure existing skills
-
-RELATED FILES:
-- PAISYSTEMARCHITECTURE.md - Core philosophy
-- CLIFIRSTARCHITECTURE.md - CLI-First patterns
-- ACTIONS.md - Action system (multi-step workflows)
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Custom Skill System
 
 **The MANDATORY configuration system for ALL PAI skills.**

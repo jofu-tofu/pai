@@ -1,33 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/TECHSTACKPREFERENCES.md
-================================================================================
-
-PURPOSE:
-Your technology stack preferences. Your AI uses this to make consistent
-technology choices across all development work - languages, package managers,
-formats, and workflow patterns.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/USER/TECHSTACKPREFERENCES.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/TECHSTACKPREFERENCES.md
-
-CUSTOMIZATION:
-- [ ] Adjust language preferences to match your stack
-- [ ] Update package manager preferences
-- [ ] Modify format standards as needed
-- [ ] Add your own workflow patterns
-
-RELATED FILES:
-- SYSTEM/TOOLS.md - CLI utilities reference
-- SYSTEM/CLIFIRSTARCHITECTURE.md - CLI-first design patterns
-- ALGOPREFS.md - AI behavior customizations
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Stack Preferences
 
 **Your Technology Stack Preferences - Definitive Reference**

@@ -1,32 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/ABOUTME.md
-================================================================================
-
-PURPOSE:
-Personal background and philosophy. Your AI uses this to understand who you are,
-what you care about, and how to represent you authentically.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/USER/ABOUTME.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/ABOUTME.md
-
-CUSTOMIZATION:
-- [ ] Fill in your personal background
-- [ ] Add your core beliefs and values
-- [ ] Include what you're working toward
-- [ ] This is deeply personal - customize fully
-
-RELATED FILES:
-- RESUME.md - Professional background
-- DEFINITIONS.md - Your canonical definitions
-- CORECONTENT.md - Your content registry
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # About Me
 
 Personal background and philosophy for your AI assistant to understand who you are.

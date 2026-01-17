@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/PAISECURITYSYSTEM/COMMANDINJECTION.md
-================================================================================
-
-PURPOSE:
-Comprehensive guide to preventing command injection vulnerabilities in PAI code.
-Covers shell safety, input validation, and secure coding patterns.
-
-LOCATION:
-- Private Installation: ${PAI_DIR}/skills/CORE/USER/PAISECURITYSYSTEM/COMMANDINJECTION.md
-- PAI Pack: Packs/kai-core-install/src/skills/CORE/USER/PAISECURITYSYSTEM/COMMANDINJECTION.md
-
-CUSTOMIZATION:
-- [ ] Review examples and adapt to your codebase
-- [ ] Add organization-specific URL allowlists
-- [ ] Configure logging paths for your installation
-
-RELATED FILES:
-- PROMPTINJECTION.md - Prompt injection defense
-- patterns.yaml - Security rules
-- ARCHITECTURE.md - Trust hierarchy
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.2.0
-================================================================================
--->
-
 # Command Injection & Shell Safety
 
 **MANDATORY FOR ALL PAI CODE**

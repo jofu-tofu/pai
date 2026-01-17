@@ -1,32 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/PAISECURITYSYSTEM/README.md
-================================================================================
-
-PURPOSE:
-Security system overview and philosophy. This file introduces the PAI security
-architecture and provides quick navigation to detailed documentation.
-
-LOCATION:
-- Private Installation: ${PAI_DIR}/skills/CORE/USER/PAISECURITYSYSTEM/README.md
-- PAI Pack: Packs/kai-core-install/src/skills/CORE/USER/PAISECURITYSYSTEM/README.md
-
-CUSTOMIZATION:
-- [ ] Review the philosophy and adapt to your security needs
-- [ ] Update file references if you add custom security files
-- [ ] Configure patterns.yaml with your specific rules
-
-RELATED FILES:
-- ARCHITECTURE.md - Security layers and trust hierarchy
-- patterns.yaml - Single source of truth for rules
-- PROMPTINJECTION.md - Prompt injection defense
-- COMMANDINJECTION.md - Shell safety
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.2.0
-================================================================================
--->
-
 # PAI Security System
 
 **Security Architecture - Permissive by Default**

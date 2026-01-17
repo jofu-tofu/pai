@@ -1,32 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/ASSETMANAGEMENT.md
-================================================================================
-
-PURPOSE:
-Centralized registry of your digital assets for instant recognition and
-management. Your AI uses this for deployment tasks, account management,
-and troubleshooting.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/USER/ASSETMANAGEMENT.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/ASSETMANAGEMENT.md
-
-CUSTOMIZATION:
-- [ ] Replace example entries with your actual web properties
-- [ ] Add your cloud accounts and services
-- [ ] Include hardware inventory if useful
-- [ ] Add routing rules for common phrases ("my site" → specific project)
-
-RELATED FILES:
-- SECURITYSYSTEM.md - Security protocols for these assets
-- SYSTEM/TOOLS.md - CLI utilities for asset management
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Asset Management System
 
 **Purpose:** Centralized registry of your digital assets for instant recognition and management.

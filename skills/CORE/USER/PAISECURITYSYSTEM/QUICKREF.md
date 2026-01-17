@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/PAISECURITYSYSTEM/QUICKREF.md
-================================================================================
-
-PURPOSE:
-Quick reference card for common security questions. Fast lookup tables for
-command protection, path protection, and common operations.
-
-LOCATION:
-- Private Installation: ${PAI_DIR}/skills/CORE/USER/PAISECURITYSYSTEM/QUICKREF.md
-- PAI Pack: Packs/kai-core-install/src/skills/CORE/USER/PAISECURITYSYSTEM/QUICKREF.md
-
-CUSTOMIZATION:
-- [ ] Add your project-specific entries
-- [ ] Update paths to match your installation
-- [ ] Add custom protected commands
-
-RELATED FILES:
-- patterns.yaml - Full security rules
-- ARCHITECTURE.md - Security layers
-- PROJECTRULES.md - Project-specific rules
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.2.0
-================================================================================
--->
-
 # Security Quick Reference
 
 **Fast lookup for common security questions**

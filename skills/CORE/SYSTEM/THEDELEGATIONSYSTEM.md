@@ -1,30 +1,3 @@
-<!--
-================================================================================
-PAI CORE - SYSTEM/THEDELEGATIONSYSTEM.md
-================================================================================
-
-PURPOSE:
-Delegation and agent parallelization patterns. How to launch multiple agents,
-when to use different agent types, and model selection for optimal performance.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/SYSTEM/THEDELEGATIONSYSTEM.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/SYSTEM/THEDELEGATIONSYSTEM.md
-
-CUSTOMIZATION:
-- These patterns are generic and apply to all PAI implementations
-- User-specific agent rosters go in AGENTS.md
-- Voice configurations go in USER/IDENTITY.md or AGENTS.md
-
-RELATED FILES:
-- AGENTS.md - Agent configuration and traits
-- CORE/SKILL.md - Quick delegation reference
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Delegation & Parallelization Reference
 
 **Quick reference in SKILL.md** → For full details, see this file

@@ -1,30 +1,3 @@
-<!--
-================================================================================
-PAI CORE - SYSTEM/TERMINALTABS.md
-================================================================================
-
-PURPOSE:
-Terminal tab title system documentation. Automatically updates terminal tab
-titles with task summaries for visual feedback.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/SYSTEM/TERMINALTABS.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/SYSTEM/TERMINALTABS.md
-
-CUSTOMIZATION:
-- [ ] Configure stop-hook.ts for your terminal
-- [ ] Adjust word count for summaries
-- [ ] Customize prefix/suffix patterns
-
-RELATED FILES:
-- THEHOOKSYSTEM.md - Hook configuration
-- THENOTIFICATIONSYSTEM.md - Notification channels
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Terminal Tab Title System
 
 ## Overview

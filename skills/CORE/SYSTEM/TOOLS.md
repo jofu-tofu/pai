@@ -1,30 +1,3 @@
-<!--
-================================================================================
-PAI CORE - SYSTEM/TOOLS.md
-================================================================================
-
-PURPOSE:
-CLI utilities reference. Documents single-purpose command-line tools that don't
-need separate skills. Simple utilities documented here, executed directly.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/SYSTEM/TOOLS.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/SYSTEM/TOOLS.md
-
-CUSTOMIZATION:
-- [ ] Add your own CLI tools
-- [ ] Update paths to match your setup
-- [ ] Add environment variables documentation
-
-RELATED FILES:
-- CLIFIRSTARCHITECTURE.md - CLI-first design principles
-- PAISYSTEMARCHITECTURE.md - Core architecture
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # PAI Tools - CLI Utilities Reference
 
 This file documents single-purpose CLI utilities that have been consolidated from individual skills. These are pure command-line tools that wrap APIs or external commands.

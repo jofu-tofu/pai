@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/DEFINITIONS.md
-================================================================================
-
-PURPOSE:
-Your canonical definitions for key concepts. Your AI uses this when discussing
-these topics to ensure consistency with your established thinking.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/USER/DEFINITIONS.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/DEFINITIONS.md
-
-CUSTOMIZATION:
-- [ ] Add your own canonical definitions
-- [ ] Include sources/references for your thinking
-- [ ] Group by topic area (AI, Security, Philosophy, etc.)
-- [ ] Update as your thinking evolves
-
-RELATED FILES:
-- CORECONTENT.md - Your essential content registry
-- ABOUTME.md - Personal philosophy and background
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Key Definitions
 
 This file contains your canonical definitions for important concepts. These definitions represent your considered thinking and should be used when discussing these topics.

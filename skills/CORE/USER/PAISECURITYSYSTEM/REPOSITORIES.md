@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/PAISECURITYSYSTEM/REPOSITORIES.md
-================================================================================
-
-PURPOSE:
-Documents the critical separation between private and public repositories.
-This is essential for preventing accidental exposure of sensitive data.
-
-LOCATION:
-- Private Installation: ${PAI_DIR}/skills/CORE/USER/PAISECURITYSYSTEM/REPOSITORIES.md
-- PAI Pack: Packs/kai-core-install/src/skills/CORE/USER/PAISECURITYSYSTEM/REPOSITORIES.md
-
-CUSTOMIZATION:
-- [ ] Update repository URLs to your own
-- [ ] Configure sanitization patterns for your data
-- [ ] Set up pre-commit hooks as described
-
-RELATED FILES:
-- PROJECTRULES.md - Project-specific rules
-- patterns.yaml - Security rules
-- QUICKREF.md - Quick reference
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.2.0
-================================================================================
--->
-
 # Repository Security
 
 **Two Repositories - NEVER CONFUSE THEM**
@@ -37,7 +9,7 @@ VERSION: 1.2.0
 | Property | Value |
 |----------|-------|
 | **Location** | `${PAI_DIR}/` |
-| **Repository** | github.com/jofu-tofu/[PRIVATE_REPO] (PRIVATE, STAYS PRIVATE FOREVER) |
+| **Repository** | github.com/[YOUR_USERNAME]/[PRIVATE_REPO] (PRIVATE, STAYS PRIVATE FOREVER) |
 | **Contains** | ALL sensitive data, API keys, personal history, contacts, private configurations |
 | **Purpose** | Your actual working PAI infrastructure |
 | **Status** | NEVER MAKE PUBLIC - contains real API keys, personal data, conversation history |
@@ -51,7 +23,7 @@ VERSION: 1.2.0
 | Property | Value |
 |----------|-------|
 | **Location** | `[YOUR_PUBLIC_REPO_PATH]/` |
-| **Repository** | github.com/jofu-tofu/pai (PUBLIC) |
+| **Repository** | github.com/[YOUR_USERNAME]/[PUBLIC_REPO] (PUBLIC) |
 | **Contains** | ONLY sanitized, generic, example code for others to use |
 | **Purpose** | Share PAI concepts and architecture with the community as templates |
 | **Status** | PUBLIC - anyone can see this |

@@ -1,34 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/DAIDENTITY.md
-================================================================================
-
-PURPOSE:
-Digital Assistant Identity - the core identity file that hooks read from.
-This file defines your AI's name, display name, color, and voice ID.
-All hooks (CoreLoader, VoiceNotify, StatusLine, Banner) read from this file.
-
-LOCATION:
-- Private Installation: ${PAI_DIR}/skills/CORE/USER/DAIDENTITY.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/DAIDENTITY.md
-
-CUSTOMIZATION:
-- [ ] Set your AI's name (appears in 🗣️ responses)
-- [ ] Set display name (appears in UI/banners)
-- [ ] Choose a color (hex code)
-- [ ] Configure voice ID (if using voice server)
-
-RELATED FILES:
-- hooks/lib/identity.ts - Loads values from this file
-- CORE/SKILL.md - References this for response format
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.4.0
-
-IMPORTANT: Hooks parse this file's markdown format. Keep the **Field:** format.
-================================================================================
--->
-
 # DA Identity & Interaction Rules
 
 **Configure your Digital Assistant's core identity here.**

@@ -1,32 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/BASICINFO.md
-================================================================================
-
-PURPOSE:
-Your personal contact information used by the AI assistant for personalization,
-official correspondence, and account management tasks.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/USER/BASICINFO.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/BASICINFO.md
-
-CUSTOMIZATION:
-- [ ] Replace all [placeholder] values with your actual information
-- [ ] Remove sections you don't want to store
-- [ ] Add additional fields as needed for your use case
-- [ ] This file contains sensitive data - keep in private repo only
-
-RELATED FILES:
-- CONTACTS.md - Directory of people you work with
-- RESUME.md - Professional background
-- IDENTITY.md - AI identity configuration
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # Basic Information
 
 Your personal contact information used by the AI assistant.

@@ -1,31 +1,3 @@
-<!--
-================================================================================
-PAI CORE - USER/README.md
-================================================================================
-
-PURPOSE:
-Overview of the USER directory structure and contents. This directory contains
-your personal knowledge base that enables your AI assistant to understand your
-life, work, preferences, and goals.
-
-LOCATION:
-- Kai (Private): ${PAI_DIR}/skills/CORE/USER/README.md
-- PAI Pack: Packs/pai-core-install/src/skills/CORE/USER/README.md
-
-CUSTOMIZATION:
-- [ ] Update directory descriptions to match your actual file organization
-- [ ] Add or remove sections based on which files you've created
-- [ ] This file is user-specific - customize freely
-
-RELATED FILES:
-- SYSTEM/README.md - System-level documentation
-- CORE/SKILL.md - Main skill definition
-
-LAST UPDATED: 2026-01-08
-VERSION: 1.1.0
-================================================================================
--->
-
 # USER
 
 Personal knowledge base for your AI assistant. This directory contains information your AI needs to answer questions about your life, business, health, finances, and preferences.
