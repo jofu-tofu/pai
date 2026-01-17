@@ -49,7 +49,21 @@ const INACTIVE_TEXT = '#A0A0A0';
 // Simple question indicator - teal background does the work
 const QUESTION_TITLE = '❓ Question';
 
+/**
+ * Check if we're running in a Kitty terminal.
+ */
+function isKittyTerminal(): boolean {
+  if (process.platform === 'win32') return false;
+  const term = process.env.TERM || '';
+  return term.includes('kitty') || term === 'xterm-kitty';
+}
+
 async function main() {
+  // Skip on Windows or non-Kitty terminals
+  if (!isKittyTerminal()) {
+    process.exit(0);
+  }
+
   try {
     // Set tab color: active stays dark blue, inactive shows teal
     await Bun.$`kitten @ set-tab-color --self active_bg=${ACTIVE_TAB_BG} active_fg=${TAB_TEXT} inactive_bg=${TAB_AWAITING_BG} inactive_fg=${INACTIVE_TEXT}`;

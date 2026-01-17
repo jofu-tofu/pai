@@ -41,7 +41,21 @@ const ACTIVE_TAB_BG = '#002B80';       // Dark blue - active tab always
 const ACTIVE_TEXT = '#FFFFFF';
 const INACTIVE_TEXT = '#A0A0A0';
 
+/**
+ * Check if we're running in a Kitty terminal.
+ */
+function isKittyTerminal(): boolean {
+  if (process.platform === 'win32') return false;
+  const term = process.env.TERM || '';
+  return term.includes('kitty') || term === 'xterm-kitty';
+}
+
 async function main() {
+  // Skip on Windows or non-Kitty terminals
+  if (!isKittyTerminal()) {
+    process.exit(0);
+  }
+
   try {
     // Set tab color: active stays dark blue, inactive shows orange
     await Bun.$`kitten @ set-tab-color --self active_bg=${ACTIVE_TAB_BG} active_fg=${ACTIVE_TEXT} inactive_bg=${TAB_WORKING_BG} inactive_fg=${INACTIVE_TEXT}`.quiet();

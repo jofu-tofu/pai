@@ -230,6 +230,10 @@ function setTabTitle(title: string, state: TabState = 'normal'): void {
     const escaped = truncated.replace(/'/g, "'\\''");
 
     // Check if we're in Kitty (TERM=xterm-kitty or KITTY_LISTEN_ON set)
+    // Skip on Windows - Kitty doesn't run there
+    if (process.platform === 'win32') {
+      return;
+    }
     const isKitty = process.env.TERM === 'xterm-kitty' || process.env.KITTY_LISTEN_ON;
 
     if (isKitty) {

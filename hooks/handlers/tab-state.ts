@@ -26,9 +26,29 @@ const ACTIVE_TEXT_COLOR = '#FFFFFF';
 const INACTIVE_TEXT_COLOR = '#A0A0A0';
 
 /**
+ * Check if we're running in a Kitty terminal.
+ * Returns true only on Linux/macOS when TERM indicates Kitty.
+ */
+function isKittyTerminal(): boolean {
+  // Skip on Windows - Kitty doesn't run there
+  if (process.platform === 'win32') {
+    return false;
+  }
+
+  // Check TERM environment variable for kitty
+  const term = process.env.TERM || '';
+  return term.includes('kitty') || term === 'xterm-kitty';
+}
+
+/**
  * Handle tab state update with pre-parsed transcript data.
  */
 export async function handleTabState(parsed: ParsedTranscript): Promise<void> {
+  // Skip silently if not in Kitty terminal
+  if (!isKittyTerminal()) {
+    return;
+  }
+
   let plainCompletion = parsed.plainCompletion;
 
   // Validate completion
