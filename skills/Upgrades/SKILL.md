@@ -25,7 +25,7 @@ Monitor Anthropic ecosystem AND AI development YouTube channels for updates that
    Running the **WorkflowName** workflow from the **Upgrades** skill...
    ```
 
-**Full documentation:** `~/.claude/skills/CORE/SkillNotifications.md`
+**Full documentation:** `$PAI_DIR/skills/CORE/SkillNotifications.md`
 
 ## Workflow Routing
 
@@ -91,7 +91,7 @@ User: "deep dive the latest release notes"
 ## YouTube Monitoring
 
 YouTube channels are configured via the **Skill Customization Layer**.
-See `~/.claude/SKILLCUSTOMIZATIONS/Upgrades/` for user-specific channels.
+See `$PAI_DIR/SKILLCUSTOMIZATIONS/Upgrades/` for user-specific channels.
 
 **Features:**
 - Detection of new videos via yt-dlp
@@ -113,15 +113,15 @@ See `~/.claude/SKILLCUSTOMIZATIONS/Upgrades/` for user-specific channels.
 - `state/last-check.json` - Anthropic state
 - `state/youtube-videos.json` - YouTube state
 
-**User Customizations** (`~/.claude/SKILLCUSTOMIZATIONS/Upgrades/`):
+**User Customizations** (`$PAI_DIR/SKILLCUSTOMIZATIONS/Upgrades/`):
 - `EXTEND.yaml` - Extension manifest
 - `youtube-channels.json` - User's personal YouTube channels
 
-Use `bun ~/.claude/skills/CORE/Tools/LoadSkillConfig.ts` to load configs with customizations merged.
+Use `bun $PAI_DIR/skills/CORE/Tools/LoadSkillConfig.ts` to load configs with customizations merged.
 
 ## Integration
 
 Uses **VideoTranscript** skill for transcript extraction:
 ```bash
-bun ~/.claude/skills/CORE/Tools/GetTranscript.ts "<youtube-url>"
+bun $PAI_DIR/skills/CORE/Tools/GetTranscript.ts "<youtube-url>"
 ```

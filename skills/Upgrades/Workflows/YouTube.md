@@ -3,7 +3,7 @@
 Monitor configured YouTube channels for new videos and extract transcripts.
 
 **Note:** Personal YouTube channels are configured via the skill customization layer.
-See `~/.claude/SKILLCUSTOMIZATIONS/Upgrades/` for user-specific channels.
+See `$PAI_DIR/SKILLCUSTOMIZATIONS/Upgrades/` for user-specific channels.
 
 ## Process
 
@@ -11,7 +11,7 @@ See `~/.claude/SKILLCUSTOMIZATIONS/Upgrades/` for user-specific channels.
 
 Load channels using the config loader (merges base + user customizations):
 ```bash
-bun ~/.claude/skills/CORE/Tools/LoadSkillConfig.ts ~/.claude/skills/Upgrades youtube-channels.json
+bun $PAI_DIR/skills/CORE/Tools/LoadSkillConfig.ts $PAI_DIR/skills/Upgrades youtube-channels.json
 ```
 
 ### Step 2: Check Each Channel for New Videos
@@ -25,7 +25,7 @@ yt-dlp --flat-playlist --dump-json "https://www.youtube.com/@channelhandle/video
 
 Read the seen videos state:
 ```bash
-cat ~/.claude/skills/Upgrades/state/youtube-videos.json
+cat $PAI_DIR/skills/Upgrades/state/youtube-videos.json
 ```
 
 Compare video IDs to identify NEW videos not in the seen list.
@@ -34,7 +34,7 @@ Compare video IDs to identify NEW videos not in the seen list.
 
 For each new video, use the **VideoTranscript** skill:
 ```bash
-bun ~/.claude/skills/CORE/Tools/GetTranscript.ts "<video-url>"
+bun $PAI_DIR/skills/CORE/Tools/GetTranscript.ts "<video-url>"
 ```
 
 ### Step 5: Update State
@@ -54,14 +54,14 @@ For each new video, provide:
 ## Channels Monitored
 
 Channels are configured via the skill customization layer:
-- **Base skill**: `~/.claude/skills/Upgrades/youtube-channels.json` (empty - for PAI generic channels if any)
-- **User customization**: `~/.claude/SKILLCUSTOMIZATIONS/Upgrades/youtube-channels.json`
+- **Base skill**: `$PAI_DIR/skills/Upgrades/youtube-channels.json` (empty - for PAI generic channels if any)
+- **User customization**: `$PAI_DIR/SKILLCUSTOMIZATIONS/Upgrades/youtube-channels.json`
 
 The config loader merges both, so user channels are automatically included.
 
 ## Adding New Channels
 
-Edit your customization file at `~/.claude/SKILLCUSTOMIZATIONS/Upgrades/youtube-channels.json`:
+Edit your customization file at `$PAI_DIR/SKILLCUSTOMIZATIONS/Upgrades/youtube-channels.json`:
 
 ```json
 {

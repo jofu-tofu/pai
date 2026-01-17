@@ -7,7 +7,7 @@ Check 30+ official Anthropic sources for updates relevant to PAI infrastructure.
 ### Step 1: Run the Anthropic Check Tool
 
 ```bash
-bun ~/.claude/skills/Upgrades/Tools/Anthropic.ts
+bun $PAI_DIR/skills/Upgrades/Tools/Anthropic.ts
 ```
 
 **Options:**
