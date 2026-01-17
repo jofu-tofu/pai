@@ -1,18 +1,10 @@
-# Development Guide - PAI System
+# PAI Development Guide
 
-## Context & Motivation
+## Quick Start (Required Before Any Work)
 
-The PAI system architecture requires `PAI_DIR` to locate code and data across the entire codebase. Without proper configuration, tests access wrong paths, create files in incorrect locations, and development work pollutes production environments. This guide ensures isolated development with reliable test execution.
+PAI requires the `PAI_DIR` environment variable to locate all resources. Set it to your current working directory before running tests or making changes.
 
-## Critical Environment Setup
-
-Before running ANY tests or development commands, configure your environment. This prevents path errors, wrong file locations, and cross-environment pollution.
-
-### Step 1: Set PAI_DIR
-
-Navigate to your development worktree root, then set the environment variable:
-
-**PowerShell (Windows):**
+**PowerShell 7 (Windows):**
 ```powershell
 $env:PAI_DIR = $PWD.Path
 ```
@@ -22,324 +14,284 @@ $env:PAI_DIR = $PWD.Path
 export PAI_DIR="$(pwd)"
 ```
 
-### Step 2: Verify Configuration
+**Verify:** `echo $env:PAI_DIR` (pwsh) or `echo $PAI_DIR` (bash) → should show your worktree path
 
-```bash
-# PowerShell
-echo $env:PAI_DIR
+**Test:** `bun test` → should run without path errors
 
-# Bash
-echo $PAI_DIR
+---
+
+## Critical Path Rules
+
+### PAI_DIR vs ~/.claude
+
+This repository IS the PAI_DIR. Claude Code's `~/.claude` is completely separate.
+
+| Path | Purpose |
+|------|---------|
+| `~/.claude/` | Claude Code's global config (NOT PAI) |
+| `$PAI_DIR/` | PAI system root |
+| `$PAI_DIR/.claude/` | PAI's hook configuration |
+
+**Code referencing `~/.claude` directly is a bug.** Use `$PAI_DIR/.claude/` instead.
+
+```typescript
+// ✅ Correct
+const settingsPath = path.join(process.env.PAI_DIR!, '.claude', 'settings.json');
+
+// ❌ Wrong - bypasses PAI_DIR
+const settingsPath = path.join(os.homedir(), '.claude', 'settings.json');
 ```
 
-**Expected output:** Your current worktree directory path
+**Run the linter to catch violations:** `bun run tools/PaiDirLinter.ts`
 
-### Step 3: Run Initial Test
+### Verify Local Paths Before Writing Code
 
+This instance diverges from upstream PAI. A path that exists upstream may not exist here.
+
+**Before writing imports or references:**
 ```bash
-bun test
+ls -la "$PAI_DIR/path/you/expect"
+find "$PAI_DIR" -name "filename.ts" 2>/dev/null
 ```
 
-**Success:** Tests run without path errors
-**Failure:** PAI_DIR not set correctly - repeat Step 1
+---
 
-## How PAI_DIR Works
+## Environment Isolation
 
-The PAI system uses `PAI_DIR` as the root path for all resource location:
+| Environment | PAI_DIR | Purpose |
+|-------------|---------|---------|
+| Development | `$(pwd)` | Isolated testing in worktree |
+| Production | `~/pai` | Live PAI system |
 
-**Code locations:**
-- `$PAI_DIR/hooks/` - Git hooks and automation
-- `$PAI_DIR/hooks/memory/` - Memory system code
-- `$PAI_DIR/scripts/` - Utility scripts
-- `$PAI_DIR/skills/` - Skill definitions
+Setting PAI_DIR to your worktree ensures:
+- Tests write to your worktree, not production
+- Hook changes don't affect the live system
+- Development and production remain isolated
 
-**Data locations:**
-- `$PAI_DIR/mem-store/` - Memory system data
-- `$PAI_DIR/MEMORY/` - Session and state data
-- `$PAI_DIR/agentic_logs/` - Agent execution logs
+---
 
-**Environment isolation:**
-- **Development:** `PAI_DIR=$(pwd)` - Your worktree (isolated testing)
-- **Production:** `PAI_DIR=~/pai` - Global installation (live system)
+## Directory Structure
 
-## Development vs Production
+```
+$PAI_DIR/
+├── .claude/settings.json     ← Hook configuration
+├── hooks/                    ← Hook system (*.hook.ts)
+│   ├── handlers/             ← Handler modules
+│   ├── lib/                  ← Shared utilities
+│   └── memory/               ← Custom memory system
+├── skills/                   ← Skill definitions (CORE, etc.)
+├── tools/                    ← Linters, generators
+├── scripts/                  ← Setup scripts
+├── MEMORY/                   ← Session history, state, learnings
+├── mem-store/                ← Memory system data
+└── agentic_logs/             ← Agent execution logs
+```
 
-| Environment | PAI_DIR Value | Purpose |
-|-------------|---------------|---------|
-| **Development** | `$(pwd)` (worktree root) | Isolated testing in development branch |
-| **Production** | `~/pai` or `$HOME/pai` | Deployed global PAI system |
+---
 
-## Working with Hooks
+## Hook System
 
-Claude Code uses a **per-directory** hook system. Hooks are only active when Claude Code finds a `.claude/settings.json` file in the current working directory or parent directories.
+Hooks execute at Claude Code lifecycle events. They are only active when `.claude/settings.json` exists in the current directory or a parent.
 
-### Hook Architecture
+### Hook Types
 
-**Production PAI System:**
-- Location: `$HOME/pai/.claude/settings.json`
-- Active when: Working in `~/pai` directory
-- Purpose: Full PAI System hooks (memory, security, context loading)
-
-**Development (this repository):**
-- Location: `$(pwd)/.claude/settings.json` (optional, create as needed)
-- Active when: Working in this worktree
-- Purpose: Test hooks in isolation without affecting production PAI System
-
-**Other directories:**
-- No hooks active
-- Clean Claude Code experience
-- Perfect for general development work
-
-### Developing Hooks
-
-When working on hook code in this repository:
-
-1. **Set PAI_DIR to your worktree** (as per standard workflow):
-   ```powershell
-   $env:PAI_DIR = $PWD.Path
-   ```
-
-2. **Create local .claude/settings.json** (if testing hooks):
-   ```powershell
-   bun run scripts/setup-hooks.ts
-   ```
-   This creates `.claude/settings.json` pointing to hooks in THIS repository.
-
-3. **Launch Claude Code** in this directory:
-   ```bash
-   claude
-   ```
-   Hooks will now execute from your development code, not production.
-
-4. **Verify hook behavior**:
-   - Check terminal output for hook execution messages
-   - Verify files are written to `$PAI_DIR/history/` (your worktree)
-   - Not writing to production `~/pai/history/`
-
-5. **When done**, remove `.claude/settings.json` to disable hooks:
-   ```powershell
-   rm .claude/settings.json
-   ```
+| Event | Hooks | Purpose |
+|-------|-------|---------|
+| SessionStart | LoadContext, StartupGreeting, CheckVersion | Context injection, greetings |
+| PreToolUse | SecurityValidator | Block dangerous operations |
+| UserPromptSubmit | UpdateTabTitle, FormatEnforcer, AutoWorkCreation, memory/retrieve | UI updates, format reminders, memory |
+| Stop | StopOrchestrator (voice, capture, tab-state handlers) | Response processing |
+| SubagentStop | AgentOutputCapture | Capture Task tool outputs |
+| SessionEnd | SessionSummary, QuestionAnswered | Session analysis |
 
 ### Hook Reference
 
-Each hook serves a specific purpose in the PAI System:
+**SessionStart:**
+- **LoadContext.hook.ts** — Loads CORE skill, injects as `<system-reminder>`, loads active work items. Skips subagents.
+- **StartupGreeting.hook.ts** — Announces session via voice server, sets tab state.
+- **CheckVersion.hook.ts** — Verifies PAI system version compatibility.
 
-#### SessionStart Hooks
+**PreToolUse:**
+- **SecurityValidator.hook.ts** — Validates Bash/Edit/Write/Read against `patterns.yaml`. Categories: `blocked` (exit 2), `confirm`, `alert`. Writes to `MEMORY/SECURITY/`.
 
-1. **initialize-session.ts** - Session initialization
-   - Sets terminal tab title with project name
-   - Creates required directory structure
-   - Writes session marker file
+**UserPromptSubmit:**
+- **UpdateTabTitle.hook.ts** — Dynamic tab title from prompt keywords.
+- **SetQuestionTab.hook.ts** — Detects question-type prompts.
+- **AutoWorkCreation.hook.ts** — Creates WORK/ items with Work.md, IdealState.jsonl, TRACE.jsonl.
+- **FormatEnforcer.hook.ts** — Response format reminders, tracks compliance streaks.
+- **memory/retrieve.ts** — Retrieves relevant memory context for injection.
 
-2. **load-core-context.ts** - Context injection
-   - Loads CORE skill from `$PAI_DIR/skills/CORE/SKILL.md`
-   - Injects into Claude's context as `<system-reminder>`
-   - Skips for subagent sessions
+**Stop:**
+- **StopOrchestrator.hook.ts** — Single entry point, reads transcript once, distributes to handlers:
+  - `voice.ts` — Extracts 🗣️ line for voice server
+  - `capture.ts` — Updates WORK/ items
+  - `tab-state.ts` — Resets tab to default
+  - `SystemIntegrity.ts` — Detects PAI changes, spawns maintenance
+- **WorkCompletionLearning.hook.ts** — Extracts learnings, routes to phase directories.
+- **ExplicitRatingCapture.hook.ts** — Captures user satisfaction ratings.
+- **ImplicitSentimentCapture.hook.ts** — Detects implicit satisfaction signals.
 
-#### PreToolUse Hooks
+**SubagentStop:**
+- **AgentOutputCapture.hook.ts** — Captures Task tool outputs, routes by agent type.
 
-3. **security-validator.ts** - Security validation (Bash tool only)
-   - Validates Bash commands against attack patterns
-   - Blocks: rm -rf, reverse shells, credential theft, prompt injection
-   - Warns: git force operations, sudo usage
-   - Logs: network operations, system modifications
+**SessionEnd:**
+- **SessionSummary.hook.ts** — Analyzes session, creates summary in `MEMORY/sessions/`.
+- **QuestionAnswered.hook.ts** — Tracks question resolution.
 
-#### Continuous Capture Hooks
+### Hook Command Escaping (settings.json)
 
-4. **capture-all-events.ts** - Universal event logger
-   - Captures ALL hook events to JSONL files
-   - Location: `$PAI_DIR/history/raw-outputs/YYYY-MM/YYYY-MM-DD_all-events.jsonl`
-   - Tracks agent types and session mapping
-   - Runs on: SessionStart, PreToolUse, PostToolUse, Stop, SubagentStop, SessionEnd, UserPromptSubmit
+PowerShell hook commands require triple backslash-quote (`\\\"`) for paths:
 
-#### UserPromptSubmit Hooks
+```json
+{
+  "type": "command",
+  "command": "pwsh -NoProfile -Command \"bun run \\\"$env:PAI_DIR/hooks/MyHook.hook.ts\\\"\""
+}
+```
 
-5. **memory/retrieve.ts** - Memory retrieval
-   - Retrieves relevant memory context based on user prompt
-   - Injects context into Claude's conversation
-   - PAI Memory System component
+**How it parses:**
 
-6. **cleanup-temp-files.ts** - Temporary file cleanup
-   - Recursively scans working directory for temporary Claude files
-   - Deletes files and directories matching `tmpclaude-*` pattern
-   - Runs silently to avoid cluttering output
-   - Prevents accumulation of temporary files during sessions
+| Level | Sees |
+|-------|------|
+| JSON string | `pwsh -NoProfile -Command "bun run \"$env:PAI_DIR/hooks/MyHook.hook.ts\""` |
+| Shell | `pwsh -NoProfile -Command "bun run \"$env:PAI_DIR/hooks/MyHook.hook.ts\""` |
+| PowerShell | `bun run "$env:PAI_DIR/hooks/MyHook.hook.ts"` |
 
-7. **update-tab-titles.ts** - UI updates
-   - Updates terminal tab title based on user prompt
-   - Extracts keywords from prompt
-   - Sets dynamic tab title (e.g., "🤖 Fix authentication bug")
+**Symptom of incorrect escaping:** Hooks silently fail, PowerShell token errors.
 
-#### SessionEnd Hooks
+### Developing Hooks
 
-8. **memory/capture.ts** - Memory system capture
-   - Captures session learnings to semantic memory
-   - Processes conversation for extractable knowledge
-   - Routes to appropriate memory segments
+1. Set `PAI_DIR` to your worktree
+2. Create local config: `bun run scripts/setup-hooks.ts`
+3. Launch Claude Code: `claude`
+4. Verify files write to `$PAI_DIR/MEMORY/`, not `~/pai/MEMORY/`
+5. Remove `.claude/settings.json` when done
 
-9. **capture-session-summary.ts** - Final session summary
-   - Analyzes entire session from raw events
-   - Determines session focus (blog-work, hook-development, etc.)
-   - Lists files changed, commands executed, tools used
-   - Creates comprehensive session summary
+### Hook Best Practices
 
-#### Stop Hooks
+| Practice | Reason |
+|----------|--------|
+| Write to `$PAI_DIR/MEMORY/` | Ensures environment isolation |
+| Log to stderr, output to stdout | Claude sees stdout only |
+| Exit 0 (allow), 2 (block) | Exit codes control hook behavior |
+| Use `hooks/lib/` utilities | Consistent path resolution, notifications |
+| Support both pwsh and bash | Cross-platform compatibility |
 
-10. **stop-hook.ts** - Main session capture
-    - Captures main agent work summaries
-    - Detects learnings vs regular sessions
-    - Routes to: `history/learnings/` or `history/sessions/`
-    - Extracts summary from final response
+---
 
-11. **subagent-stop-hook.ts** - Subagent output capture
-    - Captures Task tool outputs
-    - Routes by agent type:
-      - `researcher` → `history/research/`
-      - `architect` → `history/decisions/`
-      - `engineer`, `designer` → `history/execution/features/`
-    - Extracts completion message
+## Memory Systems
 
-### Hook Development Best Practices
+PAI uses two complementary memory systems:
 
-1. **Never test hooks in production** - Always use a development worktree with `PAI_DIR=$(pwd)`
+| System | Location | Purpose |
+|--------|----------|---------|
+| Claude Code (CLAUDE.md) | `~/.claude/`, `PROJECT_DIR/` | User prefs, project instructions |
+| PAI Memory | `$PAI_DIR/hooks/memory/`, `$PAI_DIR/mem-store/` | Semantic retrieval, session history |
 
-2. **Check hook output** - Hooks write to stderr for logging; Claude sees stdout
+### PAI Memory Architecture
 
-3. **Exit codes matter**:
-   - `0` - Success, allow operation
-   - `2` - Block operation (security-validator)
-   - Non-zero - Error, operation may be blocked
+```
+hooks/memory/
+├── core/           # Retrieval pipeline, ranking, filters, decay
+├── providers/      # Pluggable: search, segment, storage, extract, organize, summarize
+├── lib/            # Ranking implementations, output formatters
+├── api/            # Programmatic API
+└── tools/          # Diagnostic and query tools
+```
 
-4. **Memory/History writes** - All hooks write to `$PAI_DIR/history/`, verify it's your worktree
+**When to use which:**
 
-5. **Cross-platform** - Hooks must work on Windows (PowerShell) and Unix (bash)
+| Need | System |
+|------|--------|
+| Persistent user preferences | Claude Code (CLAUDE.md) |
+| Project-specific instructions | Claude Code (project CLAUDE.md) |
+| Semantic memory retrieval | PAI Memory |
+| Historical session context | PAI Memory |
+| Learning from past sessions | PAI Memory |
 
-## Running Tests
+---
+
+## Testing
 
 ```bash
-# All tests
-bun test
-
-# Specific file
-bun test hooks/memory/types/common.test.ts
-
-# Watch mode
-bun test --watch
-
-# With coverage (if configured)
-bun test --coverage
+bun test                              # All tests
+bun test hooks/memory/types/common.test.ts  # Specific file
+bun test --watch                      # Watch mode
 ```
 
-## Project Structure
+---
 
-```
-<repo-root>/                         ← SET PAI_DIR HERE (use $PWD or $(pwd))
-├── hooks/memory/                    ← Memory system code
-├── mem-store/                       ← Memory system data (development)
-└── _bmad-output/                    ← BMM artifacts
-```
+## Common Issues
 
-## Standard Development Workflow
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| Path not found errors | PAI_DIR not set | Set `$env:PAI_DIR = $PWD.Path` |
+| PowerShell 5 errors | Using `powershell` not `pwsh` | Install PowerShell 7, use `pwsh` |
+| Files in wrong location | PAI_DIR points elsewhere | Verify PAI_DIR matches `pwd` |
+| Missing types/modules | Dependencies not installed | Run `bun install` |
 
-Follow this pattern for all development work:
+---
 
-1. **Create branch/worktree** for your feature or fix
-2. **Navigate to worktree root** in your terminal
-3. **Set PAI_DIR** using commands in Step 1 above
-4. **Verify configuration** using Step 2 above
-5. **Run initial tests** to confirm environment is correct
-6. **Develop changes** iteratively
-7. **Run tests frequently** during development
-8. **Verify all tests pass** before committing
-9. **Commit and push** when complete
+## Upstream Relationship
 
-## Troubleshooting
+This instance derives from [danielmiessler/PAI](https://github.com/danielmiessler/PAI).
 
-Use this section to resolve common development issues.
+| Resource | Location |
+|----------|----------|
+| Local upstream clone | `C:\Users\fujos\Github\Personal_AI_Infrastructure` |
+| GitHub repository | https://github.com/danielmiessler/Personal_AI_Infrastructure |
 
-### Issue: Tests fail with "path not found" errors
+### Active Development Warning
 
-**Cause:** PAI_DIR environment variable not set
+The upstream project changes frequently. This instance intentionally diverges:
 
-**Solution:**
-1. Navigate to worktree root
-2. Run: `$env:PAI_DIR = $PWD.Path` (PowerShell) or `export PAI_DIR="$(pwd)"` (Bash)
-3. Verify: `echo $env:PAI_DIR` should show your worktree path
-4. Run tests again
+- **Volatile changes** — Upstream may change significantly between pulls
+- **Partial adoption** — We use parts of upstream, not all
+- **Local implementations** — Some features here don't exist upstream
+- **Missing features** — Some upstream features aren't present here
 
-### Issue: Files created in unexpected locations
+### Key Differences
 
-**Cause:** PAI_DIR points to wrong directory
+| Area | This Instance | Upstream |
+|------|---------------|----------|
+| Hooks | `.hook.ts` naming, custom handlers | Different patterns |
+| Memory | Provider-based architecture | Different implementation |
+| Skills | Adapted subset | Full library |
+| Configuration | Personalized | Generic/template |
 
-**Solution:**
-1. Check current PAI_DIR: `echo $env:PAI_DIR`
-2. Compare to current directory: `pwd`
-3. If different, set PAI_DIR to current directory
-4. Verify configuration
+### Using Upstream as Reference
 
-### Issue: Cannot find types or modules
+1. **Source of truth** — How PAI concepts *should* work per original design
+2. **Missing hook reference** — Check upstream for full implementations
+3. **Pattern reference** — Consistent naming, structure, architecture
+4. **Documentation source** — May have docs not incorporated here
 
-**Cause:** Dependencies not installed
+**Sync upstream:** `cd C:\Users\fujos\Github\Personal_AI_Infrastructure && git pull origin main`
 
-**Solution:**
-1. Run: `bun install`
-2. Wait for installation to complete
-3. Run tests again
+### Writing Code in This Instance
 
-### Issue: Tests pass locally but fail in CI
+Paths and structures may differ from upstream. Before writing code:
 
-**Cause:** CI environment missing PAI_DIR configuration
+1. **Verify paths exist locally** — `ls -la "$PAI_DIR/path/you/expect"`
+2. **Search for actual location** — `find "$PAI_DIR" -name "filename.ts"`
+3. **Adapt imports** — Upstream's `../lib/utils` might be `hooks/lib/` here
+4. **Don't copy blindly** — Adapt code to local paths and patterns
 
-**Solution:**
-1. Check CI configuration file
-2. Ensure PAI_DIR is set in CI environment
-3. Verify CI uses correct directory structure
+---
 
 ## Deployment Checklist
 
-Complete all items before deploying to production:
+**Pre-Deploy:**
+- [ ] `bun test` passes
+- [ ] `bun run tools/PaiDirLinter.ts` shows no violations
+- [ ] No debug code in production files
 
-**Pre-Deployment Verification:**
-- [ ] All tests passing: `bun test` shows no failures
-- [ ] Code review approved by team member
-- [ ] Documentation updated to reflect changes
-- [ ] No debug code or console.logs in production code
-- [ ] All dependencies in package.json are production-ready
+**Deploy:**
+- [ ] Set `$env:PAI_DIR = "$HOME/pai"`
+- [ ] Copy files to production location
+- [ ] Update `.claude/settings.json`
+- [ ] Run smoke tests
 
-**Environment Configuration:**
-- [ ] Set PAI_DIR to production path
-  - PowerShell: `$env:PAI_DIR = "$HOME/pai"`
-  - Bash: `export PAI_DIR="$HOME/pai"`
-- [ ] Verify production PAI_DIR: `echo $env:PAI_DIR` (PowerShell) or `echo $PAI_DIR` (Bash)
-
-**Deployment Steps:**
-- [ ] Copy code to production location: `cp -r hooks/memory $PAI_DIR/hooks/`
-- [ ] Create required data directories: `mkdir -p $PAI_DIR/mem-store/{segments,structured,indexes/keyword,queue,metrics,cache}`
-- [ ] Update `.claude/settings.json` with new hooks/configurations
-- [ ] Run production smoke tests
-- [ ] Verify all features work in production environment
-
-**Post-Deployment:**
-- [ ] Monitor logs for errors
-- [ ] Verify data is being written to correct locations
-- [ ] Test critical user workflows
-
-## Success Criteria
-
-Development environment is correctly configured when:
-
-✅ PAI_DIR environment variable is set and verified
-✅ `bun test` runs without path-related errors
-✅ Files are created in worktree, not in global pai directory
-✅ Changes can be made without affecting production environment
-✅ All tests pass consistently
-
-## Development Best Practices
-
-1. **Set PAI_DIR first** - Every development session starts with environment configuration
-2. **Verify before running** - Always check PAI_DIR is correct before tests or code execution
-3. **Test frequently** - Run tests after each meaningful change
-4. **Isolate environments** - Keep development and production strictly separated via PAI_DIR
-5. **Follow patterns** - Match existing code structure and conventions
-6. **Document changes** - Update relevant documentation when modifying behavior
+**Post-Deploy:**
+- [ ] Monitor logs
+- [ ] Verify files write to correct locations
