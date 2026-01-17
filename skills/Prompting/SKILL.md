@@ -1,6 +1,6 @@
 ---
 name: Prompting
-description: Prompt engineering standards and template system. USE WHEN prompt optimization OR best practices OR review prompt OR prompt quality OR meta-prompting OR template generation OR writing workflow prompts OR improving skill prompts.
+description: Meta-prompting system for dynamic prompt generation using templates, standards, and patterns. USE WHEN meta-prompting, template generation, prompt optimization, or programmatic prompt composition.
 ---
 
 # Prompting - Meta-Prompting & Template System

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * RenderTemplate.ts - Template Rendering Engine
+ * RenderTemplate.ts - PAI Templating Engine
  *
  * Renders Handlebars templates with YAML data sources.
  *
@@ -9,7 +9,8 @@
  *
  * Examples:
  *   bun run RenderTemplate.ts --template Primitives/Roster.hbs --data Data/Agents.yaml
- *   bun run RenderTemplate.ts -t Primitives/Gate.hbs -d Data/Gates.yaml --preview
+ *   bun run RenderTemplate.ts -t Evals/Judge.hbs -d Data/JudgeConfig.yaml -o Compiled/judge.md
+ *   bun run RenderTemplate.ts --template Primitives/Gate.hbs --data Data/Gates.yaml --preview
  */
 
 import Handlebars from 'handlebars';
@@ -135,37 +136,49 @@ interface RenderOptions {
 }
 
 function resolveTemplatePath(path: string): string {
+  // If absolute, use as-is
   if (path.startsWith('/')) return path;
+
+  // Resolve relative to Templates directory
   const templatesDir = dirname(dirname(import.meta.path));
   return resolve(templatesDir, path);
 }
 
 function loadTemplate(templatePath: string): HandlebarsTemplateDelegate {
   const fullPath = resolveTemplatePath(templatePath);
+
   if (!existsSync(fullPath)) {
     throw new Error(`Template not found: ${fullPath}`);
   }
+
   const templateSource = readFileSync(fullPath, 'utf-8');
   return Handlebars.compile(templateSource);
 }
 
 function loadData(dataPath: string): Record<string, unknown> {
   const fullPath = resolveTemplatePath(dataPath);
+
   if (!existsSync(fullPath)) {
     throw new Error(`Data file not found: ${fullPath}`);
   }
+
   const dataSource = readFileSync(fullPath, 'utf-8');
+
+  // Support both YAML and JSON
   if (dataPath.endsWith('.json')) {
     return JSON.parse(dataSource);
   }
+
   return parseYaml(dataSource) as Record<string, unknown>;
 }
 
 function registerPartials(templatesDir: string): void {
   const partialsDir = resolve(templatesDir, 'Partials');
+
   if (!existsSync(partialsDir)) return;
 
   const files = Bun.spawnSync(['ls', partialsDir]).stdout.toString().trim().split('\n');
+
   for (const file of files) {
     if (file.endsWith('.hbs')) {
       const partialName = basename(file, '.hbs');
@@ -178,12 +191,20 @@ function registerPartials(templatesDir: string): void {
 
 export function renderTemplate(options: RenderOptions): string {
   const templatesDir = dirname(dirname(import.meta.path));
+
+  // Register any partials
   registerPartials(templatesDir);
 
+  // Load and compile template
   const template = loadTemplate(options.templatePath);
+
+  // Load data
   const data = loadData(options.dataPath);
+
+  // Render
   const rendered = template(data);
 
+  // Output
   if (options.preview) {
     console.log('\n=== PREVIEW ===\n');
     console.log(rendered);
@@ -219,7 +240,7 @@ function main(): void {
 
   if (values.help || !values.template || !values.data) {
     console.log(`
-Template Renderer
+PAI Template Renderer
 
 Usage:
   bun run RenderTemplate.ts --template <path> --data <path> [options]
@@ -227,26 +248,32 @@ Usage:
 Options:
   -t, --template <path>  Template file (.hbs)
   -d, --data <path>      Data file (.yaml or .json)
-  -o, --output <path>    Output file (optional)
+  -o, --output <path>    Output file (optional, prints to stdout if omitted)
   -p, --preview          Show preview in console
   -h, --help             Show this help
+
+Examples:
+  bun run RenderTemplate.ts -t Primitives/Roster.hbs -d Data/Agents.yaml -p
+  bun run RenderTemplate.ts -t Evals/Judge.hbs -d Data/JudgeConfig.yaml -o Compiled/judge.md
 
 Available Helpers:
   {{uppercase str}}           - Convert to uppercase
   {{lowercase str}}           - Convert to lowercase
   {{titlecase str}}           - Convert to title case
-  {{indent str spaces}}       - Indent text
-  {{join arr separator}}      - Join array
+  {{indent str spaces}}       - Indent text by N spaces
+  {{join arr separator}}      - Join array with separator
   {{eq a b}}                  - Check equality
   {{gt a b}} / {{lt a b}}     - Greater/less than
+  {{includes arr value}}      - Check if array includes value
   {{now format}}              - Current date/time
-  {{pluralize count word}}    - Pluralize
+  {{pluralize count word}}    - Pluralize based on count
   {{formatNumber num}}        - Format with commas
   {{percent value total}}     - Calculate percentage
   {{truncate str length}}     - Truncate to length
-  {{default value fallback}}  - Default value
+  {{default value fallback}}  - Default value if undefined
   {{json obj pretty}}         - JSON stringify
   {{codeblock code lang}}     - Markdown code block
+  {{repeat count}}...{{/repeat}} - Repeat content N times
 `);
     process.exit(values.help ? 0 : 1);
   }
@@ -264,6 +291,7 @@ Available Helpers:
   }
 }
 
+// Run if called directly
 if (import.meta.main) {
   main();
 }
