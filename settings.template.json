@@ -1,0 +1,121 @@
+{
+  "model": "opus",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/StartupGreeting.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/LoadContext.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/CheckVersion.hook.ts"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/SecurityValidator.hook.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/SetQuestionTab.hook.ts"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/QuestionAnswered.hook.ts"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/UpdateTabTitle.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/ExplicitRatingCapture.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/AutoWorkCreation.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/ImplicitSentimentCapture.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/FormatEnforcer.hook.ts"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/StopOrchestrator.hook.ts"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/AgentOutputCapture.hook.ts"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/SessionSummary.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/WorkCompletionLearning.hook.ts"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bun {{PAI_DIR}}/tools/statusline.ts"
+  },
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": true
+  }
+}

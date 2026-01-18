@@ -32,7 +32,7 @@ This repository IS the PAI_DIR. Claude Code's `~/.claude` is completely separate
 | `$PAI_DIR/` | PAI system root |
 | `$PAI_DIR/.claude/` | PAI's hook configuration |
 
-**Code referencing `~/.claude` directly is a bug.** Use `$PAI_DIR/.claude/` instead.
+**Code referencing `~/.claude` directly is a bug.** Use `$PAI_DIR` instead.
 
 ```typescript
 // ✅ Correct
@@ -156,13 +156,54 @@ PowerShell hook commands require triple backslash-quote (`\\\"`) for paths:
 
 **Symptom of incorrect escaping:** Hooks silently fail, PowerShell token errors.
 
+### Settings Setup (Cross-Platform)
+
+Hook paths in `settings.json` must be absolute because Claude Code's shell doesn't reliably expand environment variables like `$PAI_DIR` on all platforms.
+
+**Solution:** Use a template file with placeholders, then expand to absolute paths.
+
+| File | Purpose | Git Status |
+|------|---------|------------|
+| `settings.template.json` | Source with `{{PAI_DIR}}` placeholders | Tracked |
+| `settings.json` | Generated with absolute paths | Ignored |
+
+**Generate settings.json:**
+```bash
+bun scripts/expand-settings.ts
+```
+
+This reads `{{PAI_DIR}}` placeholders and replaces them with the resolved absolute path (e.g., `C:/Users/fujos/pai`).
+
+**Deploy to Claude Code:**
+```bash
+# Copy to global Claude config
+cp settings.json ~/.claude/settings.json
+```
+
+**Full workflow after changes:**
+```bash
+# 1. Edit the template (not settings.json directly)
+#    settings.template.json uses {{PAI_DIR}} placeholders
+
+# 2. Generate settings.json with absolute paths
+bun scripts/expand-settings.ts
+
+# 3. Copy to Claude Code's config directory
+cp settings.json ~/.claude/settings.json
+
+# 4. Restart Claude Code to pick up changes
+```
+
+**Note:** If you move your PAI directory, re-run the expand script and copy again.
+
 ### Developing Hooks
 
 1. Set `PAI_DIR` to your worktree
-2. Create local config: `bun run scripts/setup-hooks.ts`
-3. Launch Claude Code: `claude`
-4. Verify files write to `$PAI_DIR/MEMORY/`, not `~/pai/MEMORY/`
-5. Remove `.claude/settings.json` when done
+2. Generate settings: `bun scripts/expand-settings.ts`
+3. Deploy settings: `cp settings.json ~/.claude/settings.json`
+4. Launch Claude Code: `claude`
+5. Verify files write to `$PAI_DIR/MEMORY/`, not `~/pai/MEMORY/`
+6. Remove `~/.claude/settings.json` when done (or restore original)
 
 ### Hook Best Practices
 
