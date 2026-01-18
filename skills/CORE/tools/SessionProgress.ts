@@ -11,6 +11,7 @@
 
 import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { getPaiDir } from '../../../hooks/lib/paths';
 
 interface Decision {
   timestamp: string;
@@ -43,7 +44,7 @@ interface SessionProgress {
   next_steps: string[];
 }
 
-const PAI_DIR = process.env.PAI_DIR || process.env.PAI_HOME || join(process.env.HOME || process.env.USERPROFILE || '', '.claude');
+const PAI_DIR = getPaiDir();
 const PROGRESS_DIR = join(PAI_DIR, 'MEMORY', 'STATE', 'progress');
 
 function ensureDir(dir: string): void {

@@ -14,74 +14,57 @@ import { readdirSync, existsSync, readFileSync } from "fs";
 import { join, dirname } from "path";
 import { spawnSync } from "child_process";
 import { homedir } from "os";
-
-// Get PAI directory - mirrors hooks/lib/paths.ts logic
-function getPaiDir(): string {
-  const envPaiDir = process.env.PAI_DIR;
-  if (envPaiDir) {
-    const home = homedir();
-    return envPaiDir
-      .replace(/^\$HOME(?=\/|$)/, home)
-      .replace(/^\$\{HOME\}(?=\/|$)/, home)
-      .replace(/^~(?=\/|$)/, home);
-  }
-  return join(homedir(), '.claude');
-}
+import { isWindows, isMacOS, getPlatformDisplayName, supportsAnsiColors, splitLines } from '../../../hooks/lib/platform';
+import { getPaiDir } from '../../../hooks/lib/paths';
 
 const PAI_DIR = getPaiDir();
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Terminal Width Detection
+// Terminal Width Detection (Cross-Platform)
 // ═══════════════════════════════════════════════════════════════════════════
 
 function getTerminalWidth(): number {
-  let width: number | null = null;
+  // 1. Primary: Use Node.js built-in (works on all platforms)
+  if (process.stdout.columns && process.stdout.columns > 0) {
+    return process.stdout.columns;
+  }
 
-  const kittyWindowId = process.env.KITTY_WINDOW_ID;
-  if (kittyWindowId) {
+  // 2. Fallback: COLUMNS environment variable (cross-platform)
+  const envColumns = parseInt(process.env.COLUMNS || "0");
+  if (envColumns > 0) {
+    return envColumns;
+  }
+
+  // 3. Kitty terminal detection (Unix/macOS only)
+  // Note: kitten/kitty binaries only exist on Unix systems where Kitty terminal is installed.
+  // The platform check ensures we never attempt this on Windows.
+  if (!isWindows() && process.env.KITTY_WINDOW_ID) {
     try {
-      const result = spawnSync("kitten", ["@", "ls"], { encoding: "utf-8" });
+      const result = spawnSync("kitten", ["@", "ls"], {
+        encoding: "utf-8",
+        timeout: 1000,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
       if (result.stdout) {
         const data = JSON.parse(result.stdout);
+        const kittyWindowId = parseInt(process.env.KITTY_WINDOW_ID);
         for (const osWindow of data) {
           for (const tab of osWindow.tabs) {
             for (const win of tab.windows) {
-              if (win.id === parseInt(kittyWindowId)) {
-                width = win.columns;
-                break;
+              if (win.id === kittyWindowId && win.columns > 0) {
+                return win.columns;
               }
             }
           }
         }
       }
-    } catch {}
+    } catch {
+      // Kitty not available or command failed - fall through to default
+    }
   }
 
-  if (!width || width <= 0) {
-    try {
-      const result = spawnSync("sh", ["-c", "stty size </dev/tty 2>/dev/null"], { encoding: "utf-8" });
-      if (result.stdout) {
-        const cols = parseInt(result.stdout.trim().split(/\s+/)[1]);
-        if (cols > 0) width = cols;
-      }
-    } catch {}
-  }
-
-  if (!width || width <= 0) {
-    try {
-      const result = spawnSync("tput", ["cols"], { encoding: "utf-8" });
-      if (result.stdout) {
-        const cols = parseInt(result.stdout.trim());
-        if (cols > 0) width = cols;
-      }
-    } catch {}
-  }
-
-  if (!width || width <= 0) {
-    width = parseInt(process.env.COLUMNS || "100") || 100;
-  }
-
-  return width;
+  // 4. Default fallback
+  return 100;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -142,7 +125,7 @@ function getStats(): SystemStats {
 
   // Count workflows in skills/CORE/Workflows
   try {
-    const workflowsDir = join(PAI_DIR, "skills/CORE/Workflows");
+    const workflowsDir = join(PAI_DIR, "skills", "CORE", "Workflows");
     if (existsSync(workflowsDir)) {
       for (const e of readdirSync(workflowsDir, { withFileTypes: true })) {
         if (e.isFile() && e.name.endsWith(".md")) workflows++;
@@ -167,25 +150,31 @@ function getStats(): SystemStats {
     return c;
   };
 
-  learnings = countFiles(join(PAI_DIR, "MEMORY/LEARNING"));
-  userFiles = countFiles(join(PAI_DIR, "skills/CORE/USER"));
+  learnings = countFiles(join(PAI_DIR, "MEMORY", "LEARNING"));
+  userFiles = countFiles(join(PAI_DIR, "skills", "CORE", "USER"));
 
   try {
     const historyFile = join(PAI_DIR, "history.jsonl");
     if (existsSync(historyFile)) {
       const content = readFileSync(historyFile, "utf-8");
-      sessions = content.split("\n").filter(line => line.trim()).length;
+      sessions = splitLines(content).filter(line => line.trim()).length;
     }
   } catch {}
 
   // Get platform info
-  const platform = process.platform === "darwin" ? "macOS" : process.platform;
+  const platform = getPlatformDisplayName();
   const arch = process.arch;
 
-  // Try to get Claude Code version
+  // Try to get Claude Code version (cross-platform: Windows may need .exe)
   let ccVersion = "2.0";
   try {
-    const result = spawnSync("claude", ["--version"], { encoding: "utf-8" });
+    // On Windows, spawnSync handles PATH lookup including .exe, .cmd, .bat extensions
+    // Using shell: true ensures Windows can find the command regardless of extension
+    const result = spawnSync("claude", ["--version"], {
+      encoding: "utf-8",
+      shell: isWindows(),  // Use shell on Windows for better command resolution
+      timeout: 5000
+    });
     if (result.stdout) {
       const match = result.stdout.match(/(\d+\.\d+\.\d+)/);
       if (match) ccVersion = match[1];

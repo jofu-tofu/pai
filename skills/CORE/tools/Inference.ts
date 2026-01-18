@@ -10,6 +10,7 @@
  */
 
 import { spawn } from 'child_process';
+import { getKillSignal } from '../../../hooks/lib/platform';
 
 type InferenceLevel = 'fast' | 'standard' | 'smart';
 
@@ -65,7 +66,8 @@ export async function inference(options: InferenceOptions): Promise<InferenceRes
 
     const timer = setTimeout(() => {
       timedOut = true;
-      proc.kill('SIGTERM');
+      // Use platform-appropriate signal (Windows doesn't support POSIX signals)
+      proc.kill(getKillSignal());
     }, timeout);
 
     proc.stdout.on('data', (data) => {

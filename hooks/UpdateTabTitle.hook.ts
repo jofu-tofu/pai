@@ -60,10 +60,12 @@
  * - Includes 5-second stdin timeout
  */
 
-import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
 import { inference } from '../skills/CORE/Tools/Inference';
 import { isValidTabSummary, getTabFallback } from './lib/response-format';
+import { crossSpawnSync } from './lib/spawn';
+import { isKittyTerminal, isWindowsTerminal } from './lib/terminal';
+import { isWindows, splitLines } from './lib/platform';
 
 // Tab colors - different states
 const TAB_WORKING_BG = '#804000';      // Dark orange - actively working
@@ -111,7 +113,8 @@ function getRecentContext(transcriptPath: string, maxTurns: number = 4): string 
     if (!transcriptPath) return '';
 
     const content = readFileSync(transcriptPath, 'utf-8');
-    const lines = content.trim().split('\n');
+    // Handle both Unix (LF) and Windows (CRLF) line endings
+    const lines = splitLines(content.trim());
 
     const turns: { role: string; text: string }[] = [];
 
@@ -229,41 +232,54 @@ function setTabTitle(title: string, state: TabState = 'normal'): void {
     const truncated = titleWithSuffix.length > 50 ? titleWithSuffix.slice(0, 47) + '…' : titleWithSuffix;
     const escaped = truncated.replace(/'/g, "'\\''");
 
-    // Check if we're in Kitty (TERM=xterm-kitty or KITTY_LISTEN_ON set)
-    // Skip on Windows - Kitty doesn't run there
-    if (process.platform === 'win32') {
-      return;
-    }
-    const isKitty = process.env.TERM === 'xterm-kitty' || process.env.KITTY_LISTEN_ON;
-
-    if (isKitty) {
+    // Use centralized Kitty detection (handles platform checks internally)
+    if (isKittyTerminal()) {
       // Use Kitty remote control - works even without TTY
-      execSync(`kitty @ set-tab-title "${escaped}"`, { stdio: 'ignore', timeout: 2000 });
+      // Using crossSpawnSync for consistent cross-platform behavior
+      crossSpawnSync('kitty', ['@', 'set-tab-title', escaped], { timeout: 2000 });
 
       // Set color based on state
       if (state === 'inference') {
         // Purple for inference/AI thinking - active tab stays dark blue, inactive shows purple
-        execSync(
-          `kitten @ set-tab-color --self active_bg=${ACTIVE_TAB_BG} active_fg=${ACTIVE_TEXT} inactive_bg=${TAB_INFERENCE_BG} inactive_fg=${INACTIVE_TEXT}`,
-          { stdio: 'ignore', timeout: 2000 }
-        );
+        crossSpawnSync('kitten', [
+          '@', 'set-tab-color', '--self',
+          `active_bg=${ACTIVE_TAB_BG}`, `active_fg=${ACTIVE_TEXT}`,
+          `inactive_bg=${TAB_INFERENCE_BG}`, `inactive_fg=${INACTIVE_TEXT}`
+        ], { timeout: 2000 });
         console.error('[UpdateTabTitle] Set inference color (purple on inactive only)');
       } else if (state === 'working') {
         // Orange for actively working - active tab stays dark blue, inactive shows orange
-        execSync(
-          `kitten @ set-tab-color --self active_bg=${ACTIVE_TAB_BG} active_fg=${ACTIVE_TEXT} inactive_bg=${TAB_WORKING_BG} inactive_fg=${INACTIVE_TEXT}`,
-          { stdio: 'ignore', timeout: 2000 }
-        );
+        crossSpawnSync('kitten', [
+          '@', 'set-tab-color', '--self',
+          `active_bg=${ACTIVE_TAB_BG}`, `active_fg=${ACTIVE_TEXT}`,
+          `inactive_bg=${TAB_WORKING_BG}`, `inactive_fg=${INACTIVE_TEXT}`
+        ], { timeout: 2000 });
         console.error('[UpdateTabTitle] Set working color (orange on inactive only)');
       }
 
       console.error('[UpdateTabTitle] Set via Kitty remote control');
-    } else {
-      // Fallback to escape codes for other terminals
-      execSync(`printf '\\033]0;${escaped}\\007' >&2`, { stdio: ['pipe', 'pipe', 'inherit'] });
-      execSync(`printf '\\033]2;${escaped}\\007' >&2`, { stdio: ['pipe', 'pipe', 'inherit'] });
-      execSync(`printf '\\033]30;${escaped}\\007' >&2`, { stdio: ['pipe', 'pipe', 'inherit'] });
+    } else if (isWindowsTerminal()) {
+      // Windows Terminal supports ANSI escape codes including title setting
+      // WT_SESSION env var indicates running inside Windows Terminal
+      try {
+        const titleEscaped = truncated.replace(/[^\x20-\x7E]/g, ''); // ASCII printable only
+        process.stderr.write(`\x1b]0;${titleEscaped}\x07`); // OSC sequence for title
+        console.error('[UpdateTabTitle] Set via Windows Terminal escape codes');
+      } catch {
+        // Silently fail
+      }
+    } else if (!isWindows()) {
+      // Fallback to escape codes for other terminals (macOS/Linux only)
+      // Legacy Windows terminals (cmd.exe, older PowerShell) don't support these reliably
+      try {
+        const titleEscaped = truncated.replace(/[^\x20-\x7E]/g, ''); // ASCII printable only
+        process.stderr.write(`\x1b]0;${titleEscaped}\x07`); // Set window title
+        process.stderr.write(`\x1b]2;${titleEscaped}\x07`); // Set window title (alternate)
+      } catch {
+        // Silently fail if terminal doesn't support escape codes
+      }
     }
+    // On legacy Windows (cmd.exe, old PowerShell) without Kitty/Windows Terminal, skip title update
   } catch (err) {
     console.error(`[UpdateTabTitle] Failed to set title: ${err}`);
   }
@@ -272,17 +288,20 @@ function setTabTitle(title: string, state: TabState = 'normal'): void {
 /**
  * Send voice notification
  */
-function announceVoice(summary: string): void {
+async function announceVoice(summary: string): Promise<void> {
   try {
     // Summary already starts with gerund - use directly, capitalize first letter
     const message = summary.charAt(0).toUpperCase() + summary.slice(1);
-    const escaped = message.replace(/"/g, '\\"');
-    execSync(
-      `curl -s -X POST http://localhost:8888/notify -H "Content-Type: application/json" -d '{"message": "${escaped}"}' > /dev/null 2>&1 &`,
-      { stdio: 'ignore', timeout: 2000 }
-    );
+    const url = (process.env.PAI_VOICE_SERVER || 'http://localhost:8888') + '/notify';
+    const payload = { message };
+
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
   } catch {
-    // Voice server might not be running
+    // Silently fail - notifications are non-critical
   }
 }
 
@@ -328,7 +347,7 @@ async function main() {
 
     // Voice announcement - validated to prevent garbage
     if (isValidTabSummary(summary)) {
-      announceVoice(summary);
+      await announceVoice(summary);
       console.error(`[UpdateTabTitle] Voice: "${summary}"`);
     } else {
       console.error(`[UpdateTabTitle] Skipped voice - invalid summary: "${summary}"`);

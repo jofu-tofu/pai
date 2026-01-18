@@ -48,17 +48,19 @@
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { paiPath } from './lib/paths';
+import { splitLines } from './lib/platform';
 import { sendEventToObservability, getCurrentTimestamp, getSourceApp } from './lib/observability';
 import { extractAgentInstanceId } from './lib/metadata-extraction';
 import { notifyBackgroundAgent } from './lib/notifications';
 
 /**
- * Get current timestamp in PST timezone
- * Format: YYYY-MM-DD HH:MM:SS PST
+ * Get current timestamp in configured timezone
+ * Format: YYYY-MM-DD HH:MM:SS TZ
  */
 function getPSTTimestamp(): string {
   const date = new Date();
-  const pstDate = new Date(date.toLocaleString('en-US', { timeZone: process.env.TIME_ZONE || 'America/Los_Angeles' }));
+  const timezone = process.env.TZ || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  const pstDate = new Date(date.toLocaleString('en-US', { timeZone: process.env.TIME_ZONE || timezone }));
 
   const year = pstDate.getFullYear();
   const month = String(pstDate.getMonth() + 1).padStart(2, '0');
@@ -72,7 +74,8 @@ function getPSTTimestamp(): string {
 
 function getPSTDate(): string {
   const date = new Date();
-  const pstDate = new Date(date.toLocaleString('en-US', { timeZone: process.env.TIME_ZONE || 'America/Los_Angeles' }));
+  const timezone = process.env.TZ || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  const pstDate = new Date(date.toLocaleString('en-US', { timeZone: process.env.TIME_ZONE || timezone }));
 
   const year = pstDate.getFullYear();
   const month = String(pstDate.getMonth() + 1).padStart(2, '0');
@@ -125,7 +128,8 @@ async function findTaskResult(transcriptPath: string, maxAttempts: number = 2): 
 
     try {
       const transcript = readFileSync(actualTranscriptPath, 'utf-8');
-      const lines = transcript.trim().split('\n');
+      // Handle both Unix (LF) and Windows (CRLF) line endings
+      const lines = splitLines(transcript.trim());
 
       // Search from the end of the transcript backwards
       for (let i = lines.length - 1; i >= 0; i--) {

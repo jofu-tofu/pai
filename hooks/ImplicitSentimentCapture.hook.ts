@@ -68,6 +68,8 @@ import { getIdentity, getPrincipal } from './lib/identity';
 import { getLearningCategory } from './lib/learning-utils';
 import { getISOTimestamp, getPSTComponents } from './lib/time';
 import { getPaiDir } from './lib/paths';
+import { splitLines } from './lib/platform';
+import { runScriptDetached } from './lib/spawn';
 
 const PRINCIPAL_NAME = getPrincipal().name;
 const ASSISTANT_NAME = getIdentity().name;
@@ -204,7 +206,8 @@ function getRecentContext(transcriptPath: string, maxTurns: number = 3): string 
     if (!transcriptPath || !existsSync(transcriptPath)) return '';
 
     const content = readFileSync(transcriptPath, 'utf-8');
-    const lines = content.trim().split('\n');
+    // Handle both Unix (LF) and Windows (CRLF) line endings
+    const lines = splitLines(content.trim());
 
     const turns: { role: string; text: string }[] = [];
 
@@ -320,7 +323,8 @@ function captureLowRatingLearning(
   try {
     if (transcriptPath && existsSync(transcriptPath)) {
       const content = readFileSync(transcriptPath, 'utf-8');
-      const lines = content.trim().split('\n');
+      // Handle both Unix (LF) and Windows (CRLF) line endings
+      const lines = splitLines(content.trim());
       for (const line of lines) {
         try {
           const entry = JSON.parse(line);
@@ -452,10 +456,7 @@ async function main() {
     const baseDir = getPaiDir();
     const trendingScript = join(baseDir, 'tools', 'TrendingAnalysis.ts');
     if (existsSync(trendingScript)) {
-      Bun.spawn(['bun', trendingScript, '--force'], {
-        stdout: 'ignore',
-        stderr: 'ignore'
-      });
+      runScriptDetached(trendingScript, ['--force']);
       console.error('[ImplicitSentimentCapture] Triggered TrendingAnalysis update');
     }
 

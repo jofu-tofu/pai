@@ -18,6 +18,7 @@
 
 import { readFileSync } from 'fs';
 import { getIdentity } from '../../../hooks/lib/identity';
+import { splitLines } from '../../../hooks/lib/platform';
 
 const DA_IDENTITY = getIdentity();
 
@@ -81,7 +82,7 @@ export function contentToText(content: unknown): string {
  * Takes raw content string to avoid re-reading file.
  */
 export function parseLastAssistantMessage(transcriptContent: string): string {
-  const lines = transcriptContent.trim().split('\n');
+  const lines = splitLines(transcriptContent.trim());
   let lastAssistantMessage = '';
 
   for (const line of lines) {
@@ -236,7 +237,7 @@ export function extractStructuredSections(text: string): StructuredResponse {
 export function detectResponseState(lastMessage: string, transcriptContent: string): ResponseState {
   try {
     // Check if the LAST assistant message used AskUserQuestion
-    const lines = transcriptContent.trim().split('\n');
+    const lines = splitLines(transcriptContent.trim());
     let lastAssistantEntry: any = null;
 
     for (const line of lines) {

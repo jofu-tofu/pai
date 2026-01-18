@@ -5,6 +5,16 @@
  * Enforces proper usage of PAI_DIR environment variable instead of hardcoded paths.
  * Detects and optionally fixes violations like ~/pai, ~/.claude, $HOME/pai, etc.
  *
+ * Cross-Platform Support:
+ *   - Works on Windows, macOS, and Linux
+ *   - Handles both Unix-style (/) and Windows-style (\) path separators
+ *   - Normalizes paths before pattern matching for consistent detection
+ *
+ * Path Formats Detected:
+ *   Unix:    ~/pai, ~/.claude, $HOME/pai, ${HOME}/.claude
+ *   Windows: C:\Users\username\pai, C:\Users\username\.claude
+ *   JS/TS:   process.env.HOME + "/pai", join(process.env.HOME, ".claude")
+ *
  * Usage:
  *   bun run tools/PaiDirLinter.ts              # Scan entire codebase
  *   bun run tools/PaiDirLinter.ts path/to/dir  # Scan specific directory
@@ -13,6 +23,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { toForwardSlash } from '../hooks/lib/platform';
 
 // Pattern categories for different violation types
 export const PATH_VIOLATIONS = {
@@ -82,15 +93,16 @@ export const PATH_VIOLATIONS = {
     ],
     fix: (text: string) => {
       let result = text;
-      // Fix Windows paths to .claude
+      // Fix Windows paths to .claude - use forward slashes for cross-platform compatibility
+      // (Forward slashes work in both Bun/Node.js paths and JSON on all platforms)
       result = result.replace(
         /[A-Za-z]:\\[Uu]sers\\[^\\]+\\\.claude(\\|$)/gi,
-        '${PAI_DIR}\\.claude$1'
+        (_, trailing) => `\${PAI_DIR}/.claude${trailing === '\\' ? '/' : ''}`
       );
       // Fix Windows paths to pai
       result = result.replace(
         /[A-Za-z]:\\[Uu]sers\\[^\\]+\\pai(\\|$)/gi,
-        '${PAI_DIR}$1'
+        (_, trailing) => `\${PAI_DIR}${trailing === '\\' ? '/' : ''}`
       );
       return result;
     }
@@ -114,27 +126,32 @@ interface Violation {
   severity: 'error' | 'warning';
 }
 
-// Files and directories to skip
+// Files and directories to skip (patterns use forward slashes for cross-platform compatibility)
 const SKIP_PATTERNS = [
   /node_modules/,
   /\.test\.ts$/,
   /\.spec\.ts$/,
   /\.git/,
   /agentic_logs/,
-  /MEMORY[\\\/]sessions/,
-  /MEMORY[\\\/]Work/,
-  /MEMORY[\\\/]Learning/,
+  /MEMORY\/sessions/,
+  /MEMORY\/Work/,
+  /MEMORY\/Learning/,
   /backups/,
   /\.map$/,
   /\.d\.ts$/,
   /PaiDirLinter\.ts$/, // Don't lint ourselves
-  /history[\\\/]/, // Historical learning files
+  /history\//, // Historical learning files
   /DEVELOPMENT\.md$/, // Documentation showing examples of bad patterns
-  /tools[\\\/]README\.md$/, // Documentation showing bad patterns
+  /tools\/README\.md$/, // Documentation showing bad patterns
 ];
 
+/**
+ * Checks if a file should be skipped during linting.
+ * Normalizes path separators for cross-platform consistency.
+ */
 function shouldSkip(filePath: string): boolean {
-  return SKIP_PATTERNS.some(pattern => pattern.test(filePath));
+  const normalizedPath = toForwardSlash(filePath);
+  return SKIP_PATTERNS.some(pattern => pattern.test(normalizedPath));
 }
 
 function getFiles(dir: string): string[] {
@@ -178,7 +195,8 @@ function scanFile(filePath: string): Violation[] {
     return violations;
   }
 
-  const lines = content.split('\n');
+  // Handle both Unix (LF) and Windows (CRLF) line endings
+  const lines = content.split(/\r?\n/);
 
   for (const [categoryName, category] of Object.entries(PATH_VIOLATIONS)) {
     for (const pattern of category.patterns) {

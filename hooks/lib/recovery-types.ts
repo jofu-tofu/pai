@@ -48,19 +48,24 @@ export interface RecoveryPointSummary {
 }
 
 import { getPaiDir } from './paths';
+import { toForwardSlash } from './platform';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
 // Safe paths that don't need journaling (within .claude ecosystem)
 const PAI_HOME = getPaiDir();
+
+// Cross-platform safe path prefixes
+// Normalize to forward slashes for consistent matching
 export const SAFE_PATH_PREFIXES = [
-  `${PAI_HOME}/MEMORY/`,  // All MEMORY output is safe (sessions, learnings, raw-outputs, etc.)
-  `${PAI_HOME}/Scratchpad/`,
-  `${PAI_HOME}/Tmp/`,
-  `${PAI_HOME}/Debug/`,
-  `${PAI_HOME}/SessionEnv/`,
-  `${PAI_HOME}/Todos/`,
-  '/tmp/',
-  '/var/tmp/',
-];
+  toForwardSlash(join(PAI_HOME, 'MEMORY')),     // All MEMORY output is safe
+  toForwardSlash(join(PAI_HOME, 'Scratchpad')),
+  toForwardSlash(join(PAI_HOME, 'Tmp')),
+  toForwardSlash(join(PAI_HOME, 'Debug')),
+  toForwardSlash(join(PAI_HOME, 'SessionEnv')),
+  toForwardSlash(join(PAI_HOME, 'Todos')),
+  toForwardSlash(tmpdir()),                      // Cross-platform temp directory
+].map(p => p.endsWith('/') ? p : p + '/');
 
 // Skip journaling for these output-only operations
 export const SKIP_COMMAND_PATTERNS = [
@@ -75,6 +80,9 @@ export const SKIP_COMMAND_PATTERNS = [
   /^\s*find\b[^|]*$/,  // find without pipe
   /^\s*grep\b/,
   /^\s*rg\b/,
+  /^\s*dir\b/,       // Windows dir
+  /^\s*type\b/,      // Windows type (like cat)
+  /^\s*where\b/,     // Windows where (like which)
 ];
 
 // Patterns that indicate destructive operations requiring journaling
@@ -106,6 +114,41 @@ export const DESTRUCTIVE_PATTERNS: DestructivePattern[] = [
     pattern: /\bgit\s+clean\s+-[fd]+/i,
     type: 'git_clean',
     extractPaths: () => ['.'] // Current git repo
+  },
+  // Windows destructive patterns
+  {
+    pattern: /\b(?:del|erase)\s+(?:\/[fqsap]+\s+)*([^\|;&]+)/i,
+    type: 'file_delete',
+    extractPaths: (cmd) => {
+      const withoutCmd = cmd.replace(/^\s*(?:del|erase)\s+/i, '');
+      const withoutFlags = withoutCmd.replace(/^(\/[fqsap]+\s+)+/i, '');
+      return withoutFlags.split(/\s+/).filter(p => p && !p.startsWith('/'));
+    },
+    description: 'Windows file deletion',
+  },
+  {
+    pattern: /\b(?:rd|rmdir)\s+(?:\/[sq]+\s+)*([^\|;&]+)/i,
+    type: 'file_delete',
+    extractPaths: (cmd) => {
+      const withoutCmd = cmd.replace(/^\s*(?:rd|rmdir)\s+/i, '');
+      const withoutFlags = withoutCmd.replace(/^(\/[sq]+\s+)+/i, '');
+      return withoutFlags.split(/\s+/).filter(p => p && !p.startsWith('/'));
+    },
+    description: 'Windows directory deletion',
+  },
+  {
+    pattern: /\bmove\s+([^\|;&]+)/i,
+    type: 'file_move',
+    extractPaths: (cmd) => {
+      const withoutMove = cmd.replace(/^\s*move\s+/i, '');
+      const parts = withoutMove.split(/\s+/).filter(p => p && !p.startsWith('/'));
+      // Last part is destination, everything else is source
+      if (parts.length >= 2) {
+        return parts.slice(0, -1);
+      }
+      return parts;
+    },
+    description: 'Windows file move',
   },
 ];
 

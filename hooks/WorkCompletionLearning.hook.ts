@@ -55,6 +55,7 @@ import { join, dirname } from 'path';
 import { getISOTimestamp, getPSTDate } from './lib/time';
 import { getLearningCategory } from './lib/learning-utils';
 import { getMemoryDir } from './lib/paths';
+import { splitLines } from './lib/platform';
 
 const MEMORY_DIR = getMemoryDir();
 const STATE_DIR = join(MEMORY_DIR, 'STATE');
@@ -87,7 +88,8 @@ interface WorkMeta {
 function parseYaml(content: string): WorkMeta {
   // Simple YAML parser for our specific format
   const meta: any = {};
-  const lines = content.split('\n');
+  // Handle both Unix (LF) and Windows (CRLF) line endings
+  const lines = splitLines(content);
   let currentKey = '';
   let inArray = false;
   let arrayKey = '';

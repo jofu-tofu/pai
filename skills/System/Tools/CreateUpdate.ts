@@ -19,9 +19,11 @@
 import { writeFile, mkdir, readFile } from "fs/promises";
 import { join } from "path";
 import { parseArgs } from "util";
+import { homedir } from "os";
+import { splitLines } from '../../../hooks/lib/platform';
 
-const PAI_DIR = process.env.PAI_DIR || `${process.env.HOME}/.claude`;
-const UPDATES_DIR = join(PAI_DIR, "MEMORY/PAISYSTEMUPDATES");
+const PAI_DIR = process.env.PAI_DIR || join(homedir(), 'pai');
+const UPDATES_DIR = join(PAI_DIR, "MEMORY", "PAISYSTEMUPDATES");
 const INDEX_PATH = join(UPDATES_DIR, "INDEX.md");
 
 // ============================================================================
@@ -117,7 +119,7 @@ async function prependToIndex(
 ): Promise<void> {
   try {
     const indexContent = await readFile(INDEX_PATH, "utf-8");
-    const lines = indexContent.split("\n");
+    const lines = splitLines(indexContent);
 
     // Find the line after "---" (the separator after the header)
     let insertIndex = -1;

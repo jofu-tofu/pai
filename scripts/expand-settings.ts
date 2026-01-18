@@ -19,6 +19,8 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, resolve, dirname } from 'path';
 import { homedir } from 'os';
+import { fileURLToPath } from 'url';
+import { toForwardSlash } from '../hooks/lib/platform';
 
 // ============================================================================
 // Configuration
@@ -69,15 +71,14 @@ function resolvePaiDir(): ResolutionResult {
   }
 
   // Priority 4: Script's directory (go up from scripts/ to pai/)
-  const scriptDir = dirname(new URL(import.meta.url).pathname);
+  // Use fileURLToPath for cross-platform URL-to-path conversion
+  // This properly handles Windows paths (file:///C:/... -> C:\...)
+  const scriptPath = fileURLToPath(import.meta.url);
+  const scriptDir = dirname(scriptPath);
   const parentDir = resolve(scriptDir, '..');
-  // Handle Windows path (remove leading / if present)
-  const cleanParentDir = process.platform === 'win32' && parentDir.startsWith('/')
-    ? parentDir.slice(1)
-    : parentDir;
-  const parentTemplate = join(cleanParentDir, TEMPLATE_NAME);
+  const parentTemplate = join(parentDir, TEMPLATE_NAME);
   if (existsSync(parentTemplate)) {
-    return { paiDir: normalizePath(cleanParentDir), source: 'script parent directory' };
+    return { paiDir: normalizePath(parentDir), source: 'script parent directory' };
   }
 
   // No valid source found
@@ -115,7 +116,7 @@ function expandHomePath(inputPath: string): string {
  * Normalizes path separators to forward slashes (works cross-platform with bun)
  */
 function normalizePath(inputPath: string): string {
-  return resolve(inputPath).replace(/\\/g, '/');
+  return toForwardSlash(resolve(inputPath));
 }
 
 // ============================================================================

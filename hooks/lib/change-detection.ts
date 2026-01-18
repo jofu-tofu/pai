@@ -6,8 +6,9 @@
  */
 
 import { readFileSync, existsSync } from 'fs';
-import { join, relative, basename } from 'path';
+import { join, relative, basename, isAbsolute } from 'path';
 import { getPaiDir } from './paths';
+import { splitLines, toForwardSlash, normalizePathForComparison, isCaseInsensitiveFilesystem, pathContainsSegment } from './platform';
 
 // ============================================================================
 // Types
@@ -115,7 +116,7 @@ export function parseToolUseBlocks(transcriptPath: string): FileChange[] {
     }
 
     const content = readFileSync(transcriptPath, 'utf-8');
-    const lines = content.trim().split('\n');
+    const lines = splitLines(content.trim());
     const changes: FileChange[] = [];
     const seenPaths = new Set<string>();
 
@@ -177,12 +178,26 @@ export function parseToolUseBlocks(transcriptPath: string): FileChange[] {
 
 /**
  * Normalize an absolute path to relative (to PAI_DIR).
+ * Handles Windows case-insensitivity for path comparison.
+ * Always returns forward slashes for consistent pattern matching.
  */
 function normalizeToRelativePath(absolutePath: string): string {
-  if (absolutePath.startsWith(PAI_DIR)) {
-    return relative(PAI_DIR, absolutePath);
+  let pathToCheck = absolutePath;
+  let dirToCheck = PAI_DIR;
+
+  // On Windows and macOS, paths are case-insensitive
+  // (macOS uses case-insensitive HFS+/APFS by default)
+  const isCaseInsensitive = isCaseInsensitiveFilesystem();
+  if (isCaseInsensitive) {
+    pathToCheck = pathToCheck.toLowerCase();
+    dirToCheck = dirToCheck.toLowerCase();
   }
-  return absolutePath;
+
+  if (pathToCheck.startsWith(dirToCheck)) {
+    // Use toForwardSlash to ensure consistent path separators for pattern matching
+    return toForwardSlash(relative(PAI_DIR, absolutePath));
+  }
+  return toForwardSlash(absolutePath);
 }
 
 /**
@@ -214,14 +229,17 @@ export function categorizeChange(path: string): ChangeCategory | null {
   }
 
   // Check if path is within PAI directory
-  const absolutePath = path.startsWith('/') ? path : join(PAI_DIR, path);
-  if (!absolutePath.startsWith(PAI_DIR)) {
+  // Use normalized comparison to handle Windows case-insensitivity
+  const absolutePath = isAbsolute(path) ? path : join(PAI_DIR, path);
+  const normalizedAbsPath = normalizePathForComparison(absolutePath);
+  const normalizedPaiDir = normalizePathForComparison(PAI_DIR);
+  if (!normalizedAbsPath.startsWith(normalizedPaiDir)) {
     return null;
   }
 
   // Categorize by path pattern
   if (path.includes('skills/')) {
-    if (path.includes('/Workflows/')) return 'workflow';
+    if (pathContainsSegment(path, 'Workflows')) return 'workflow';
     if (path.includes('CORE/SYSTEM/')) return 'core-system';
     return 'skill';
   }
@@ -323,7 +341,7 @@ export function shouldDocumentChanges(changes: FileChange[]): boolean {
   if (newFiles.length > 0) return true;
 
   // Document any tool file changes (.ts in Tools/)
-  if (systemChanges.some(c => c.path.includes('/Tools/') && c.path.endsWith('.ts'))) {
+  if (systemChanges.some(c => pathContainsSegment(c.path, 'Tools') && c.path.endsWith('.ts'))) {
     return true;
   }
 
@@ -505,8 +523,8 @@ export function generateDescriptiveTitle(changes: FileChange[]): string {
 
   // Detect file types
   const hasSkillMd = paths.some(p => p.endsWith('SKILL.md'));
-  const hasWorkflows = paths.some(p => p.includes('/Workflows/'));
-  const hasTools = paths.some(p => p.includes('/Tools/') && p.endsWith('.ts'));
+  const hasWorkflows = paths.some(p => pathContainsSegment(p, 'Workflows'));
+  const hasTools = paths.some(p => pathContainsSegment(p, 'Tools') && p.endsWith('.ts'));
   const hasHooks = paths.some(p => p.includes('hooks/'));
   const hasConfig = paths.some(p => p.endsWith('settings.json'));
   const hasCoreSystem = paths.some(p => p.includes('CORE/SYSTEM/'));
@@ -521,7 +539,7 @@ export function generateDescriptiveTitle(changes: FileChange[]): string {
       title = `${skill} Skill Definition Update`;
     } else if (hasWorkflows) {
       const workflowNames = paths
-        .filter(p => p.includes('/Workflows/'))
+        .filter(p => pathContainsSegment(p, 'Workflows'))
         .map(p => basename(p, '.md'));
       if (workflowNames.length === 1) {
         title = `${skill} ${workflowNames[0]} Workflow Update`;
@@ -530,7 +548,7 @@ export function generateDescriptiveTitle(changes: FileChange[]): string {
       }
     } else if (hasTools) {
       const toolNames = paths
-        .filter(p => p.includes('/Tools/'))
+        .filter(p => pathContainsSegment(p, 'Tools'))
         .map(p => basename(p, '.ts'));
       if (toolNames.length === 1) {
         title = `${skill} ${toolNames[0]} Tool Update`;

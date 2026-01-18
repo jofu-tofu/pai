@@ -61,6 +61,8 @@ import { getLearningCategory } from './lib/learning-utils';
 import { getPrincipalName } from './lib/identity';
 import { getISOTimestamp, getPSTComponents } from './lib/time';
 import { getPaiDir } from './lib/paths';
+import { splitLines } from './lib/platform';
+import { runScriptDetached } from './lib/spawn';
 
 interface HookInput {
   session_id: string;
@@ -155,7 +157,8 @@ function getLastResponseSummary(transcriptPath: string): string {
     if (!transcriptPath || !existsSync(transcriptPath)) return '';
 
     const content = readFileSync(transcriptPath, 'utf-8');
-    const lines = content.trim().split('\n');
+    // Handle both Unix (LF) and Windows (CRLF) line endings
+    const lines = splitLines(content.trim());
 
     let lastAssistant = '';
     for (const line of lines) {
@@ -265,10 +268,7 @@ async function main() {
     const baseDir = getPaiDir();
     const trendingScript = join(baseDir, 'tools', 'TrendingAnalysis.ts');
     if (existsSync(trendingScript)) {
-      Bun.spawn(['bun', trendingScript, '--force'], {
-        stdout: 'ignore',
-        stderr: 'ignore'
-      });
+      runScriptDetached(trendingScript, ['--force']);
       console.error('[ExplicitRatingCapture] Triggered TrendingAnalysis update');
     }
 
