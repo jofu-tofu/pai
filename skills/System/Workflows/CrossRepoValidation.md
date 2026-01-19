@@ -1,8 +1,16 @@
 # CrossRepoValidation Workflow
 
-**Purpose:** Validate separation between private PAI instance (~/.claude) and public PAI repository (~/Projects/PAI). Ensures no sensitive data leaks to public repo and references between systems are consistent.
+**Purpose:** Validate separation between private PAI instance ($PAI_DIR) and public PAI repository. Ensures no sensitive data leaks to public repo and references between systems are consistent.
 
 **Triggers:** "cross-repo validation", "check for leaks", "validate repo separation", "verify nothing sensitive in public"
+
+---
+
+## Platform Notes
+
+All commands use `$PAI_DIR` and `$HOME` for cross-platform compatibility:
+- Works on macOS, Linux, and Windows (Git Bash/WSL)
+- Avoid `~` expansion - always use environment variables
 
 ---
 
@@ -11,8 +19,7 @@
 ```bash
 curl -s -X POST http://localhost:8888/notify \
   -H "Content-Type: application/json" \
-  -d '{"message": "Running cross-repo validation between private and public PAI"}' \
-  > /dev/null 2>&1 &
+  -d '{"message": "Running cross-repo validation between private and public PAI"}' 2>/dev/null &
 ```
 
 Running the **CrossRepoValidation** workflow from the **System** skill...
@@ -23,8 +30,8 @@ Running the **CrossRepoValidation** workflow from the **System** skill...
 
 | Repository | Path | Purpose |
 |------------|------|---------|
-| **Private** | `~/.claude/` | Personal PAI instance with sensitive config |
-| **Public** | `~/Projects/PAI/` | Open source PAI template for community |
+| **Private** | `$PAI_DIR` | Personal PAI instance with sensitive config |
+| **Public** | `$HOME/Projects/PAI` | Open source PAI template for community |
 
 **RULE:** Content must NEVER flow from private to public without explicit sanitization.
 
@@ -37,11 +44,16 @@ Running the **CrossRepoValidation** workflow from the **System** skill...
 ```bash
 # Confirm both repos exist and are distinct
 echo "=== Private PAI ==="
-cd ~/.claude && pwd && git remote -v
+cd "$PAI_DIR" && pwd && git remote -v
 
 echo ""
 echo "=== Public PAI ==="
-cd ~/Projects/PAI && pwd && git remote -v
+PUBLIC_PAI="$HOME/Projects/PAI"
+if [ -d "$PUBLIC_PAI" ]; then
+  cd "$PUBLIC_PAI" && pwd && git remote -v
+else
+  echo "Public PAI not found at $PUBLIC_PAI"
+fi
 ```
 
 **Expected:**
@@ -52,7 +64,10 @@ cd ~/Projects/PAI && pwd && git remote -v
 
 ```bash
 # CRITICAL: Scan public repo for any leaked secrets
-bun ~/.claude/skills/CORE/Tools/SecretScan.ts ~/Projects/PAI --verbose
+PUBLIC_PAI="$HOME/Projects/PAI"
+if [ -d "$PUBLIC_PAI" ]; then
+  bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" "$PUBLIC_PAI" --verbose
+fi
 ```
 
 **Must return:** "No sensitive information found!"
@@ -60,17 +75,32 @@ bun ~/.claude/skills/CORE/Tools/SecretScan.ts ~/Projects/PAI --verbose
 ### Step 3: Check for Private Path References
 
 ```bash
-cd ~/Projects/PAI
+PUBLIC_PAI="$HOME/Projects/PAI"
+if [ -d "$PUBLIC_PAI" ]; then
+  cd "$PUBLIC_PAI"
 
-echo "=== Checking for private paths ==="
-# Look for ~/.claude references (should NOT exist in public)
-grep -r "~/.claude" . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null && echo "FOUND" || echo "Clean"
+  echo "=== Checking for private paths ==="
+  # Look for hardcoded home directory references (should NOT exist in public)
+  if grep -r "\$HOME/\." . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null | grep -v "example"; then
+    echo "FOUND: hardcoded home path"
+  else
+    echo "Clean: no hardcoded home paths"
+  fi
 
-# Look for absolute home path (replace YOUR_USERNAME with your system username)
-grep -r "/Users/$USER" . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null && echo "FOUND" || echo "Clean"
+  # Look for tilde paths (should use $PAI_DIR instead)
+  if grep -r "~/\." . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null | grep -v "example\|README"; then
+    echo "FOUND: tilde paths"
+  else
+    echo "Clean: no tilde paths"
+  fi
 
-# Look for private email (replace with your domain if applicable)
-grep -r "@yourdomain.com" . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null && echo "FOUND" || echo "Clean"
+  # Look for private email (replace with your domain if applicable)
+  if grep -r "@yourdomain.com" . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null; then
+    echo "FOUND: private email"
+  else
+    echo "Clean: no private emails"
+  fi
+fi
 ```
 
 **Expected:** All "Clean"
@@ -78,12 +108,15 @@ grep -r "@yourdomain.com" . --exclude-dir=.git --exclude-dir=node_modules 2>/dev
 ### Step 4: Check for Hardcoded Identities
 
 ```bash
-cd ~/Projects/PAI
+PUBLIC_PAI="$HOME/Projects/PAI"
+if [ -d "$PUBLIC_PAI" ]; then
+  cd "$PUBLIC_PAI"
 
-echo "=== Checking for hardcoded identities ==="
-# Should use {daidentity.name} or {principal.name} placeholders
-grep -r '"Kai"' . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null | grep -v example
-grep -r '"Daniel"' . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null | grep -v example
+  echo "=== Checking for hardcoded identities ==="
+  # Should use {daidentity.name} or {principal.name} placeholders
+  grep -r '"Kai"' . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null | grep -v example
+  grep -r '"Daniel"' . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null | grep -v example
+fi
 ```
 
 **Expected:** Only in example contexts, not hardcoded
@@ -93,11 +126,14 @@ grep -r '"Daniel"' . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null |
 ```bash
 # Compare pack structure between private skills and public packs
 echo "=== Private Skills ==="
-ls ~/.claude/skills/ | grep -v "^_" | grep -v "^\." | head -20
+ls "$PAI_DIR/skills/" 2>/dev/null | grep -v "^_" | grep -v "^\." | head -20
 
 echo ""
 echo "=== Public Packs ==="
-ls ~/Projects/PAI/Packs/ 2>/dev/null | head -20
+PUBLIC_PAI="$HOME/Projects/PAI"
+if [ -d "$PUBLIC_PAI/Packs" ]; then
+  ls "$PUBLIC_PAI/Packs/" | head -20
+fi
 ```
 
 Note any packs that should exist in public but don't (or vice versa).
@@ -105,15 +141,18 @@ Note any packs that should exist in public but don't (or vice versa).
 ### Step 6: Check for Sensitive File Types
 
 ```bash
-cd ~/Projects/PAI
+PUBLIC_PAI="$HOME/Projects/PAI"
+if [ -d "$PUBLIC_PAI" ]; then
+  cd "$PUBLIC_PAI"
 
-echo "=== Checking for sensitive file types ==="
-# These should NEVER exist in public repo
-find . -name ".env" -not -path "./.git/*" 2>/dev/null && echo "FOUND .env" || echo "No .env"
-find . -name "*.pem" -not -path "./.git/*" 2>/dev/null && echo "FOUND .pem" || echo "No .pem"
-find . -name "credentials.json" -not -path "./.git/*" 2>/dev/null && echo "FOUND credentials" || echo "No credentials"
-find . -name "*.key" -not -path "./.git/*" 2>/dev/null && echo "FOUND .key" || echo "No .key"
-find . -name "settings.json" -not -path "./.git/*" 2>/dev/null && echo "FOUND settings.json" || echo "No settings.json"
+  echo "=== Checking for sensitive file types ==="
+  # These should NEVER exist in public repo
+  find . -name ".env" -not -path "./.git/*" 2>/dev/null && echo "FOUND .env" || echo "No .env"
+  find . -name "*.pem" -not -path "./.git/*" 2>/dev/null && echo "FOUND .pem" || echo "No .pem"
+  find . -name "credentials.json" -not -path "./.git/*" 2>/dev/null && echo "FOUND credentials" || echo "No credentials"
+  find . -name "*.key" -not -path "./.git/*" 2>/dev/null && echo "FOUND .key" || echo "No .key"
+  find . -name "settings.json" -not -path "./.git/*" 2>/dev/null && echo "FOUND settings.json" || echo "No settings.json"
+fi
 ```
 
 **Expected:** All "No [type]"
@@ -121,10 +160,17 @@ find . -name "settings.json" -not -path "./.git/*" 2>/dev/null && echo "FOUND se
 ### Step 7: Validate gitignore Coverage
 
 ```bash
-cd ~/Projects/PAI
+PUBLIC_PAI="$HOME/Projects/PAI"
+if [ -d "$PUBLIC_PAI" ]; then
+  cd "$PUBLIC_PAI"
 
-echo "=== Public .gitignore ==="
-cat .gitignore 2>/dev/null | grep -E "\.env|\.pem|credentials|settings\.json" || echo "Missing critical entries!"
+  echo "=== Public .gitignore ==="
+  if [ -f .gitignore ]; then
+    cat .gitignore | grep -E "\.env|\.pem|credentials|settings\.json" || echo "Missing critical entries!"
+  else
+    echo "WARNING: No .gitignore found!"
+  fi
+fi
 ```
 
 **Required entries:**
@@ -141,8 +187,8 @@ cat .gitignore 2>/dev/null | grep -E "\.env|\.pem|credentials|settings\.json" ||
 # Cross-Repository Validation Report
 
 **Date:** [DATE]
-**Private Repo:** ~/.claude/
-**Public Repo:** ~/Projects/PAI/
+**Private Repo:** $PAI_DIR
+**Public Repo:** $HOME/Projects/PAI
 
 ## Security Checks
 
@@ -187,8 +233,7 @@ If ANY critical check fails:
 ```bash
 curl -s -X POST http://localhost:8888/notify \
   -H "Content-Type: application/json" \
-  -d '{"message": "Cross-repo validation complete. [STATUS]"}' \
-  > /dev/null 2>&1 &
+  -d '{"message": "Cross-repo validation complete. [STATUS]"}' 2>/dev/null &
 ```
 
 ---

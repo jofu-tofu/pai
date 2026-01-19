@@ -61,10 +61,10 @@
  */
 
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
-import { join } from 'path';
-import { homedir } from 'os';
+import { join, dirname, sep } from 'path';
 import { parse as parseYaml } from 'yaml';
-import { paiPath } from './lib/paths';
+import { paiPath, expandPath } from './lib/paths';
+import { isCaseInsensitiveFilesystem, ensureTrailingSeparator } from './lib/platform';
 
 // ========================================
 // Security Event Logging
@@ -119,7 +119,7 @@ function getSecurityLogPath(event: SecurityEvent): string {
 function logSecurityEvent(event: SecurityEvent): void {
   try {
     const logPath = getSecurityLogPath(event);
-    const dir = logPath.substring(0, logPath.lastIndexOf('/'));
+    const dir = dirname(logPath);
 
     // Ensure directory exists
     if (!existsSync(dir)) {
@@ -252,14 +252,6 @@ function matchesPattern(command: string, pattern: string): boolean {
   }
 }
 
-function expandPath(path: string): string {
-  // Expand ~ to home directory
-  if (path.startsWith('~')) {
-    return path.replace('~', homedir());
-  }
-  return path;
-}
-
 function matchesPathPattern(filePath: string, pattern: string): boolean {
   const expandedPattern = expandPath(pattern);
   const expandedPath = expandPath(filePath);
@@ -283,8 +275,21 @@ function matchesPathPattern(filePath: string, pattern: string): boolean {
   }
 
   // Exact match or prefix match for directories
-  return expandedPath === expandedPattern ||
-         expandedPath.startsWith(expandedPattern.endsWith('/') ? expandedPattern : expandedPattern + '/');
+  // Normalize separators for cross-platform comparison
+  let normalizedPath = expandedPath.replace(/[\\/]/g, '/');
+  let normalizedPattern = expandedPattern.replace(/[\\/]/g, '/');
+
+  // On Windows and macOS, path comparison should be case-insensitive
+  // (macOS uses case-insensitive HFS+/APFS by default)
+  const isCaseInsensitive = isCaseInsensitiveFilesystem();
+  if (isCaseInsensitive) {
+    normalizedPath = normalizedPath.toLowerCase();
+    normalizedPattern = normalizedPattern.toLowerCase();
+  }
+
+  // Use ensureTrailingSeparator for consistent path prefix matching
+  return normalizedPath === normalizedPattern ||
+         normalizedPath.startsWith(ensureTrailingSeparator(normalizedPattern));
 }
 
 // ========================================

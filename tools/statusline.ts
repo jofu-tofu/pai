@@ -19,21 +19,24 @@
 
 import { existsSync, statSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, basename, dirname } from 'path';
-import { spawnSync, execSync } from 'child_process';
-import { homedir } from 'os';
+import { spawnSync, type SpawnSyncOptions } from 'child_process';
+import { isWindows, isMacOS, getEnvVar, splitLines, getWindowsSyncSpawnOptions, isNoColorSet } from '../hooks/lib/platform';
+import { getPaiDir } from '../hooks/lib/paths';
 
-// =============================================================================
-// Platform Detection (inline to avoid import issues when run standalone)
-// =============================================================================
-
-const isWindows = process.platform === 'win32';
-const isMacOS = process.platform === 'darwin';
+// Helper for cross-platform spawn options with windowsHide
+function getSpawnOpts(timeout = 2000): SpawnSyncOptions {
+  return {
+    encoding: 'utf-8' as const,
+    timeout,
+    ...getWindowsSyncSpawnOptions(),
+  };
+}
 
 // =============================================================================
 // Configuration
 // =============================================================================
 
-const PAI_DIR = process.env.PAI_DIR || join(homedir(), '.claude');
+const PAI_DIR = getPaiDir();
 const SETTINGS_FILE = join(PAI_DIR, 'settings.json');
 const RATINGS_FILE = join(PAI_DIR, 'MEMORY', 'LEARNING', 'SIGNALS', 'ratings.jsonl');
 const MODEL_CACHE = join(PAI_DIR, 'MEMORY', 'STATE', 'model-cache.txt');
@@ -49,69 +52,81 @@ const LOCATION_CACHE_TTL = 3600; // 1 hour
 const WEATHER_CACHE_TTL = 900; // 15 minutes
 
 // =============================================================================
-// Color Palette (Tailwind-inspired)
+// Feature Flags (toggle sections on/off)
 // =============================================================================
 
-const RESET = '\x1b[0m';
+const SHOW_PAI_BRANDING = false;     // PAI branding header with location, time, weather
+const SHOW_MEMORY_SECTION = false;   // Memory stats (work, ratings, sessions, research)
+const SHOW_LEARNING_SECTION = false; // Learning signal with sparklines
+
+// =============================================================================
+// Color Palette (Tailwind-inspired)
+// Respects NO_COLOR environment variable: https://no-color.org
+// =============================================================================
+
+// Check if colors should be disabled (NO_COLOR standard)
+const NO_COLOR = isNoColorSet();
+
+const RESET = NO_COLOR ? '' : '\x1b[0m';
 
 // Structural (chrome, labels, separators)
-const SLATE_300 = '\x1b[38;2;203;213;225m';
-const SLATE_400 = '\x1b[38;2;148;163;184m';
-const SLATE_500 = '\x1b[38;2;100;116;139m';
-const SLATE_600 = '\x1b[38;2;71;85;105m';
+const SLATE_300 = NO_COLOR ? '' : '\x1b[38;2;203;213;225m';
+const SLATE_400 = NO_COLOR ? '' : '\x1b[38;2;148;163;184m';
+const SLATE_500 = NO_COLOR ? '' : '\x1b[38;2;100;116;139m';
+const SLATE_600 = NO_COLOR ? '' : '\x1b[38;2;71;85;105m';
 
 // Semantic colors
-const EMERALD = '\x1b[38;2;74;222;128m';
-const ROSE = '\x1b[38;2;251;113;133m';
+const EMERALD = NO_COLOR ? '' : '\x1b[38;2;74;222;128m';
+const ROSE = NO_COLOR ? '' : '\x1b[38;2;251;113;133m';
 
 // Rating gradient
-const RATING_10 = '\x1b[38;2;74;222;128m';
-const RATING_8 = '\x1b[38;2;163;230;53m';
-const RATING_7 = '\x1b[38;2;250;204;21m';
-const RATING_6 = '\x1b[38;2;251;191;36m';
-const RATING_5 = '\x1b[38;2;251;146;60m';
-const RATING_4 = '\x1b[38;2;248;113;113m';
-const RATING_LOW = '\x1b[38;2;239;68;68m';
+const RATING_10 = NO_COLOR ? '' : '\x1b[38;2;74;222;128m';
+const RATING_8 = NO_COLOR ? '' : '\x1b[38;2;163;230;53m';
+const RATING_7 = NO_COLOR ? '' : '\x1b[38;2;250;204;21m';
+const RATING_6 = NO_COLOR ? '' : '\x1b[38;2;251;191;36m';
+const RATING_5 = NO_COLOR ? '' : '\x1b[38;2;251;146;60m';
+const RATING_4 = NO_COLOR ? '' : '\x1b[38;2;248;113;113m';
+const RATING_LOW = NO_COLOR ? '' : '\x1b[38;2;239;68;68m';
 
 // Line themes
-const GREET_PRIMARY = '\x1b[38;2;167;139;250m';
-const WIELD_PRIMARY = '\x1b[38;2;34;211;238m';
-const WIELD_ACCENT = '\x1b[38;2;103;232;249m';
-const WIELD_WORKFLOWS = '\x1b[38;2;94;234;212m';
-const WIELD_HOOKS = '\x1b[38;2;6;182;212m';
-const GIT_PRIMARY = '\x1b[38;2;56;189;248m';
-const GIT_VALUE = '\x1b[38;2;186;230;253m';
-const GIT_DIR = '\x1b[38;2;147;197;253m';
-const GIT_CLEAN = '\x1b[38;2;125;211;252m';
-const GIT_MODIFIED = '\x1b[38;2;96;165;250m';
-const GIT_ADDED = '\x1b[38;2;59;130;246m';
-const GIT_STASH = '\x1b[38;2;165;180;252m';
-const GIT_AGE_FRESH = '\x1b[38;2;125;211;252m';
-const GIT_AGE_RECENT = '\x1b[38;2;96;165;250m';
-const GIT_AGE_STALE = '\x1b[38;2;59;130;246m';
-const GIT_AGE_OLD = '\x1b[38;2;99;102;241m';
-const LEARN_PRIMARY = '\x1b[38;2;167;139;250m';
-const LEARN_SECONDARY = '\x1b[38;2;196;181;253m';
-const LEARN_WORK = '\x1b[38;2;192;132;252m';
-const LEARN_SIGNALS = '\x1b[38;2;139;92;246m';
-const LEARN_RESEARCH = '\x1b[38;2;129;140;248m';
-const LEARN_SESSIONS = '\x1b[38;2;99;102;241m';
-const SIGNAL_PERIOD = '\x1b[38;2;148;163;184m';
-const LEARN_LABEL = '\x1b[38;2;21;128;61m';
-const CTX_PRIMARY = '\x1b[38;2;129;140;248m';
-const CTX_SECONDARY = '\x1b[38;2;165;180;252m';
-const CTX_ACCENT = '\x1b[38;2;139;92;246m';
-const CTX_BUCKET_EMPTY = '\x1b[38;2;75;82;95m';
-const QUOTE_PRIMARY = '\x1b[38;2;252;211;77m';
-const QUOTE_AUTHOR = '\x1b[38;2;180;140;60m';
-const PAI_P = '\x1b[38;2;30;58;138m';
-const PAI_A = '\x1b[38;2;59;130;246m';
-const PAI_I = '\x1b[38;2;147;197;253m';
-const PAI_LABEL = '\x1b[38;2;100;116;139m';
-const PAI_CITY = '\x1b[38;2;147;197;253m';
-const PAI_STATE = '\x1b[38;2;100;116;139m';
-const PAI_TIME = '\x1b[38;2;96;165;250m';
-const PAI_WEATHER = '\x1b[38;2;135;206;235m';
+const GREET_PRIMARY = NO_COLOR ? '' : '\x1b[38;2;167;139;250m';
+const WIELD_PRIMARY = NO_COLOR ? '' : '\x1b[38;2;34;211;238m';
+const WIELD_ACCENT = NO_COLOR ? '' : '\x1b[38;2;103;232;249m';
+const WIELD_WORKFLOWS = NO_COLOR ? '' : '\x1b[38;2;94;234;212m';
+const WIELD_HOOKS = NO_COLOR ? '' : '\x1b[38;2;6;182;212m';
+const GIT_PRIMARY = NO_COLOR ? '' : '\x1b[38;2;56;189;248m';
+const GIT_VALUE = NO_COLOR ? '' : '\x1b[38;2;186;230;253m';
+const GIT_DIR = NO_COLOR ? '' : '\x1b[38;2;147;197;253m';
+const GIT_CLEAN = NO_COLOR ? '' : '\x1b[38;2;125;211;252m';
+const GIT_MODIFIED = NO_COLOR ? '' : '\x1b[38;2;96;165;250m';
+const GIT_ADDED = NO_COLOR ? '' : '\x1b[38;2;59;130;246m';
+const GIT_STASH = NO_COLOR ? '' : '\x1b[38;2;165;180;252m';
+const GIT_AGE_FRESH = NO_COLOR ? '' : '\x1b[38;2;125;211;252m';
+const GIT_AGE_RECENT = NO_COLOR ? '' : '\x1b[38;2;96;165;250m';
+const GIT_AGE_STALE = NO_COLOR ? '' : '\x1b[38;2;59;130;246m';
+const GIT_AGE_OLD = NO_COLOR ? '' : '\x1b[38;2;99;102;241m';
+const LEARN_PRIMARY = NO_COLOR ? '' : '\x1b[38;2;167;139;250m';
+const LEARN_SECONDARY = NO_COLOR ? '' : '\x1b[38;2;196;181;253m';
+const LEARN_WORK = NO_COLOR ? '' : '\x1b[38;2;192;132;252m';
+const LEARN_SIGNALS = NO_COLOR ? '' : '\x1b[38;2;139;92;246m';
+const LEARN_RESEARCH = NO_COLOR ? '' : '\x1b[38;2;129;140;248m';
+const LEARN_SESSIONS = NO_COLOR ? '' : '\x1b[38;2;99;102;241m';
+const SIGNAL_PERIOD = NO_COLOR ? '' : '\x1b[38;2;148;163;184m';
+const LEARN_LABEL = NO_COLOR ? '' : '\x1b[38;2;21;128;61m';
+const CTX_PRIMARY = NO_COLOR ? '' : '\x1b[38;2;129;140;248m';
+const CTX_SECONDARY = NO_COLOR ? '' : '\x1b[38;2;165;180;252m';
+const CTX_ACCENT = NO_COLOR ? '' : '\x1b[38;2;139;92;246m';
+const CTX_BUCKET_EMPTY = NO_COLOR ? '' : '\x1b[38;2;75;82;95m';
+const QUOTE_PRIMARY = NO_COLOR ? '' : '\x1b[38;2;252;211;77m';
+const QUOTE_AUTHOR = NO_COLOR ? '' : '\x1b[38;2;180;140;60m';
+const PAI_P = NO_COLOR ? '' : '\x1b[38;2;30;58;138m';
+const PAI_A = NO_COLOR ? '' : '\x1b[38;2;59;130;246m';
+const PAI_I = NO_COLOR ? '' : '\x1b[38;2;147;197;253m';
+const PAI_LABEL = NO_COLOR ? '' : '\x1b[38;2;100;116;139m';
+const PAI_CITY = NO_COLOR ? '' : '\x1b[38;2;147;197;253m';
+const PAI_STATE = NO_COLOR ? '' : '\x1b[38;2;100;116;139m';
+const PAI_TIME = NO_COLOR ? '' : '\x1b[38;2;96;165;250m';
+const PAI_WEATHER = NO_COLOR ? '' : '\x1b[38;2;135;206;235m';
 
 // =============================================================================
 // Types
@@ -194,25 +209,35 @@ function countFiles(dir: string, pattern?: RegExp, recursive: boolean = true): n
 function countWorkflows(skillsDir: string): number {
   // Count .md files in */workflows/ or */Workflows/ subdirectories
   // (matching bash: ls "$PAI_DIR/skills"/*/workflows/*.md)
+  // Note: Check both 'Workflows' and 'workflows' for case-sensitive filesystems (Linux)
   try {
     if (!existsSync(skillsDir)) return 0;
     let count = 0;
     const skills = readdirSync(skillsDir, { withFileTypes: true });
     for (const skill of skills) {
       if (skill.isDirectory()) {
-        // Check for workflows directory (case-insensitive on Windows)
         const skillDir = join(skillsDir, skill.name);
-        const entries = readdirSync(skillDir, { withFileTypes: true });
-        for (const entry of entries) {
-          if (entry.isDirectory() && entry.name.toLowerCase() === 'workflows') {
-            const workflowsDir = join(skillDir, entry.name);
-            const files = readdirSync(workflowsDir, { withFileTypes: true });
-            for (const file of files) {
-              if (!file.isDirectory() && file.name.endsWith('.md')) {
-                count++;
+
+        // Try both common casing conventions for case-sensitive filesystems
+        // This avoids performance penalty of readdir + lowercase comparison
+        const workflowsDirCandidates = [
+          join(skillDir, 'Workflows'),  // Pascal case (project convention)
+          join(skillDir, 'workflows'),  // lowercase
+        ];
+
+        for (const workflowsDir of workflowsDirCandidates) {
+          if (existsSync(workflowsDir)) {
+            try {
+              const files = readdirSync(workflowsDir, { withFileTypes: true });
+              for (const file of files) {
+                if (!file.isDirectory() && file.name.endsWith('.md')) {
+                  count++;
+                }
               }
+              break; // Only count one workflows directory per skill
+            } catch {
+              // Continue to next candidate
             }
-            break; // Only count one workflows directory per skill
           }
         }
       }
@@ -247,7 +272,7 @@ function countLinesInFile(filePath: string): number {
   try {
     if (!existsSync(filePath)) return 0;
     const content = readFileSync(filePath, 'utf-8');
-    return content.split('\n').filter((line) => line.trim()).length;
+    return content.split(/\r?\n/).filter((line) => line.trim()).length;
   } catch {
     return 0;
   }
@@ -290,8 +315,8 @@ function ensureDir(dir: string): void {
 
 function detectTerminalWidth(): number {
   // Try Kitty IPC first (most accurate for Kitty panes)
-  const kittyWindowId = process.env.KITTY_WINDOW_ID;
-  if (kittyWindowId && !isWindows) {
+  const kittyWindowId = getEnvVar('KITTY_WINDOW_ID');
+  if (kittyWindowId && !isWindows()) {
     try {
       const result = spawnSync('kitten', ['@', 'ls'], {
         encoding: 'utf-8',
@@ -315,7 +340,7 @@ function detectTerminalWidth(): number {
   }
 
   // Try tput (Unix systems)
-  if (!isWindows) {
+  if (!isWindows()) {
     try {
       const result = spawnSync('tput', ['cols'], {
         encoding: 'utf-8',
@@ -329,14 +354,15 @@ function detectTerminalWidth(): number {
   }
 
   // Try Windows mode command
-  if (isWindows) {
+  if (isWindows()) {
     try {
-      const result = spawnSync('mode', ['con'], {
-        encoding: 'utf-8',
-        shell: true,
-        timeout: 1000,
-      });
-      const match = result.stdout?.match(/Columns:\s*(\d+)/i);
+      // Use cmd.exe explicitly to run 'mode con' since it's a cmd built-in
+      const result = spawnSync('cmd', ['/c', 'mode', 'con'], getSpawnOpts(1000));
+      // Multi-locale support for "Columns" in various languages:
+      // English: Columns, German: Spalten, Spanish: Columnas, French: Colonnes,
+      // Italian: Colonne, Dutch: Kolommen, Portuguese: Colunas, Polish: Kolumny,
+      // Swedish: Kolumner, Norwegian: Kolonner, Czech: Sloupce, Danish: Kolonner
+      const match = result.stdout?.match(/(?:Columns|Spalten|Columnas|Colonnes|Colonne|Kolommen|Colunas|Kolumny|Kolumner|Kolonner|Sloupce):\s*(\d+)/i);
       if (match) {
         const cols = parseInt(match[1]);
         if (!isNaN(cols) && cols > 0) return cols;
@@ -344,10 +370,18 @@ function detectTerminalWidth(): number {
     } catch {
       // Fall through
     }
+
+    // ConEmu/Cmder terminal detection (popular Windows terminal emulators)
+    // These set environment variables with terminal dimensions
+    const conemuCols = getEnvVar('ConEmuColumns') || getEnvVar('TERM_WIDTH');
+    if (conemuCols) {
+      const cols = parseInt(conemuCols);
+      if (!isNaN(cols) && cols > 0) return cols;
+    }
   }
 
   // Environment variable fallback
-  const cols = parseInt(process.env.COLUMNS || '');
+  const cols = parseInt(getEnvVar('COLUMNS') || '');
   if (!isNaN(cols) && cols > 0) return cols;
 
   // stdout columns (if available)
@@ -463,58 +497,51 @@ function getGitStatus(cwd: string): GitStatus {
   try {
     // Check if git repo
     const gitCheck = spawnSync('git', ['rev-parse', '--git-dir'], {
-      encoding: 'utf-8',
+      ...getSpawnOpts(),
       cwd,
-      timeout: 2000,
     });
     if (gitCheck.status !== 0) return status;
     status.isRepo = true;
 
     // Branch
     const branchResult = spawnSync('git', ['branch', '--show-current'], {
-      encoding: 'utf-8',
+      ...getSpawnOpts(),
       cwd,
-      timeout: 2000,
     });
     status.branch = branchResult.stdout?.trim() || 'detached';
 
     // Modified files
     const diffResult = spawnSync('git', ['diff', '--name-only'], {
-      encoding: 'utf-8',
+      ...getSpawnOpts(),
       cwd,
-      timeout: 2000,
     });
-    status.modified = (diffResult.stdout?.trim().split('\n').filter(Boolean) || []).length;
+    status.modified = splitLines(diffResult.stdout?.trim() || '').filter(Boolean).length;
 
     // Staged files
     const stagedResult = spawnSync('git', ['diff', '--cached', '--name-only'], {
-      encoding: 'utf-8',
+      ...getSpawnOpts(),
       cwd,
-      timeout: 2000,
     });
-    status.staged = (stagedResult.stdout?.trim().split('\n').filter(Boolean) || []).length;
+    status.staged = splitLines(stagedResult.stdout?.trim() || '').filter(Boolean).length;
 
     // Untracked files
     const untrackedResult = spawnSync('git', ['ls-files', '--others', '--exclude-standard'], {
-      encoding: 'utf-8',
+      ...getSpawnOpts(),
       cwd,
-      timeout: 2000,
     });
-    status.untracked = (untrackedResult.stdout?.trim().split('\n').filter(Boolean) || []).length;
+    status.untracked = splitLines(untrackedResult.stdout?.trim() || '').filter(Boolean).length;
 
     // Stash count
     const stashResult = spawnSync('git', ['stash', 'list'], {
-      encoding: 'utf-8',
+      ...getSpawnOpts(),
       cwd,
-      timeout: 2000,
     });
-    status.stashCount = (stashResult.stdout?.trim().split('\n').filter(Boolean) || []).length;
+    status.stashCount = splitLines(stashResult.stdout?.trim() || '').filter(Boolean).length;
 
     // Ahead/behind
     const aheadBehindResult = spawnSync('git', ['rev-list', '--left-right', '--count', 'HEAD...@{u}'], {
-      encoding: 'utf-8',
+      ...getSpawnOpts(),
       cwd,
-      timeout: 2000,
     });
     if (aheadBehindResult.stdout) {
       const parts = aheadBehindResult.stdout.trim().split(/\s+/);
@@ -524,9 +551,8 @@ function getGitStatus(cwd: string): GitStatus {
 
     // Commit age
     const logResult = spawnSync('git', ['log', '-1', '--format=%ct'], {
-      encoding: 'utf-8',
+      ...getSpawnOpts(),
       cwd,
-      timeout: 2000,
     });
     if (logResult.stdout) {
       const lastCommitEpoch = parseInt(logResult.stdout.trim());
@@ -730,6 +756,9 @@ function parseIsoToEpoch(ts: string): number {
 }
 
 function toBar(rating: number): string {
+  // Use ASCII characters when NO_COLOR is set
+  const bar = NO_COLOR ? '#' : (rating >= 10 ? '\u2585' : rating >= 8 ? '\u2584' : rating >= 5 ? '\u2583' : rating >= 3 ? '\u2582' : '\u2581');
+  if (NO_COLOR) return bar;
   if (rating >= 10) return '\x1b[38;2;34;197;94m\u2585\x1b[0m';
   if (rating >= 9) return '\x1b[38;2;74;222;128m\u2585\x1b[0m';
   if (rating >= 8) return '\x1b[38;2;134;239;172m\u2584\x1b[0m';
@@ -757,7 +786,7 @@ function makeSparkline(
     const slotRatings = entries.filter((e) => e.epoch >= slotStart && e.epoch < slotEnd).map((e) => e.rating);
 
     if (slotRatings.length === 0) {
-      bars.push('\x1b[38;2;45;50;60m \x1b[0m');
+      bars.push(NO_COLOR ? '.' : '\x1b[38;2;45;50;60m \x1b[0m');
     } else {
       const avg = slotRatings.reduce((a, b) => a + b, 0) / slotRatings.length;
       bars.push(toBar(avg));
@@ -772,7 +801,8 @@ function calculateRatingStats(): RatingStats | null {
 
   try {
     const content = readFileSync(RATINGS_FILE, 'utf-8');
-    const lines = content.split('\n').filter((l) => l.trim());
+    // Handle both Unix (LF) and Windows (CRLF) line endings
+    const lines = splitLines(content).filter((l) => l.trim());
     if (lines.length === 0) return null;
 
     const entries: Array<{ epoch: number; rating: number; source: string }> = [];
@@ -869,7 +899,7 @@ async function getQuote(): Promise<{ text: string; author: string } | null> {
   }
 
   // Fetch new quote if API key available
-  const apiKey = process.env.ZENQUOTES_API_KEY;
+  const apiKey = getEnvVar('ZENQUOTES_API_KEY');
   if (apiKey) {
     try {
       const response = await fetch(`https://zenquotes.io/api/random/${apiKey}`, {
@@ -1038,7 +1068,7 @@ function renderGit(mode: DisplayMode, git: GitStatus, dirName: string): void {
       break;
     }
   }
-  console.log(separator);
+  // Separator moved to main() for conditional control
 }
 
 function renderMemory(
@@ -1102,8 +1132,7 @@ function renderLearning(mode: DisplayMode, stats: RatingStats | null): void {
 async function renderQuote(mode: DisplayMode): Promise<void> {
   if (mode !== 'normal') return;
 
-  const separator = `${SLATE_600}\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500${RESET}`;
-  console.log(separator);
+  // Separator handled by main() for conditional control
 
   const quote = await getQuote();
   if (!quote) return;
@@ -1172,11 +1201,14 @@ async function main(): Promise<void> {
   const outputTokens = input.context_window?.current_usage?.output_tokens || 0;
   const contextMax = input.context_window?.context_window_size || 200000;
 
-  // Get CC version
+  // Get CC version (cross-platform: use shell on Windows for proper command resolution)
   let ccVersion = input.version || 'unknown';
   if (ccVersion === 'unknown') {
     try {
-      const result = spawnSync('claude', ['--version'], { encoding: 'utf-8', timeout: 2000 });
+      const result = spawnSync('claude', ['--version'], {
+        ...getSpawnOpts(),
+        shell: isWindows(),  // Use shell on Windows for .exe/.cmd/.bat resolution
+      });
       ccVersion = result.stdout?.trim().split(' ')[0] || 'unknown';
     } catch {
       // Keep unknown
@@ -1231,13 +1263,32 @@ async function main(): Promise<void> {
   // Get rating stats
   const ratingStats = calculateRatingStats();
 
+  // Separator helper
+  const separator = `${SLATE_600}\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500${RESET}`;
+
   // Render output
-  renderPaiBranding(mode, ccVersion, paiVersion, skillsCount, workflowsCount, hooksCount, currentTime, location, weather);
+  if (SHOW_PAI_BRANDING) {
+    renderPaiBranding(mode, ccVersion, paiVersion, skillsCount, workflowsCount, hooksCount, currentTime, location, weather);
+  }
   renderContext(mode, contextPct, contextK, maxK, timeDisplay);
   renderGit(mode, gitStatus, dirName);
-  renderMemory(mode, workCount, ratingsCount, sessionsCount, researchCount);
-  renderLearning(mode, ratingStats);
-  await renderQuote(mode);
+
+  // Conditionally render memory/learning sections with smart separator handling
+  if (SHOW_MEMORY_SECTION || SHOW_LEARNING_SECTION) {
+    console.log(separator); // Separator after git when memory/learning sections exist
+    if (SHOW_MEMORY_SECTION) {
+      renderMemory(mode, workCount, ratingsCount, sessionsCount, researchCount);
+    }
+    if (SHOW_LEARNING_SECTION) {
+      renderLearning(mode, ratingStats);
+    }
+  }
+
+  // Quote section (normal mode only) - separator printed before quote
+  if (mode === 'normal') {
+    console.log(separator);
+    await renderQuote(mode);
+  }
 }
 
 main().catch(console.error);

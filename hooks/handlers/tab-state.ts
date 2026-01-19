@@ -6,6 +6,8 @@
  */
 
 import { isValidVoiceCompletion, getTabFallback } from '../lib/response-format';
+import { isKittyTerminal } from '../lib/terminal';
+import { crossSpawnSync } from '../lib/spawn';
 import type { ParsedTranscript, ResponseState } from '../../skills/CORE/Tools/TranscriptParser';
 
 // Tab color states for visual feedback (inactive tab only - active tab stays dark blue)
@@ -24,21 +26,6 @@ const TAB_SUFFIXES = {
 const ACTIVE_TAB_COLOR = '#002B80';  // Dark blue
 const ACTIVE_TEXT_COLOR = '#FFFFFF';
 const INACTIVE_TEXT_COLOR = '#A0A0A0';
-
-/**
- * Check if we're running in a Kitty terminal.
- * Returns true only on Linux/macOS when TERM indicates Kitty.
- */
-function isKittyTerminal(): boolean {
-  // Skip on Windows - Kitty doesn't run there
-  if (process.platform === 'win32') {
-    return false;
-  }
-
-  // Check TERM environment variable for kitty
-  const term = process.env.TERM || '';
-  return term.includes('kitty') || term === 'xterm-kitty';
-}
 
 /**
  * Handle tab state update with pre-parsed transcript data.
@@ -77,10 +64,16 @@ export async function handleTabState(parsed: ParsedTranscript): Promise<void> {
     console.error(`[TabState] State: ${state}, Color: ${stateColor}, Suffix: "${suffix}"`);
 
     // Set tab colors: active tab always dark blue, inactive shows state color
-    await Bun.$`kitten @ set-tab-color --self active_bg=${ACTIVE_TAB_COLOR} active_fg=${ACTIVE_TEXT_COLOR} inactive_bg=${stateColor} inactive_fg=${INACTIVE_TEXT_COLOR}`;
+    crossSpawnSync('kitten', [
+      '@', 'set-tab-color', '--self',
+      `active_bg=${ACTIVE_TAB_COLOR}`,
+      `active_fg=${ACTIVE_TEXT_COLOR}`,
+      `inactive_bg=${stateColor}`,
+      `inactive_fg=${INACTIVE_TEXT_COLOR}`
+    ]);
 
     // Set tab title
-    await Bun.$`kitty @ set-tab-title ${tabTitle}`;
+    crossSpawnSync('kitty', ['@', 'set-tab-title', tabTitle]);
   } catch (error) {
     console.error('[TabState] Failed to update Kitty tab:', error);
   }

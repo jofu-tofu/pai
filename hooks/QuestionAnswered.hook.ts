@@ -36,19 +36,13 @@
  * - Kitty unavailable: Silent failure
  */
 
+import { isKittyTerminal } from './lib/terminal';
+import { crossSpawnSync } from './lib/spawn';
+
 const TAB_WORKING_BG = '#804000';      // Dark orange - actively working
 const ACTIVE_TAB_BG = '#002B80';       // Dark blue - active tab always
 const ACTIVE_TEXT = '#FFFFFF';
 const INACTIVE_TEXT = '#A0A0A0';
-
-/**
- * Check if we're running in a Kitty terminal.
- */
-function isKittyTerminal(): boolean {
-  if (process.platform === 'win32') return false;
-  const term = process.env.TERM || '';
-  return term.includes('kitty') || term === 'xterm-kitty';
-}
 
 async function main() {
   // Skip on Windows or non-Kitty terminals
@@ -58,10 +52,16 @@ async function main() {
 
   try {
     // Set tab color: active stays dark blue, inactive shows orange
-    await Bun.$`kitten @ set-tab-color --self active_bg=${ACTIVE_TAB_BG} active_fg=${ACTIVE_TEXT} inactive_bg=${TAB_WORKING_BG} inactive_fg=${INACTIVE_TEXT}`.quiet();
+    crossSpawnSync('kitten', [
+      '@', 'set-tab-color', '--self',
+      `active_bg=${ACTIVE_TAB_BG}`,
+      `active_fg=${ACTIVE_TEXT}`,
+      `inactive_bg=${TAB_WORKING_BG}`,
+      `inactive_fg=${INACTIVE_TEXT}`
+    ]);
 
     // Set working title
-    await Bun.$`kitty @ set-tab-title "⚙️Processing answer…"`.quiet();
+    crossSpawnSync('kitty', ['@', 'set-tab-title', '⚙️Processing answer…']);
 
     console.error('[QuestionAnswered] Tab reset to working state (orange on inactive only)');
   } catch (error) {

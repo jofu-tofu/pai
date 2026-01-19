@@ -217,6 +217,132 @@ cp settings.json ~/.claude/settings.json
 
 ---
 
+## Shared Utilities (`hooks/lib/`)
+
+PAI provides shared utilities in `hooks/lib/` to solve common problems consistently. **Always use these instead of rolling your own solutions.**
+
+### Why These Exist
+
+| Problem | Naive Approach | What Goes Wrong | Utility Solution |
+|---------|----------------|-----------------|------------------|
+| Path comparison | `pathA === pathB` | Fails on Windows (case-insensitive, backslashes) | `normalizePathForComparison()` |
+| Line splitting | `content.split('\n')` | Leaves `\r` on Windows (CRLF) | `splitLines()` |
+| Platform check | `process.platform === 'win32'` | Scattered, inconsistent | `isWindows()`, `isUnix()` |
+| Environment expansion | Hardcode paths | `$HOME` not expanded by Claude Code | `expandPath()`, `getPaiDir()` |
+| Process spawning | `Bun.spawn()` or `Bun.$` | Bun-specific, breaks in Node.js | `crossSpawn()`, `shellExec()` |
+| Kitty terminal features | Always use them | Crashes on Windows (Kitty doesn't exist) | `canUseKitty()`, `isKittyTerminal()` |
+| Identity/config loading | Parse markdown or JSON per-file | Inconsistent, duplicated logic | `getIdentity()`, `getPrincipal()` |
+| Notifications | Direct `osascript` calls | macOS-only, blocks execution | `notify()` with graceful degradation |
+
+### Utility Reference
+
+**`platform.ts`** — Cross-platform detection and path utilities
+
+```typescript
+import { isWindows, isUnix, isMacOS, isLinux } from './lib/platform';
+import { normalizePathForComparison, splitLines, toForwardSlash } from './lib/platform';
+import { getDefaultShell, canUseKitty } from './lib/platform';
+
+// Platform detection
+if (isWindows()) { /* Windows-specific logic */ }
+if (isUnix()) { /* macOS or Linux */ }
+
+// Path comparison (handles case + separators)
+if (normalizePathForComparison(pathA) === normalizePathForComparison(pathB)) { ... }
+
+// Line splitting (handles CRLF)
+const lines = splitLines(fileContent);
+
+// Check before using Kitty features
+if (canUseKitty()) { /* Safe to use Kitty escape codes */ }
+```
+
+**`paths.ts`** — Environment-aware path resolution
+
+```typescript
+import { getPaiDir, paiPath, expandPath, getSettingsPath } from './lib/paths';
+
+// Always use these instead of hardcoding paths
+const paiDir = getPaiDir();                    // Expands PAI_DIR or defaults to ~/pai
+const memoryDir = paiPath('MEMORY');           // $PAI_DIR/MEMORY
+const settingsPath = getSettingsPath();        // $PAI_DIR/settings.json
+
+// Expand user home in any path (handles $HOME, ~, %USERPROFILE%)
+const expanded = expandPath('$HOME/Documents');
+```
+
+**`spawn.ts`** — Cross-platform, cross-runtime process execution
+
+```typescript
+import { crossSpawnSync, shellExec, runScript, getRuntime } from './lib/spawn';
+
+// Sync command execution (replaces Bun.spawnSync)
+const result = crossSpawnSync('git', ['status']);
+if (result.success) console.log(result.stdout);
+
+// Shell command (replaces Bun.$)
+const output = await shellExec('echo "hello" && ls');
+
+// Run script with current runtime (auto-detects bun/node/deno)
+runScript('./my-script.ts', ['--flag']);
+
+// Check runtime if needed
+if (getRuntime() === 'bun') { /* Bun-specific optimization */ }
+```
+
+**`terminal.ts`** — Terminal feature detection
+
+```typescript
+import { isKittyTerminal, getPlatformName } from './lib/terminal';
+
+// Check if actually running in Kitty (not just if platform supports it)
+if (isKittyTerminal()) {
+  // Safe to use Kitty-specific escape sequences
+  process.stdout.write('\x1b]30;Tab Title\x07');
+}
+```
+
+**`identity.ts`** — Centralized identity and settings
+
+```typescript
+import { getIdentity, getPrincipal, getDAName } from './lib/identity';
+
+const ai = getIdentity();      // { name, fullName, voiceId, color }
+const user = getPrincipal();   // { name, pronunciation, timezone }
+const name = getDAName();      // Just the AI name string
+```
+
+**`notifications.ts`** — Multi-channel notifications with graceful degradation
+
+```typescript
+import { notify, notifyTaskComplete, notifyError } from './lib/notifications';
+
+// Smart routing based on event type and configured channels
+await notify('taskComplete', 'Build finished');
+await notifyError('Compilation failed', { priority: 'high' });
+
+// Desktop notifications gracefully skip on non-macOS
+// ntfy/Discord/SMS only fire if configured
+```
+
+### Anti-Patterns
+
+```typescript
+// ❌ Wrong - platform-specific, inconsistent
+if (process.platform === 'win32') { ... }
+const lines = content.split('\n');
+const paiDir = process.env.PAI_DIR || `${os.homedir()}/pai`;
+await Bun.$`some command`;
+
+// ✅ Correct - use shared utilities
+if (isWindows()) { ... }
+const lines = splitLines(content);
+const paiDir = getPaiDir();
+await shellExec('some command');
+```
+
+---
+
 ## Testing
 
 ```bash

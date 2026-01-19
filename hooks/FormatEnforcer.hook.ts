@@ -54,15 +54,17 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { getPaiDir } from './lib/paths';
 import { getIdentity, getPrincipal } from './lib/identity';
+import { getEnvVar, pathContainsSegment } from './lib/platform';
 
 const FORMAT_SPEC_PATH = join(getPaiDir(), 'skills/CORE/SYSTEM/RESPONSEFORMAT.md');
 
 function main() {
   try {
     // Check if this is a subagent session - subagents don't need format enforcement
-    const claudeProjectDir = process.env.CLAUDE_PROJECT_DIR || '';
-    const isSubagent = claudeProjectDir.includes('/.claude/Agents/') ||
-                      process.env.CLAUDE_AGENT_TYPE !== undefined;
+    const claudeProjectDir = getEnvVar('CLAUDE_PROJECT_DIR') || '';
+    // Use pathContainsSegment for cross-platform path matching
+    const isSubagent = pathContainsSegment(claudeProjectDir, '.claude/Agents') ||
+                      getEnvVar('CLAUDE_AGENT_TYPE') !== undefined;
 
     if (isSubagent) {
       process.exit(0);

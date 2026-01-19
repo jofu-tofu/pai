@@ -29,19 +29,19 @@ Extract from {principal.name}'s request:
 # Example for 3 custom research agents:
 
 # Agent 1 - Enthusiastic Explorer
-bun run ~/.claude/skills/Agents/Tools/AgentFactory.ts \
+bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts \
   --traits "research,enthusiastic,exploratory" \
   --task "Research quantum computing applications" \
   --output json
 
 # Agent 2 - Skeptical Analyst
-bun run ~/.claude/skills/Agents/Tools/AgentFactory.ts \
+bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts \
   --traits "research,skeptical,systematic" \
   --task "Research quantum computing applications" \
   --output json
 
 # Agent 3 - Thorough Synthesizer
-bun run ~/.claude/skills/Agents/Tools/AgentFactory.ts \
+bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts \
   --traits "research,analytical,synthesizing" \
   --task "Research quantum computing applications" \
   --output json
@@ -242,7 +242,7 @@ AgentFactory automatically maps trait combinations to voices:
 
 ## References
 
-- Trait definitions: `~/.claude/skills/Agents/Data/Traits.yaml`
-- Agent template: `~/.claude/skills/Agents/Templates/DynamicAgent.hbs`
-- AgentFactory tool: `~/.claude/skills/Agents/Tools/AgentFactory.ts`
-- Voice mappings: `~/.claude/skills/Agents/AgentPersonalities.md`
+- Trait definitions: `$PAI_DIR/skills/Agents/Data/Traits.yaml`
+- Agent template: `$PAI_DIR/skills/Agents/Templates/DynamicAgent.hbs`
+- AgentFactory tool: `$PAI_DIR/skills/Agents/Tools/AgentFactory.ts`
+- Voice mappings: `$PAI_DIR/skills/Agents/AgentPersonalities.md`

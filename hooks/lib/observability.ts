@@ -7,6 +7,8 @@
  * Client dashboard: localhost:5173
  */
 
+import { getEnvVar } from './platform';
+
 export interface ObservabilityEvent {
   source_app: string;
   session_id: string;
@@ -28,7 +30,8 @@ export interface ObservabilityEvent {
  */
 export async function sendEventToObservability(event: ObservabilityEvent): Promise<void> {
   try {
-    const response = await fetch('http://localhost:4000/events', {
+    const observabilityHost = getEnvVar('PAI_OBSERVABILITY_HOST') || 'http://localhost:4000';
+    const response = await fetch(`${observabilityHost}/events`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,5 +63,5 @@ export function getCurrentTimestamp(): string {
  * Helper to get source app name from environment or default to 'PAI'
  */
 export function getSourceApp(): string {
-  return process.env.PAI_SOURCE_APP || 'PAI';
+  return getEnvVar('PAI_SOURCE_APP') || 'PAI';
 }

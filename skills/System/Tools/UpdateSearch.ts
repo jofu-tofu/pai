@@ -14,9 +14,11 @@
 
 import { readFile } from "fs/promises";
 import { join } from "path";
+import { homedir } from "os";
+import { joinLines, getEnvVar } from "../../../hooks/lib/platform";
 
-const PAI_DIR = process.env.PAI_DIR || `${process.env.HOME}/.claude`;
-const UPDATES_DIR = join(PAI_DIR, "MEMORY/PAISYSTEMUPDATES");
+const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
+const UPDATES_DIR = join(PAI_DIR, "MEMORY", "PAISYSTEMUPDATES");
 const INDEX_PATH = join(UPDATES_DIR, "index.json");
 
 interface UpdateRecord {
@@ -77,7 +79,7 @@ function formatTable(updates: UpdateRecord[]): string {
   lines.push("");
   lines.push(`Total: ${updates.length} updates`);
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 function formatDetail(update: UpdateRecord): string {
@@ -124,9 +126,9 @@ function formatDetail(update: UpdateRecord): string {
   }
 
   lines.push("");
-  lines.push(`**Full Document:** ${UPDATES_DIR}/${update.file_path}`);
+  lines.push(`**Full Document:** ${join(UPDATES_DIR, update.file_path)}`);
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 async function listAll() {

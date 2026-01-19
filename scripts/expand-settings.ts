@@ -17,10 +17,11 @@
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join, resolve, dirname } from 'path';
+import { join, resolve, dirname, basename, extname } from 'path';
 import { homedir } from 'os';
 import { fileURLToPath } from 'url';
-import { toForwardSlash } from '../hooks/lib/platform';
+import { toForwardSlash, formatPathForDisplay, isWindows, getEnvVar } from '../hooks/lib/platform';
+import { expandPath } from '../hooks/lib/paths';
 
 // ============================================================================
 // Configuration
@@ -43,10 +44,10 @@ interface ResolutionResult {
  * Resolves PAI_DIR from multiple sources in priority order
  */
 function resolvePaiDir(): ResolutionResult {
-  // Priority 1: Environment variable
-  const envPaiDir = process.env.PAI_DIR;
+  // Priority 1: Environment variable (case-insensitive on Windows)
+  const envPaiDir = getEnvVar('PAI_DIR');
   if (envPaiDir) {
-    const expanded = expandHomePath(envPaiDir);
+    const expanded = expandPath(envPaiDir);
     return { paiDir: normalizePath(expanded), source: 'PAI_DIR environment variable' };
   }
 
@@ -56,8 +57,9 @@ function resolvePaiDir(): ResolutionResult {
     try {
       const config = JSON.parse(readFileSync(configPath, 'utf-8'));
       if (config.PAI_DIR) {
-        const expanded = expandHomePath(config.PAI_DIR);
-        return { paiDir: normalizePath(expanded), source: `~/.pai-config` };
+        const expanded = expandPath(config.PAI_DIR);
+        // Use cross-platform path display
+        return { paiDir: normalizePath(expanded), source: formatPathForDisplay(configPath) };
       }
     } catch {
       // Config file exists but is invalid, continue to next source
@@ -87,29 +89,30 @@ function resolvePaiDir(): ResolutionResult {
   console.error('Please set PAI_DIR using one of these methods:');
   console.error('');
   console.error('  Option 1: Environment variable');
-  console.error('    PowerShell:  $env:PAI_DIR = "C:\\Users\\YourName\\pai"');
-  console.error('    Bash:        export PAI_DIR="/home/yourname/pai"');
+  if (isWindows()) {
+    console.error('    PowerShell:  $env:PAI_DIR = "C:\\Users\\YourName\\pai"');
+    console.error('    CMD:         set PAI_DIR=C:\\Users\\YourName\\pai');
+  } else {
+    console.error('    Bash/Zsh:    export PAI_DIR="/home/yourname/pai"');
+  }
   console.error('');
-  console.error('  Option 2: Config file (~/.pai-config)');
-  console.error('    { "PAI_DIR": "/path/to/your/pai" }');
+  console.error('  Option 2: Config file');
+  if (isWindows()) {
+    console.error(`    Location: ${join(homedir(), '.pai-config')}`);
+    console.error('    { "PAI_DIR": "C:\\\\Users\\\\YourName\\\\pai" }');
+  } else {
+    console.error('    Location: ~/.pai-config');
+    console.error('    { "PAI_DIR": "/home/yourname/pai" }');
+  }
   console.error('');
   console.error('  Option 3: Run from PAI directory');
-  console.error('    cd /path/to/pai && bun run scripts/expand-settings.ts');
+  if (isWindows()) {
+    console.error('    cd C:\\path\\to\\pai && bun run scripts\\expand-settings.ts');
+  } else {
+    console.error('    cd /path/to/pai && bun run scripts/expand-settings.ts');
+  }
   console.error('');
   process.exit(1);
-}
-
-/**
- * Expands ~ and $HOME in path strings
- */
-function expandHomePath(inputPath: string): string {
-  const home = homedir();
-  return inputPath
-    .replace(/^~(?=[\/\\]|$)/, home)
-    .replace(/^\$HOME(?=[\/\\]|$)/, home)
-    .replace(/^\$\{HOME\}(?=[\/\\]|$)/, home)
-    .replace(/^%USERPROFILE%(?=[\/\\]|$)/i, home)
-    .replace(/^%HOME%(?=[\/\\]|$)/i, home);
 }
 
 /**
@@ -149,7 +152,11 @@ function expandTemplate(paiDir: string, outputPath?: string): void {
   // Backup existing settings if present
   if (existsSync(finalOutputPath)) {
     const timestamp = new Date().toISOString().split('T')[0];
-    const backupPath = finalOutputPath.replace('.json', `.backup-${timestamp}.json`);
+    // Use path utilities instead of string replace to handle edge cases
+    // (e.g., if path contains '.json' in a directory name)
+    const ext = extname(finalOutputPath);
+    const base = finalOutputPath.slice(0, -ext.length);
+    const backupPath = `${base}.backup-${timestamp}${ext}`;
     const existingContent = readFileSync(finalOutputPath, 'utf-8');
     writeFileSync(backupPath, existingContent);
     console.log(`📦 Backed up existing settings: ${backupPath}`);

@@ -16,55 +16,59 @@
 import { parseArgs } from "util";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
+import { homedir } from "os";
+import { joinLines, getEnvVar, isNoColorSet } from "../../../hooks/lib/platform";
 
-const PAI_DIR = process.env.PAI_DIR || join(process.env.HOME!, ".config/pai");
-const STATE_DIR = join(PAI_DIR, "MEMORY/State");
-const ISC_PATH = join(PAI_DIR, "MEMORY/Work/current-isc.json");
+const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), "pai");
+const STATE_DIR = join(PAI_DIR, "MEMORY", "State");
+const ISC_PATH = join(PAI_DIR, "MEMORY", "Work", "current-isc.json");
 const ALGORITHM_STATE_PATH = join(STATE_DIR, "algorithm-state.json");
 
 // ANSI color codes - Tokyo Night / LCARS palette
-const RESET = "\x1b[0m";
-const BOLD = "\x1b[1m";
-const DIM = "\x1b[2m";
+// Respects NO_COLOR environment variable: https://no-color.org
+const NO_COLOR = isNoColorSet();
+const RESET = NO_COLOR ? "" : "\x1b[0m";
+const BOLD = NO_COLOR ? "" : "\x1b[1m";
+const DIM = NO_COLOR ? "" : "\x1b[2m";
 
 // LCARS colors
 const LCARS = {
   // Primary colors
-  ORANGE: "\x1b[38;2;255;153;0m",
-  GOLD: "\x1b[38;2;204;153;0m",
-  YELLOW: "\x1b[38;2;255;204;0m",
-  BLUE: "\x1b[38;2;153;204;255m",
-  PURPLE: "\x1b[38;2;204;153;255m",
-  PINK: "\x1b[38;2;255;153;204m",
-  RED: "\x1b[38;2;255;102;102m",
-  GREEN: "\x1b[38;2;153;255;153m",
-  CYAN: "\x1b[38;2;102;255;255m",
+  ORANGE: NO_COLOR ? "" : "\x1b[38;2;255;153;0m",
+  GOLD: NO_COLOR ? "" : "\x1b[38;2;204;153;0m",
+  YELLOW: NO_COLOR ? "" : "\x1b[38;2;255;204;0m",
+  BLUE: NO_COLOR ? "" : "\x1b[38;2;153;204;255m",
+  PURPLE: NO_COLOR ? "" : "\x1b[38;2;204;153;255m",
+  PINK: NO_COLOR ? "" : "\x1b[38;2;255;153;204m",
+  RED: NO_COLOR ? "" : "\x1b[38;2;255;102;102m",
+  GREEN: NO_COLOR ? "" : "\x1b[38;2;153;255;153m",
+  CYAN: NO_COLOR ? "" : "\x1b[38;2;102;255;255m",
   // Background
-  BG_ORANGE: "\x1b[48;2;255;153;0m",
-  BG_GOLD: "\x1b[48;2;204;153;0m",
-  BG_PURPLE: "\x1b[48;2;147;112;219m",
-  BG_BLUE: "\x1b[48;2;100;149;237m",
-  BG_BLACK: "\x1b[48;2;0;0;0m",
+  BG_ORANGE: NO_COLOR ? "" : "\x1b[48;2;255;153;0m",
+  BG_GOLD: NO_COLOR ? "" : "\x1b[48;2;204;153;0m",
+  BG_PURPLE: NO_COLOR ? "" : "\x1b[48;2;147;112;219m",
+  BG_BLUE: NO_COLOR ? "" : "\x1b[48;2;100;149;237m",
+  BG_BLACK: NO_COLOR ? "" : "\x1b[48;2;0;0;0m",
 };
 
 // Effort level colors
 const EFFORT_COLORS: Record<string, { fg: string; bg: string; emoji: string }> = {
-  TRIVIAL: { fg: LCARS.BLUE, bg: "\x1b[48;2;50;80;120m", emoji: "💭" },
-  QUICK: { fg: LCARS.GREEN, bg: "\x1b[48;2;40;100;40m", emoji: "⚡" },
-  STANDARD: { fg: LCARS.YELLOW, bg: "\x1b[48;2;120;100;20m", emoji: "📊" },
-  THOROUGH: { fg: LCARS.ORANGE, bg: "\x1b[48;2;140;80;0m", emoji: "🔬" },
-  DETERMINED: { fg: LCARS.RED, bg: "\x1b[48;2;140;40;40m", emoji: "🎯" },
+  TRIVIAL: { fg: LCARS.BLUE, bg: NO_COLOR ? "" : "\x1b[48;2;50;80;120m", emoji: NO_COLOR ? "[T]" : "💭" },
+  QUICK: { fg: LCARS.GREEN, bg: NO_COLOR ? "" : "\x1b[48;2;40;100;40m", emoji: NO_COLOR ? "[Q]" : "⚡" },
+  STANDARD: { fg: LCARS.YELLOW, bg: NO_COLOR ? "" : "\x1b[48;2;120;100;20m", emoji: NO_COLOR ? "[S]" : "📊" },
+  THOROUGH: { fg: LCARS.ORANGE, bg: NO_COLOR ? "" : "\x1b[48;2;140;80;0m", emoji: NO_COLOR ? "[H]" : "🔬" },
+  DETERMINED: { fg: LCARS.RED, bg: NO_COLOR ? "" : "\x1b[48;2;140;40;40m", emoji: NO_COLOR ? "[D]" : "🎯" },
 };
 
 // Phase definitions with icons and colors
 const PHASES = [
-  { name: "OBSERVE", icon: "👁️", color: LCARS.CYAN, description: "Understanding request" },
-  { name: "THINK", icon: "🧠", color: LCARS.PURPLE, description: "Analyzing requirements" },
-  { name: "PLAN", icon: "📋", color: LCARS.BLUE, description: "Sequencing steps" },
-  { name: "BUILD", icon: "🔨", color: LCARS.YELLOW, description: "Making testable" },
-  { name: "EXECUTE", icon: "⚡", color: LCARS.ORANGE, description: "Doing the work" },
-  { name: "VERIFY", icon: "✅", color: LCARS.GREEN, description: "Testing results" },
-  { name: "LEARN", icon: "📚", color: LCARS.PINK, description: "Capturing learnings" },
+  { name: "OBSERVE", icon: NO_COLOR ? "[O]" : "👁️", color: LCARS.CYAN, description: "Understanding request" },
+  { name: "THINK", icon: NO_COLOR ? "[T]" : "🧠", color: LCARS.PURPLE, description: "Analyzing requirements" },
+  { name: "PLAN", icon: NO_COLOR ? "[P]" : "📋", color: LCARS.BLUE, description: "Sequencing steps" },
+  { name: "BUILD", icon: NO_COLOR ? "[B]" : "🔨", color: LCARS.YELLOW, description: "Making testable" },
+  { name: "EXECUTE", icon: NO_COLOR ? "[E]" : "⚡", color: LCARS.ORANGE, description: "Doing the work" },
+  { name: "VERIFY", icon: NO_COLOR ? "[V]" : "✅", color: LCARS.GREEN, description: "Testing results" },
+  { name: "LEARN", icon: NO_COLOR ? "[L]" : "📚", color: LCARS.PINK, description: "Capturing learnings" },
 ] as const;
 
 type PhaseName = (typeof PHASES)[number]["name"];
@@ -81,7 +85,10 @@ interface AlgorithmState {
 // Voice notification
 async function announceVoice(message: string): Promise<void> {
   try {
-    await fetch("http://localhost:8888/notify", {
+    // Use URL constructor for proper URL handling
+    const baseUrl = getEnvVar("PAI_VOICE_SERVER") || "http://localhost:8888";
+    const url = new URL("/notify", baseUrl).toString();
+    await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message }),
@@ -183,7 +190,7 @@ function renderPhaseBar(currentPhase: string): string {
 
   lines.push(`${LCARS.ORANGE}╰${"━".repeat(width - 2)}╯${RESET}`);
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 // Effort level display
@@ -197,7 +204,7 @@ function renderEffortBanner(effort: string): string {
   lines.push(`${config.fg}${config.bg}│ ${BOLD}${barContent}${RESET}${config.fg}${config.bg}│${RESET}`);
   lines.push(`${config.fg}${config.bg}╰${"━".repeat(width - 2)}╯${RESET}`);
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 // ISC status summary
@@ -219,7 +226,7 @@ function renderISCSummary(isc: ReturnType<typeof loadISC>): string {
   lines.push(`${LCARS.BLUE}│${RESET} ${LCARS.GREEN}✅ Done: ${done}${RESET}  ${blocked > 0 ? LCARS.RED + "🚫 Blocked: " + blocked + RESET : ""}`.padEnd(blocked > 0 ? 45 : 40) + `${LCARS.BLUE}│${RESET}`);
   lines.push(`${LCARS.BLUE}╰────────────────────────────────╯${RESET}`);
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 // Full display
@@ -310,7 +317,7 @@ function renderFullDisplay(): string {
   lines.push(`${LCARS.ORANGE}╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯${RESET}`);
   lines.push("");
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 // Phase transition with voice

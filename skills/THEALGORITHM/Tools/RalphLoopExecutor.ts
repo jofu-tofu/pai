@@ -16,6 +16,8 @@
 import { parseArgs } from "util";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from "fs";
 import { join, dirname } from "path";
+import { homedir } from "os";
+import { normalizeCRLF, joinLines, getEnvVar } from "../../../hooks/lib/platform";
 
 interface RalphLoopConfig {
   prompt: string;
@@ -34,25 +36,27 @@ interface RalphLoopState {
   prompt: string;
 }
 
-// PAI_DIR configurable via environment variable
-const PAI_DIR = process.env.PAI_DIR || join(process.env.HOME || "~", "pai");
+// PAI_DIR configurable via environment variable (case-insensitive on Windows)
+const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), "pai");
 const STATE_FILE_NAME = "ralph-loop.local.md";
 
 function getStatePath(): string {
   // First check for project-local pai directory
   let dir = process.cwd();
-  while (dir !== "/") {
+  while (dir !== dirname(dir)) {  // Cross-platform root detection
     if (existsSync(join(dir, "pai"))) {
       return join(dir, "pai", STATE_FILE_NAME);
     }
     dir = dirname(dir);
   }
   // Default to PAI state directory
-  return join(PAI_DIR, "MEMORY/State", STATE_FILE_NAME);
+  return join(PAI_DIR, "MEMORY", "State", STATE_FILE_NAME);
 }
 
 function parseState(content: string): RalphLoopState | null {
-  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  // Normalize CRLF to LF for consistent parsing
+  const normalized = normalizeCRLF(content);
+  const frontmatterMatch = normalized.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!frontmatterMatch) return null;
 
   const frontmatter = frontmatterMatch[1];
@@ -154,7 +158,7 @@ function formatStatus(state: RalphLoopState | null): string {
 
   lines.push("", "Prompt:", "───────────────────────────────────────", state.prompt);
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 async function main() {
@@ -192,7 +196,7 @@ OPTIONS:
   -h, --help                       Show this help
 
 ENVIRONMENT:
-  PAI_DIR                          PAI installation directory (default: ~/.config/pai)
+  PAI_DIR                          PAI installation directory (default: ~/pai)
 
 INTEGRATION WITH THEALGORITHM:
   When an ISC row is assigned execution.ralph_loop capability, this tool:

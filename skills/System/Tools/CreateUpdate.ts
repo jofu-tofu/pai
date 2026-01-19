@@ -20,7 +20,7 @@ import { writeFile, mkdir, readFile } from "fs/promises";
 import { join } from "path";
 import { parseArgs } from "util";
 import { homedir } from "os";
-import { splitLines } from '../../../hooks/lib/platform';
+import { splitLines, joinLines } from '../../../hooks/lib/platform';
 
 const PAI_DIR = process.env.PAI_DIR || join(homedir(), 'pai');
 const UPDATES_DIR = join(PAI_DIR, "MEMORY", "PAISYSTEMUPDATES");
@@ -141,7 +141,7 @@ async function prependToIndex(
     lines.splice(insertIndex, 0, newEntry);
 
     // Update the total count at the bottom
-    const updatedContent = lines.join("\n").replace(
+    const updatedContent = joinLines(lines).replace(
       /\*\*Total:\*\* (\d+) updates/,
       (match, count) => `**Total:** ${parseInt(count) + 1} updates`
     );
@@ -302,7 +302,7 @@ function generateContent(options: ContentOptions): string {
 
 ${vn.how_it_was || 'Previously, the system operated as follows:'}
 
-${vn.how_it_was_bullets?.length ? 'This approach had these characteristics:\n' + vn.how_it_was_bullets.map(b => `- ${b}`).join('\n') : ''}`;
+${vn.how_it_was_bullets?.length ? 'This approach had these characteristics:\n' + joinLines(vn.how_it_was_bullets.map(b => `- ${b}`)) : ''}`;
   } else {
     howItWasSection = `## How It Used To Work
 
@@ -316,7 +316,7 @@ ${vn.how_it_was_bullets?.length ? 'This approach had these characteristics:\n' +
 
 ${vn.how_it_is || 'The system now operates as follows:'}
 
-${vn.how_it_is_bullets?.length ? 'Key improvements:\n' + vn.how_it_is_bullets.map(b => `- ${b}`).join('\n') : ''}`;
+${vn.how_it_is_bullets?.length ? 'Key improvements:\n' + joinLines(vn.how_it_is_bullets.map(b => `- ${b}`)) : ''}`;
   } else {
     howItIsSection = `## How It Works Now
 
@@ -332,7 +332,7 @@ ${expected_improvement || '*New behavior matches the changes made below.*'}`;
 ### Files Modified`;
 
   if (files.length > 0) {
-    changesSection += '\n' + files.map(f => `- \`${f}\``).join('\n');
+    changesSection += '\n' + joinLines(files.map(f => `- \`${f}\``));
   } else {
     changesSection += '\n- *No files recorded*';
   }
@@ -359,7 +359,7 @@ ${expected_improvement || '*New behavior matches the changes made below.*'}`;
 
 ${vn.future_impact || 'In the future:'}
 
-${vn.future_bullets?.length ? vn.future_bullets.map(b => `- ${b}`).join('\n') : ''}`;
+${vn.future_bullets?.length ? joinLines(vn.future_bullets.map(b => `- ${b}`)) : ''}`;
   } else {
     goingForwardSection = `## Going Forward
 
@@ -372,14 +372,14 @@ ${expected_improvement ? `In the future, ${expected_improvement.toLowerCase().re
     verificationSection = `## Verification
 
 **Tests Performed:**
-${vn.verification_steps?.map(s => `- ${s}`).join('\n') || '- *None recorded*'}`;
+${vn.verification_steps ? joinLines(vn.verification_steps.map(s => `- ${s}`)) : '- *None recorded*'}`;
 
     if (vn.verification_commands?.length) {
       verificationSection += `
 
 **Verification Commands:**
 \`\`\`bash
-${vn.verification_commands.join('\n')}
+${joinLines(vn.verification_commands)}
 \`\`\``;
     }
   } else if (n?.verification) {
@@ -426,7 +426,7 @@ ${verificationSection}
 **Auto-generated:** Yes
 `;
 
-  return frontmatter.join("\n") + "\n" + body;
+  return joinLines(frontmatter) + "\n" + body;
 }
 
 function getSignificanceBadge(significance: SignificanceLabel): string {

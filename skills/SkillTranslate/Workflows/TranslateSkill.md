@@ -20,10 +20,10 @@ Translate a complete skill from one platform to another (e.g., Claude Code → W
 Ensure the source skill exists and is valid:
 ```bash
 # Check skill exists
-ls $PAI_DIR/.claude/skills/SkillName/SKILL.md
+ls $PAI_DIR/skills/SkillName/SKILL.md
 
 # Validate skill structure (if validator available)
-bun run $PAI_DIR/.claude/skills/UpdateSkill/Tools/ValidateSkill.ts SkillName
+bun run $PAI_DIR/skills/UpdateSkill/Tools/ValidateSkill.ts SkillName
 ```
 
 ### 2. Check Platform Support
@@ -31,17 +31,17 @@ bun run $PAI_DIR/.claude/skills/UpdateSkill/Tools/ValidateSkill.ts SkillName
 Verify that both platforms have schemas defined:
 ```bash
 # List available platforms
-ls $PAI_DIR/.claude/skills/SkillTranslate/Mappings/Platforms/
+ls $PAI_DIR/skills/SkillTranslate/Mappings/Platforms/
 
 # Check if mapping exists
-ls $PAI_DIR/.claude/skills/SkillTranslate/Mappings/Translations/
+ls $PAI_DIR/skills/SkillTranslate/Mappings/Translations/
 ```
 
 ### 3. View Platform Mappings (Optional)
 
 Understand what will be translated:
 ```bash
-bun run $PAI_DIR/.claude/skills/SkillTranslate/Tools/ShowMappings.ts \
+bun run $PAI_DIR/skills/SkillTranslate/Tools/ShowMappings.ts \
   --from claude-code \
   --to windsurf
 ```
@@ -56,7 +56,7 @@ This shows:
 
 Ensure the mapping file is complete:
 ```bash
-bun run $PAI_DIR/.claude/skills/SkillTranslate/Tools/ValidateMappings.ts \
+bun run $PAI_DIR/skills/SkillTranslate/Tools/ValidateMappings.ts \
   --from claude-code \
   --to windsurf
 ```
@@ -65,7 +65,7 @@ bun run $PAI_DIR/.claude/skills/SkillTranslate/Tools/ValidateMappings.ts \
 
 Execute the translation:
 ```bash
-bun run $PAI_DIR/.claude/skills/SkillTranslate/Tools/TranslateSkill.ts \
+bun run $PAI_DIR/skills/SkillTranslate/Tools/TranslateSkill.ts \
   --skill SkillName \
   --from claude-code \
   --to windsurf \

@@ -8,10 +8,12 @@
  *   bun run scripts/setup.ts fix      # Auto-fix issues where possible
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, readdirSync, statSync, symlinkSync } from 'fs';
 import { join, dirname } from 'path';
+// Using os.platform() directly because this script runs before hooks/lib/platform.ts is available.
+// This is intentional - setup.ts is a bootstrap script that cannot depend on other PAI utilities.
 import { homedir, platform } from 'os';
-import { $ } from 'bun';
+// Note: Using Bun.spawnSync instead of Bun.$ for reliable cross-platform behavior
 import * as readline from 'readline';
 
 // ============================================
@@ -20,8 +22,13 @@ import * as readline from 'readline';
 
 const SCRIPT_DIR = dirname(import.meta.path);
 const PAI_DIR = dirname(SCRIPT_DIR); // Parent of scripts/
-const CLAUDE_DIR = join(homedir(), '.claude');
+const CLAUDE_DIR = join(homedir(), 'pai');
 const CLAUDE_SETTINGS = join(CLAUDE_DIR, 'settings.json');
+
+// Platform detection - centralized for this bootstrap script
+// (Cannot use hooks/lib/platform.ts as setup.ts runs before it's available)
+const IS_WINDOWS = platform() === 'win32';
+const IS_MACOS = platform() === 'darwin';
 
 interface CheckResult {
   name: string;
@@ -69,53 +76,150 @@ async function askYesNo(question: string, defaultYes: boolean = true): Promise<b
 }
 
 async function commandExists(cmd: string): Promise<boolean> {
+  // Use platform-appropriate command with Bun.spawnSync for reliable cross-platform behavior
   try {
-    await $`which ${cmd}`.quiet();
-    return true;
-  } catch {
-    // Try Windows 'where' command
-    try {
-      await $`where ${cmd}`.quiet();
-      return true;
-    } catch {
-      return false;
+    if (IS_WINDOWS) {
+      // 'where' is a cmd.exe built-in, so we need to invoke through cmd
+      const result = Bun.spawnSync(['cmd', '/c', 'where', cmd], {
+        stdout: 'pipe',
+        stderr: 'pipe',
+      });
+      return result.exitCode === 0;
+    } else {
+      // Unix/macOS: 'which' is a standalone binary
+      const result = Bun.spawnSync(['which', cmd], {
+        stdout: 'pipe',
+        stderr: 'pipe',
+      });
+      return result.exitCode === 0;
     }
+  } catch {
+    return false;
   }
 }
 
 async function getCommandVersion(cmd: string): Promise<string | null> {
   try {
-    const result = await $`${cmd} --version`.quiet();
-    return result.stdout.toString().trim().split('\n')[0];
+    // Use Bun.spawnSync for reliable cross-platform behavior
+    const result = Bun.spawnSync([cmd, '--version'], {
+      stdout: 'pipe',
+      stderr: 'pipe',
+    });
+    if (result.exitCode !== 0) return null;
+    return result.stdout.toString().trim().split(/\r?\n/)[0];
   } catch {
     return null;
   }
 }
 
-function detectShell(): { type: 'bash' | 'zsh' | 'powershell' | 'unknown', profilePath: string | null } {
-  const shell = process.env.SHELL || '';
-  const isWindows = platform() === 'win32';
-
-  if (isWindows) {
-    // PowerShell
-    const psProfile = process.env.PROFILE;
-    if (psProfile) {
-      return { type: 'powershell', profilePath: psProfile };
+function detectShell(): { type: 'bash' | 'zsh' | 'powershell' | 'fish' | 'unknown', profilePath: string | null } {
+  // On Windows, SHELL is typically undefined unless running in Git Bash/MSYS2/WSL
+  // COMSPEC points to cmd.exe, but we want to detect PowerShell as that's more common now
+  // On Unix, SHELL contains the user's default shell
+  let shell = '';
+  if (IS_WINDOWS) {
+    // Check for Unix-like shell environments first (Git Bash, WSL, MSYS2)
+    if (process.env.SHELL) {
+      shell = process.env.SHELL;
+    } else {
+      // Default to PowerShell on modern Windows (it's always available)
+      // COMSPEC points to cmd.exe, but PowerShell is preferred
+      shell = 'powershell';
     }
-    // Default PowerShell profile location
-    const defaultProfile = join(homedir(), 'Documents', 'PowerShell', 'Microsoft.PowerShell_profile.ps1');
-    return { type: 'powershell', profilePath: defaultProfile };
+  } else {
+    shell = process.env.SHELL || '';
   }
 
-  if (shell.includes('zsh')) {
+  if (IS_WINDOWS) {
+    // PowerShell - check PROFILE env var first (works for both pwsh and older PS)
+    const psProfile = process.env.PROFILE;
+    if (psProfile && existsSync(dirname(psProfile))) {
+      return { type: 'powershell', profilePath: psProfile };
+    }
+
+    // Try to get the actual Documents folder path using PowerShell
+    // This handles localized Windows installs (e.g., "Dokumente" in German, "Documentos" in Spanish)
+    const userProfile = process.env.USERPROFILE || homedir();
+    let documentsPath: string | null = null;
+
+    try {
+      // Use PowerShell to get the actual Documents folder (handles localization)
+      const result = Bun.spawnSync(['powershell', '-NoProfile', '-Command',
+        '[Environment]::GetFolderPath("MyDocuments")'], {
+        stdout: 'pipe',
+        stderr: 'pipe',
+      });
+      const output = result.stdout.toString().trim();
+      if (output && existsSync(output)) {
+        documentsPath = output;
+      }
+    } catch {
+      // Fall back to checking known locations
+    }
+
+    // Build profile paths based on detected or fallback Documents path
+    const possibleProfiles: string[] = [];
+
+    if (documentsPath) {
+      // Use actual Documents folder (handles localization)
+      possibleProfiles.push(
+        join(documentsPath, 'PowerShell', 'Microsoft.PowerShell_profile.ps1'),
+        join(documentsPath, 'WindowsPowerShell', 'Microsoft.PowerShell_profile.ps1'),
+      );
+    }
+
+    // Add fallback locations
+    possibleProfiles.push(
+      // Standard English locations
+      join(userProfile, 'Documents', 'PowerShell', 'Microsoft.PowerShell_profile.ps1'),
+      join(userProfile, 'Documents', 'WindowsPowerShell', 'Microsoft.PowerShell_profile.ps1'),
+      // OneDrive Documents (common on Windows 10/11)
+      join(userProfile, 'OneDrive', 'Documents', 'PowerShell', 'Microsoft.PowerShell_profile.ps1'),
+      join(userProfile, 'OneDrive', 'Documents', 'WindowsPowerShell', 'Microsoft.PowerShell_profile.ps1'),
+    );
+
+    // Return first existing parent directory, or fallback to standard location
+    for (const profile of possibleProfiles) {
+      const profileDir = dirname(profile);
+      if (existsSync(profileDir) || existsSync(dirname(profileDir))) {
+        return { type: 'powershell', profilePath: profile };
+      }
+    }
+
+    // Ultimate fallback - use standard path and let the setup create it
+    return { type: 'powershell', profilePath: possibleProfiles[0] };
+  }
+
+  // Unix shells
+  if (shell.toLowerCase().includes('zsh')) {
     return { type: 'zsh', profilePath: join(homedir(), '.zshrc') };
   }
 
-  if (shell.includes('bash')) {
-    return { type: 'bash', profilePath: join(homedir(), '.bashrc') };
+  if (shell.toLowerCase().includes('bash')) {
+    // Check for actual file existence to handle modern macOS (which uses zsh by default)
+    // and various bash configurations
+    const bashProfile = join(homedir(), '.bash_profile');
+    const bashrc = join(homedir(), '.bashrc');
+
+    if (IS_MACOS) {
+      // macOS: prefer .bash_profile if it exists, otherwise .bashrc
+      // Modern macOS (Catalina+) uses zsh by default, but users may still have bash config
+      if (existsSync(bashProfile)) {
+        return { type: 'bash', profilePath: bashProfile };
+      }
+      return { type: 'bash', profilePath: bashrc };
+    }
+
+    // Linux: use .bashrc (interactive shells source this)
+    return { type: 'bash', profilePath: bashrc };
   }
 
-  // Default to bash
+  if (shell.toLowerCase().includes('fish')) {
+    // Fish shell uses its own config directory
+    return { type: 'fish', profilePath: join(homedir(), '.config', 'fish', 'config.fish') };
+  }
+
+  // Default to bash with .bashrc
   return { type: 'bash', profilePath: join(homedir(), '.bashrc') };
 }
 
@@ -256,7 +360,15 @@ async function checkDependencies(): Promise<CheckResult> {
           const fullPath = join(PAI_DIR, dir);
           log('🔧', `Installing dependencies in ${dir}/`);
           try {
-            await $`cd ${fullPath} && bun install`.quiet();
+            // Use Bun.spawnSync for reliable cross-platform behavior
+            const installResult = Bun.spawnSync(['bun', 'install'], {
+              cwd: fullPath,
+              stdout: 'pipe',
+              stderr: 'pipe',
+            });
+            if (installResult.exitCode !== 0) {
+              throw new Error('bun install failed');
+            }
             log('✅', `Installed ${dir}/`);
           } catch (e) {
             log('❌', `Failed to install ${dir}/`);
@@ -350,18 +462,90 @@ async function checkSkillsJunction(): Promise<CheckResult> {
       message: `Junction not created: .claude/skills does not exist`,
       fix: async () => {
         log('🔧', `Creating junction: ${paiClaudeSkills} -> ${paiSkills}`);
-        try {
-          // Use PowerShell 7 to create junction (works without admin)
-          await $`pwsh -Command "New-Item -ItemType Junction -Path '${paiClaudeSkills}' -Target '${paiSkills}'"`.quiet();
-          log('✅', 'Skills junction created');
-        } catch (e) {
-          // Fallback to mklink
+
+        if (IS_WINDOWS) {
+          // Windows: Try multiple methods for creating junctions
+          // Priority: Node.js symlink > Windows PowerShell 5 > PowerShell 7 > mklink
+          let created = false;
+
+          // Method 1: Try Node.js fs.symlink with 'junction' type (no admin required)
           try {
-            await $`cmd /c mklink /J "${paiClaudeSkills}" "${paiSkills}"`.quiet();
-            log('✅', 'Skills junction created (mklink)');
-          } catch (e2) {
-            log('❌', 'Failed to create junction. Try running as administrator.');
-            throw e2;
+            symlinkSync(paiSkills, paiClaudeSkills, 'junction');
+            log('✅', 'Skills junction created (Node.js)');
+            created = true;
+          } catch {
+            // Fall through to PowerShell methods
+          }
+
+          // Method 2: Try Windows PowerShell 5 (powershell.exe - pre-installed on all Windows)
+          // Using Bun.spawnSync for reliable cross-platform behavior
+          if (!created) {
+            try {
+              // Escape paths for PowerShell: replace ' with '' for single-quoted strings
+              const escapedSkills = paiSkills.replace(/'/g, "''");
+              const escapedClaudeSkills = paiClaudeSkills.replace(/'/g, "''");
+              const psCommand = `New-Item -ItemType Junction -Path '${escapedClaudeSkills}' -Target '${escapedSkills}'`;
+              const psResult = Bun.spawnSync(['powershell', '-NoProfile', '-Command', psCommand], {
+                stdout: 'pipe',
+                stderr: 'pipe',
+              });
+              if (psResult.exitCode === 0) {
+                log('✅', 'Skills junction created (PowerShell)');
+                created = true;
+              }
+            } catch {
+              // Fall through to pwsh
+            }
+          }
+
+          // Method 3: Try PowerShell 7 (pwsh - may not be installed)
+          if (!created) {
+            try {
+              const escapedSkills = paiSkills.replace(/'/g, "''");
+              const escapedClaudeSkills = paiClaudeSkills.replace(/'/g, "''");
+              const psCommand = `New-Item -ItemType Junction -Path '${escapedClaudeSkills}' -Target '${escapedSkills}'`;
+              const pwshResult = Bun.spawnSync(['pwsh', '-NoProfile', '-Command', psCommand], {
+                stdout: 'pipe',
+                stderr: 'pipe',
+              });
+              if (pwshResult.exitCode === 0) {
+                log('✅', 'Skills junction created (pwsh)');
+                created = true;
+              }
+            } catch {
+              // Fall through to mklink
+            }
+          }
+
+          // Method 4: Fallback to cmd mklink (may require admin on older Windows)
+          if (!created) {
+            try {
+              const mklinkResult = Bun.spawnSync(['cmd', '/c', 'mklink', '/J', paiClaudeSkills, paiSkills], {
+                stdout: 'pipe',
+                stderr: 'pipe',
+              });
+              if (mklinkResult.exitCode !== 0) {
+                throw new Error('mklink failed');
+              }
+              log('✅', 'Skills junction created (mklink)');
+              created = true;
+            } catch (e) {
+              log('❌', 'Failed to create junction.');
+              log('💡', 'This may require one of the following:');
+              log('   ', '1. Enable Developer Mode: Settings > System > For developers > Developer Mode');
+              log('   ', '2. Run as Administrator');
+              log('   ', `3. Manually create junction: mklink /J "${paiClaudeSkills}" "${paiSkills}"`);
+              throw e;
+            }
+          }
+        } else {
+          // Unix/macOS: Use native symlink
+          try {
+            symlinkSync(paiSkills, paiClaudeSkills, 'dir');
+            log('✅', 'Skills symlink created');
+          } catch (e) {
+            log('❌', `Failed to create symlink: ${e instanceof Error ? e.message : 'unknown error'}`);
+            throw e;
           }
         }
       },
@@ -431,7 +615,7 @@ async function checkHooksWork(): Promise<CheckResult> {
     return {
       name: 'Hook Files',
       status: 'pass',
-      message: `All ${requiredHooks.length} core hooks present (run 'cd hooks && bun test' to verify)`,
+      message: `All ${requiredHooks.length} core hooks present (run 'bun test' in hooks/ to verify)`,
     };
   } catch (e) {
     return {
@@ -453,14 +637,16 @@ async function checkSkills(): Promise<CheckResult> {
     };
   }
 
-  // Count skills
+  // Count skills using cross-platform fs API
   const skillsDir = join(PAI_DIR, 'skills');
   try {
-    const entries = await Bun.file(skillsDir).exists()
-      ? []
-      : (await $`ls -d ${skillsDir}/*/`.quiet()).stdout.toString().trim().split('\n');
+    const entries = readdirSync(skillsDir, { withFileTypes: true });
+    const skillCount = entries.filter(e => {
+      if (!e.isDirectory()) return false;
+      // Only count directories that have SKILL.md (actual skills)
+      return existsSync(join(skillsDir, e.name, 'SKILL.md'));
+    }).length;
 
-    const skillCount = entries.filter(e => e.trim()).length;
     return {
       name: 'Skills',
       status: 'pass',
@@ -493,9 +679,16 @@ async function configureHooks(): Promise<void> {
   }
 
   try {
-    // Set PAI_DIR for the subprocess
+    // Set PAI_DIR for the subprocess - use Bun.spawnSync for reliable cross-platform behavior
     process.env.PAI_DIR = PAI_DIR;
-    await $`bun run ${setupHooksScript}`.env({ PAI_DIR });
+    const hookResult = Bun.spawnSync(['bun', 'run', setupHooksScript], {
+      env: { ...process.env, PAI_DIR },
+      stdout: 'inherit',
+      stderr: 'inherit',
+    });
+    if (hookResult.exitCode !== 0) {
+      throw new Error('Hook setup failed');
+    }
     log('✅', 'PAI hooks configured successfully');
   } catch (e) {
     log('❌', 'Failed to configure hooks');
@@ -549,7 +742,12 @@ async function addPaiDirToShellProfile(): Promise<void> {
 
   if (!shell.profilePath) {
     log('⚠️', 'Could not detect shell profile. Please add PAI_DIR manually:');
-    log('  ', `export PAI_DIR="${PAI_DIR}"`);
+    // Show both syntaxes so user knows which to use
+    if (IS_WINDOWS) {
+      log('  ', `PowerShell: $env:PAI_DIR = "${PAI_DIR}"`);
+    } else {
+      log('  ', `Bash/Zsh:   export PAI_DIR="${PAI_DIR}"`);
+    }
     return;
   }
 
@@ -579,24 +777,57 @@ async function addPaiDirToShellProfile(): Promise<void> {
     }
 
     // Check if PAI_DIR is already set
+    // Normalize line endings for consistent checking across platforms
     const profileContent = readFileSync(shell.profilePath, 'utf-8');
-    if (profileContent.includes('PAI_DIR')) {
+    const normalizedContent = profileContent.replace(/\r\n/g, '\n');
+    if (normalizedContent.includes('PAI_DIR')) {
       log('✅', 'PAI_DIR already configured in shell profile');
       return;
     }
 
     // Add PAI_DIR to profile
-    const exportLine = shell.type === 'powershell'
-      ? `\n# PAI System\n$env:PAI_DIR = "${PAI_DIR}"\n`
-      : `\n# PAI System\nexport PAI_DIR="${PAI_DIR}"\n`;
+    // Generate shell-specific export syntax
+    // Use appropriate line endings: LF for Unix shells, CRLF for PowerShell on Windows
+    const isUnixShell = shell.type !== 'powershell';
+    const lineEnding = isUnixShell ? '\n' : '\r\n';
+
+    let exportLine: string;
+    switch (shell.type) {
+      case 'powershell':
+        // PowerShell uses $env: syntax and typically CRLF on Windows
+        exportLine = `${lineEnding}# PAI System${lineEnding}$env:PAI_DIR = "${PAI_DIR}"${lineEnding}`;
+        break;
+      case 'fish':
+        // Fish shell uses 'set -gx' for global exported variables
+        exportLine = `${lineEnding}# PAI System${lineEnding}set -gx PAI_DIR "${PAI_DIR}"${lineEnding}`;
+        break;
+      default:
+        // Bash, Zsh, and other POSIX shells use export with LF
+        exportLine = `${lineEnding}# PAI System${lineEnding}export PAI_DIR="${PAI_DIR}"${lineEnding}`;
+        break;
+    }
+
+    // Ensure file ends with newline before appending
+    const needsNewline = profileContent.length > 0 &&
+                         !profileContent.endsWith('\n') &&
+                         !profileContent.endsWith('\r\n');
+    if (needsNewline) {
+      appendFileSync(shell.profilePath, lineEnding);
+    }
 
     appendFileSync(shell.profilePath, exportLine);
     log('✅', `Added PAI_DIR to ${shell.profilePath}`);
     log('ℹ️', 'Restart your terminal or run:');
-    if (shell.type === 'powershell') {
-      log('  ', `. $PROFILE`);
-    } else {
-      log('  ', `source ${shell.profilePath}`);
+    switch (shell.type) {
+      case 'powershell':
+        log('  ', `. $PROFILE`);
+        break;
+      case 'fish':
+        log('  ', `source ${shell.profilePath}`);
+        break;
+      default:
+        log('  ', `source ${shell.profilePath}`);
+        break;
     }
   } catch (e) {
     log('❌', 'Failed to add PAI_DIR to shell profile');

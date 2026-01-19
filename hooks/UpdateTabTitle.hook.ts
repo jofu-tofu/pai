@@ -64,8 +64,8 @@ import { readFileSync } from 'fs';
 import { inference } from '../skills/CORE/Tools/Inference';
 import { isValidTabSummary, getTabFallback } from './lib/response-format';
 import { crossSpawnSync } from './lib/spawn';
-import { isKittyTerminal, isWindowsTerminal } from './lib/terminal';
-import { isWindows, splitLines } from './lib/platform';
+import { isKittyTerminal, isWindowsTerminal, supportsAnsiTitles } from './lib/terminal';
+import { isWindows, splitLines, isNoColorSet, getEnvVar, joinLines } from './lib/platform';
 
 // Tab colors - different states
 const TAB_WORKING_BG = '#804000';      // Dark orange - actively working
@@ -149,7 +149,7 @@ function getRecentContext(transcriptPath: string, maxTurns: number = 4): string 
               : '';
           if (text) {
             // Extract just the summary line if present, otherwise first 300 chars
-            const summaryMatch = text.match(/SUMMARY:\s*([^\n]+)/);
+            const summaryMatch = text.match(/SUMMARY:\s*([^\r\n]+)/);
             const shortText = summaryMatch ? summaryMatch[1] : text.slice(0, 300);
             turns.push({ role: 'Assistant', text: shortText });
           }
@@ -163,7 +163,7 @@ function getRecentContext(transcriptPath: string, maxTurns: number = 4): string 
     const recentTurns = turns.slice(-maxTurns);
     if (recentTurns.length === 0) return '';
 
-    return recentTurns.map(t => `${t.role}: ${t.text}`).join('\n');
+    return joinLines(recentTurns.map(t => `${t.role}: ${t.text}`));
   } catch (err) {
     console.error('[UpdateTabTitle] Error reading transcript:', err);
     return '';
@@ -258,23 +258,18 @@ function setTabTitle(title: string, state: TabState = 'normal'): void {
       }
 
       console.error('[UpdateTabTitle] Set via Kitty remote control');
-    } else if (isWindowsTerminal()) {
-      // Windows Terminal supports ANSI escape codes including title setting
-      // WT_SESSION env var indicates running inside Windows Terminal
+    } else if (supportsAnsiTitles() && !isNoColorSet()) {
+      // Use ANSI escape codes for terminals that support them
+      // Respects NO_COLOR to avoid any escape sequences when user prefers clean output
       try {
         const titleEscaped = truncated.replace(/[^\x20-\x7E]/g, ''); // ASCII printable only
         process.stderr.write(`\x1b]0;${titleEscaped}\x07`); // OSC sequence for title
-        console.error('[UpdateTabTitle] Set via Windows Terminal escape codes');
-      } catch {
-        // Silently fail
-      }
-    } else if (!isWindows()) {
-      // Fallback to escape codes for other terminals (macOS/Linux only)
-      // Legacy Windows terminals (cmd.exe, older PowerShell) don't support these reliably
-      try {
-        const titleEscaped = truncated.replace(/[^\x20-\x7E]/g, ''); // ASCII printable only
-        process.stderr.write(`\x1b]0;${titleEscaped}\x07`); // Set window title
-        process.stderr.write(`\x1b]2;${titleEscaped}\x07`); // Set window title (alternate)
+        if (isWindowsTerminal()) {
+          console.error('[UpdateTabTitle] Set via Windows Terminal escape codes');
+        } else {
+          process.stderr.write(`\x1b]2;${titleEscaped}\x07`); // Set window title (alternate)
+          console.error('[UpdateTabTitle] Set via ANSI escape codes');
+        }
       } catch {
         // Silently fail if terminal doesn't support escape codes
       }
@@ -292,7 +287,9 @@ async function announceVoice(summary: string): Promise<void> {
   try {
     // Summary already starts with gerund - use directly, capitalize first letter
     const message = summary.charAt(0).toUpperCase() + summary.slice(1);
-    const url = (process.env.PAI_VOICE_SERVER || 'http://localhost:8888') + '/notify';
+    // Use URL constructor for proper URL handling
+    const baseUrl = getEnvVar('PAI_VOICE_SERVER') || 'http://localhost:8888';
+    const url = new URL('/notify', baseUrl).toString();
     const payload = { message };
 
     await fetch(url, {

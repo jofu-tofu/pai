@@ -31,11 +31,14 @@ import { parseArgs } from "util";
 import { readFileSync, existsSync } from "fs";
 import { parse as parseYaml } from "yaml";
 import Handlebars from "handlebars";
+import { homedir } from "os";
+import { join } from "path";
+import { getEnvVar } from "../../../hooks/lib/platform";
 
 // Paths
-const HOME = process.env.HOME || "~";
-const TRAITS_PATH = `${HOME}/.claude/skills/Agents/Data/Traits.yaml`;
-const TEMPLATE_PATH = `${HOME}/.claude/skills/Agents/Templates/DynamicAgent.hbs`;
+const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
+const TRAITS_PATH = join(PAI_DIR, 'skills', 'Agents', 'Data', 'Traits.yaml');
+const TEMPLATE_PATH = join(PAI_DIR, 'skills', 'Agents', 'Templates', 'DynamicAgent.hbs');
 
 // Types
 interface TraitDefinition {

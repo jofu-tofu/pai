@@ -88,8 +88,10 @@ bmad-output/
 # ============================================
 # USER-SPECIFIC SETTINGS
 # ============================================
-# Root settings.json contains user-specific env paths
+# Root settings.json is generated from settings.template.json by expand-settings.ts
+# Contains absolute paths specific to each user's installation
 /settings.json
+/settings.backup-*.json
 
 # ============================================
 # VOICE/MEDIA OUTPUT
@@ -124,5 +126,7 @@ tmpclaude-*
 nul
 NUL
 _bmad-output/
+# TruffleHog binaries (downloaded per-platform)
+bin/trufflehog
 bin/trufflehog.exe
 hooks/subagent-stop-debug.log

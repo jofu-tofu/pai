@@ -120,21 +120,23 @@ curl -X POST ${VOICE_SERVER_URL}/notify \
 
 ## Secret Scanning - TruffleHog
 
-**Location:** System-installed CLI tool (`brew install trufflehog`)
+**Location:** `${PAI_DIR}/bin/trufflehog.ts` (cross-platform wrapper)
 
 Scan directories for 700+ types of credentials and secrets.
 
 **Usage:**
 ```bash
 # Scan directory
-trufflehog filesystem /path/to/directory
+bun ${PAI_DIR}/bin/trufflehog.ts filesystem /path/to/directory
 
 # Scan git repository
-trufflehog git file:///path/to/repo
+bun ${PAI_DIR}/bin/trufflehog.ts git file:///path/to/repo
 
 # Verified findings only
-trufflehog filesystem /path/to/directory --only-verified
+bun ${PAI_DIR}/bin/trufflehog.ts filesystem /path/to/directory --only-verified
 ```
+
+**Note:** The wrapper automatically downloads the appropriate binary for your platform (Windows/macOS/Linux) on first use.
 
 **When to Use:**
 - "check for secrets"

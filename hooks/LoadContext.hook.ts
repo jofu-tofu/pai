@@ -11,7 +11,7 @@
  * TRIGGER: SessionStart
  *
  * INPUT:
- * - Environment: PAI_DIR, TIME_ZONE
+ * - Environment: PAI_DIR, TZ
  * - Files: skills/CORE/SKILL.md, MEMORY/STATE/progress/*.json
  *
  * OUTPUT:
@@ -43,7 +43,7 @@
  * ERROR HANDLING:
  * - Missing SKILL.md: Fatal error, exits with code 1
  * - Progress file errors: Logged, continues (non-fatal)
- * - Date command failure: Falls back to ISO timestamp
+ * - Timezone format failure: Falls back to ISO timestamp
  *
  * PERFORMANCE:
  * - Blocking: Yes (context is essential)
@@ -53,21 +53,29 @@
 
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { spawn } from 'child_process';
 import { getPaiDir } from './lib/paths';
 import { recordSessionStart } from './lib/notifications';
+import { getEnvVarSyntax, getEnvVar, pathContainsSegment } from './lib/platform';
 
-async function getCurrentDate(): Promise<string> {
+function getCurrentDateTime(): string {
+  const now = new Date();
+  // Use case-insensitive env access, with Intl fallback for cross-platform timezone
+  const timezone = getEnvVar('TZ') || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
   try {
-    const proc = Bun.spawn(['date', '+%Y-%m-%d %H:%M:%S %Z'], {
-      stdout: 'pipe',
-      env: { ...process.env, TZ: process.env.TIME_ZONE || 'America/Los_Angeles' }
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+      timeZoneName: 'short'
     });
-    const output = await new Response(proc.stdout).text();
-    return output.trim();
-  } catch (error) {
-    console.error('Failed to get current date:', error);
-    return new Date().toISOString();
+    return formatter.format(now);
+  } catch {
+    return now.toISOString();
   }
 }
 
@@ -133,8 +141,10 @@ async function checkActiveProgress(paiDir: string): Promise<string | null> {
       }
     }
 
-    summary += '\n💡 To resume: `bun run $PAI_DIR/skills/CORE/Tools/SessionProgress.ts resume <project>`\n';
-    summary += '💡 To complete: `bun run $PAI_DIR/skills/CORE/Tools/SessionProgress.ts complete <project>`\n';
+    // Use platform-appropriate env var syntax for user-facing commands
+    const paiVar = getEnvVarSyntax('PAI_DIR');
+    summary += `\n💡 To resume: \`bun run ${paiVar}/skills/CORE/Tools/SessionProgress.ts resume <project>\`\n`;
+    summary += `💡 To complete: \`bun run ${paiVar}/skills/CORE/Tools/SessionProgress.ts complete <project>\`\n`;
 
     return summary;
   } catch (error) {
@@ -146,9 +156,10 @@ async function checkActiveProgress(paiDir: string): Promise<string | null> {
 async function main() {
   try {
     // Check if this is a subagent session - if so, exit silently
-    const claudeProjectDir = process.env.CLAUDE_PROJECT_DIR || '';
-    const isSubagent = claudeProjectDir.includes('/.claude/Agents/') ||
-                      process.env.CLAUDE_AGENT_TYPE !== undefined;
+    const claudeProjectDir = getEnvVar('CLAUDE_PROJECT_DIR') || '';
+    // Use pathContainsSegment for cross-platform path matching
+    const isSubagent = pathContainsSegment(claudeProjectDir, '.claude/Agents') ||
+                      getEnvVar('CLAUDE_AGENT_TYPE') !== undefined;
 
     if (isSubagent) {
       // Subagent sessions don't need PAI context loading
@@ -161,7 +172,7 @@ async function main() {
     console.error('⏱️ Session start time recorded for notification timing');
 
     const paiDir = getPaiDir();
-    const paiSkillPath = join(paiDir, 'skills/CORE/SKILL.md');
+    const paiSkillPath = join(paiDir, 'skills', 'CORE', 'SKILL.md');
 
     // Verify PAI skill file exists
     if (!existsSync(paiSkillPath)) {
@@ -177,7 +188,7 @@ async function main() {
     console.error(`✅ Read ${paiContent.length} characters from PAI SKILL.md`);
 
     // Get current date/time to prevent confusion about dates
-    const currentDate = await getCurrentDate();
+    const currentDate = getCurrentDateTime();
     console.error(`📅 Current Date: ${currentDate}`);
 
     // Output the PAI content as a system-reminder

@@ -17,6 +17,8 @@ import { parseArgs } from "util";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
 import Anthropic from "@anthropic-ai/sdk";
+import { homedir } from "os";
+import { getEnvVar } from "../../../hooks/lib/platform";
 
 type Source = "EXPLICIT" | "INFERRED" | "IMPLICIT";
 type Status = "PENDING" | "ACTIVE" | "DONE" | "ADJUSTED" | "BLOCKED";
@@ -48,8 +50,8 @@ interface ISCTable {
   log: string[];
 }
 
-const PAI_DIR = process.env.PAI_DIR || join(process.env.HOME || "~", ".config/pai");
-const ISC_DIR = join(PAI_DIR, "MEMORY/Work");
+const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), "pai");
+const ISC_DIR = join(PAI_DIR, "MEMORY", "Work");
 const CURRENT_ISC_PATH = join(ISC_DIR, "current-isc.json");
 
 // Capability category to icon mapping

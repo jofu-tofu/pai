@@ -14,7 +14,7 @@ import { readdirSync, existsSync, readFileSync } from "fs";
 import { join, dirname } from "path";
 import { spawnSync } from "child_process";
 import { homedir } from "os";
-import { isWindows, isMacOS, getPlatformDisplayName, supportsAnsiColors, splitLines } from '../../../hooks/lib/platform';
+import { isWindows, isMacOS, getPlatformDisplayName, supportsAnsiColors, splitLines, getArchitecture, joinLines, canUseKitty, getWindowsShellOptions, getEnvVar } from '../../../hooks/lib/platform';
 import { getPaiDir } from '../../../hooks/lib/paths';
 
 const PAI_DIR = getPaiDir();
@@ -29,16 +29,17 @@ function getTerminalWidth(): number {
     return process.stdout.columns;
   }
 
-  // 2. Fallback: COLUMNS environment variable (cross-platform)
-  const envColumns = parseInt(process.env.COLUMNS || "0");
+  // 2. Fallback: COLUMNS environment variable (case-insensitive on Windows)
+  const envColumns = parseInt(getEnvVar('COLUMNS') || "0");
   if (envColumns > 0) {
     return envColumns;
   }
 
   // 3. Kitty terminal detection (Unix/macOS only)
   // Note: kitten/kitty binaries only exist on Unix systems where Kitty terminal is installed.
-  // The platform check ensures we never attempt this on Windows.
-  if (!isWindows() && process.env.KITTY_WINDOW_ID) {
+  // The canUseKitty() check ensures we never attempt this on Windows.
+  const kittyWindowIdStr = getEnvVar('KITTY_WINDOW_ID');
+  if (canUseKitty() && kittyWindowIdStr) {
     try {
       const result = spawnSync("kitten", ["@", "ls"], {
         encoding: "utf-8",
@@ -47,7 +48,7 @@ function getTerminalWidth(): number {
       });
       if (result.stdout) {
         const data = JSON.parse(result.stdout);
-        const kittyWindowId = parseInt(process.env.KITTY_WINDOW_ID);
+        const kittyWindowId = parseInt(kittyWindowIdStr);
         for (const osWindow of data) {
           for (const tab of osWindow.tabs) {
             for (const win of tab.windows) {
@@ -163,17 +164,17 @@ function getStats(): SystemStats {
 
   // Get platform info
   const platform = getPlatformDisplayName();
-  const arch = process.arch;
+  const arch = getArchitecture();
 
   // Try to get Claude Code version (cross-platform: Windows may need .exe)
   let ccVersion = "2.0";
   try {
     // On Windows, spawnSync handles PATH lookup including .exe, .cmd, .bat extensions
-    // Using shell: true ensures Windows can find the command regardless of extension
+    // Using getWindowsShellOptions() ensures Windows can find the command and hides console
     const result = spawnSync("claude", ["--version"], {
       encoding: "utf-8",
-      shell: isWindows(),  // Use shell on Windows for better command resolution
-      timeout: 5000
+      timeout: 5000,
+      ...getWindowsShellOptions(),
     });
     if (result.stdout) {
       const match = result.stdout.match(/(\d+\.\d+\.\d+)/);
@@ -337,7 +338,7 @@ function createNavyBanner(stats: SystemStats, width: number): string {
   lines.push(`${framePad}${bottomBorder}`);
   lines.push("");
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -436,7 +437,7 @@ function createNavyMediumBanner(stats: SystemStats, width: number): string {
   lines.push(`${urlPad}${urlLine}`);
   lines.push("");
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 // Compact Banner (55-69 cols)
@@ -477,7 +478,7 @@ function createNavyCompactBanner(stats: SystemStats, width: number): string {
   }
   lines.push("");
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 // Minimal Banner (45-54 cols)
@@ -506,7 +507,7 @@ function createNavyMinimalBanner(stats: SystemStats, width: number): string {
   }
   lines.push("");
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 // Ultra-compact Banner (<45 cols)
@@ -522,7 +523,7 @@ function createNavyUltraCompactBanner(stats: SystemStats, width: number): string
   lines.push(center(`${C.lightBlue}\u2726${RESET}${C.silver}${stats.skills}${RESET} ${C.royalBlue}\u21AA${RESET}${C.periwinkle}${stats.hooks}${RESET} ${C.medBlue}\u2726${RESET}${C.skyBlue}${stats.learnings}${RESET}`, width));
   lines.push("");
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

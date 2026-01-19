@@ -25,6 +25,14 @@
 
 ---
 
+## Platform Notes
+
+All commands use `$PAI_DIR` environment variable for cross-platform compatibility.
+- Works on macOS, Linux, and Windows (Git Bash/WSL)
+- Avoid `~` expansion - always use `$PAI_DIR` or `$HOME`
+
+---
+
 ## Execution
 
 ### Step 1: Extract Search Keywords
@@ -48,13 +56,13 @@ Search these locations IN PARALLEL using Intern agents:
 
 | Location | What to Search For | Example Command |
 |----------|-------------------|-----------------|
-| **MEMORY/WORK/** | Directory names, META.yaml files | `ls ~/.claude/MEMORY/WORK/ \| grep -i [keyword]` |
-| **MEMORY/STATE/progress/** | Active multi-session projects | `cat ~/.claude/MEMORY/STATE/progress/*.json \| grep -i [keyword]` |
-| **MEMORY/LEARNING/** | Related learnings and patterns | `grep -r [keyword] ~/.claude/MEMORY/LEARNING/` |
-| **MEMORY/RESEARCH/** | Agent output captures | `grep -r [keyword] ~/.claude/MEMORY/RESEARCH/` |
-| **projects/-Users-{username}--claude/** | Session transcripts (last 30 days) | `grep -l [keyword] ~/.claude/projects/-Users-{username}--claude/*.jsonl` |
-| **Plans/** | Planning documents | `grep -r [keyword] ~/.claude/Plans/` |
-| **WORK/** | Root work scratch files | `ls ~/.claude/WORK/` |
+| **MEMORY/WORK/** | Directory names, META.yaml files | `ls "$PAI_DIR/MEMORY/WORK/" \| grep -i [keyword]` |
+| **MEMORY/STATE/progress/** | Active multi-session projects | `cat "$PAI_DIR/MEMORY/STATE/progress/"*.json \| grep -i [keyword]` |
+| **MEMORY/LEARNING/** | Related learnings and patterns | `grep -r [keyword] "$PAI_DIR/MEMORY/LEARNING/"` |
+| **MEMORY/RESEARCH/** | Agent output captures | `grep -r [keyword] "$PAI_DIR/MEMORY/RESEARCH/"` |
+| **projects/** | Session transcripts (last 30 days) | `grep -rl [keyword] "$PAI_DIR/projects/" \| head -20` |
+| **Plans/** | Planning documents | `grep -r [keyword] "$PAI_DIR/Plans/"` |
+| **WORK/** | Root work scratch files | `ls "$PAI_DIR/WORK/"` |
 
 ### Step 3: Prioritize Results by Recency
 
@@ -120,26 +128,30 @@ After presenting the synthesis:
 ### For Work Directories
 ```bash
 # Find work directories matching keyword
-ls -lt ~/.claude/MEMORY/WORK/ | grep -i "[keyword]"
+ls -lt "$PAI_DIR/MEMORY/WORK/" | grep -i "[keyword]"
 
 # Read META.yaml for context
-cat ~/.claude/MEMORY/WORK/*/META.yaml | grep -A5 -B5 "[keyword]"
+cat "$PAI_DIR/MEMORY/WORK/"*/META.yaml 2>/dev/null | grep -A5 -B5 "[keyword]"
 ```
 
 ### For Session Transcripts
 ```bash
 # Find sessions mentioning the topic (recent first)
-# Replace {username} with your system username
-ls -t ~/.claude/projects/-Users-{username}--claude/*.jsonl | head -20 | xargs -I{} sh -c 'grep -l "[keyword]" "{}" 2>/dev/null && echo {}'
+# Works cross-platform with $PAI_DIR
+find "$PAI_DIR/projects/" -name "*.jsonl" -type f 2>/dev/null | while read -r file; do
+    if grep -l "[keyword]" "$file" 2>/dev/null; then
+        echo "$file"
+    fi
+done | head -20
 
 # Read matching session content (use jq for parsing)
-jq -r '.content // .text' session.jsonl | grep -i "[keyword]" -B2 -A2
+jq -r '.content // .text' session.jsonl 2>/dev/null | grep -i "[keyword]" -B2 -A2
 ```
 
 ### For Multi-Session Projects
 ```bash
 # Check active progress tracking
-cat ~/.claude/MEMORY/STATE/progress/*.json | jq '.name, .objectives, .lastHandoff'
+cat "$PAI_DIR/MEMORY/STATE/progress/"*.json 2>/dev/null | jq '.name, .objectives, .lastHandoff' 2>/dev/null
 ```
 
 ### For Git History (if relevant)

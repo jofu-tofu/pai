@@ -68,7 +68,7 @@ import { getIdentity, getPrincipal } from './lib/identity';
 import { getLearningCategory } from './lib/learning-utils';
 import { getISOTimestamp, getPSTComponents } from './lib/time';
 import { getPaiDir } from './lib/paths';
-import { splitLines } from './lib/platform';
+import { splitLines, joinLines } from './lib/platform';
 import { runScriptDetached } from './lib/spawn';
 
 const PRINCIPAL_NAME = getPrincipal().name;
@@ -238,7 +238,7 @@ function getRecentContext(transcriptPath: string, maxTurns: number = 3): string 
               ? entry.message.content.filter((c: any) => c.type === 'text').map((c: any) => c.text).join(' ')
               : '';
           if (text) {
-            const summaryMatch = text.match(/SUMMARY:\s*([^\n]+)/i);
+            const summaryMatch = text.match(/SUMMARY:\s*([^\r\n]+)/i);
             const shortText = summaryMatch ? summaryMatch[1] : text.slice(0, 150);
             turns.push({ role: 'Assistant', text: shortText });
           }
@@ -249,7 +249,7 @@ function getRecentContext(transcriptPath: string, maxTurns: number = 3): string 
     const recentTurns = turns.slice(-maxTurns);
     if (recentTurns.length === 0) return '';
 
-    return recentTurns.map(t => `${t.role}: ${t.text}`).join('\n');
+    return joinLines(recentTurns.map(t => `${t.role}: ${t.text}`));
   } catch {
     return '';
   }

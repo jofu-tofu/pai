@@ -15,7 +15,7 @@ User says:
 ### Step 1: Run AgentFactory with --list Flag
 
 ```bash
-bun run ~/.claude/skills/Agents/Tools/AgentFactory.ts --list
+bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts --list
 ```
 
 ### Step 2: Present Results to User
@@ -195,6 +195,6 @@ Popular Combos:
 
 ## References
 
-- Full trait definitions: `~/.claude/skills/Agents/Data/Traits.yaml`
+- Full trait definitions: `$PAI_DIR/skills/Agents/Data/Traits.yaml`
 - Voice mappings: Lines 349-794 in Traits.yaml
-- AgentFactory tool: `~/.claude/skills/Agents/Tools/AgentFactory.ts`
+- AgentFactory tool: `$PAI_DIR/skills/Agents/Tools/AgentFactory.ts`

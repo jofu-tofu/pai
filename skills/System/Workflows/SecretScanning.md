@@ -6,13 +6,20 @@
 
 ---
 
+## Platform Notes
+
+All commands use `$PAI_DIR` for cross-platform compatibility:
+- Works on macOS, Linux, and Windows (Git Bash/WSL)
+- TruffleHog binary is automatically downloaded for your platform
+
+---
+
 ## Voice Notification
 
 ```bash
 curl -s -X POST http://localhost:8888/notify \
   -H "Content-Type: application/json" \
-  -d '{"message": "Running secret scanning workflow"}' \
-  > /dev/null 2>&1 &
+  -d '{"message": "Running secret scanning workflow"}' 2>/dev/null &
 ```
 
 Running the **SecretScanning** workflow from the **System** skill...
@@ -21,7 +28,7 @@ Running the **SecretScanning** workflow from the **System** skill...
 
 ## Tool Location
 
-**Scanner:** `~/.claude/skills/CORE/Tools/SecretScan.ts`
+**Scanner:** `$PAI_DIR/skills/CORE/Tools/SecretScan.ts`
 
 ---
 
@@ -29,19 +36,19 @@ Running the **SecretScanning** workflow from the **System** skill...
 
 ```bash
 # Scan current directory
-bun ~/.claude/skills/CORE/Tools/SecretScan.ts
+bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts"
 
 # Scan specific directory
-bun ~/.claude/skills/CORE/Tools/SecretScan.ts /path/to/project
+bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" /path/to/project
 
 # Verbose output (show redacted secrets)
-bun ~/.claude/skills/CORE/Tools/SecretScan.ts /path/to/project --verbose
+bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" /path/to/project --verbose
 
 # JSON output for parsing
-bun ~/.claude/skills/CORE/Tools/SecretScan.ts /path/to/project --json
+bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" /path/to/project --json
 
 # Verify if credentials are active
-bun ~/.claude/skills/CORE/Tools/SecretScan.ts /path/to/project --verify
+bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" /path/to/project --verify
 ```
 
 ---
@@ -69,13 +76,13 @@ TruffleHog detects 700+ credential types:
 Before pushing to any repository:
 
 ```bash
-bun ~/.claude/skills/CORE/Tools/SecretScan.ts .
+bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" .
 ```
 
 ### 2. Audit Private PAI Instance
 
 ```bash
-bun ~/.claude/skills/CORE/Tools/SecretScan.ts ~/.claude --verbose
+bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" "$PAI_DIR" --verbose
 ```
 
 ### 3. Audit Public PAI Before Push
@@ -83,13 +90,14 @@ bun ~/.claude/skills/CORE/Tools/SecretScan.ts ~/.claude --verbose
 **CRITICAL - Always run before pushing to public PAI:**
 
 ```bash
-bun ~/.claude/skills/CORE/Tools/SecretScan.ts ~/Projects/PAI --verbose
+# Replace with your public PAI repository path
+bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" "$HOME/Projects/PAI" --verbose
 ```
 
 ### 4. Full Verification (Active Credential Check)
 
 ```bash
-bun ~/.claude/skills/CORE/Tools/SecretScan.ts . --verify
+bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" . --verify
 ```
 
 ---
@@ -135,7 +143,8 @@ When secrets are found:
 
 ```bash
 # Using BFG (recommended)
-brew install bfg
+# macOS: brew install bfg
+# Linux: apt install bfg or download from https://rtyley.github.io/bfg-repo-cleaner/
 bfg --delete-files .env
 git reflog expire --expire=now --all && git gc --prune=now --aggressive
 ```
@@ -152,10 +161,19 @@ git reflog expire --expire=now --all && git gc --prune=now --aggressive
 
 ## Requirements
 
-**TruffleHog must be installed:**
+**TruffleHog is auto-downloaded on first use.**
+
+The PAI system includes a cross-platform wrapper that automatically downloads the appropriate TruffleHog binary:
+
 ```bash
-brew install trufflehog
+# The wrapper handles download automatically
+bun "$PAI_DIR/bin/trufflehog.ts" filesystem /path/to/scan
+
+# Force re-download if needed
+bun "$PAI_DIR/bin/trufflehog-download.ts" --force
 ```
+
+Supports Windows, macOS (Intel and ARM), and Linux.
 
 ---
 

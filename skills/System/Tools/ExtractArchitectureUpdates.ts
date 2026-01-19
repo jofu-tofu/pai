@@ -11,10 +11,12 @@
 
 import { readFile, writeFile, mkdir } from "fs/promises";
 import { join } from "path";
+import { homedir } from "os";
+import { joinLines, getEnvVar } from "../../../hooks/lib/platform";
 
-const PAI_DIR = process.env.PAI_DIR || `${process.env.HOME}/.claude`;
-const ARCHITECTURE_PATH = join(PAI_DIR, "skills/CORE/SYSTEM/ARCHITECTURE.md");
-const UPDATES_DIR = join(PAI_DIR, "MEMORY/PAISYSTEMUPDATES");
+const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
+const ARCHITECTURE_PATH = join(PAI_DIR, "skills", "CORE", "SYSTEM", "ARCHITECTURE.md");
+const UPDATES_DIR = join(PAI_DIR, "MEMORY", "PAISYSTEMUPDATES");
 
 interface ExtractedUpdate {
   date: string;
@@ -61,10 +63,10 @@ function extractVersion(content: string): string | undefined {
 
 function extractFiles(content: string): string[] {
   const files: string[] = [];
-  const filesMatch = content.match(/\*\*Files:?\*\*([^*]+?)(?=\*\*|---|\n\n#|$)/is);
+  const filesMatch = content.match(/\*\*Files:?\*\*([^*]+?)(?=\*\*|---|\r?\n\r?\n#|$)/is);
   if (filesMatch) {
     const filesSection = filesMatch[1];
-    const fileMatches = filesSection.matchAll(/[-*]\s*(?:Created|Modified|Deleted|Moved|Renamed)?:?\s*([^\n,]+)/gi);
+    const fileMatches = filesSection.matchAll(/[-*]\s*(?:Created|Modified|Deleted|Moved|Renamed)?:?\s*([^\r\n,]+)/gi);
     for (const match of fileMatches) {
       const file = match[1].trim().replace(/^\[.*?\]\s*/, '');
       if (file && !file.startsWith('**') && file.length < 100) {
@@ -89,14 +91,15 @@ function parseUpdates(content: string): ExtractedUpdate[] {
   const section = content.slice(evolutionStart);
 
   // Split by ### headers (each update starts with ### YYYY-MM-DD)
+  // Use CRLF-safe pattern
   const updateSections = section.split(/(?=^### \d{4})/gm).slice(1);
 
   for (const updateSection of updateSections) {
-    // Parse the header: ### YYYY-MM-DD: Title
-    const headerMatch = updateSection.match(/^### (\d{4}-\d{2}-\d{2}):\s*(.+?)(?:\n|$)/);
+    // Parse the header: ### YYYY-MM-DD: Title (CRLF-safe)
+    const headerMatch = updateSection.match(/^### (\d{4}-\d{2}-\d{2}):\s*(.+?)(?:\r?\n|$)/);
     if (!headerMatch) {
-      // Try alternate format without colon
-      const altMatch = updateSection.match(/^### (\d{4}-\d{2}-\d{2})\s+(.+?)(?:\n|$)/);
+      // Try alternate format without colon (CRLF-safe)
+      const altMatch = updateSection.match(/^### (\d{4}-\d{2}-\d{2})\s+(.+?)(?:\r?\n|$)/);
       if (!altMatch) continue;
 
       const [, date, title] = altMatch;
@@ -165,7 +168,7 @@ function generateUpdateFile(update: ExtractedUpdate): string {
   // Add the main title
   const fullContent = `# ${update.title}\n\n**Date:** ${update.date}\n**Type:** ${update.type.charAt(0).toUpperCase() + update.type.slice(1)}\n**Impact:** ${update.impact}${update.version ? `\n**Version:** ${update.version}` : ''}\n\n---\n\n${body}`;
 
-  return frontmatter.join("\n") + fullContent;
+  return joinLines(frontmatter) + fullContent;
 }
 
 function determineTags(update: ExtractedUpdate): string[] {

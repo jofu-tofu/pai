@@ -35,9 +35,10 @@
 import { appendFileSync, existsSync, statSync, renameSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { findActiveWorkDir, type AlgorithmPhase } from './IdealState';
+import { getEnvVar } from './platform';
 
 // DEBUG flag
-const DEBUG = process.env.DEBUG_HOOKS === 'true';
+const DEBUG = getEnvVar('DEBUG_HOOKS') === 'true';
 
 // Maximum size before rotation (1MB)
 const MAX_TRACE_SIZE = 1_000_000;

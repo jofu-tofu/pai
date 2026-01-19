@@ -13,9 +13,11 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYAML } from 'yaml';
+import { homedir } from 'os';
+import { getEnvVar } from '../../../hooks/lib/platform';
 
 // Configuration
-const PAI_DIR = process.env.PAI_DIR || join(process.env.HOME || process.env.USERPROFILE || '', 'pai');
+const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
 const MAPPINGS_DIR = join(PAI_DIR, '.claude', 'skills', 'SkillTranslate', 'Mappings');
 
 // Parse CLI arguments

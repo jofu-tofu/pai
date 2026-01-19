@@ -175,7 +175,7 @@ function getLastResponseSummary(transcriptPath: string): string {
       } catch { /* skip invalid lines */ }
     }
 
-    const summaryMatch = lastAssistant.match(/SUMMARY:\s*([^\n]+)/i);
+    const summaryMatch = lastAssistant.match(/SUMMARY:\s*([^\r\n]+)/i);
     return summaryMatch ? summaryMatch[1].trim() : lastAssistant.slice(0, 500);
   } catch {
     return '';

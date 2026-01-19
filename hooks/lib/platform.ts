@@ -6,6 +6,7 @@
  */
 
 import * as path from 'path';
+import type { SpawnOptions, SpawnSyncOptions } from 'child_process';
 
 // =============================================================================
 // Platform Detection Functions
@@ -46,7 +47,7 @@ export function isUnix(): boolean {
 /**
  * Normalize a path for cross-platform comparison.
  * - Converts all backslashes to forward slashes
- * - On Windows, converts to lowercase for case-insensitive comparison
+ * - On case-insensitive filesystems (Windows, macOS), converts to lowercase
  *
  * @param p - The path to normalize
  * @returns Normalized path suitable for comparison
@@ -55,8 +56,8 @@ export function normalizePathForComparison(p: string): string {
   // Convert backslashes to forward slashes
   let normalized = p.replace(/\\/g, '/');
 
-  // On Windows, paths are case-insensitive
-  if (isWindows()) {
+  // On case-insensitive filesystems (Windows, macOS), normalize case
+  if (isCaseInsensitiveFilesystem()) {
     normalized = normalized.toLowerCase();
   }
 
@@ -87,12 +88,13 @@ export function getDefaultShell(): string {
   if (isWindows()) {
     // On Windows, COMSPEC points to cmd.exe which is always present
     // Fall back to cmd.exe (not pwsh) since cmd is guaranteed to exist
-    return process.env.COMSPEC || 'cmd.exe';
+    // Use getEnvVar for case-insensitive lookup on Windows
+    return getEnvVar('COMSPEC') || 'cmd.exe';
   }
 
   // On Unix systems, use SHELL environment variable or fall back to 'sh'
   // Don't hardcode /bin/sh - let PATH resolve it for portability
-  return process.env.SHELL || 'sh';
+  return getEnvVar('SHELL') || 'sh';
 }
 
 /**
@@ -123,6 +125,24 @@ export function canUseKitty(): boolean {
  */
 export function splitLines(content: string): string[] {
   return content.split(/\r?\n/);
+}
+
+/**
+ * Join lines with LF line endings.
+ *
+ * NOTE: Always uses LF (\n) regardless of platform because:
+ * 1. Git normalizes line endings on commit (core.autocrlf)
+ * 2. Modern editors handle LF correctly on all platforms
+ * 3. Consistency is more important than platform-native endings
+ * 4. CRLF in source files can cause issues with some tools
+ *
+ * Use this instead of .join('\n') for explicit intent.
+ *
+ * @param lines - Array of lines to join
+ * @returns Joined string with LF line endings
+ */
+export function joinLines(lines: string[]): string {
+  return lines.join('\n');
 }
 
 /**
@@ -207,10 +227,17 @@ export function getKillSignal(): NodeJS.Signals | undefined {
  * Includes fallback mechanisms for edge cases.
  *
  * @param cmd - The command to check
+ * @param options - Optional configuration
+ * @param options.timeout - Timeout in ms (default: 5000)
+ * @param options.fallbackTimeout - Timeout for fallback check in ms (default: 2000)
  * @returns true if the command exists
  */
-export function commandExistsSync(cmd: string): boolean {
+export function commandExistsSync(
+  cmd: string,
+  options: { timeout?: number; fallbackTimeout?: number } = {}
+): boolean {
   const { spawnSync } = require('child_process');
+  const { timeout = 5000, fallbackTimeout = 2000 } = options;
 
   try {
     if (isWindows()) {
@@ -218,7 +245,7 @@ export function commandExistsSync(cmd: string): boolean {
       // Using shell: true ensures 'where' built-in is available from any context
       const result = spawnSync('where', [cmd], {
         encoding: 'utf-8',
-        timeout: 5000,
+        timeout,
         stdio: ['pipe', 'pipe', 'pipe'],
         shell: true,  // Ensures where built-in is available
       });
@@ -229,7 +256,7 @@ export function commandExistsSync(cmd: string): boolean {
       try {
         const fallback = spawnSync(cmd, ['--version'], {
           encoding: 'utf-8',
-          timeout: 2000,
+          timeout: fallbackTimeout,
           stdio: ['pipe', 'pipe', 'pipe'],
           shell: true,
         });
@@ -241,7 +268,7 @@ export function commandExistsSync(cmd: string): boolean {
       // Unix: Use 'which' command
       const result = spawnSync('which', [cmd], {
         encoding: 'utf-8',
-        timeout: 5000,
+        timeout,
         stdio: ['pipe', 'pipe', 'pipe'],
       });
       return result.status === 0;
@@ -309,24 +336,367 @@ export function getPlatformDisplayName(): string {
 }
 
 // =============================================================================
+// Process Spawn Utilities
+// =============================================================================
+
+/**
+ * Get spawn options for Windows that hide the console window.
+ * Use this to avoid console flashing when spawning processes on Windows.
+ *
+ * Usage: spawn(cmd, args, { ...getWindowsSpawnOptions() })
+ */
+export function getWindowsSpawnOptions(): Partial<SpawnOptions> {
+  return isWindows() ? { windowsHide: true } : {};
+}
+
+/**
+ * Get spawn options for Windows that use shell and hide console.
+ * Use this when running commands that need shell resolution on Windows.
+ *
+ * Usage: spawn(cmd, args, { ...getWindowsShellOptions() })
+ */
+export function getWindowsShellOptions(): Partial<SpawnOptions> {
+  return isWindows() ? { shell: true, windowsHide: true } : {};
+}
+
+/**
+ * Get sync spawn options for Windows that hide the console window.
+ *
+ * Usage: spawnSync(cmd, args, { ...getWindowsSyncSpawnOptions() })
+ */
+export function getWindowsSyncSpawnOptions(): Partial<SpawnSyncOptions> {
+  return isWindows() ? { windowsHide: true } : {};
+}
+
+// =============================================================================
 // Terminal Detection Utilities
 // =============================================================================
 
 /**
- * Check if running in Windows Terminal (has better ANSI support)
+ * Check if NO_COLOR environment variable is set.
+ * NO_COLOR is a standard for disabling color output.
+ * See: https://no-color.org/
  */
-export function isWindowsTerminal(): boolean {
-  return isWindows() && !!process.env.WT_SESSION;
+export function isNoColorSet(): boolean {
+  return getEnvVar('NO_COLOR') !== undefined;
 }
 
 /**
- * Check if terminal supports ANSI colors (for safe color output)
+ * Check if FORCE_COLOR environment variable is set.
+ * FORCE_COLOR can override NO_COLOR and enable colors even without TTY.
+ */
+export function isForceColorSet(): boolean {
+  const forceColor = getEnvVar('FORCE_COLOR');
+  return forceColor !== undefined && forceColor !== '0' && forceColor.toLowerCase() !== 'false';
+}
+
+/**
+ * Check if running in Windows Terminal (has better ANSI support).
+ * Checks multiple indicators for more reliable detection.
+ *
+ * Note: For terminal-specific features, prefer using terminal.ts functions.
+ * This is a lightweight check for platform.ts internal use.
+ */
+export function isWindowsTerminal(): boolean {
+  if (!isWindows()) return false;
+  // WT_SESSION is the primary indicator
+  if (getEnvVar('WT_SESSION')) return true;
+  // WT_PROFILE_ID is set in newer versions
+  if (getEnvVar('WT_PROFILE_ID')) return true;
+  return false;
+}
+
+/**
+ * Check if terminal supports ANSI colors.
+ *
+ * This function is context-aware:
+ * - Respects NO_COLOR (disables colors)
+ * - Respects FORCE_COLOR (enables colors even without TTY)
+ * - Works in hook contexts where TTY may not be available
+ * - Checks environment variables that indicate color support
  */
 export function supportsAnsiColors(): boolean {
-  if (!process.stdout.isTTY) return false;
+  // NO_COLOR always takes precedence
+  if (isNoColorSet()) return false;
+
+  // FORCE_COLOR enables colors regardless of TTY
+  if (isForceColorSet()) return true;
+
+  // Windows Terminal supports colors
   if (isWindowsTerminal()) return true;
-  const term = process.env.TERM || '';
-  const colorTerm = process.env.COLORTERM || '';
-  return colorTerm === 'truecolor' || colorTerm === '24bit' ||
-         term.includes('256color') || term.includes('truecolor');
+
+  // Check COLORTERM for truecolor support
+  const colorTerm = getEnvVar('COLORTERM') || '';
+  if (colorTerm === 'truecolor' || colorTerm === '24bit') return true;
+
+  // Check TERM for color support indicators
+  const term = getEnvVar('TERM') || '';
+  if (term.includes('256color') || term.includes('truecolor') || term.includes('color')) {
+    return true;
+  }
+
+  // For hooks and non-interactive contexts, we can't rely on TTY
+  // but we can assume most modern terminals support basic ANSI
+  // unless explicitly disabled via NO_COLOR
+  if (term && term !== 'dumb') {
+    return true;
+  }
+
+  // If we have a TTY, assume color support (traditional check)
+  if (process.stdout?.isTTY) return true;
+
+  // Default: no color support if we can't determine
+  return false;
+}
+
+/**
+ * Get terminal width in columns.
+ * Cross-platform: Works on Windows, macOS, and Linux.
+ *
+ * Detection order:
+ * 1. process.stdout.columns (Node.js built-in, most reliable)
+ * 2. COLUMNS environment variable (standard Unix, also works on Windows)
+ * 3. Windows: 'mode con' command (for legacy cmd.exe)
+ * 4. Unix: 'tput cols' command (fallback for edge cases)
+ * 5. Default: returns specified fallback (default 80)
+ *
+ * @param fallback - Default width if detection fails (default: 80)
+ * @returns Terminal width in columns
+ */
+export function getTerminalWidth(fallback: number = 80): number {
+  const { spawnSync } = require('child_process');
+
+  // 1. Primary: Use Node.js built-in (works on all platforms)
+  if (process.stdout.columns && process.stdout.columns > 0) {
+    return process.stdout.columns;
+  }
+
+  // 2. Environment variable (cross-platform, case-insensitive on Windows)
+  const envColumns = parseInt(getEnvVar('COLUMNS') || '0');
+  if (envColumns > 0) {
+    return envColumns;
+  }
+
+  // 3. Platform-specific fallbacks
+  try {
+    if (isWindows()) {
+      // Windows: Use 'mode con' command
+      const result = spawnSync('cmd', ['/c', 'mode', 'con'], {
+        encoding: 'utf-8',
+        timeout: 2000,
+        stdio: ['pipe', 'pipe', 'pipe'],
+        windowsHide: true,
+      });
+      if (result.stdout) {
+        // Match multi-locale column names
+        const match = result.stdout.match(/(?:Columns|Spalten|Columnas|Colonnes|Colonne|Kolommen|Colunas|Kolumny|Kolumner|Kolonner|Sloupce):\s*(\d+)/i);
+        if (match) {
+          const cols = parseInt(match[1]);
+          if (cols > 0) return cols;
+        }
+      }
+    } else {
+      // Unix/macOS: Use 'tput cols'
+      const result = spawnSync('tput', ['cols'], {
+        encoding: 'utf-8',
+        timeout: 2000,
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
+      if (result.stdout) {
+        const cols = parseInt(result.stdout.trim());
+        if (cols > 0) return cols;
+      }
+    }
+  } catch {
+    // Command failed - use fallback
+  }
+
+  return fallback;
+}
+
+// =============================================================================
+// Architecture Utilities
+// =============================================================================
+
+/**
+ * Get the current CPU architecture.
+ * Common values: 'x64', 'arm64', 'ia32', 'arm'
+ */
+export function getArchitecture(): string {
+  return process.arch;
+}
+
+/**
+ * Get platform and architecture combined.
+ * Useful for downloading platform-specific binaries.
+ * Examples: 'win32-x64', 'darwin-arm64', 'linux-x64'
+ */
+export function getPlatformAndArch(): string {
+  return `${process.platform}-${process.arch}`;
+}
+
+/**
+ * Get platform string for binary downloads.
+ * Maps Node's process.platform to common naming conventions.
+ * Examples: 'windows', 'darwin', 'linux'
+ */
+export function getPlatformString(): string {
+  if (isWindows()) return 'windows';
+  if (isMacOS()) return 'darwin';
+  return 'linux';
+}
+
+// =============================================================================
+// CRLF / Line Ending Utilities
+// =============================================================================
+
+/**
+ * Normalize line endings to LF (Unix-style).
+ * Use this when processing file content that may have Windows CRLF line endings.
+ *
+ * @param content - Text content that may contain CRLF
+ * @returns Content with all CRLF converted to LF
+ */
+export function normalizeCRLF(content: string): string {
+  return content.replace(/\r\n/g, '\n');
+}
+
+/**
+ * Cross-platform frontmatter regex pattern.
+ * Matches YAML frontmatter blocks that start and end with ---.
+ *
+ * IMPORTANT: This regex assumes LF-normalized content.
+ * Always use with normalizeCRLF() first, or use parseFrontmatter() which handles this.
+ *
+ * @example
+ * const normalized = normalizeCRLF(content);
+ * const match = normalized.match(FRONTMATTER_REGEX);
+ *
+ * @deprecated Prefer using parseFrontmatter() which handles CRLF normalization automatically
+ */
+export const FRONTMATTER_REGEX = /^---\n([\s\S]*?)\n---\n?/;
+
+/**
+ * Parse YAML frontmatter from content, handling both CRLF and LF line endings.
+ * This is the safe, cross-platform way to extract frontmatter.
+ *
+ * @param content - File content that may contain frontmatter
+ * @returns Object with frontmatter (raw YAML string) and body (remaining content), or null if no frontmatter
+ */
+export function parseFrontmatter(content: string): { frontmatter: string; body: string } | null {
+  // Normalize CRLF to LF for consistent matching
+  const normalized = normalizeCRLF(content);
+  const match = normalized.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+
+  if (!match) return null;
+
+  return {
+    frontmatter: match[1],
+    body: match[2] || '',
+  };
+}
+
+/**
+ * Extract the first line from content after a pattern, handling CRLF.
+ * Use this instead of regex patterns like /Pattern\n\n([^\n]+)/
+ *
+ * @param content - Content to search
+ * @param pattern - Pattern to find (e.g., "## Overview")
+ * @returns The first non-empty line after the pattern, or null if not found
+ */
+export function extractLineAfterPattern(content: string, pattern: string): string | null {
+  const normalized = normalizeCRLF(content);
+  const index = normalized.indexOf(pattern);
+  if (index === -1) return null;
+
+  const afterPattern = normalized.slice(index + pattern.length);
+  const lines = splitLines(afterPattern);
+
+  // Find first non-empty line
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed) return trimmed;
+  }
+
+  return null;
+}
+
+/**
+ * Ensure a path ends with a forward slash (for prefix matching).
+ * Use this for consistent path prefix comparisons across platforms.
+ * All paths should be normalized to forward slashes first using toForwardSlash().
+ *
+ * NOTE: Uses forward slash '/' intentionally because:
+ * 1. This function is for path PREFIX MATCHING, not filesystem operations
+ * 2. Forward slashes work cross-platform in Node.js/Bun for path operations
+ * 3. Paths should be normalized with toForwardSlash() before calling this
+ *
+ * @param p - The path (should already be normalized to forward slashes)
+ * @returns Path guaranteed to end with '/'
+ */
+export function ensureTrailingSeparator(p: string): string {
+  return p.endsWith('/') ? p : p + '/';
+}
+
+/**
+ * Get a display-friendly path that works for user-facing messages.
+ * On Windows, shows actual path. On Unix, can optionally use ~ for home.
+ *
+ * @param p - The path to format
+ * @param options - Options for formatting
+ * @returns Formatted path suitable for display
+ */
+export function formatPathForDisplay(p: string, options: { useTilde?: boolean } = {}): string {
+  const { useTilde = !isWindows() } = options;
+  const home = require('os').homedir();
+  const normalizedPath = toForwardSlash(p);
+  const normalizedHome = toForwardSlash(home);
+
+  if (useTilde && normalizedPath.startsWith(normalizedHome)) {
+    return '~' + normalizedPath.slice(normalizedHome.length);
+  }
+  return normalizedPath;
+}
+
+/**
+ * Get the platform-appropriate environment variable syntax for display.
+ * Use this when showing command examples to users.
+ *
+ * @param varName - The variable name (e.g., "PAI_DIR")
+ * @returns Platform-appropriate syntax (e.g., "$PAI_DIR" or "%PAI_DIR%")
+ */
+export function getEnvVarSyntax(varName: string): string {
+  return isWindows() ? `%${varName}%` : `$${varName}`;
+}
+
+/**
+ * Split content on a CRLF-safe pattern and capture content up to the next newline.
+ * Use this instead of regex like /SUMMARY:\s*([^\n]+)/
+ *
+ * @param content - Content to search
+ * @param pattern - Pattern to find (e.g., "SUMMARY:")
+ * @returns The captured content after the pattern until newline, or null if not found
+ */
+export function captureAfterPattern(content: string, pattern: string | RegExp): string | null {
+  const normalized = normalizeCRLF(content);
+  let index: number;
+  let matchLength: number;
+
+  if (typeof pattern === 'string') {
+    index = normalized.indexOf(pattern);
+    matchLength = pattern.length;
+  } else {
+    const match = normalized.match(pattern);
+    if (!match) return null;
+    index = match.index!;
+    matchLength = match[0].length;
+  }
+
+  if (index === -1) return null;
+
+  const afterPattern = normalized.slice(index + matchLength);
+  const newlineIndex = afterPattern.indexOf('\n');
+  const captured = newlineIndex === -1 ? afterPattern : afterPattern.slice(0, newlineIndex);
+
+  return captured.trim();
 }

@@ -1,4 +1,6 @@
 #!/usr/bin/env bun
+import { crossSpawnSync } from './lib/spawn';
+import { pathContainsSegment, getEnvVar } from './lib/platform';
 /**
  * CheckVersion.hook.ts - Check for Claude Code Updates (SessionStart)
  *
@@ -37,28 +39,22 @@
  * - Skipped for subagents: Yes
  */
 
-async function getCurrentVersion(): Promise<string> {
+function getCurrentVersion(): string {
   try {
-    const proc = Bun.spawn(['claude', '--version'], {
-      stdout: 'pipe',
-      stderr: 'pipe'
-    });
-    const output = await new Response(proc.stdout).text();
-    const match = output.match(/(\d+\.\d+\.\d+)/);
+    const result = crossSpawnSync('claude', ['--version']);
+    if (!result.success) return 'unknown';
+    const match = result.stdout.match(/(\d+\.\d+\.\d+)/);
     return match ? match[1] : 'unknown';
   } catch {
     return 'unknown';
   }
 }
 
-async function getLatestVersion(): Promise<string> {
+function getLatestVersion(): string {
   try {
-    const proc = Bun.spawn(['npm', 'view', '@anthropic-ai/claude-code', 'version'], {
-      stdout: 'pipe',
-      stderr: 'pipe'
-    });
-    const output = await new Response(proc.stdout).text();
-    return output.trim() || 'unknown';
+    const result = crossSpawnSync('npm', ['view', '@anthropic-ai/claude-code', 'version']);
+    if (!result.success) return 'unknown';
+    return result.stdout.trim() || 'unknown';
   } catch {
     return 'unknown';
   }
@@ -66,19 +62,17 @@ async function getLatestVersion(): Promise<string> {
 
 async function main() {
   try {
-    // Skip for subagents
-    const claudeProjectDir = process.env.CLAUDE_PROJECT_DIR || '';
-    const isSubagent = claudeProjectDir.includes('/.claude/Agents/') ||
-                      process.env.CLAUDE_AGENT_TYPE !== undefined;
+    // Skip for subagents - use cross-platform path matching and case-insensitive env access
+    const claudeProjectDir = getEnvVar('CLAUDE_PROJECT_DIR') || '';
+    const isSubagent = pathContainsSegment(claudeProjectDir, '.claude/Agents') ||
+                      getEnvVar('CLAUDE_AGENT_TYPE') !== undefined;
 
     if (isSubagent) {
       process.exit(0);
     }
 
-    const [currentVersion, latestVersion] = await Promise.all([
-      getCurrentVersion(),
-      getLatestVersion()
-    ]);
+    const currentVersion = getCurrentVersion();
+    const latestVersion = getLatestVersion();
 
     if (currentVersion !== 'unknown' && latestVersion !== 'unknown' && currentVersion !== latestVersion) {
       console.error(`💡 Update available: CC ${currentVersion} → ${latestVersion}`);

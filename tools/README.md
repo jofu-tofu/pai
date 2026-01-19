@@ -2,6 +2,31 @@
 
 Development and maintenance tools for the PAI system.
 
+## Cross-Platform Support
+
+All tools are designed to work on Windows, macOS, and Linux.
+
+### Running Tools
+
+The `bun run` command works across all platforms:
+
+```bash
+# Unix (macOS/Linux)
+bun run tools/PaiDirLinter.ts
+
+# Windows (PowerShell or cmd)
+bun run tools/PaiDirLinter.ts
+```
+
+### Path Differences
+
+| Platform | Home Directory | PAI_DIR Default |
+|----------|----------------|-----------------|
+| macOS/Linux | `$HOME` or `~` | `~/.claude` |
+| Windows | `%USERPROFILE%` | `C:\Users\<username>\.claude` |
+
+The tools automatically detect your platform and use the appropriate path handling.
+
 ## Available Tools
 
 ### PaiDirLinter.ts

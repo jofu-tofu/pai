@@ -14,7 +14,7 @@
 
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
-import { platform } from 'os';
+import { toForwardSlash, getEnvVar } from '../hooks/lib/platform';
 
 interface HookConfig {
   type: string;
@@ -36,25 +36,18 @@ interface SettingsJson {
 }
 
 /**
- * Detects the current platform and returns appropriate shell command prefix
+ * Creates the hook command - uses absolute paths for cross-platform compatibility
  */
-function getShellCommand(scriptPath: string): string {
-  const isWindows = platform() === 'win32';
-
-  if (isWindows) {
-    // Windows: Use PowerShell Core to run Bun scripts
-    return `pwsh -Command "bun run ${scriptPath}"`;
-  } else {
-    // Unix-like: Direct bun execution
-    return `bun run ${scriptPath}`;
-  }
+function getHookCommand(scriptPath: string): string {
+  // Use 'bun run' with absolute path - works on all platforms
+  return `bun run ${scriptPath}`;
 }
 
 /**
  * Gets the PAI_DIR path or exits with error
  */
 function getPaiDir(): string {
-  const paiDir = process.env.PAI_DIR;
+  const paiDir = getEnvVar('PAI_DIR');
 
   if (!paiDir) {
     console.error('❌ ERROR: PAI_DIR environment variable not set');
@@ -72,20 +65,22 @@ function getPaiDir(): string {
 
 /**
  * Generates the complete settings.json configuration
+ * Uses absolute paths with forward slashes for cross-platform compatibility
  */
 function generateSettings(paiDir: string): SettingsJson {
-  const hookPath = (scriptName: string) =>
-    platform() === 'win32'
-      ? `$env:PAI_DIR/hooks/${scriptName}`
-      : `$PAI_DIR/hooks/${scriptName}`;
+  // Normalize to forward slashes - works on all platforms with bun
+  const normalizedPaiDir = toForwardSlash(paiDir);
+
+  // Helper to create absolute hook path - use join() then normalize to forward slashes
+  // This is more maintainable than template literals with hardcoded separators
+  const hookPath = (scriptName: string) => toForwardSlash(join(paiDir, 'hooks', scriptName));
+  const toolPath = (scriptName: string) => toForwardSlash(join(paiDir, 'tools', scriptName));
 
   return {
     model: 'sonnet',
     statusLine: {
       type: 'command',
-      command: platform() === 'win32'
-        ? 'pwsh -NoProfile -Command "& \\"$env:PAI_DIR/scripts/statusline.ps1\\""'
-        : 'bash $PAI_DIR/scripts/statusline.sh'
+      command: getHookCommand(toolPath('statusline.ts'))
     },
     hooks: {
       SessionStart: [
@@ -94,15 +89,15 @@ function generateSettings(paiDir: string): SettingsJson {
           hooks: [
             {
               type: 'command',
-              command: getShellCommand(hookPath('initialize-session.ts'))
+              command: getHookCommand(hookPath('initialize-session.ts'))
             },
             {
               type: 'command',
-              command: getShellCommand(hookPath('load-core-context.ts'))
+              command: getHookCommand(hookPath('load-core-context.ts'))
             },
             {
               type: 'command',
-              command: getShellCommand(hookPath('capture-all-events.ts') + ' --event-type SessionStart')
+              command: `${getHookCommand(hookPath('capture-all-events.ts'))} --event-type SessionStart`
             }
           ]
         }
@@ -113,7 +108,7 @@ function generateSettings(paiDir: string): SettingsJson {
           hooks: [
             {
               type: 'command',
-              command: getShellCommand(hookPath('security-validator.ts'))
+              command: getHookCommand(hookPath('security-validator.ts'))
             }
           ]
         },
@@ -122,7 +117,7 @@ function generateSettings(paiDir: string): SettingsJson {
           hooks: [
             {
               type: 'command',
-              command: getShellCommand(hookPath('capture-all-events.ts') + ' --event-type PreToolUse')
+              command: `${getHookCommand(hookPath('capture-all-events.ts'))} --event-type PreToolUse`
             }
           ]
         }
@@ -133,7 +128,7 @@ function generateSettings(paiDir: string): SettingsJson {
           hooks: [
             {
               type: 'command',
-              command: getShellCommand(hookPath('capture-all-events.ts') + ' --event-type PostToolUse')
+              command: `${getHookCommand(hookPath('capture-all-events.ts'))} --event-type PostToolUse`
             }
           ]
         }
@@ -143,11 +138,11 @@ function generateSettings(paiDir: string): SettingsJson {
           hooks: [
             {
               type: 'command',
-              command: getShellCommand(hookPath('stop-hook.ts'))
+              command: getHookCommand(hookPath('stop-hook.ts'))
             },
             {
               type: 'command',
-              command: getShellCommand(hookPath('capture-all-events.ts') + ' --event-type Stop')
+              command: `${getHookCommand(hookPath('capture-all-events.ts'))} --event-type Stop`
             }
           ]
         }
@@ -157,11 +152,11 @@ function generateSettings(paiDir: string): SettingsJson {
           hooks: [
             {
               type: 'command',
-              command: getShellCommand(hookPath('subagent-stop-hook.ts'))
+              command: getHookCommand(hookPath('subagent-stop-hook.ts'))
             },
             {
               type: 'command',
-              command: getShellCommand(hookPath('capture-all-events.ts') + ' --event-type SubagentStop')
+              command: `${getHookCommand(hookPath('capture-all-events.ts'))} --event-type SubagentStop`
             }
           ]
         }
@@ -171,11 +166,11 @@ function generateSettings(paiDir: string): SettingsJson {
           hooks: [
             {
               type: 'command',
-              command: getShellCommand(hookPath('capture-session-summary.ts'))
+              command: getHookCommand(hookPath('capture-session-summary.ts'))
             },
             {
               type: 'command',
-              command: getShellCommand(hookPath('capture-all-events.ts') + ' --event-type SessionEnd')
+              command: `${getHookCommand(hookPath('capture-all-events.ts'))} --event-type SessionEnd`
             }
           ]
         }
@@ -186,15 +181,15 @@ function generateSettings(paiDir: string): SettingsJson {
           hooks: [
             {
               type: 'command',
-              command: getShellCommand(hookPath('cleanup-temp-files.ts'))
+              command: getHookCommand(hookPath('cleanup-temp-files.ts'))
             },
             {
               type: 'command',
-              command: getShellCommand(hookPath('update-tab-titles.ts'))
+              command: getHookCommand(hookPath('update-tab-titles.ts'))
             },
             {
               type: 'command',
-              command: getShellCommand(hookPath('capture-all-events.ts') + ' --event-type UserPromptSubmit')
+              command: `${getHookCommand(hookPath('capture-all-events.ts'))} --event-type UserPromptSubmit`
             }
           ]
         }

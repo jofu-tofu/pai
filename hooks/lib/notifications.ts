@@ -16,8 +16,11 @@
 
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import { homedir } from 'os';
+import { tmpdir } from 'os';
+import { spawn } from 'child_process';
 import { getIdentity } from './identity';
+import { isMacOS, getEnvVar } from './platform';
+import { getPaiDir, getSettingsPath } from './paths';
 
 // ============================================================================
 // Types
@@ -96,20 +99,15 @@ const DEFAULT_CONFIG: NotificationConfig = {
   }
 };
 
-/**
- * Expand ${VAR} patterns in a string using environment variables
- */
-function expandEnvVars(content: string): string {
-  return content.replace(/\$\{(\w+)\}/g, (_, key) => process.env[key] || '');
-}
+// Import the cross-platform env var expansion that handles Windows case-insensitivity
+import { expandEnvVars } from './platform';
 
 /**
  * Load notification config from settings.json
  */
 export function getNotificationConfig(): NotificationConfig {
   try {
-    const paiDir = process.env.PAI_DIR || join(homedir(), '.claude');
-    const settingsPath = join(paiDir, 'settings.json');
+    const settingsPath = getSettingsPath();
 
     if (existsSync(settingsPath)) {
       const rawContent = readFileSync(settingsPath, 'utf-8');
@@ -139,7 +137,7 @@ export function getNotificationConfig(): NotificationConfig {
 // Session Timing
 // ============================================================================
 
-const SESSION_START_FILE = '/tmp/kai-session-start.txt';
+const SESSION_START_FILE = join(tmpdir(), 'kai-session-start.txt');
 
 /**
  * Record session start time (call from SessionStart hook)
@@ -304,16 +302,24 @@ export async function sendDesktop(
     subtitle?: string;
   } = {}
 ): Promise<boolean> {
+  if (!isMacOS()) {
+    // Desktop notifications only supported on macOS via osascript
+    // On other platforms, use ntfy or other notification methods
+    console.debug('[Notifications] Desktop notifications skipped (macOS only)');
+    return false;
+  }
+
   try {
     const soundPart = options.sound ? ` sound name "${options.sound}"` : '';
     const subtitlePart = options.subtitle ? ` subtitle "${options.subtitle}"` : '';
 
     const script = `display notification "${message}" with title "${title}"${subtitlePart}${soundPart}`;
 
-    const proc = Bun.spawn(['osascript', '-e', script]);
-    await proc.exited;
-
-    return proc.exitCode === 0;
+    return new Promise((resolve) => {
+      const proc = spawn('osascript', ['-e', script]);
+      proc.on('close', (code) => resolve(code === 0));
+      proc.on('error', () => resolve(false));
+    });
   } catch (error) {
     console.error('Desktop notification failed:', error);
     return false;
@@ -331,8 +337,8 @@ export async function sendSMS(message: string): Promise<boolean> {
     return false;
   }
 
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const accountSid = getEnvVar('TWILIO_ACCOUNT_SID');
+  const authToken = getEnvVar('TWILIO_AUTH_TOKEN');
 
   if (!accountSid || !authToken) {
     console.error('Twilio credentials not found in environment');
@@ -340,7 +346,7 @@ export async function sendSMS(message: string): Promise<boolean> {
   }
 
   try {
-    const fromNumber = process.env.TWILIO_FROM_NUMBER;
+    const fromNumber = getEnvVar('TWILIO_FROM_NUMBER');
     if (!fromNumber) {
       console.error('TWILIO_FROM_NUMBER not set in environment');
       return false;
@@ -348,18 +354,24 @@ export async function sendSMS(message: string): Promise<boolean> {
     const daName = getIdentity().name;
     const body = `[${daName}] ${message}`.substring(0, 160); // SMS limit
 
-    // Use curl for reliability
-    const proc = Bun.spawn([
-      'curl', '-s', '-X', 'POST',
-      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-      '-u', `${accountSid}:${authToken}`,
-      '-d', `To=${config.twilio.toNumber}`,
-      '-d', `From=${fromNumber}`,
-      '-d', `Body=${body}`
-    ]);
+    // Use native fetch for cross-platform compatibility
+    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+    const credentials = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
 
-    await proc.exited;
-    return proc.exitCode === 0;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${credentials}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        To: config.twilio.toNumber,
+        From: fromNumber,
+        Body: body,
+      }),
+    });
+
+    return response.ok;
   } catch (error) {
     console.error('SMS send failed:', error);
     return false;

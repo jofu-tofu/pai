@@ -14,8 +14,9 @@ import { readdir, readFile } from 'fs/promises';
 import { join, basename } from 'path';
 import { existsSync } from 'fs';
 import { homedir } from 'os';
+import { parseFrontmatter as parseFrontmatterUtil, getEnvVar } from '../../../hooks/lib/platform';
 
-const PAI_DIR = process.env.PAI_DIR || process.env.PAI_HOME || join(homedir(), 'pai');
+const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
 const SKILLS_DIR = join(PAI_DIR, 'skills');
 
 interface ValidationResult {
@@ -35,11 +36,11 @@ function isTitleCase(str: string): boolean {
 }
 
 function parseFrontmatter(content: string): { name?: string; description?: string } | null {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return null;
+  const parsed = parseFrontmatterUtil(content);
+  if (!parsed) return null;
 
-  const nameMatch = match[1].match(/^name:\s*(.+)$/m);
-  const descMatch = match[1].match(/^description:\s*(.+)$/m);
+  const nameMatch = parsed.frontmatter.match(/^name:\s*(.+)$/m);
+  const descMatch = parsed.frontmatter.match(/^description:\s*(.+)$/m);
 
   return {
     name: nameMatch?.[1]?.trim(),
@@ -117,8 +118,8 @@ async function validateSkill(skillPath: string): Promise<ValidationResult> {
       message: hasUseWhen ? undefined : 'Description missing "USE WHEN" clause'
     });
 
-    // Check 7: Description is single line (no newlines)
-    const isSingleLine = !frontmatter.description.includes('\n');
+    // Check 7: Description is single line (no newlines - handle both LF and CRLF)
+    const isSingleLine = !/[\r\n]/.test(frontmatter.description);
     checks.push({
       name: 'Single-line description',
       passed: isSingleLine,

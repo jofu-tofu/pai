@@ -48,7 +48,7 @@ export interface RecoveryPointSummary {
 }
 
 import { getPaiDir } from './paths';
-import { toForwardSlash } from './platform';
+import { toForwardSlash, ensureTrailingSeparator } from './platform';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
@@ -57,6 +57,7 @@ const PAI_HOME = getPaiDir();
 
 // Cross-platform safe path prefixes
 // Normalize to forward slashes for consistent matching
+// Uses ensureTrailingSeparator utility for proper cross-platform path handling
 export const SAFE_PATH_PREFIXES = [
   toForwardSlash(join(PAI_HOME, 'MEMORY')),     // All MEMORY output is safe
   toForwardSlash(join(PAI_HOME, 'Scratchpad')),
@@ -65,7 +66,7 @@ export const SAFE_PATH_PREFIXES = [
   toForwardSlash(join(PAI_HOME, 'SessionEnv')),
   toForwardSlash(join(PAI_HOME, 'Todos')),
   toForwardSlash(tmpdir()),                      // Cross-platform temp directory
-].map(p => p.endsWith('/') ? p : p + '/');
+].map(ensureTrailingSeparator);
 
 // Skip journaling for these output-only operations
 export const SKIP_COMMAND_PATTERNS = [

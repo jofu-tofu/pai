@@ -6,9 +6,10 @@
 
 import { existsSync, readFileSync, appendFileSync, readdirSync } from 'fs';
 import { join } from 'path';
+import { getEnvVar } from './platform';
 
 // DEBUG flag - set DEBUG_HOOKS=true to see informational output
-const DEBUG = process.env.DEBUG_HOOKS === 'true';
+const DEBUG = getEnvVar('DEBUG_HOOKS') === 'true';
 
 export type AlgorithmPhase = 'OBSERVE' | 'THINK' | 'PLAN' | 'BUILD' | 'EXECUTE' | 'VERIFY' | 'LEARN';
 export type EffortLevel = 'Skip' | 'Fast' | 'Standard' | 'Deep' | 'Excellence';
@@ -171,7 +172,7 @@ export interface GapMetrics {
 import { getPaiDir } from './paths';
 
 const CLAUDE_DIR = getPaiDir();
-const WORK_DIR = join(CLAUDE_DIR, 'MEMORY', 'Work');
+const WORK_DIR = join(CLAUDE_DIR, 'MEMORY', 'WORK');
 
 /**
  * Find the most recent active work directory
@@ -221,7 +222,8 @@ export function readIdealState(workDir: string): IdealState | null {
     if (!existsSync(filePath)) return null;
 
     const content = readFileSync(filePath, 'utf-8');
-    const lines = content.trim().split('\n').filter(l => l.trim());
+    // Handle both Unix (LF) and Windows (CRLF) line endings
+    const lines = content.trim().split(/\r?\n/).filter(l => l.trim());
     if (lines.length === 0) return null;
 
     const lastLine = lines[lines.length - 1];

@@ -8,14 +8,16 @@
  */
 
 import { readdir, readFile, writeFile, stat } from "fs/promises";
-import { join, basename } from "path";
+import { join, basename, relative } from "path";
 import { parse as parseYaml } from "yaml";
+import { homedir } from "os";
+import { toForwardSlash, parseFrontmatter as parseFrontmatterUtil, extractLineAfterPattern, joinLines, formatPathForDisplay, getEnvVarSyntax, getEnvVar } from "../../../hooks/lib/platform";
 
-const PAI_DIR = process.env.PAI_DIR || `${process.env.HOME}/.claude`;
-const UPDATES_DIR = join(PAI_DIR, "MEMORY/PAISYSTEMUPDATES");
+const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
+const UPDATES_DIR = join(PAI_DIR, "MEMORY", "PAISYSTEMUPDATES");
 const INDEX_PATH = join(UPDATES_DIR, "index.json");
 const CHANGELOG_PATH = join(UPDATES_DIR, "CHANGELOG.md");
-const RECENT_PATH = join(PAI_DIR, "skills/CORE/USER/UPGRADES/RECENT.md");
+const RECENT_PATH = join(PAI_DIR, "skills", "CORE", "USER", "UPGRADES", "RECENT.md");
 
 type SignificanceLabel = 'trivial' | 'minor' | 'moderate' | 'major' | 'critical';
 type ChangeType = 'skill_update' | 'structure_change' | 'doc_update' | 'hook_update' | 'workflow_update' | 'config_update' | 'tool_update' | 'multi_area';
@@ -83,19 +85,18 @@ async function parseUpdateFile(filePath: string): Promise<UpdateRecord | null> {
   try {
     const content = await readFile(filePath, "utf-8");
 
-    // Extract YAML frontmatter
-    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-    if (!frontmatterMatch) {
+    // Extract YAML frontmatter using CRLF-safe utility
+    const parsed = parseFrontmatterUtil(content);
+    if (!parsed) {
       // Try to parse from markdown structure if no frontmatter
       return parseFromMarkdown(filePath, content);
     }
 
-    const frontmatter = parseYaml(frontmatterMatch[1]);
+    const frontmatter = parseYaml(parsed.frontmatter);
 
-    // Extract summary from Overview section or Purpose section
-    const overviewMatch = content.match(/## Overview\n\n([^\n]+)/) ||
-                          content.match(/## Purpose\n\n([^\n]+)/);
-    const summary = overviewMatch ? overviewMatch[1] : undefined;
+    // Extract summary from Overview section or Purpose section (CRLF-safe)
+    const summary = extractLineAfterPattern(content, "## Overview") ||
+                   extractLineAfterPattern(content, "## Purpose");
 
     // Handle both new 'timestamp' and legacy 'date' fields
     const timestamp = frontmatter.timestamp || frontmatter.date || extractTimestampFromFilename(filePath);
@@ -130,7 +131,7 @@ async function parseUpdateFile(filePath: string): Promise<UpdateRecord | null> {
       tags: frontmatter.tags || [],
       files_affected: frontmatter.files_affected || [],
       summary,
-      file_path: filePath.replace(UPDATES_DIR + "/", ""),
+      file_path: toForwardSlash(relative(UPDATES_DIR, filePath)),
     };
   } catch (error) {
     console.error(`Error parsing ${filePath}:`, error);
@@ -166,11 +167,10 @@ function parseFromMarkdown(filePath: string, content: string): UpdateRecord | nu
                        content.match(/PAI (v[\d.]+)/i);
   const version = versionMatch ? versionMatch[1] : undefined;
 
-  // Extract overview/summary/purpose
-  const overviewMatch = content.match(/## Overview\n\n([^\n]+)/) ||
-                        content.match(/## Summary\n\n([^\n]+)/) ||
-                        content.match(/## Purpose\n\n([^\n]+)/);
-  const summary = overviewMatch ? overviewMatch[1] : undefined;
+  // Extract overview/summary/purpose (CRLF-safe)
+  const summary = extractLineAfterPattern(content, "## Overview") ||
+                 extractLineAfterPattern(content, "## Summary") ||
+                 extractLineAfterPattern(content, "## Purpose");
 
   return {
     id: filename,
@@ -184,7 +184,7 @@ function parseFromMarkdown(filePath: string, content: string): UpdateRecord | nu
     tags: [],
     files_affected: [],
     summary,
-    file_path: filePath.replace(UPDATES_DIR + "/", ""),
+    file_path: toForwardSlash(relative(UPDATES_DIR, filePath)),
   };
 }
 
@@ -396,11 +396,15 @@ function generateChangelog(updates: UpdateRecord[]): string {
     }
   }
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 function generateRecent(updates: UpdateRecord[], count: number = 10): string {
   const recent = updates.slice(0, count);
+
+  // Use cross-platform path display - formatPathForDisplay uses ~ on Unix, full path on Windows
+  const updatesDisplayPath = formatPathForDisplay(UPDATES_DIR);
+  const paiVarSyntax = getEnvVarSyntax('PAI_DIR');
 
   const lines: string[] = [
     "# Recent System Updates",
@@ -408,8 +412,8 @@ function generateRecent(updates: UpdateRecord[], count: number = 10): string {
     `**Last Updated:** ${new Date().toISOString().replace(/\.\d{3}Z$/, "Z")}`,
     "",
     "Quick reference to the most recent system changes. For full history, see:",
-    "- `~/.claude/MEMORY/PAISYSTEMUPDATES/CHANGELOG.md`",
-    "- `~/.claude/MEMORY/PAISYSTEMUPDATES/index.json`",
+    `- \`${updatesDisplayPath}/CHANGELOG.md\``,
+    `- \`${updatesDisplayPath}/index.json\``,
     "",
     "---",
     "",
@@ -418,7 +422,7 @@ function generateRecent(updates: UpdateRecord[], count: number = 10): string {
   ];
 
   for (const update of recent) {
-    const fullPath = `~/.claude/MEMORY/PAISYSTEMUPDATES/${update.file_path}`;
+    const fullPath = `${updatesDisplayPath}/${update.file_path}`;
     lines.push(`| ${update.timestamp} | [${update.title}](${fullPath}) | ${getSignificanceBadge(update.significance)} | ${formatChangeType(update.change_type)} |`);
   }
 
@@ -427,7 +431,7 @@ function generateRecent(updates: UpdateRecord[], count: number = 10): string {
   lines.push("");
   lines.push(`*Showing ${recent.length} of ${updates.length} total updates*`);
 
-  return lines.join("\n");
+  return joinLines(lines);
 }
 
 async function regenerate() {

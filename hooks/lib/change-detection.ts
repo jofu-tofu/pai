@@ -219,8 +219,12 @@ function createFileChange(tool: 'Write' | 'Edit', path: string): FileChange {
 
 /**
  * Categorize a file path by its location in the PAI system.
+ * Path is normalized to forward slashes for consistent cross-platform matching.
  */
-export function categorizeChange(path: string): ChangeCategory | null {
+export function categorizeChange(inputPath: string): ChangeCategory | null {
+  // Normalize to forward slashes for consistent pattern matching across platforms
+  const path = toForwardSlash(inputPath);
+
   // Check exclusions first
   for (const excluded of EXCLUDED_PATHS) {
     if (path.includes(excluded)) {
@@ -255,8 +259,12 @@ export function categorizeChange(path: string): ChangeCategory | null {
 
 /**
  * Check if a path represents philosophical/architectural content.
+ * Path is normalized to forward slashes for consistent cross-platform matching.
  */
-function isPhilosophicalPath(path: string): boolean {
+function isPhilosophicalPath(inputPath: string): boolean {
+  // Normalize to forward slashes for consistent pattern matching
+  const path = toForwardSlash(inputPath);
+
   for (const pattern of PHILOSOPHICAL_PATTERNS) {
     if (pattern.test(path)) return true;
   }
@@ -268,8 +276,12 @@ function isPhilosophicalPath(path: string): boolean {
 
 /**
  * Check if a path represents structural content (SKILL.md, workflows, config).
+ * Path is normalized to forward slashes for consistent cross-platform matching.
  */
-function isStructuralPath(path: string): boolean {
+function isStructuralPath(inputPath: string): boolean {
+  // Normalize to forward slashes for consistent pattern matching
+  const path = toForwardSlash(inputPath);
+
   for (const pattern of STRUCTURAL_PATTERNS) {
     if (pattern.test(path)) return true;
   }
@@ -521,14 +533,14 @@ export function generateDescriptiveTitle(changes: FileChange[]): string {
     if (match && match[1] !== 'CORE') skillNames.add(match[1]);
   }
 
-  // Detect file types
+  // Detect file types (use pathContainsSegment for cross-platform compatibility)
   const hasSkillMd = paths.some(p => p.endsWith('SKILL.md'));
   const hasWorkflows = paths.some(p => pathContainsSegment(p, 'Workflows'));
   const hasTools = paths.some(p => pathContainsSegment(p, 'Tools') && p.endsWith('.ts'));
-  const hasHooks = paths.some(p => p.includes('hooks/'));
+  const hasHooks = paths.some(p => pathContainsSegment(p, 'hooks'));
   const hasConfig = paths.some(p => p.endsWith('settings.json'));
-  const hasCoreSystem = paths.some(p => p.includes('CORE/SYSTEM/'));
-  const hasCoreUser = paths.some(p => p.includes('CORE/USER/'));
+  const hasCoreSystem = paths.some(p => pathContainsSegment(p, 'CORE/SYSTEM'));
+  const hasCoreUser = paths.some(p => pathContainsSegment(p, 'CORE/USER'));
 
   let title = '';
 
@@ -567,7 +579,7 @@ export function generateDescriptiveTitle(changes: FileChange[]): string {
   // Hook changes
   else if (hasHooks) {
     const hookNames = paths
-      .filter(p => p.includes('hooks/'))
+      .filter(p => pathContainsSegment(p, 'hooks'))
       .map(p => basename(p, '.ts').replace('.hook', ''));
     if (hookNames.length === 1) {
       title = `${hookNames[0]} Hook Updated`;
@@ -584,7 +596,7 @@ export function generateDescriptiveTitle(changes: FileChange[]): string {
   // Core system changes
   else if (hasCoreSystem) {
     const docNames = paths
-      .filter(p => p.includes('CORE/SYSTEM/'))
+      .filter(p => pathContainsSegment(p, 'CORE/SYSTEM'))
       .map(p => basename(p, '.md'));
     if (docNames.length === 1) {
       title = `${docNames[0]} Documentation Updated`;
@@ -595,7 +607,7 @@ export function generateDescriptiveTitle(changes: FileChange[]): string {
   // Core user changes
   else if (hasCoreUser) {
     const docNames = paths
-      .filter(p => p.includes('CORE/USER/'))
+      .filter(p => pathContainsSegment(p, 'CORE/USER'))
       .map(p => basename(p, '.md'));
     if (docNames.length === 1) {
       title = `${docNames[0]} User Config Updated`;

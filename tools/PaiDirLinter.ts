@@ -23,7 +23,15 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { toForwardSlash } from '../hooks/lib/platform';
+import { toForwardSlash, isNoColorSet } from '../hooks/lib/platform';
+
+// Respects NO_COLOR environment variable: https://no-color.org
+const NO_COLOR = isNoColorSet();
+const RED = NO_COLOR ? '' : '\x1b[31m';
+const YELLOW = NO_COLOR ? '' : '\x1b[33m';
+const GREEN = NO_COLOR ? '' : '\x1b[32m';
+const BOLD = NO_COLOR ? '' : '\x1b[1m';
+const RESET = NO_COLOR ? '' : '\x1b[0m';
 
 // Pattern categories for different violation types
 export const PATH_VIOLATIONS = {
@@ -250,7 +258,7 @@ function fixFile(filePath: string): boolean {
 }
 
 function formatViolation(v: Violation): string {
-  const icon = v.severity === 'error' ? '\x1b[31m✗\x1b[0m' : '\x1b[33m⚠\x1b[0m';
+  const icon = v.severity === 'error' ? `${RED}${NO_COLOR ? 'X' : '✗'}${RESET}` : `${YELLOW}${NO_COLOR ? '!' : '⚠'}${RESET}`;
   return `${icon} ${v.file}:${v.line}:${v.column} - ${v.category}: ${v.text}`;
 }
 
@@ -259,10 +267,10 @@ async function main() {
   const shouldFix = args.includes('--fix');
   const targetDir = args.find(arg => !arg.startsWith('--')) || process.env.PAI_DIR || process.cwd();
 
-  console.log(`\n\x1b[1mPAI_DIR Path Linter\x1b[0m`);
+  console.log(`\n${BOLD}PAI_DIR Path Linter${RESET}`);
   console.log(`Scanning: ${targetDir}`);
   if (shouldFix) {
-    console.log('\x1b[33mAuto-fix mode enabled\x1b[0m\n');
+    console.log(`${YELLOW}Auto-fix mode enabled${RESET}\n`);
   } else {
     console.log('');
   }
@@ -279,7 +287,7 @@ async function main() {
 
       if (shouldFix && fixFile(file)) {
         fixedFiles++;
-        console.log(`\x1b[32m✓ Fixed: ${file}\x1b[0m`);
+        console.log(`${GREEN}${NO_COLOR ? '+' : '✓'} Fixed: ${file}${RESET}`);
       }
     }
   }
@@ -294,7 +302,7 @@ async function main() {
   const errors = allViolations.filter(v => v.severity === 'error').length;
   const warnings = allViolations.filter(v => v.severity === 'warning').length;
 
-  console.log(`\n\x1b[1mSummary:\x1b[0m`);
+  console.log(`\n${BOLD}Summary:${RESET}`);
   console.log(`  Files scanned: ${files.length}`);
   console.log(`  Errors: ${errors}`);
   console.log(`  Warnings: ${warnings}`);

@@ -8,10 +8,12 @@
  */
 
 import { readdir, readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { join, relative } from 'path';
 import { existsSync } from 'fs';
+import { getPaiDir } from '../hooks/lib/paths';
+import { parseFrontmatter as parseFrontmatterUtil } from '../hooks/lib/platform';
 
-const PAI_DIR = process.env.PAI_DIR || process.env.PAI_HOME || join(process.env.HOME || '', '.claude');
+const PAI_DIR = getPaiDir();
 const SKILLS_DIR = join(PAI_DIR, 'skills');
 const OUTPUT_FILE = join(SKILLS_DIR, 'skill-index.json');
 
@@ -31,11 +33,11 @@ async function findSkillFiles(dir: string): Promise<string[]> {
 }
 
 function parseFrontmatter(content: string) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return null;
+  const result = parseFrontmatterUtil(content);
+  if (!result) return null;
 
-  const nameMatch = match[1].match(/^name:\s*(.+)$/m);
-  const descMatch = match[1].match(/^description:\s*(.+)$/m);
+  const nameMatch = result.frontmatter.match(/^name:\s*(.+)$/m);
+  const descMatch = result.frontmatter.match(/^description:\s*(.+)$/m);
 
   return {
     name: nameMatch?.[1]?.trim() || '',
@@ -80,7 +82,7 @@ async function main() {
 
     index.skills[key] = {
       name: fm.name,
-      path: filePath.replace(SKILLS_DIR, '').replace(/^\//, ''),
+      path: relative(SKILLS_DIR, filePath),
       fullDescription: fm.description,
       triggers: extractTriggers(fm.description),
       workflows: [],

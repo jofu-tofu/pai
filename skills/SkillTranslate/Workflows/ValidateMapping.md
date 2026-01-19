@@ -20,7 +20,7 @@ Validate that translation mapping files are complete, correct, and ready to use.
 
 If you know the mapping file name:
 ```bash
-bun run $PAI_DIR/.claude/skills/SkillTranslate/Tools/ValidateMappings.ts \
+bun run $PAI_DIR/skills/SkillTranslate/Tools/ValidateMappings.ts \
   --mapping claude-windsurf
 ```
 
@@ -28,7 +28,7 @@ bun run $PAI_DIR/.claude/skills/SkillTranslate/Tools/ValidateMappings.ts \
 
 If you know source and target platforms:
 ```bash
-bun run $PAI_DIR/.claude/skills/SkillTranslate/Tools/ValidateMappings.ts \
+bun run $PAI_DIR/skills/SkillTranslate/Tools/ValidateMappings.ts \
   --from claude-code \
   --to windsurf
 ```

@@ -47,9 +47,10 @@
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { spawnSync } from 'child_process';
 
 import { getPaiDir, getSettingsPath } from './lib/paths';
+import { runScript, getRuntimeCommand } from './lib/spawn';
+import { pathContainsSegment, getEnvVar } from './lib/platform';
 
 const paiDir = getPaiDir();
 const settingsPath = getSettingsPath();
@@ -58,26 +59,33 @@ try {
   const settings = JSON.parse(readFileSync(settingsPath, 'utf-8'));
 
   // Check if this is a subagent session - if so, exit silently
-  const claudeProjectDir = process.env.CLAUDE_PROJECT_DIR || '';
-  const isSubagent = claudeProjectDir.includes('/.claude/Agents/') ||
-                    process.env.CLAUDE_AGENT_TYPE !== undefined;
+  // Use cross-platform path matching and case-insensitive env access
+  const claudeProjectDir = getEnvVar('CLAUDE_PROJECT_DIR') || '';
+  const isSubagent = pathContainsSegment(claudeProjectDir, '.claude/Agents') ||
+                    getEnvVar('CLAUDE_AGENT_TYPE') !== undefined;
 
   if (isSubagent) {
     process.exit(0);
   }
 
-  // Run the banner tool
-  const bannerPath = join(paiDir, 'skills/CORE/Tools/Banner.ts');
-  const result = spawnSync('bun', ['run', bannerPath], {
-    encoding: 'utf-8',
-    stdio: ['inherit', 'pipe', 'pipe'],
+  // Run the banner tool using the current runtime (bun/node/deno)
+  const bannerPath = join(paiDir, 'skills', 'CORE', 'tools', 'Banner.ts');
+  const result = runScript(bannerPath, ['run'], {
     env: {
       ...process.env,
-      // Pass through terminal detection env vars
-      COLUMNS: process.env.COLUMNS,
-      KITTY_WINDOW_ID: process.env.KITTY_WINDOW_ID,
+      // Pass through terminal detection env vars with fallback (case-insensitive access)
+      COLUMNS: getEnvVar('COLUMNS') || String(process.stdout.columns || 80),
+      KITTY_WINDOW_ID: getEnvVar('KITTY_WINDOW_ID'),
     }
   });
+
+  // Handle case where runtime is not in PATH or command failed
+  if (!result.success && result.code === null) {
+    const runtime = getRuntimeCommand();
+    console.error(`StartupGreeting: ${runtime} is not installed or not in PATH`);
+    // Don't exit with error - allow Claude Code to continue without banner
+    process.exit(0);
+  }
 
   if (result.stdout) {
     console.log(result.stdout);

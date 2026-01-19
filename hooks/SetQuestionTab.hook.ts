@@ -41,6 +41,9 @@
  * - Typical execution: <50ms
  */
 
+import { isKittyTerminal } from './lib/terminal';
+import { crossSpawnSync } from './lib/spawn';
+
 const TAB_AWAITING_BG = '#085050';  // Dark teal - waiting for user input
 const ACTIVE_TAB_BG = '#002B80';    // Dark blue - active tab always
 const TAB_TEXT = '#FFFFFF';
@@ -48,15 +51,6 @@ const INACTIVE_TEXT = '#A0A0A0';
 
 // Simple question indicator - teal background does the work
 const QUESTION_TITLE = '❓ Question';
-
-/**
- * Check if we're running in a Kitty terminal.
- */
-function isKittyTerminal(): boolean {
-  if (process.platform === 'win32') return false;
-  const term = process.env.TERM || '';
-  return term.includes('kitty') || term === 'xterm-kitty';
-}
 
 async function main() {
   // Skip on Windows or non-Kitty terminals
@@ -66,10 +60,16 @@ async function main() {
 
   try {
     // Set tab color: active stays dark blue, inactive shows teal
-    await Bun.$`kitten @ set-tab-color --self active_bg=${ACTIVE_TAB_BG} active_fg=${TAB_TEXT} inactive_bg=${TAB_AWAITING_BG} inactive_fg=${INACTIVE_TEXT}`;
+    crossSpawnSync('kitten', [
+      '@', 'set-tab-color', '--self',
+      `active_bg=${ACTIVE_TAB_BG}`,
+      `active_fg=${TAB_TEXT}`,
+      `inactive_bg=${TAB_AWAITING_BG}`,
+      `inactive_fg=${INACTIVE_TEXT}`
+    ]);
 
     // Set simple question title - teal background provides visual distinction
-    await Bun.$`kitty @ set-tab-title ${QUESTION_TITLE}`;
+    crossSpawnSync('kitty', ['@', 'set-tab-title', QUESTION_TITLE]);
 
     console.error('[SetQuestionTab] Tab set to teal with question indicator');
   } catch (error) {

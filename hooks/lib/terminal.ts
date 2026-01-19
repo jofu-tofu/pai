@@ -28,12 +28,18 @@ export {
 } from './platform';
 
 // Import for internal use
-import { isWindows, canUseKitty } from './platform';
+import { isWindows, canUseKitty, getEnvVar, isNoColorSet } from './platform';
 
 /**
  * Check if we're running in a Kitty terminal.
  * Returns true only on Linux/macOS when TERM indicates Kitty.
  * Kitty terminal doesn't exist on Windows.
+ *
+ * Detection methods (in order of reliability):
+ * 1. KITTY_LISTEN_ON - Most reliable, set when remote control is enabled
+ * 2. KITTY_WINDOW_ID - Set in all Kitty windows
+ * 3. KITTY_PID - Process ID of the Kitty instance
+ * 4. TERM variable - Checks for kitty-related TERM values
  */
 export function isKittyTerminal(): boolean {
   // Skip on Windows - Kitty doesn't run there (native Windows, not WSL)
@@ -41,23 +47,42 @@ export function isKittyTerminal(): boolean {
     return false;
   }
 
-  // KITTY_LISTEN_ON is the most reliable indicator of running in Kitty
-  if (process.env.KITTY_LISTEN_ON) {
+  // KITTY_LISTEN_ON is the most reliable indicator (remote control enabled)
+  // Use getEnvVar for consistent cross-platform env var access
+  if (getEnvVar('KITTY_LISTEN_ON')) {
+    return true;
+  }
+
+  // KITTY_WINDOW_ID is set in all Kitty windows (even without remote control)
+  if (getEnvVar('KITTY_WINDOW_ID')) {
+    return true;
+  }
+
+  // KITTY_PID indicates we're running inside Kitty
+  if (getEnvVar('KITTY_PID')) {
     return true;
   }
 
   // Fallback: Check TERM environment variable for kitty variants
-  const term = process.env.TERM || '';
+  const term = getEnvVar('TERM') || '';
   return /kitty(-direct)?|xterm-kitty/.test(term);
 }
 
 /**
  * Check if we're running in Windows Terminal.
  * Windows Terminal supports ANSI escape codes including OSC sequences for titles.
- * WT_SESSION environment variable is set when running inside Windows Terminal.
+ *
+ * Detection methods:
+ * 1. WT_SESSION - Primary indicator (session GUID)
+ * 2. WT_PROFILE_ID - Profile identifier (set in newer versions)
  */
 export function isWindowsTerminal(): boolean {
-  return isWindows() && !!process.env.WT_SESSION;
+  if (!isWindows()) return false;
+  // WT_SESSION is the primary indicator
+  if (getEnvVar('WT_SESSION')) return true;
+  // WT_PROFILE_ID is set in newer versions
+  if (getEnvVar('WT_PROFILE_ID')) return true;
+  return false;
 }
 
 /**
@@ -70,8 +95,14 @@ export function isWindowsTerminal(): boolean {
  * Returns false for:
  * - Legacy Windows cmd.exe
  * - Older PowerShell without Windows Terminal
+ * - When NO_COLOR is set (respects user preference)
  */
 export function supportsAnsiTitles(): boolean {
+  // Respect NO_COLOR - if set, assume no ANSI support desired
+  if (isNoColorSet()) {
+    return false;
+  }
+
   // Kitty has its own remote control API, but also supports ANSI
   if (isKittyTerminal()) {
     return true;
@@ -91,28 +122,5 @@ export function supportsAnsiTitles(): boolean {
   return false;
 }
 
-/**
- * Get the current platform as a friendly string.
- */
-export function getPlatformName(): 'windows' | 'macos' | 'linux' | 'unknown' {
-  switch (process.platform) {
-    case 'win32':
-      return 'windows';
-    case 'darwin':
-      return 'macos';
-    case 'linux':
-      return 'linux';
-    default:
-      return 'unknown';
-  }
-}
-
-/**
- * Normalize a path for cross-platform comparison.
- * Converts backslashes to forward slashes.
- *
- * @deprecated Use normalizePathForComparison from platform.ts for full functionality
- */
-export function normalizePath(path: string): string {
-  return path.replace(/\\/g, '/');
-}
+// NOTE: getPlatformName() and normalizePath() were removed as duplicates.
+// Use getPlatformDisplayName() and normalizePathForComparison() from platform.ts instead.

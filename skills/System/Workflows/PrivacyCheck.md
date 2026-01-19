@@ -6,13 +6,21 @@
 
 ---
 
+## Platform Notes
+
+All commands use `$PAI_DIR` for cross-platform compatibility:
+- Works on macOS, Linux, and Windows (Git Bash/WSL)
+- Avoid `~` expansion - always use `$PAI_DIR` or `$HOME`
+
+---
+
 ## Voice Notification
 
 ```bash
+# Cross-platform notification (fire-and-forget)
 curl -s -X POST http://localhost:8888/notify \
   -H "Content-Type: application/json" \
-  -d '{"message": "Running privacy check for sensitive data leakage"}' \
-  > /dev/null 2>&1 &
+  -d '{"message": "Running privacy check for sensitive data leakage"}' 2>/dev/null &
 ```
 
 Running the **PrivacyCheck** workflow from the **System** skill...
@@ -38,13 +46,13 @@ Build a list of sensitive patterns to search for:
 
 ```bash
 # Extract potentially sensitive identifiers from USER/
-cd ~/.claude/skills/CORE/USER
+cd "$PAI_DIR/skills/CORE/USER"
 
 # Customer names (if any)
-CUSTOMERS=$(ls ../WORK/Customers/ 2>/dev/null | head -10)
+CUSTOMERS=$(ls "$PAI_DIR/skills/CORE/WORK/Customers/" 2>/dev/null | head -10)
 
 # Email patterns
-EMAILS=$(grep -roh '[a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]*\.[a-zA-Z]{2,}' . 2>/dev/null | sort -u | head -20)
+EMAILS=$(grep -roh '[a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]*\.[a-zA-Z]\{2,\}' . 2>/dev/null | sort -u | head -20)
 
 # Phone patterns
 PHONES=$(grep -roh '[0-9]\{3\}[-. ][0-9]\{3\}[-. ][0-9]\{4\}' . 2>/dev/null | sort -u | head -10)
@@ -55,16 +63,17 @@ PHONES=$(grep -roh '[0-9]\{3\}[-. ][0-9]\{3\}[-. ][0-9]\{4\}' . 2>/dev/null | so
 Check that sensitive patterns don't appear in regular skill directories:
 
 ```bash
-cd ~/.claude/skills
+cd "$PAI_DIR/skills"
 
 echo "=== Scanning skills for USER/WORK content leakage ==="
 
 # Directories to scan (everything except CORE/USER and CORE/WORK)
-SCAN_DIRS=$(find . -type d -name "Workflows" -o -type d -name "Tools" 2>/dev/null | grep -v "CORE/USER" | grep -v "CORE/WORK")
-
-# Check for personal email
-for dir in $SCAN_DIRS; do
-  grep -r "@danielmiessler.com" "$dir" 2>/dev/null && echo "FOUND in $dir"
+# Find directories, exclude protected ones
+find . -type d \( -name "Workflows" -o -name "Tools" \) 2>/dev/null | grep -v "CORE/USER" | grep -v "CORE/WORK" | while read -r dir; do
+  # Check for personal email (replace with actual email to check)
+  if grep -r "@youremail.com" "$dir" 2>/dev/null; then
+    echo "FOUND in $dir"
+  fi
 done
 
 # Check for private paths referenced
@@ -75,7 +84,7 @@ grep -r "CORE/WORK" . --exclude-dir="CORE/USER" --exclude-dir="CORE/WORK" --excl
 ### Step 3: Check for Customer Data Leakage
 
 ```bash
-cd ~/.claude
+cd "$PAI_DIR"
 
 echo "=== Checking for customer data outside WORK/ ==="
 
@@ -84,7 +93,9 @@ if [ -d "skills/CORE/WORK/Customers" ]; then
   for customer in skills/CORE/WORK/Customers/*/; do
     CUST_NAME=$(basename "$customer")
     # Search outside of WORK for this customer name
-    grep -ri "$CUST_NAME" skills/ --exclude-dir="CORE/WORK" --exclude-dir=".git" 2>/dev/null && echo "LEAKED: $CUST_NAME"
+    if grep -ri "$CUST_NAME" skills/ --exclude-dir="CORE/WORK" --exclude-dir=".git" 2>/dev/null | head -1; then
+      echo "LEAKED: $CUST_NAME"
+    fi
   done
 fi
 ```
@@ -92,7 +103,7 @@ fi
 ### Step 4: Validate No PII in Skills
 
 ```bash
-cd ~/.claude/skills
+cd "$PAI_DIR/skills"
 
 echo "=== Checking for PII patterns in skills ==="
 
@@ -100,19 +111,25 @@ echo "=== Checking for PII patterns in skills ==="
 EXCLUDE="--exclude-dir=CORE/USER --exclude-dir=CORE/WORK --exclude-dir=.git --exclude-dir=node_modules"
 
 # SSN pattern (XXX-XX-XXXX)
-grep -rE '[0-9]{3}-[0-9]{2}-[0-9]{4}' . $EXCLUDE 2>/dev/null && echo "FOUND: SSN pattern"
+if grep -rE '[0-9]{3}-[0-9]{2}-[0-9]{4}' . $EXCLUDE 2>/dev/null; then
+  echo "FOUND: SSN pattern"
+fi
 
 # Credit card pattern (basic)
-grep -rE '[0-9]{4}[- ]?[0-9]{4}[- ]?[0-9]{4}[- ]?[0-9]{4}' . $EXCLUDE 2>/dev/null && echo "FOUND: CC pattern"
+if grep -rE '[0-9]{4}[- ]?[0-9]{4}[- ]?[0-9]{4}[- ]?[0-9]{4}' . $EXCLUDE 2>/dev/null; then
+  echo "FOUND: CC pattern"
+fi
 
 # EIN pattern
-grep -rE '[0-9]{2}-[0-9]{7}' . $EXCLUDE 2>/dev/null | grep -v example && echo "FOUND: EIN pattern"
+if grep -rE '[0-9]{2}-[0-9]{7}' . $EXCLUDE 2>/dev/null | grep -v example; then
+  echo "FOUND: EIN pattern"
+fi
 ```
 
 ### Step 5: Check MEMORY/ for Sensitive Content
 
 ```bash
-cd ~/.claude/MEMORY
+cd "$PAI_DIR/MEMORY"
 
 echo "=== Checking MEMORY for sensitive content ==="
 
@@ -142,7 +159,7 @@ Invoke the CrossRepoValidation workflow to ensure nothing leaked to public repo:
 # Privacy Check Report
 
 **Date:** [DATE]
-**Scope:** ~/.claude/skills/ (excluding USER/, WORK/)
+**Scope:** $PAI_DIR/skills/ (excluding USER/, WORK/)
 
 ## Protected Content Validation
 
@@ -187,8 +204,7 @@ If ANY sensitive data is found outside protected directories:
 ```bash
 curl -s -X POST http://localhost:8888/notify \
   -H "Content-Type: application/json" \
-  -d '{"message": "Privacy check complete. [STATUS]"}' \
-  > /dev/null 2>&1 &
+  -d '{"message": "Privacy check complete. [STATUS]"}' 2>/dev/null &
 ```
 
 ---

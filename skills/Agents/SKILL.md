@@ -10,7 +10,7 @@ description: Dynamic agent composition and management system. USE WHEN user says
 ## Customization
 
 **Before executing, check for user customizations at:**
-`~/.claude/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/`
+`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/`
 
 If this directory exists, load and apply:
 - `PREFERENCES.md` - Named agent roster summary
@@ -45,7 +45,7 @@ The Agents skill is a complete agent composition and management system. It conso
    Running the **WorkflowName** workflow from the **Agents** skill...
    ```
 
-**Full documentation:** `~/.claude/skills/CORE/SkillNotifications.md`
+**Full documentation:** `$PAI_DIR/skills/CORE/SkillNotifications.md`
 
 ## Workflow Routing
 
@@ -150,9 +150,9 @@ The system uses two types of agents:
 
 ```bash
 # Usage examples
-bun run ~/.claude/skills/Agents/Tools/AgentFactory.ts --task "Review security architecture"
-bun run ~/.claude/skills/Agents/Tools/AgentFactory.ts --traits "legal,skeptical,meticulous"
-bun run ~/.claude/skills/Agents/Tools/AgentFactory.ts --list
+bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts --task "Review security architecture"
+bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts --traits "legal,skeptical,meticulous"
+bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts --list
 ```
 
 ### Personalities
@@ -178,12 +178,12 @@ bun run ~/.claude/skills/Agents/Tools/AgentFactory.ts --list
 
 ## Integration Points
 
-**Voice Server** (`~/.claude/VoiceServer/`)
+**Voice Server** (`$PAI_DIR/VoiceServer/`)
 - Reads agent personality configuration from AgentPersonalities.md
 - Maps agent names to ElevenLabs voice IDs
 - Delivers personality-driven voice notifications
 
-**CORE Skill** (`~/.claude/skills/CORE/`)
+**CORE Skill** (`$PAI_DIR/skills/CORE/`)
 - References Agents skill for custom agent creation
 - Documents the custom vs generic distinction
 - Includes agent creation in delegation patterns

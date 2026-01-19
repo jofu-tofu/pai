@@ -12,15 +12,80 @@
  *   --force  Re-download even if binary already exists
  */
 
-import { existsSync, mkdirSync, chmodSync, unlinkSync, createWriteStream } from "fs";
+import { existsSync, mkdirSync, chmodSync, unlinkSync, createWriteStream, writeFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { execFileSync, execSync } from "child_process";
+import { spawnSync } from "child_process";
 import { pipeline } from "stream/promises";
 import { Readable } from "stream";
-import { isWindows, getBinaryExtension, commandExistsSync } from "../hooks/lib/platform";
+import { isWindows, getBinaryExtension, commandExistsSync, getPlatformString, getArchitecture, getPlatformDisplayName, getWindowsSyncSpawnOptions } from "../hooks/lib/platform";
 
 const GITHUB_API_URL = "https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest";
+
+/**
+ * Extract a tar archive from a Uint8Array buffer.
+ * Pure TypeScript implementation - no external dependencies or PowerShell.
+ * Implements the POSIX ustar tar format.
+ */
+function extractTarBuffer(buffer: Uint8Array, destDir: string): void {
+  const BLOCK_SIZE = 512;
+  let offset = 0;
+  const decoder = new TextDecoder("utf-8");
+
+  while (offset + BLOCK_SIZE <= buffer.length) {
+    const header = buffer.subarray(offset, offset + BLOCK_SIZE);
+
+    // Check for end of archive (two zero blocks)
+    if (header.every((byte) => byte === 0)) {
+      break;
+    }
+
+    // Parse header fields (ustar format)
+    const name = decoder.decode(header.subarray(0, 100)).replace(/\0/g, "").trim();
+    if (!name) break;
+
+    // Parse file size (octal, bytes 124-135)
+    const sizeStr = decoder.decode(header.subarray(124, 136)).replace(/\0/g, "").trim();
+    const size = sizeStr ? parseInt(sizeStr, 8) : 0;
+
+    // Parse type flag (byte 156)
+    const typeFlag = String.fromCharCode(header[156]);
+
+    // Parse prefix for long paths (ustar format, bytes 345-500)
+    const prefix = decoder.decode(header.subarray(345, 500)).replace(/\0/g, "").trim();
+    const fullPath = prefix ? join(prefix, name) : name;
+
+    // Calculate content blocks (rounded up to 512-byte boundary)
+    const contentBlocks = Math.ceil(size / BLOCK_SIZE);
+    const contentStart = offset + BLOCK_SIZE;
+    const contentEnd = contentStart + size;
+
+    // Create full destination path
+    const filePath = join(destDir, fullPath);
+    const fileDir = dirname(filePath);
+
+    if (typeFlag === "5" || typeFlag === "D") {
+      // Directory
+      if (!existsSync(fileDir)) {
+        mkdirSync(fileDir, { recursive: true });
+      }
+      if (!existsSync(filePath)) {
+        mkdirSync(filePath, { recursive: true });
+      }
+    } else if (typeFlag === "0" || typeFlag === "\0" || typeFlag === "") {
+      // Regular file
+      if (!existsSync(fileDir)) {
+        mkdirSync(fileDir, { recursive: true });
+      }
+      const content = buffer.subarray(contentStart, contentEnd);
+      writeFileSync(filePath, content);
+    }
+    // Skip other types (symlinks, etc.) - not needed for binary downloads
+
+    // Move to next header (header + content blocks)
+    offset = contentStart + contentBlocks * BLOCK_SIZE;
+  }
+}
 
 interface ReleaseAsset {
   name: string;
@@ -35,32 +100,17 @@ interface GithubRelease {
 
 /**
  * Get platform-specific configuration
+ * Uses centralized utilities from platform.ts for consistency
  */
 function getPlatformConfig(): { os: string; arch: string; ext: string } {
-  // Note: We use process.platform directly here because we need the string value
-  // for the OS name mapping (win32 -> "windows", darwin -> "darwin", linux -> "linux")
-  const platform = process.platform;
-  const arch = process.arch;
-
-  let os: string;
-
-  switch (platform) {
-    case "win32":
-      os = "windows";
-      break;
-    case "darwin":
-      os = "darwin";
-      break;
-    case "linux":
-      os = "linux";
-      break;
-    default:
-      throw new Error(`Unsupported platform: ${platform}`);
-  }
+  // Use centralized utility for platform string (windows, darwin, linux)
+  const os = getPlatformString();
 
   // Use centralized utility for binary extension
   const ext = getBinaryExtension();
 
+  // Map Node's architecture to TruffleHog's naming convention
+  const arch = getArchitecture();
   let archStr: string;
   switch (arch) {
     case "x64":
@@ -176,9 +226,19 @@ async function extractTarGz(archivePath: string, destDir: string): Promise<void>
   // Method 1: Try native tar (available on Windows 10+, macOS, Linux)
   if (commandExistsSync("tar")) {
     try {
-      execFileSync("tar", ["-xzf", archivePath, "-C", destDir], { stdio: "inherit" });
-      console.log("Extraction complete!");
-      return;
+      // Use spawnSync with cross-platform options for reliable behavior
+      const tarResult = spawnSync("tar", ["-xzf", archivePath, "-C", destDir], {
+        stdio: "inherit",
+        ...getWindowsSyncSpawnOptions(),
+      });
+      if (tarResult.status === 0) {
+        console.log("Extraction complete!");
+        return;
+      }
+      if (!isWindows()) {
+        throw new Error(`Failed to extract archive with tar: ${archivePath}`);
+      }
+      // Fall through to alternative methods on Windows
     } catch {
       // Fall through to alternative methods on Windows
       if (!isWindows()) {
@@ -187,85 +247,22 @@ async function extractTarGz(archivePath: string, destDir: string): Promise<void>
     }
   }
 
-  // Method 2: Windows fallback - Use PowerShell with .NET GZipStream and tar
+  // Method 2: Windows fallback - Use Bun's native gunzip + TypeScript tar parser
+  // This eliminates the PowerShell dependency for cleaner cross-platform support
   if (isWindows()) {
-    console.log("Native tar unavailable, trying PowerShell extraction...");
-
-    // First decompress .gz to .tar, then extract .tar
-    const tarPath = archivePath.replace(/\.gz$/, "");
+    console.log("Native tar unavailable, using Bun gunzip + TypeScript tar parser...");
 
     try {
-      // Decompress .gz using PowerShell's .NET GZipStream
-      const decompressScript = `
-        $gzPath = '${archivePath.replace(/'/g, "''")}'
-        $tarPath = '${tarPath.replace(/'/g, "''")}'
-        $input = New-Object System.IO.FileStream $gzPath, ([IO.FileMode]::Open), ([IO.FileAccess]::Read), ([IO.FileShare]::Read)
-        $output = New-Object System.IO.FileStream $tarPath, ([IO.FileMode]::Create), ([IO.FileAccess]::Write), ([IO.FileShare]::None)
-        $gzipStream = New-Object System.IO.Compression.GzipStream $input, ([IO.Compression.CompressionMode]::Decompress)
-        $buffer = New-Object byte[](1024)
-        while ($true) {
-          $read = $gzipStream.Read($buffer, 0, 1024)
-          if ($read -le 0) { break }
-          $output.Write($buffer, 0, $read)
-        }
-        $gzipStream.Close()
-        $output.Close()
-        $input.Close()
-      `;
-      execSync(`powershell -NoProfile -Command "${decompressScript}"`, { stdio: "inherit" });
+      // Read and decompress using Bun's native gunzipSync
+      const gzBuffer = await Bun.file(archivePath).arrayBuffer();
+      const tarBuffer = Bun.gunzipSync(new Uint8Array(gzBuffer));
 
-      // Now extract the .tar file using tar or PowerShell
-      if (commandExistsSync("tar")) {
-        execFileSync("tar", ["-xf", tarPath, "-C", destDir], { stdio: "inherit" });
-      } else {
-        // Use PowerShell to extract .tar (requires PowerShell 5.0+ with appropriate modules)
-        // This is a basic tar extraction using .NET
-        const extractScript = `
-          Add-Type -AssemblyName System.IO.Compression.FileSystem
-          $tarPath = '${tarPath.replace(/'/g, "''")}'
-          $destDir = '${destDir.replace(/'/g, "''")}'
-          # Basic tar extraction - reads tar format manually
-          $tarStream = [System.IO.File]::OpenRead($tarPath)
-          $buffer = New-Object byte[](512)
-          while ($tarStream.Read($buffer, 0, 512) -eq 512) {
-            $name = [System.Text.Encoding]::ASCII.GetString($buffer, 0, 100).Trim([char]0)
-            if ([string]::IsNullOrEmpty($name)) { break }
-            $sizeStr = [System.Text.Encoding]::ASCII.GetString($buffer, 124, 12).Trim([char]0, ' ')
-            $size = if ($sizeStr) { [Convert]::ToInt64($sizeStr, 8) } else { 0 }
-            $typeFlag = [char]$buffer[156]
-            if ($typeFlag -eq '0' -or $typeFlag -eq [char]0) {
-              $filePath = Join-Path $destDir $name
-              $fileDir = Split-Path $filePath -Parent
-              if (!(Test-Path $fileDir)) { New-Item -ItemType Directory -Path $fileDir -Force | Out-Null }
-              $fileData = New-Object byte[]($size)
-              $tarStream.Read($fileData, 0, $size) | Out-Null
-              [System.IO.File]::WriteAllBytes($filePath, $fileData)
-            }
-            # Skip to next 512-byte boundary
-            $padding = (512 - ($size % 512)) % 512
-            $tarStream.Seek($padding, [System.IO.SeekOrigin]::Current) | Out-Null
-          }
-          $tarStream.Close()
-        `;
-        execSync(`powershell -NoProfile -Command "${extractScript}"`, { stdio: "inherit" });
-      }
-
-      // Clean up intermediate .tar file
-      try {
-        unlinkSync(tarPath);
-      } catch {
-        // Ignore cleanup errors
-      }
+      // Extract tar archive using pure TypeScript
+      extractTarBuffer(tarBuffer, destDir);
 
       console.log("Extraction complete!");
       return;
     } catch (error) {
-      // Clean up intermediate file on error
-      try {
-        unlinkSync(tarPath);
-      } catch {
-        // Ignore
-      }
       throw new Error(
         `Failed to extract archive on Windows.\n` +
         `Archive: ${archivePath}\n` +
@@ -282,7 +279,7 @@ async function extractTarGz(archivePath: string, destDir: string): Promise<void>
   // If we get here, no extraction method worked
   throw new Error(
     `No suitable extraction tool found.\n` +
-    `Platform: ${process.platform}\n` +
+    `Platform: ${getPlatformDisplayName()}\n` +
     `Archive: ${archivePath}\n\n` +
     `Please install tar or extract manually.`
   );

@@ -48,7 +48,7 @@
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { paiPath } from './lib/paths';
-import { splitLines } from './lib/platform';
+import { splitLines, getEnvVar, joinLines } from './lib/platform';
 import { sendEventToObservability, getCurrentTimestamp, getSourceApp } from './lib/observability';
 import { extractAgentInstanceId } from './lib/metadata-extraction';
 import { notifyBackgroundAgent } from './lib/notifications';
@@ -59,8 +59,9 @@ import { notifyBackgroundAgent } from './lib/notifications';
  */
 function getPSTTimestamp(): string {
   const date = new Date();
-  const timezone = process.env.TZ || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-  const pstDate = new Date(date.toLocaleString('en-US', { timeZone: process.env.TIME_ZONE || timezone }));
+  // Use case-insensitive env access with Intl fallback
+  const timezone = getEnvVar('TZ') || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  const pstDate = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
 
   const year = pstDate.getFullYear();
   const month = String(pstDate.getMonth() + 1).padStart(2, '0');
@@ -74,8 +75,9 @@ function getPSTTimestamp(): string {
 
 function getPSTDate(): string {
   const date = new Date();
-  const timezone = process.env.TZ || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-  const pstDate = new Date(date.toLocaleString('en-US', { timeZone: process.env.TIME_ZONE || timezone }));
+  // Use case-insensitive env access with Intl fallback
+  const timezone = getEnvVar('TZ') || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  const pstDate = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
 
   const year = pstDate.getFullYear();
   const month = String(pstDate.getMonth() + 1).padStart(2, '0');
@@ -157,10 +159,9 @@ async function findTaskResult(transcriptPath: string, maxAttempts: number = 2): 
                           taskOutput = resultContent.content;
                         } else if (Array.isArray(resultContent.content)) {
                           // Extract text from array of content objects
-                          taskOutput = resultContent.content
+                          taskOutput = joinLines(resultContent.content
                             .filter((item: any) => item.type === 'text')
-                            .map((item: any) => item.text)
-                            .join('\n');
+                            .map((item: any) => item.text));
                         } else {
                           console.error('❌ Unexpected tool_result content type');
                           continue;

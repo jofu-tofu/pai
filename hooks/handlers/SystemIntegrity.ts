@@ -17,9 +17,9 @@
  */
 
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
-import { spawn } from 'child_process';
 import { join } from 'path';
 import { paiPath } from '../lib/paths';
+import { crossSpawn, getRuntimeCommand } from '../lib/spawn';
 import {
   parseToolUseBlocks,
   isSignificantChange,
@@ -127,8 +127,9 @@ function spawnIntegrityMaintenance(
       })),
     });
 
-    // Spawn detached process
-    const child = spawn('bun', [INTEGRITY_SCRIPT], {
+    // Spawn detached process using the current runtime
+    const runtime = getRuntimeCommand();
+    const child = crossSpawn(runtime, [INTEGRITY_SCRIPT], {
       detached: true,
       stdio: ['pipe', 'ignore', 'inherit'],  // stdin for input, ignore stdout, inherit stderr for logging
       env: { ...process.env },

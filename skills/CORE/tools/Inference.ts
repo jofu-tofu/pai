@@ -10,7 +10,7 @@
  */
 
 import { spawn } from 'child_process';
-import { getKillSignal } from '../../../hooks/lib/platform';
+import { getKillSignal, getWindowsShellOptions } from '../../../hooks/lib/platform';
 
 type InferenceLevel = 'fast' | 'standard' | 'smart';
 
@@ -57,7 +57,9 @@ export async function inference(options: InferenceOptions): Promise<InferenceRes
 
     const proc = spawn('claude', args, {
       env,
-      stdio: ['ignore', 'pipe', 'pipe']
+      stdio: ['ignore', 'pipe', 'pipe'],
+      // Windows needs shell: true for command resolution and windowsHide to prevent console popup
+      ...getWindowsShellOptions(),
     });
 
     let stdout = '';

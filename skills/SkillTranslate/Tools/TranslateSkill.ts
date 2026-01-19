@@ -13,6 +13,8 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
 import { join, basename } from 'path';
 import { parse as parseYAML, stringify as stringifyYAML } from 'yaml';
+import { homedir } from 'os';
+import { parseFrontmatter as parseFrontmatterUtil, splitLines, getEnvVar } from '../../../hooks/lib/platform';
 
 // Types
 interface PlatformSchema {
@@ -49,9 +51,9 @@ interface TranslationContext {
 }
 
 // Configuration
-const PAI_DIR = process.env.PAI_DIR || join(process.env.HOME || process.env.USERPROFILE || '', 'pai');
-const SKILLS_DIR = join(PAI_DIR, '.claude', 'skills');
-const MAPPINGS_DIR = join(PAI_DIR, '.claude', 'skills', 'SkillTranslate', 'Mappings');
+const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
+const SKILLS_DIR = join(PAI_DIR, 'skills');
+const MAPPINGS_DIR = join(PAI_DIR, 'skills', 'SkillTranslate', 'Mappings');
 
 // Parse CLI arguments
 function parseArgs(): { skill: string; from: string; to: string; output?: string } {
@@ -131,15 +133,15 @@ const transforms = {
   },
 
   extract_frontmatter(markdownContent: string): SkillMetadata | null {
-    const match = markdownContent.match(/^---\n([\s\S]+?)\n---/);
-    if (!match) return null;
+    const parsed = parseFrontmatterUtil(markdownContent);
+    if (!parsed) return null;
 
-    return parseYAML(match[1]) as SkillMetadata;
+    return parseYAML(parsed.frontmatter) as SkillMetadata;
   },
 
   markdown_to_flow_steps(markdown: string): any[] {
     const steps: any[] = [];
-    const lines = markdown.split('\n');
+    const lines = splitLines(markdown);
 
     for (const line of lines) {
       const match = line.match(/^[-*]\s+(.+)$/);
@@ -220,12 +222,12 @@ function translateWorkflowToFlow(workflowPath: string, workflowName: string): an
   const nameMatch = content.match(/^#\s+(.+)$/m);
   const name = nameMatch ? nameMatch[1] : workflowName;
 
-  // Extract purpose/description
-  const purposeMatch = content.match(/##\s+Purpose\s+(.+?)(?=\n##|\n$)/s);
+  // Extract purpose/description (CRLF-safe)
+  const purposeMatch = content.match(/##\s+Purpose\s+(.+?)(?=\r?\n##|\r?\n$)/s);
   const description = purposeMatch ? purposeMatch[1].trim() : '';
 
-  // Extract steps
-  const stepsMatch = content.match(/##\s+Steps\s+([\s\S]+?)(?=\n##|\n$)/);
+  // Extract steps (CRLF-safe)
+  const stepsMatch = content.match(/##\s+Steps\s+([\s\S]+?)(?=\r?\n##|\r?\n$)/);
   const steps = stepsMatch ? transforms.markdown_to_flow_steps(stepsMatch[1]) : [];
 
   return {

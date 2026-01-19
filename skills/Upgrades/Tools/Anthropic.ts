@@ -28,6 +28,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { createHash } from 'crypto';
 import { join } from 'path';
 import { homedir } from 'os';
+import { splitLines, getEnvVar } from '../../../hooks/lib/platform';
 
 // Types
 interface Source {
@@ -78,8 +79,8 @@ interface State {
 }
 
 // Config
-const HOME = homedir();
-const SKILL_DIR = join(HOME, '.claude', 'skills', 'Upgrades');
+const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
+const SKILL_DIR = join(PAI_DIR, 'skills', 'Upgrades');
 const STATE_DIR = join(SKILL_DIR, 'state');
 const STATE_FILE = join(STATE_DIR, 'last-check.json');
 const SOURCES_FILE = join(SKILL_DIR, 'sources.json');
@@ -161,7 +162,7 @@ function getLastRunInfo(): { days_ago: number, last_timestamp: string } | null {
   try {
     if (!existsSync(LOG_FILE)) return null;
 
-    const logs = readFileSync(LOG_FILE, 'utf-8').trim().split('\n');
+    const logs = splitLines(readFileSync(LOG_FILE, 'utf-8').trim());
     if (logs.length === 0) return null;
 
     const lastLog = JSON.parse(logs[logs.length - 1]);
@@ -221,7 +222,7 @@ async function fetchBlog(source: Source, state: State): Promise<Update[]> {
 
 async function fetchGitHubRepo(source: Source, state: State): Promise<Update[]> {
   const updates: Update[] = [];
-  const token = process.env.GITHUB_TOKEN || '';
+  const token = getEnvVar('GITHUB_TOKEN') || '';
   const headers: Record<string, string> = {
     'Accept': 'application/vnd.github.v3+json',
     'User-Agent': 'PAI-Anthropic-Monitor'
@@ -247,7 +248,7 @@ async function fetchGitHubRepo(source: Source, state: State): Promise<Update[]> 
               source: source.name,
               category: 'github',
               type: 'commit',
-              title: commit.commit.message.split('\n')[0],
+              title: splitLines(commit.commit.message)[0],
               url: commit.html_url,
               date: commit.commit.author.date.split('T')[0],
               sha: commit.sha,
@@ -316,7 +317,7 @@ async function fetchChangelog(source: Source, state: State): Promise<Update[]> {
     }
 
     // Extract first version/section
-    const versionMatch = content.match(/##?\s*(v?[\d.]+|[\w\s]+)\s*\n/i);
+    const versionMatch = content.match(/##?\s*(v?[\d.]+|[\w\s]+)\s*\r?\n/i);
     const title = versionMatch ? versionMatch[1] : 'Latest update';
 
     return [{

@@ -71,7 +71,7 @@ PAI uses a **hybrid agent system** that combines:
 **Trigger words:** "custom agents", "custom", "specialized agents with different expertise"
 
 **What happens:**
-1. Run `bun run ~/.claude/skills/Agents/Tools/AgentFactory.ts` for EACH agent
+1. Run `bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts` for EACH agent
 2. Use DIFFERENT trait combinations to get unique voices
 3. Each agent gets a personality-matched ElevenLabs voice
 4. Launch with the full AgentFactory-generated prompt
@@ -144,16 +144,16 @@ bun run AgentFactory.ts --traits "..."  # Overkill for generic parallel work
 - **Approach**: thorough, rapid, systematic, exploratory, comparative, synthesizing, adversarial, consultative
 
 **Internal Infrastructure** (for {daidentity.name}'s use):
-- Trait definitions: `~/.claude/skills/Agents/Data/Traits.yaml`
-- Agent template: `~/.claude/skills/Agents/Templates/DynamicAgent.hbs`
-- Composition tool: `~/.claude/skills/Agents/Tools/AgentFactory.ts`
+- Trait definitions: `$PAI_DIR/skills/Agents/Data/Traits.yaml`
+- Agent template: `$PAI_DIR/skills/Agents/Templates/DynamicAgent.hbs`
+- Composition tool: `$PAI_DIR/skills/Agents/Tools/AgentFactory.ts`
 
 ---
 
 ## Named Agent Architecture
 
-- **Location**: `~/.claude/skills/CORE/AgentPersonalities.md` (this file)
-- **Consumer**: `~/.claude/VoiceServer/server.ts` extracts JSON config from this file
+- **Location**: `$PAI_DIR/skills/CORE/AgentPersonalities.md` (this file)
+- **Consumer**: `$PAI_DIR/VoiceServer/server.ts` extracts JSON config from this file
 - **Format**: Human-readable markdown with embedded JSON configuration
 
 ## Configuration

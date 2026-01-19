@@ -9,7 +9,13 @@
  */
 
 import { spawn, spawnSync, type SpawnOptions, type SpawnSyncOptions } from 'child_process';
-import { isWindows, getDefaultShell } from './platform';
+import {
+  isWindows,
+  getDefaultShell,
+  getWindowsSpawnOptions,
+  getWindowsSyncSpawnOptions,
+  getEnvVar,
+} from './platform';
 
 // =============================================================================
 // Shell Command Helper
@@ -86,7 +92,7 @@ export function getRuntimeCommand(): string {
     case 'bun': return 'bun';
     case 'deno': return 'deno';
     case 'node': return 'node';
-    default: return process.env.RUNTIME_CMD || 'node';
+    default: return getEnvVar('RUNTIME_CMD') || 'node';
   }
 }
 
@@ -112,6 +118,8 @@ export function crossSpawn(
     ...options,
     // Use shell on Windows for better command resolution
     shell: options.shell ?? false,
+    // Hide console window on Windows
+    ...getWindowsSpawnOptions(),
   };
 
   return spawn(command, args, spawnOptions);
@@ -137,6 +145,8 @@ export function crossSpawnSync(
     cwd: options.cwd,
     env: options.env,
     stdio: options.stdio || ['pipe', 'pipe', 'pipe'],
+    // Hide console window on Windows
+    ...getWindowsSyncSpawnOptions(),
   };
 
   const result = spawnSync(command, args, spawnOptions);
@@ -172,6 +182,8 @@ export async function shellExec(
     const child = spawn(shell, [shellArg, command], {
       ...options,
       stdio: options.stdio || ['pipe', 'pipe', 'pipe'],
+      // Hide console window on Windows
+      ...getWindowsSpawnOptions(),
     });
 
     let stdout = '';
@@ -236,6 +248,8 @@ export function spawnDetached(
     ...options,
     detached: true,
     stdio: options.stdio || 'ignore',
+    // Hide console window on Windows
+    ...getWindowsSpawnOptions(),
   });
 
   // Unref so the parent can exit independently
