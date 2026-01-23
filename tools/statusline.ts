@@ -977,30 +977,39 @@ function renderContext(
   contextPct: number,
   contextK: number,
   maxK: number,
-  timeDisplay: string
+  timeDisplay: string,
+  modelName: string
 ): void {
   const pctColor = contextPct <= 33 ? EMERALD : contextPct <= 66 ? '\x1b[38;2;251;191;36m' : ROSE;
   const separator = `${SLATE_600}\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500${RESET}`;
 
+  // Format model name for display (shorten common prefixes)
+  const shortModel = modelName
+    .replace('claude-opus-4-5', 'opus-4.5')
+    .replace('claude-sonnet-4', 'sonnet-4')
+    .replace('claude-3-5-sonnet', 'sonnet-3.5')
+    .replace('claude-3-5-haiku', 'haiku-3.5')
+    .replace('claude-', '');
+
   switch (mode) {
     case 'nano': {
       const bar = renderContextBar(5, contextPct);
-      console.log(`${CTX_PRIMARY}\u25C9${RESET} ${bar} ${pctColor}${contextPct}%${RESET} ${CTX_ACCENT}\u23F1${RESET} ${SLATE_300}${timeDisplay}${RESET}`);
+      console.log(`${CTX_PRIMARY}\u25C9${RESET} ${CTX_ACCENT}${shortModel}${RESET} ${bar} ${pctColor}${contextPct}%${RESET} ${CTX_ACCENT}\u23F1${RESET} ${SLATE_300}${timeDisplay}${RESET}`);
       break;
     }
     case 'micro': {
       const bar = renderContextBar(6, contextPct);
-      console.log(`${CTX_PRIMARY}\u25C9${RESET} ${bar} ${pctColor}${contextPct}%${RESET} ${SLATE_500}(${contextK}k)${RESET} ${CTX_ACCENT}\u23F1${RESET} ${SLATE_300}${timeDisplay}${RESET}`);
+      console.log(`${CTX_PRIMARY}\u25C9${RESET} ${CTX_ACCENT}${shortModel}${RESET} ${SLATE_600}\u2502${RESET} ${bar} ${pctColor}${contextPct}%${RESET} ${SLATE_500}(${contextK}k)${RESET} ${CTX_ACCENT}\u23F1${RESET} ${SLATE_300}${timeDisplay}${RESET}`);
       break;
     }
     case 'mini': {
       const bar = renderContextBar(8, contextPct);
-      console.log(`${CTX_PRIMARY}\u25C9${RESET} ${CTX_SECONDARY}CONTEXT:${RESET} ${bar} ${pctColor}${contextPct}%${RESET} ${SLATE_500}(${contextK}k/${maxK}k)${RESET} ${CTX_ACCENT}\u23F1${RESET} ${SLATE_300}${timeDisplay}${RESET}`);
+      console.log(`${CTX_PRIMARY}\u25C9${RESET} ${CTX_ACCENT}${shortModel}${RESET} ${SLATE_600}\u2502${RESET} ${CTX_SECONDARY}CTX:${RESET} ${bar} ${pctColor}${contextPct}%${RESET} ${SLATE_500}(${contextK}k/${maxK}k)${RESET} ${CTX_ACCENT}\u23F1${RESET} ${SLATE_300}${timeDisplay}${RESET}`);
       break;
     }
     case 'normal': {
       const bar = renderContextBar(16, contextPct);
-      console.log(`${CTX_PRIMARY}\u25C9${RESET} ${CTX_SECONDARY}CONTEXT:${RESET} ${bar} ${LAST_BUCKET_COLOR}${contextPct}%${RESET} ${SLATE_500}(${contextK}k/${maxK}k)${RESET} ${SLATE_600}\u2502${RESET} ${CTX_ACCENT}\u23F1${RESET} ${SLATE_300}${timeDisplay}${RESET}`);
+      console.log(`${CTX_PRIMARY}\u25C9${RESET} ${CTX_SECONDARY}Model:${RESET} ${CTX_ACCENT}${shortModel}${RESET} ${SLATE_600}\u2502${RESET} ${CTX_SECONDARY}Context:${RESET} ${bar} ${LAST_BUCKET_COLOR}${contextPct}%${RESET} ${SLATE_500}(${contextK}k/${maxK}k)${RESET} ${SLATE_600}\u2502${RESET} ${CTX_ACCENT}\u23F1${RESET} ${SLATE_300}${timeDisplay}${RESET}`);
       break;
     }
   }
@@ -1270,7 +1279,7 @@ async function main(): Promise<void> {
   if (SHOW_PAI_BRANDING) {
     renderPaiBranding(mode, ccVersion, paiVersion, skillsCount, workflowsCount, hooksCount, currentTime, location, weather);
   }
-  renderContext(mode, contextPct, contextK, maxK, timeDisplay);
+  renderContext(mode, contextPct, contextK, maxK, timeDisplay, modelName);
   renderGit(mode, gitStatus, dirName);
 
   // Conditionally render memory/learning sections with smart separator handling

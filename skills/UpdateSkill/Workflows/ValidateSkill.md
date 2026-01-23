@@ -2,6 +2,11 @@
 
 > **Trigger:** "validate skill", "check skill", "verify skill", "is skill valid"
 
+## Reference Material
+
+- **Full Checklist:** `../ValidationChecklist.md`
+- **Authoritative Spec:** `$PAI_DIR/skills/CORE/SYSTEM/SKILLSYSTEM.md`
+
 ## Purpose
 
 Run comprehensive validation checks on a skill to ensure it complies with the SkillSystem.md specification. Reports all issues found with specific remediation guidance.

@@ -2,6 +2,12 @@
 
 > **Trigger:** "retrospective on skill", "analyze skill performance", "improve skill based on session", "review skill usage"
 
+## Reference Material
+
+- **Risk Framework:** `../RiskFramework.md`
+- **Validation Checklist:** `../ValidationChecklist.md`
+- **Authoritative Spec:** `$PAI_DIR/skills/CORE/SYSTEM/SKILLSYSTEM.md`
+
 ## Purpose
 
 Analyze the current session to identify skills that were invoked, evaluate their performance, and suggest improvements to the skill based on observed usage patterns, gaps, or issues encountered during execution.

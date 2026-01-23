@@ -2,6 +2,12 @@
 
 > **Trigger:** "refactor skill", "restructure skill", "reorganize skill", "major skill update"
 
+## Reference Material
+
+- **Validation Checklist:** `../ValidationChecklist.md`
+- **Risk Framework:** `../RiskFramework.md`
+- **Authoritative Spec:** `$PAI_DIR/skills/CORE/SYSTEM/SKILLSYSTEM.md`
+
 ## Purpose
 
 Perform major restructuring of an existing skill while preserving functionality. Use this for significant changes that affect multiple files or the overall skill architecture.

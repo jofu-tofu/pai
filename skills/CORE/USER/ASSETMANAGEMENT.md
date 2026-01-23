@@ -67,6 +67,22 @@ git push
 
 ---
 
+## Local Applications
+
+| Application | Path | Purpose |
+|-------------|------|---------|
+| **Obsidian Vault** | `C:\Users\fujos\Obsidian` | Knowledge management, Learning OS |
+
+### Routing Rules
+
+- "obsidian", "my vault", "my notes", "save to obsidian" → Obsidian Vault path
+- "inbox" (in Obsidian context) → `Obsidian Vault/0_Inbox/`
+- "research notes" → `Obsidian Vault/1_Research/`
+- "implementing", "practicing" → `Obsidian Vault/2_Implementing/`
+- "learned", "skills", "lessons", "wisdom" → `Obsidian Vault/3_Learned/`
+
+---
+
 ## Hardware
 
 | Device | Purpose | Location |
