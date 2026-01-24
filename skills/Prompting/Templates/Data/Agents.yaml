@@ -14,8 +14,8 @@ defaults:
 # Agent definitions
 agents:
   # === PRIMARY ASSISTANT ===
-  main:
-    id: main
+  primary:
+    id: primary
     name: Jamie Thompson
     display_name: PAI
     archetype: enthusiast

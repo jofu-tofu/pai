@@ -15,10 +15,9 @@
 
 import Handlebars from 'handlebars';
 import { parse as parseYaml } from 'yaml';
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
-import { resolve, dirname, basename, isAbsolute } from 'path';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { resolve, dirname, basename } from 'path';
 import { parseArgs } from 'util';
-import { splitLines } from '../../../../hooks/lib/platform';
 
 // ============================================================================
 // Custom Handlebars Helpers
@@ -45,7 +44,7 @@ Handlebars.registerHelper('titlecase', (str: string) => {
 Handlebars.registerHelper('indent', (str: string, spaces: number) => {
   if (!str) return '';
   const indent = ' '.repeat(typeof spaces === 'number' ? spaces : 2);
-  return splitLines(str).map(line => indent + line).join('\n');
+  return str.split('\n').map(line => indent + line).join('\n');
 });
 
 // Join array with separator
@@ -138,7 +137,7 @@ interface RenderOptions {
 
 function resolveTemplatePath(path: string): string {
   // If absolute, use as-is
-  if (isAbsolute(path)) return path;
+  if (path.startsWith('/')) return path;
 
   // Resolve relative to Templates directory
   const templatesDir = dirname(dirname(import.meta.path));
@@ -178,13 +177,15 @@ function registerPartials(templatesDir: string): void {
 
   if (!existsSync(partialsDir)) return;
 
-  const files = readdirSync(partialsDir).filter(f => f.endsWith('.hbs'));
+  const files = Bun.spawnSync(['ls', partialsDir]).stdout.toString().trim().split('\n');
 
   for (const file of files) {
-    const partialName = basename(file, '.hbs');
-    const partialPath = resolve(partialsDir, file);
-    const partialSource = readFileSync(partialPath, 'utf-8');
-    Handlebars.registerPartial(partialName, partialSource);
+    if (file.endsWith('.hbs')) {
+      const partialName = basename(file, '.hbs');
+      const partialPath = resolve(partialsDir, file);
+      const partialSource = readFileSync(partialPath, 'utf-8');
+      Handlebars.registerPartial(partialName, partialSource);
+    }
   }
 }
 

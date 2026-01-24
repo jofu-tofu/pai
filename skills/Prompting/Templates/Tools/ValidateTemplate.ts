@@ -15,9 +15,8 @@
 import Handlebars from 'handlebars';
 import { parse as parseYaml } from 'yaml';
 import { readFileSync, existsSync } from 'fs';
-import { resolve, dirname, basename, isAbsolute } from 'path';
+import { resolve, dirname, basename } from 'path';
 import { parseArgs } from 'util';
-import { splitLines } from '../../../../hooks/lib/platform';
 
 // ============================================================================
 // Types
@@ -43,7 +42,7 @@ interface ValidateOptions {
 // ============================================================================
 
 function resolveTemplatePath(path: string): string {
-  if (isAbsolute(path)) return path;
+  if (path.startsWith('/')) return path;
   const templatesDir = dirname(dirname(import.meta.path));
   return resolve(templatesDir, path);
 }
@@ -97,7 +96,7 @@ function extractPartials(source: string): string[] {
 function checkUnbalancedBlocks(source: string): string[] {
   const errors: string[] = [];
   const blockStack: { name: string; line: number }[] = [];
-  const lines = splitLines(source);
+  const lines = source.split('\n');
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
