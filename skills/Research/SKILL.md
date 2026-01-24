@@ -1,10 +1,22 @@
 ---
 name: Research
-description: Comprehensive research, analysis, and content extraction system. USE WHEN user says 'do research', 'do extensive research', 'quick research', 'minor research', 'research this', 'find information', 'investigate', 'extract wisdom', 'extract alpha', 'analyze content', 'can't get this content', 'use fabric', OR requests any web/content research. Supports three research modes (quick/standard/extensive), deep content analysis, intelligent retrieval, and 242+ Fabric patterns. NOTE: For due diligence, OSINT, or background checks, use OSINT skill instead.
+description: Comprehensive research, analysis, and content extraction system. USE WHEN user says 'research' (ANY form - this is the MANDATORY trigger), 'do research', 'extensive research', 'quick research', 'minor research', 'research this', 'find information', 'investigate', 'extract wisdom', 'extract alpha', 'analyze content', 'can't get this content', 'use fabric', OR requests any web/content research. Supports three research modes (quick/standard/extensive), deep content analysis, intelligent retrieval, and 240+ Fabric patterns. NOTE: For due diligence, OSINT, or background checks, use OSINT skill instead.
 implements: Science
 science_cycle_time: meso
 context: fork
 ---
+
+## MANDATORY TRIGGER
+
+**When user says "research" (in any form), ALWAYS invoke this skill.**
+
+| User Says | Action |
+|-----------|--------|
+| "research" / "do research" / "research this" | → Standard mode (2 agents) |
+| "quick research" / "minor research" | → Quick mode (1 agent) |
+| "extensive research" / "deep research" | → Extensive mode (9 agents) |
+
+**"Research" alone = Standard mode. No exceptions.**
 
 ## Customization
 
@@ -69,7 +81,7 @@ Route to the appropriate workflow based on the request.
 - AI trends analysis -> `Workflows/AnalyzeAiTrends.md`
 
 ### Fabric Pattern Processing
-- Use Fabric patterns (242+ specialized prompts) -> `Workflows/Fabric.md`
+- Use Fabric patterns (240+ specialized prompts) -> **Invoke Fabric skill** (`$PAI_DIR/skills/Fabric/SKILL.md`)
 
 ### Content Enhancement
 - Enhance/improve content -> `Workflows/Enhance.md`

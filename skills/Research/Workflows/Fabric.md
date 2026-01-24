@@ -1,10 +1,16 @@
 # Fabric Workflow
 
-Intelligent pattern selection for Fabric CLI. Automatically selects the right pattern from 242+ specialized prompts based on your intent - threat modeling, analysis, summarization, content creation, extraction, and more.
+Routes Fabric pattern requests to the dedicated Fabric skill.
 
-**USE WHEN** processing content, analyzing data, creating summaries, threat modeling, or transforming text.
+**USE WHEN** processing content, analyzing data, creating summaries, threat modeling, or transforming text using Fabric patterns.
 
-## When to Activate This Skill
+## Routing
+
+**This workflow routes to the Fabric skill.** All Fabric pattern execution is now handled by:
+
+`$PAI_DIR/skills/Fabric/SKILL.md`
+
+## When to Route to Fabric Skill
 
 **Primary Use Cases:**
 - "Create a threat model for..."
@@ -14,150 +20,49 @@ Intelligent pattern selection for Fabric CLI. Automatically selects the right pa
 - "Improve my writing/code/prompt..."
 - "Create a [visualization/summary/report]..."
 - "Rate/review/judge this content..."
+- "Use fabric pattern [pattern_name]..."
 
-**The Goal:** Select the RIGHT pattern from 242+ available patterns based on what you're trying to accomplish.
+## How to Use
 
-## Pattern Selection Strategy
+When a user requests Fabric pattern processing:
 
-### 1. Identify Intent Category
+1. **Invoke the Fabric skill** - Read and follow `$PAI_DIR/skills/Fabric/SKILL.md`
+2. **Route to ExecutePattern workflow** - `$PAI_DIR/skills/Fabric/Workflows/ExecutePattern.md`
+3. **The Fabric skill handles**:
+   - Pattern selection based on intent
+   - Native pattern execution (reads system.md directly)
+   - CLI fallback for YouTube (`-y`) and blocked URLs (`-u`)
+   - Structured output formatting
 
-**Threat Modeling & Security:**
-- Threat model -> `create_threat_model` or `create_stride_threat_model`
-- Threat scenarios -> `create_threat_scenarios`
-- Security rules -> `create_sigma_rules`, `write_nuclei_template_rule`
+## Pattern Categories (240+)
 
-**Summarization:**
-- General summary -> `summarize`
-- 5-sentence summary -> `create_5_sentence_summary`
-- Meeting -> `summarize_meeting`
-- Paper/research -> `summarize_paper`
-- Video/YouTube -> `youtube_summary`
+The Fabric skill provides access to 240+ patterns organized by category:
 
-**Wisdom Extraction:**
-- General wisdom -> `extract_wisdom`
-- Article wisdom -> `extract_article_wisdom`
-- Book ideas -> `extract_book_ideas`
-- Insights -> `extract_insights`
-- Main idea -> `extract_main_idea`
+| Category | Examples |
+|----------|----------|
+| **Extraction** | extract_wisdom, extract_insights, extract_main_idea |
+| **Summarization** | summarize, create_5_sentence_summary, youtube_summary |
+| **Analysis** | analyze_claims, analyze_code, analyze_threat_report |
+| **Creation** | create_threat_model, create_prd, create_mermaid_visualization |
+| **Improvement** | improve_writing, improve_prompt, review_code |
+| **Security** | create_stride_threat_model, create_sigma_rules, analyze_malware |
+| **Rating** | rate_content, judge_output, rate_ai_response |
 
-**Analysis:**
-- Malware -> `analyze_malware`
-- Code -> `analyze_code` or `review_code`
-- Claims -> `analyze_claims`
-- Debate -> `analyze_debate`
-- Paper -> `analyze_paper`
+## Integration Note
 
-**Content Creation:**
-- PRD -> `create_prd`
-- Design document -> `create_design_document`
-- User story -> `create_user_story`
-- Visualization -> `create_visualization`, `create_mermaid_visualization`
+The Research skill uses Fabric for content analysis. For deep alpha extraction that goes beyond standard patterns, use the `ExtractAlpha.md` workflow instead, which combines deep thinking with selective Fabric pattern application.
 
-**Improvement:**
-- Writing -> `improve_writing`
-- Prompt -> `improve_prompt`
-- Code -> `review_code`
+## Quick Reference
 
-**Rating/Evaluation:**
-- AI response -> `rate_ai_response`
-- Content quality -> `rate_content`
-- General judgment -> `judge_output`
-
-### 2. Execute Pattern
-
-```bash
-# Basic format
-fabric [input] -p [selected_pattern]
-
-# From URL
-fabric -u "URL" -p [pattern]
-
-# From YouTube
-fabric -y "YOUTUBE_URL" -p [pattern]
-
-# From file
-cat file.txt | fabric -p [pattern]
+```
+User: "Use fabric to summarize this article"
+→ Invoke Fabric skill
+→ Route to ExecutePattern workflow
+→ Select 'summarize' pattern
+→ Execute natively (read system.md, apply to content)
+→ Return structured output
 ```
 
-## Pattern Categories (242 Total)
+**Patterns location:** `$PAI_DIR/skills/Fabric/Patterns/`
 
-### Threat Modeling & Security (15 patterns)
-- `create_threat_model` - General threat modeling
-- `create_stride_threat_model` - STRIDE methodology
-- `create_threat_scenarios` - Threat scenario generation
-- `create_sigma_rules` - SIGMA detection rules
-- `analyze_threat_report` - Threat report analysis
-
-### Summarization (20 patterns)
-- `summarize` - General summarization
-- `create_5_sentence_summary` - Ultra-concise 5-line summary
-- `summarize_meeting` - Meeting notes summary
-- `summarize_paper` - Academic paper summary
-- `youtube_summary` - YouTube video summary
-
-### Extraction (30+ patterns)
-- `extract_wisdom` - General wisdom extraction
-- `extract_article_wisdom` - Article-specific wisdom
-- `extract_book_ideas` - Book ideas
-- `extract_insights` - General insights
-- `extract_main_idea` - Core message
-
-### Analysis (35+ patterns)
-- `analyze_claims` - Claim analysis
-- `analyze_malware` - Malware analysis
-- `analyze_code` - Code analysis
-- `analyze_paper` - Paper analysis
-- `analyze_debate` - Debate analysis
-
-### Creation (50+ patterns)
-- `create_prd` - Product Requirements Document
-- `create_design_document` - Design documentation
-- `create_mermaid_visualization` - Mermaid diagrams
-- `create_visualization` - General visualizations
-- `create_threat_model` - Threat models
-
-### Improvement (10 patterns)
-- `improve_writing` - General writing improvement
-- `improve_prompt` - Prompt engineering
-- `review_code` - Code review
-- `humanize` - Humanize AI text
-
-### Rating/Judgment (8 patterns)
-- `rate_ai_response` - Rate AI outputs
-- `rate_content` - Rate content quality
-- `judge_output` - General judgment
-
-## Usage Examples
-
-**Threat Modeling:**
-```bash
-fabric "API that handles user authentication" -p create_threat_model
-```
-
-**Summarization:**
-```bash
-fabric -u "https://example.com/blog-post" -p summarize
-```
-
-**Wisdom Extraction:**
-```bash
-fabric -y "https://youtube.com/watch?v=..." -p extract_wisdom
-```
-
-**Analysis:**
-```bash
-fabric "$(cat code.py)" -p analyze_code
-```
-
-## Key Insight
-
-**The skill's value is in selecting the RIGHT pattern for the task.**
-
-When user says "Create a threat model using Fabric", your job is to:
-1. Recognize "threat model" intent
-2. Know available options: `create_threat_model`, `create_stride_threat_model`
-3. Select the best match
-4. Execute: `fabric "[content]" -p create_threat_model`
-
-**Not:** "Here are the patterns, pick one"
-**Instead:** "I'll use `create_threat_model` for this" -> execute immediately
+**Full documentation:** `$PAI_DIR/skills/Fabric/SKILL.md`
