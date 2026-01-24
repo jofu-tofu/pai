@@ -56,19 +56,11 @@ import { getISOTimestamp, getPSTDate } from './lib/time';
 import { getLearningCategory } from './lib/learning-utils';
 import { getMemoryDir } from './lib/paths';
 import { splitLines } from './lib/platform';
+import { getSession, type SessionWork } from './utils/current-work';
 
 const MEMORY_DIR = getMemoryDir();
-const STATE_DIR = join(MEMORY_DIR, 'STATE');
-const CURRENT_WORK_FILE = join(STATE_DIR, 'current-work.json');
 const WORK_DIR = join(MEMORY_DIR, 'WORK');
 const LEARNING_DIR = join(MEMORY_DIR, 'LEARNING');
-
-interface CurrentWork {
-  session_id: string;
-  work_dir: string;
-  created_at: string;
-  item_count: number;
-}
 
 interface WorkMeta {
   id: string;
@@ -240,6 +232,11 @@ ${idealContent || 'Not specified'}
   console.error(`[WorkCompletionLearning] Created learning: ${filename}`);
 }
 
+interface HookInput {
+  session_id: string;
+  transcript_path?: string;
+}
+
 async function main() {
   try {
     // Read input from stdin (required for hook pattern)
@@ -248,14 +245,15 @@ async function main() {
       process.exit(0);
     }
 
-    // Check if there's an active work session
-    if (!existsSync(CURRENT_WORK_FILE)) {
+    const data: HookInput = JSON.parse(input);
+    const sessionId = data.session_id || 'unknown';
+
+    // Get session work state using multi-session utility
+    const currentWork = getSession(sessionId);
+    if (!currentWork) {
       console.error('[WorkCompletionLearning] No active work session');
       process.exit(0);
     }
-
-    // Read current work state
-    const currentWork: CurrentWork = JSON.parse(readFileSync(CURRENT_WORK_FILE, 'utf-8'));
 
     if (!currentWork.work_dir) {
       console.error('[WorkCompletionLearning] No work directory in current session');

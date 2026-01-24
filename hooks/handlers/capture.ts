@@ -12,19 +12,11 @@ import { sendEventToObservability, getCurrentTimestamp, getSourceApp } from '../
 import { notifyTaskComplete, notifyError, getSessionDurationMinutes } from '../lib/notifications';
 import { getLearningCategory, isLearningCapture } from '../lib/learning-utils';
 import { getPSTTimestamp, getPSTDate, getYearMonth, getISOTimestamp } from '../lib/time';
+import { getSession, type SessionWork } from '../utils/current-work';
 import type { ParsedTranscript, StructuredResponse } from '../../skills/CORE/Tools/TranscriptParser';
 
 const BASE_DIR = getPaiDir();
 const WORK_DIR = join(BASE_DIR, 'MEMORY', 'WORK');
-const STATE_DIR = join(BASE_DIR, 'MEMORY', 'STATE');
-const CURRENT_WORK_FILE = join(STATE_DIR, 'current-work.json');
-
-interface CurrentWork {
-  session_id: string;
-  work_dir: string;
-  created_at: string;
-  item_count: number;
-}
 
 interface HookInput {
   session_id: string;
@@ -110,15 +102,6 @@ ${fullText.replace(/<system-reminder>[\s\S]*?<\/system-reminder>/g, '')}
 `;
 }
 
-function readCurrentWork(): CurrentWork | null {
-  try {
-    if (!existsSync(CURRENT_WORK_FILE)) return null;
-    const content = readFileSync(CURRENT_WORK_FILE, 'utf-8');
-    return JSON.parse(content) as CurrentWork;
-  } catch {
-    return null;
-  }
-}
 
 function updateWorkItem(workDirName: string, structured: StructuredResponse): boolean {
   try {
@@ -161,14 +144,14 @@ function updateWorkItem(workDirName: string, structured: StructuredResponse): bo
   }
 }
 
-async function captureWorkSummary(text: string, structured: StructuredResponse): Promise<void> {
+async function captureWorkSummary(text: string, structured: StructuredResponse, sessionId: string): Promise<void> {
   try {
     if (!structured.summary && !structured.completed) {
       return;
     }
 
-    // Update active work directory if one exists
-    const currentWork = readCurrentWork();
+    // Update active work directory if one exists (multi-session aware)
+    const currentWork = getSession(sessionId);
     if (currentWork?.work_dir) {
       const updated = updateWorkItem(currentWork.work_dir, structured);
       if (updated) {
@@ -223,9 +206,9 @@ async function captureWorkSummary(text: string, structured: StructuredResponse):
 export async function handleCapture(parsed: ParsedTranscript, hookInput: HookInput): Promise<void> {
   const { lastMessage, structured, plainCompletion } = parsed;
 
-  // Capture work summary (async, non-blocking)
+  // Capture work summary (async, non-blocking, multi-session aware)
   if (lastMessage) {
-    captureWorkSummary(lastMessage, structured).catch(err => {
+    captureWorkSummary(lastMessage, structured, hookInput.session_id).catch(err => {
       console.error('[Capture] History capture failed (non-critical):', err);
     });
   }

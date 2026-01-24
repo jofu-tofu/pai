@@ -81,12 +81,7 @@ interface HookInput {
   hook_event_name: string;
 }
 
-interface CurrentWork {
-  session_id: string;
-  work_dir: string;
-  created_at: string;
-  item_count: number;
-}
+import { getSession, setSession, type SessionWork } from './utils/current-work';
 
 interface WorkClassification {
   type: 'work' | 'question' | 'conversational';
@@ -98,8 +93,6 @@ import { getPaiDir } from './lib/paths';
 
 const BASE_DIR = getPaiDir();
 const WORK_DIR = join(BASE_DIR, 'MEMORY', 'WORK');
-const STATE_DIR = join(BASE_DIR, 'MEMORY', 'STATE');
-const CURRENT_WORK_FILE = join(STATE_DIR, 'current-work.json');
 
 const CLASSIFICATION_PROMPT = `Classify this user request. Return ONLY valid JSON:
 {
@@ -138,28 +131,6 @@ async function readStdinWithTimeout(timeout: number = 5000): Promise<string> {
   });
 }
 
-/**
- * Read current work state
- */
-function readCurrentWork(): CurrentWork | null {
-  try {
-    if (!existsSync(CURRENT_WORK_FILE)) return null;
-    const content = readFileSync(CURRENT_WORK_FILE, 'utf-8');
-    return JSON.parse(content) as CurrentWork;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Write current work state
- */
-function writeCurrentWork(state: CurrentWork): void {
-  if (!existsSync(STATE_DIR)) {
-    mkdirSync(STATE_DIR, { recursive: true });
-  }
-  writeFileSync(CURRENT_WORK_FILE, JSON.stringify(state, null, 2), 'utf-8');
-}
 
 /**
  * Generate work directory name
@@ -335,11 +306,11 @@ async function main() {
       mkdirSync(WORK_DIR, { recursive: true });
     }
 
-    // Read current work state
-    let currentWork = readCurrentWork();
+    // Read current work state for this session
+    let currentWork = getSession(sessionId);
 
     // Check if we need to create a new work directory for this session
-    if (!currentWork || currentWork.session_id !== sessionId) {
+    if (!currentWork) {
       // New session - classify and create work directory
       const classification = await classifyPrompt(prompt);
 
@@ -352,14 +323,13 @@ async function main() {
       // Create first item
       addItemToWork(workDirName, 1, prompt, classification);
 
-      // Update state
+      // Update state (multi-session: stored by session ID key)
       currentWork = {
-        session_id: sessionId,
         work_dir: workDirName,
         created_at: getISOTimestamp(),
         item_count: 1,
       };
-      writeCurrentWork(currentWork);
+      setSession(sessionId, currentWork);
 
       console.error(`[AutoWorkCreation] Created new work directory for session ${sessionId}`);
     } else {
@@ -370,7 +340,7 @@ async function main() {
       addItemToWork(currentWork.work_dir, currentWork.item_count, prompt, classification);
 
       // Update state
-      writeCurrentWork(currentWork);
+      setSession(sessionId, currentWork);
 
       console.error(`[AutoWorkCreation] Added item ${currentWork.item_count} to existing work`);
     }

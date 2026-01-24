@@ -47,36 +47,26 @@
  * - Typical execution: <50ms
  */
 
-import { writeFileSync, existsSync, readFileSync, unlinkSync } from 'fs';
+import { writeFileSync, existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { getISOTimestamp } from './lib/time';
 import { getMemoryDir } from './lib/paths';
+import { getSession, removeSession } from './utils/current-work';
 
 const MEMORY_DIR = getMemoryDir();
-const STATE_DIR = join(MEMORY_DIR, 'STATE');
-const CURRENT_WORK_FILE = join(STATE_DIR, 'current-work.json');
 const WORK_DIR = join(MEMORY_DIR, 'WORK');
-
-interface CurrentWork {
-  session_id: string;
-  work_dir: string;
-  created_at: string;
-  item_count: number;
-}
 
 /**
  * Mark work directory as completed and clear session state
  */
-function clearSessionWork(): void {
+function clearSessionWork(sessionId: string): void {
   try {
-    if (!existsSync(CURRENT_WORK_FILE)) {
-      console.error('[SessionSummary] No current work to complete');
+    // Get session state using multi-session utility
+    const currentWork = getSession(sessionId);
+    if (!currentWork) {
+      console.error('[SessionSummary] No current work to complete for this session');
       return;
     }
-
-    // Read current work state
-    const content = readFileSync(CURRENT_WORK_FILE, 'utf-8');
-    const currentWork: CurrentWork = JSON.parse(content);
 
     // Mark work directory as COMPLETED
     if (currentWork.work_dir) {
@@ -90,25 +80,33 @@ function clearSessionWork(): void {
       }
     }
 
-    // Delete state file
-    unlinkSync(CURRENT_WORK_FILE);
+    // Remove this session from multi-session state (deletes file if last session)
+    removeSession(sessionId);
     console.error('[SessionSummary] Cleared session work state');
   } catch (error) {
     console.error(`[SessionSummary] Error clearing session work: ${error}`);
   }
 }
 
+interface HookInput {
+  session_id: string;
+  transcript_path?: string;
+}
+
 async function main() {
   try {
-    // Read input from stdin (not strictly needed but matches hook pattern)
+    // Read input from stdin to get session_id
     const input = await Bun.stdin.text();
     if (!input || input.trim() === '') {
       process.exit(0);
     }
 
-    // Mark work as complete and clear state
+    const data: HookInput = JSON.parse(input);
+    const sessionId = data.session_id || 'unknown';
+
+    // Mark work as complete and clear state for this session
     // NOTE: Does NOT write to SESSIONS/ - WORK/ is the primary system
-    clearSessionWork();
+    clearSessionWork(sessionId);
 
     console.error('[SessionSummary] Session ended, work marked complete');
     process.exit(0);

@@ -5,12 +5,13 @@
  * No I/O for transcript reading - that's done by orchestrator.
  */
 
-import { existsSync, readFileSync, appendFileSync, mkdirSync } from 'fs';
+import { existsSync, appendFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { paiPath } from '../lib/paths';
 import { getIdentity } from '../lib/identity';
 import { getISOTimestamp } from '../lib/time';
 import { isValidVoiceCompletion, getVoiceFallback } from '../lib/response-format';
+import { getSession } from '../utils/current-work';
 import type { ParsedTranscript } from '../../skills/CORE/Tools/TranscriptParser';
 
 const DA_IDENTITY = getIdentity();
@@ -35,15 +36,12 @@ interface VoiceEvent {
 }
 
 const VOICE_LOG_PATH = paiPath('MEMORY', 'VOICE', 'voice-events.jsonl');
-const CURRENT_WORK_PATH = paiPath('MEMORY', 'STATE', 'current-work.json');
 
-function getActiveWorkDir(): string | null {
+function getActiveWorkDir(sessionId: string): string | null {
   try {
-    if (!existsSync(CURRENT_WORK_PATH)) return null;
-    const content = readFileSync(CURRENT_WORK_PATH, 'utf-8');
-    const state = JSON.parse(content);
-    if (state.work_dir) {
-      const workPath = paiPath('MEMORY', 'WORK', state.work_dir);
+    const session = getSession(sessionId);
+    if (session?.work_dir) {
+      const workPath = paiPath('MEMORY', 'WORK', session.work_dir);
       if (existsSync(workPath)) return workPath;
     }
   } catch {
@@ -66,7 +64,8 @@ function logVoiceEvent(event: VoiceEvent): void {
   }
 
   try {
-    const workDir = getActiveWorkDir();
+    // Multi-session: use session_id from event to find work directory
+    const workDir = getActiveWorkDir(event.session_id);
     if (workDir) {
       appendFileSync(join(workDir, 'voice.jsonl'), line);
     }
