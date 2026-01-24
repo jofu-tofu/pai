@@ -12,18 +12,18 @@ User says:
 
 ## The Workflow
 
-### Step 1: Run AgentFactory with --list Flag
+### Step 1: Run ComposeAgent with --list Flag
 
 ```bash
-bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts --list
+bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --list
 ```
 
 ### Step 2: Present Results to User
 
-The tool outputs:
+The tool outputs (v2.0 shows base + user merged traits):
 
 ```
-AVAILABLE TRAITS
+AVAILABLE TRAITS (base + user merged)
 
 EXPERTISE (domain knowledge):
   security        - Security Expert
@@ -58,6 +58,13 @@ APPROACH (work style):
   synthesizing    - Synthesizing
   adversarial     - Adversarial
   consultative    - Consultative
+
+VOICES AVAILABLE:
+  Daniel       - Deep British male, BBC anchor authority
+               stability:0.7 style:0 speed:1 volume:0.8
+  Jeremy       - Excited young American-Irish male, high energy
+               stability:0.35 style:0 speed:1 volume:0.8
+  ...
 
 EXAMPLE COMPOSITIONS:
   security_audit       - Security architecture review
@@ -98,6 +105,11 @@ Examples:
   → creative + enthusiastic + rapid
 
 Just describe what you need naturally, and I'll compose the right agent.
+
+Each agent also gets:
+- A unique VOICE matched to their personality
+- A unique COLOR for visual identity
+- Full PROSODY settings (stability, style, speed, volume)
 ```
 
 ## Enhanced Presentation (Optional)
@@ -114,7 +126,7 @@ ENERGETIC VOICES (enthusiastic, creative, bold):
 - Dave (youthful British energy)
 
 INTELLECTUAL VOICES (analytical, skeptical, research):
-- Default (BBC anchor authority)
+- Daniel (BBC anchor authority)
 - George (academic warm raspy)
 - Charlotte (sophisticated Swedish-British)
 - Antoni (professorial articulate)
@@ -134,6 +146,13 @@ EDGY VOICES (adversarial, contrarian, security):
 - Clyde (gravelly war veteran intensity)
 - Callum (hoarse hacker character)
 - Sam (raspy gritty authentic)
+
+Each voice includes prosody settings:
+- stability: How consistent the voice sounds
+- similarity_boost: How close to the original voice
+- style: Expressiveness level
+- speed: Speaking pace
+- volume: Audio level
 ```
 
 ## Example Interaction
@@ -161,7 +180,7 @@ Just tell me what you need:
 - "Create a skeptical security analyst"
 - "Get me someone creative and fast"
 
-I'll compose the right agent with a matching voice.
+I'll compose the right agent with a matching voice and color.
 ```
 
 ## Quick Reference Card (Optional)
@@ -188,6 +207,17 @@ Popular Combos:
 - Red team:           contrarian + skeptical + bold
 ```
 
+## User Customization Note
+
+**v2.0 Feature:** Users can add custom traits by creating:
+`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml`
+
+Custom traits are merged over base traits - user definitions take priority. This allows adding:
+- New expertise areas
+- New personality types
+- New voices with custom prosody settings
+- New trait-to-voice mappings
+
 ## Related Workflows
 
 - **CreateCustomAgent** - Actually create agents with these traits
@@ -196,5 +226,6 @@ Popular Combos:
 ## References
 
 - Full trait definitions: `$PAI_DIR/skills/Agents/Data/Traits.yaml`
+- User customizations: `$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml`
 - Voice mappings: Lines 349-794 in Traits.yaml
-- AgentFactory tool: `$PAI_DIR/skills/Agents/Tools/AgentFactory.ts`
+- ComposeAgent tool: `$PAI_DIR/skills/Agents/Tools/ComposeAgent.ts`

@@ -252,4 +252,4 @@ Quick Push:         GitPush (if docs already created)
 
 - **PAI** - Public PAI repository management (includes PAIIntegrityCheck)
 - **CORE** - System architecture and memory documentation
-- **Evals** - Regression testing and capability verification
+- **Prompting** - Meta-prompting system (includes Evals templates)

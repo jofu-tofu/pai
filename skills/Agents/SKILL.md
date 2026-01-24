@@ -3,9 +3,28 @@ name: Agents
 description: Dynamic agent composition and management system. USE WHEN user says create custom agents, spin up custom agents, specialized agents, OR asks for agent personalities, available traits, agent voices. Handles custom agent creation, personality assignment, voice mapping, and parallel agent orchestration.
 ---
 
-# Agents - Custom Agent Composition System
+# Agents - Custom Agent Composition System v2.0
 
 **Auto-routes when user mentions custom agents, agent creation, or specialized personalities.**
+
+## Voice Notification (MANDATORY)
+
+**When executing ANY workflow in this skill, you MUST do BOTH:**
+
+1. **Send voice notification FIRST:**
+   ```bash
+   curl -s -X POST http://localhost:8888/notify \
+     -H "Content-Type: application/json" \
+     -d '{"message": "Running the WORKFLOWNAME workflow from the Agents skill"}' \
+     > /dev/null 2>&1 &
+   ```
+
+2. **Output text notification:**
+   ```
+   Running the **WorkflowName** workflow from the **Agents** skill...
+   ```
+
+**Full documentation:** `$PAI_DIR/skills/CORE/SkillNotifications.md`
 
 ## Customization
 
@@ -16,6 +35,7 @@ If this directory exists, load and apply:
 - `PREFERENCES.md` - Named agent roster summary
 - `VoiceConfig.json` - Voice server configuration with ElevenLabs voice IDs
 - `NamedAgents.md` - Full agent backstories and character definitions (optional)
+- `Traits.yaml` - **NEW in v2.0:** User trait customizations (merged with base traits)
 
 These define user-specific named agents with persistent identities. If the directory does not exist, use only dynamic agent composition from traits.
 
@@ -23,29 +43,12 @@ These define user-specific named agents with persistent identities. If the direc
 
 The Agents skill is a complete agent composition and management system. It consolidates all agent-related infrastructure:
 - Dynamic agent composition from traits (expertise + personality + approach)
+- **NEW:** Base + User traits merge system (user customizations take priority)
+- **NEW:** Full prosody settings (stability, similarity_boost, style, speed, volume)
+- **NEW:** Agent color generation for visual identity
 - Personality definitions and voice mappings
 - Custom agent creation with unique voices
 - Parallel agent orchestration patterns
-
-
-## Voice Notification
-
-**When executing a workflow, do BOTH:**
-
-1. **Send voice notification**:
-   ```bash
-   curl -s -X POST http://localhost:8888/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow from the Agents skill"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Output text notification**:
-   ```
-   Running the **WorkflowName** workflow from the **Agents** skill...
-   ```
-
-**Full documentation:** `$PAI_DIR/skills/CORE/SkillNotifications.md`
 
 ## Workflow Routing
 
@@ -60,8 +63,8 @@ The Agents skill is a complete agent composition and management system. It conso
 ```
 User: "Spin up 5 custom science agents to analyze this data"
 → Invokes CREATECUSTOMAGENT workflow
-→ Runs AgentFactory 5 times with DIFFERENT trait combinations
-→ Each agent gets unique personality + matched voice
+→ Runs ComposeAgent 5 times with DIFFERENT trait combinations
+→ Each agent gets unique personality + matched voice + color
 → Launches agents in parallel with model: "sonnet"
 ```
 
@@ -72,13 +75,14 @@ User: "What agent personalities can you create?"
 → Displays expertise (security, legal, finance, etc.)
 → Shows personality types (skeptical, enthusiastic, analytical, etc.)
 → Lists approach styles (thorough, rapid, systematic, etc.)
+→ Shows voice prosody settings
 ```
 
 **Example 3: Spawn parallel researchers**
 ```
 User: "Launch 10 agents to research these companies"
 → Invokes SPAWNPARALLEL workflow
-→ Creates 10 Intern agents (generic, same voice)
+→ Creates 10 general-purpose agents (generic, same voice)
 → Uses model: "haiku" for speed
 → Launches spotcheck agent after completion
 ```
@@ -113,8 +117,8 @@ The system uses two types of agents:
 
 | User Says | What to Use | Why |
 |-----------|-------------|-----|
-| "**custom agents**", "create **custom** agents" | AgentFactory | Unique prompts + unique voices |
-| "agents", "launch agents", "bunch of agents" | Generic Interns | Same voice, parallel grunt work |
+| "**custom agents**", "create **custom** agents" | ComposeAgent | Unique prompts + unique voices + colors |
+| "agents", "launch agents", "bunch of agents" | Generic general-purpose | Same voice, parallel grunt work |
 | "use Remy", "get Ava to" | Named agent | Pre-defined personality |
 
 **Other triggers:**
@@ -131,6 +135,7 @@ The system uses two types of agents:
 - Personality dimensions: skeptical, enthusiastic, cautious, bold, analytical, creative, empathetic, contrarian, pragmatic, meticulous
 - Approach styles: thorough, rapid, systematic, exploratory, comparative, synthesizing, adversarial, consultative
 - Voice mappings: Trait combinations → ElevenLabs voices
+- **NEW:** Prosody settings per voice (stability, similarity_boost, style, speed, volume)
 - Voice registry: 45+ voices with characteristics
 
 ### Templates
@@ -138,22 +143,60 @@ The system uses two types of agents:
 **DynamicAgent.hbs** (`Templates/DynamicAgent.hbs`)
 - Handlebars template for dynamic agent prompts
 - Composes: expertise + personality + approach + voice assignment
+- **NEW:** Includes color for visual identity
 - Includes operational guidelines and response format
 
 ### Tools
 
-**AgentFactory.ts** (`Tools/AgentFactory.ts`)
+**ComposeAgent.ts** (`Tools/ComposeAgent.ts`) - **v2.0**
 - Dynamic agent composition engine
 - Infers traits from task description
 - Maps trait combinations to appropriate voices
+- **NEW:** Merges base traits with user customizations
+- **NEW:** Full prosody settings (stability, similarity_boost, style, speed, volume)
+- **NEW:** Generates unique color per trait combination
 - Outputs complete agent prompt ready for Task tool
 
 ```bash
 # Usage examples
-bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts --task "Review security architecture"
-bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts --traits "legal,skeptical,meticulous"
-bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts --list
+bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --task "Review security architecture"
+bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --traits "legal,skeptical,meticulous"
+bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --list
+bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --task "..." --output json
 ```
+
+**JSON Output (v2.0):**
+```json
+{
+  "name": "Security Expert Skeptical Thorough",
+  "traits": ["security", "skeptical", "thorough"],
+  "voice": "Sam",
+  "voice_id": "yoZ06aMxZJJ28mfd3POQ",
+  "voice_reason": "Security skepticism suits raspy authenticity",
+  "voice_settings": {
+    "stability": 0.5,
+    "similarity_boost": 0.7,
+    "style": 0.0,
+    "speed": 1.0,
+    "use_speaker_boost": true,
+    "volume": 0.8
+  },
+  "color": "#E74C3C",
+  "expertise": ["Security Expert"],
+  "personality": ["Skeptical"],
+  "approach": ["Thorough"],
+  "prompt": "# Dynamic Agent: Security Expert Skeptical Thorough..."
+}
+```
+
+### Configuration Paths
+
+| Path | Purpose |
+|------|---------|
+| `$PAI_DIR/skills/Agents/Data/Traits.yaml` | Base traits (ships with PAI) |
+| `$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml` | User trait customizations |
+
+User traits are **merged over** base traits - user values take priority. This allows adding custom voices, personalities, and prosody settings without modifying base files.
 
 ### Personalities
 
@@ -181,6 +224,7 @@ bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts --list
 **Voice Server** (`$PAI_DIR/VoiceServer/`)
 - Reads agent personality configuration from AgentPersonalities.md
 - Maps agent names to ElevenLabs voice IDs
+- **NEW:** Uses prosody settings for voice quality tuning
 - Delivers personality-driven voice notifications
 
 **CORE Skill** (`$PAI_DIR/skills/CORE/`)
@@ -194,16 +238,16 @@ bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts --list
 
 Users talk naturally:
 - "I need a legal expert to review this contract" → System composes legal + analytical + thorough agent
-- "Spin up 5 custom science agents" → System uses AgentFactory 5 times with different traits
-- "Launch agents to research these companies" → System spawns generic Intern agents
+- "Spin up 5 custom science agents" → System uses ComposeAgent 5 times with different traits
+- "Launch agents to research these companies" → System spawns generic general-purpose agents
 - "Get me someone skeptical about security" → System composes security + skeptical + adversarial agent
 
 ### Internal Process
 
 When user says "custom agents", the assistant:
 1. Invokes CREATECUSTOMAGENT workflow
-2. Runs AgentFactory for EACH agent with DIFFERENT trait combinations
-3. Gets unique prompt + voice ID for each
+2. Runs ComposeAgent for EACH agent with DIFFERENT trait combinations
+3. Gets unique prompt + voice ID + color for each
 4. Launches agents using Task tool with the composed prompt
 5. Each agent has a distinct personality-matched voice
 
@@ -212,21 +256,21 @@ Example internal execution:
 # User: "Create 3 custom research agents"
 
 # Agent 1
-bun run AgentFactory.ts --traits "research,enthusiastic,exploratory"
-# Output: Prompt with voice "Jeremy" (energetic)
+bun run ComposeAgent.ts --traits "research,enthusiastic,exploratory" --output json
+# Output: voice "Jeremy", color "#FF6B35"
 
 # Agent 2
-bun run AgentFactory.ts --traits "research,skeptical,thorough"
-# Output: Prompt with voice "George" (intellectual)
+bun run ComposeAgent.ts --traits "research,skeptical,thorough" --output json
+# Output: voice "George", color "#4ECDC4"
 
 # Agent 3
-bun run AgentFactory.ts --traits "research,analytical,systematic"
-# Output: Prompt with voice "Drew" (professional)
+bun run ComposeAgent.ts --traits "research,analytical,systematic" --output json
+# Output: voice "Drew", color "#9B59B6"
 
 # Launch all 3 with Task tool
-Task({ prompt: <agent1_prompt>, subagent_type: "Intern", model: "sonnet" })
-Task({ prompt: <agent2_prompt>, subagent_type: "Intern", model: "sonnet" })
-Task({ prompt: <agent3_prompt>, subagent_type: "Intern", model: "sonnet" })
+Task({ prompt: <agent1_full_prompt>, subagent_type: "general-purpose", model: "sonnet" })
+Task({ prompt: <agent2_full_prompt>, subagent_type: "general-purpose", model: "sonnet" })
+Task({ prompt: <agent3_full_prompt>, subagent_type: "general-purpose", model: "sonnet" })
 ```
 
 ## Model Selection
@@ -249,4 +293,11 @@ Always specify the appropriate model:
 
 ## Version History
 
+- **v2.0.0** (2025-01-24): Major upgrade
+  - Replaced AgentFactory.ts with ComposeAgent.ts
+  - Added base + user traits merge system
+  - Added full prosody settings (style, speed, volume)
+  - Added agent color generation
+  - Changed subagent_type from "Intern" to "general-purpose"
+  - Cross-platform path handling via hooks/lib utilities
 - **v1.0.0** (2025-12-16): Initial creation - consolidated all agent infrastructure into discrete skill

@@ -1,8 +1,17 @@
 # PAI Development Guide
 
-## Quick Start (Required Before Any Work)
+## Context & Motivation
 
-PAI requires the `PAI_DIR` environment variable to locate all resources. Set it to your current working directory before running tests or making changes.
+This guide ensures development work stays isolated from production and works correctly across platforms. Following these patterns prevents:
+- Tests polluting production data
+- Cross-platform failures (Windows vs Linux differences)
+- Path resolution errors from hardcoded assumptions
+
+---
+
+## Quick Start
+
+Set `PAI_DIR` before any development work. This single step isolates your changes from production.
 
 **PowerShell 7 (Windows):**
 ```powershell
@@ -14,41 +23,47 @@ $env:PAI_DIR = $PWD.Path
 export PAI_DIR="$(pwd)"
 ```
 
-**Verify:** `echo $env:PAI_DIR` (pwsh) or `echo $PAI_DIR` (bash) → should show your worktree path
+**Verify setup:**
+```bash
+# Should show your worktree path
+echo $env:PAI_DIR   # PowerShell
+echo $PAI_DIR       # Bash
 
-**Test:** `bun test` → should run without path errors
+# Should run without path errors
+bun test
+```
 
 ---
 
-## Critical Path Rules
+## Path Resolution Rules
 
-### PAI_DIR vs ~/.claude
+### Use `$PAI_DIR` for All Path Construction
 
-This repository IS the PAI_DIR. Claude Code's `~/.claude` is completely separate.
+Claude Code's `~/.claude` is separate from PAI. All PAI paths resolve from `$PAI_DIR`.
 
 | Path | Purpose |
 |------|---------|
-| `~/.claude/` | Claude Code's global config (NOT PAI) |
 | `$PAI_DIR/` | PAI system root |
 | `$PAI_DIR/.claude/` | PAI's hook configuration |
+| `~/.claude/` | Claude Code global config (NOT PAI) |
 
-**Code referencing `~/.claude` directly is a bug.** Use `$PAI_DIR` instead.
-
+**Example: Correct Path Construction**
 ```typescript
-// ✅ Correct
+// Use process.env.PAI_DIR
 const settingsPath = path.join(process.env.PAI_DIR!, '.claude', 'settings.json');
 
-// ❌ Wrong - bypasses PAI_DIR
-const settingsPath = path.join(os.homedir(), '.claude', 'settings.json');
+// Use hooks/lib/paths.ts utilities
+import { getSettingsPath, paiPath } from './lib/paths';
+const settingsPath = getSettingsPath();
+const memoryDir = paiPath('MEMORY');
 ```
 
-**Run the linter to catch violations:** `bun run tools/PaiDirLinter.ts`
+**Validate paths with the linter:** `bun run tools/PaiDirLinter.ts`
 
-### Verify Local Paths Before Writing Code
+### Verify Paths Before Writing Code
 
-This instance diverges from upstream PAI. A path that exists upstream may not exist here.
+This instance diverges from upstream. Verify paths exist locally before writing imports:
 
-**Before writing imports or references:**
 ```bash
 ls -la "$PAI_DIR/path/you/expect"
 find "$PAI_DIR" -name "filename.ts" 2>/dev/null
@@ -58,15 +73,12 @@ find "$PAI_DIR" -name "filename.ts" 2>/dev/null
 
 ## Environment Isolation
 
-| Environment | PAI_DIR | Purpose |
-|-------------|---------|---------|
-| Development | `$(pwd)` | Isolated testing in worktree |
-| Production | `~/pai` | Live PAI system |
+| Environment | PAI_DIR Value | Purpose |
+|-------------|---------------|---------|
+| Development | `$(pwd)` (worktree) | Isolated testing |
+| Production | `~/pai` | Live system |
 
-Setting PAI_DIR to your worktree ensures:
-- Tests write to your worktree, not production
-- Hook changes don't affect the live system
-- Development and production remain isolated
+Setting `PAI_DIR` to your worktree ensures tests write to your worktree, hook changes don't affect the live system, and development remains isolated from production.
 
 ---
 
@@ -77,8 +89,8 @@ $PAI_DIR/
 ├── .claude/settings.json     ← Hook configuration
 ├── hooks/                    ← Hook system (*.hook.ts)
 │   ├── handlers/             ← Handler modules
-│   └── lib/                  ← Shared utilities
-├── skills/                   ← Skill definitions (CORE, etc.)
+│   └── lib/                  ← Cross-platform utilities (use these)
+├── skills/                   ← Skill definitions
 ├── tools/                    ← Linters, generators
 ├── scripts/                  ← Setup scripts
 ├── MEMORY/                   ← Session history, state, learnings
@@ -87,55 +99,108 @@ $PAI_DIR/
 
 ---
 
+## Cross-Platform Utilities
+
+Use `hooks/lib/` utilities for all platform-dependent operations. These handle Windows/Linux differences automatically.
+
+### Why These Matter
+
+Direct approaches fail across platforms:
+
+| Operation | Direct Approach | Problem | Use Instead |
+|-----------|-----------------|---------|-------------|
+| Path comparison | `pathA === pathB` | Case sensitivity, backslashes | `normalizePathForComparison()` |
+| Line splitting | `content.split('\n')` | CRLF leaves `\r` on Windows | `splitLines()` |
+| Platform check | `process.platform === 'win32'` | Scattered, inconsistent | `isWindows()`, `isUnix()` |
+| Environment vars | Hardcoded paths | `$HOME` not expanded | `expandPath()`, `getPaiDir()` |
+| Process spawning | `Bun.$` | Bun-specific, breaks in Node | `shellExec()` |
+| Terminal features | Direct Kitty codes | Crashes on Windows | `canUseKitty()` |
+
+### Import Patterns
+
+```typescript
+// Platform detection
+import { isWindows, isUnix, isMacOS, isLinux } from './lib/platform';
+
+// Path handling
+import { normalizePathForComparison, splitLines, toForwardSlash } from './lib/platform';
+import { getPaiDir, paiPath, expandPath, getSettingsPath } from './lib/paths';
+
+// Process execution
+import { crossSpawnSync, shellExec, runScript } from './lib/spawn';
+
+// Terminal features
+import { canUseKitty, supportsAnsiColors, getTerminalWidth } from './lib/platform';
+
+// Environment variables
+import { getEnvVar, expandEnvVars } from './lib/platform';
+```
+
+### Usage Examples
+
+**Platform detection:**
+```typescript
+if (isWindows()) { /* Windows-specific logic */ }
+if (isUnix()) { /* macOS or Linux */ }
+```
+
+**Path handling:**
+```typescript
+const paiDir = getPaiDir();                    // Expands PAI_DIR or defaults to ~/pai
+const memoryDir = paiPath('MEMORY');           // $PAI_DIR/MEMORY
+const settingsPath = getSettingsPath();        // $PAI_DIR/settings.json
+const expanded = expandPath('$HOME/Documents'); // Handles $HOME, ~, %USERPROFILE%
+```
+
+**Line splitting (handles CRLF):**
+```typescript
+const lines = splitLines(fileContent);
+```
+
+**Process execution:**
+```typescript
+const result = crossSpawnSync('git', ['status']);
+const output = await shellExec('echo "hello" && ls');
+```
+
+**Terminal features:**
+```typescript
+if (canUseKitty()) { /* Safe to use Kitty escape codes */ }
+```
+
+---
+
 ## Hook System
 
-Hooks execute at Claude Code lifecycle events. They are only active when `.claude/settings.json` exists in the current directory or a parent.
+Hooks execute at Claude Code lifecycle events when `.claude/settings.json` exists in the current directory or a parent.
 
-### Hook Types
+### Hook Events
 
 | Event | Hooks | Purpose |
 |-------|-------|---------|
 | SessionStart | LoadContext, StartupGreeting, CheckVersion | Context injection, greetings |
 | PreToolUse | SecurityValidator | Block dangerous operations |
-| UserPromptSubmit | UpdateTabTitle, FormatEnforcer, AutoWorkCreation, memory/retrieve | UI updates, format reminders, memory |
-| Stop | StopOrchestrator (voice, capture, tab-state handlers) | Response processing |
+| UserPromptSubmit | UpdateTabTitle, FormatEnforcer, AutoWorkCreation | UI updates, format reminders |
+| Stop | StopOrchestrator (voice, capture, tab-state) | Response processing |
 | SubagentStop | AgentOutputCapture | Capture Task tool outputs |
 | SessionEnd | SessionSummary, QuestionAnswered | Session analysis |
 
-### Hook Reference
+### Settings Configuration
 
-**SessionStart:**
-- **LoadContext.hook.ts** — Loads CORE skill, injects as `<system-reminder>`, loads active work items. Skips subagents.
-- **StartupGreeting.hook.ts** — Announces session via voice server, sets tab state.
-- **CheckVersion.hook.ts** — Verifies PAI system version compatibility.
+Hook paths in `settings.json` use absolute paths because Claude Code's shell doesn't reliably expand environment variables.
 
-**PreToolUse:**
-- **SecurityValidator.hook.ts** — Validates Bash/Edit/Write/Read against `patterns.yaml`. Categories: `blocked` (exit 2), `confirm`, `alert`. Writes to `MEMORY/SECURITY/`.
+| File | Purpose | Git Status |
+|------|---------|------------|
+| `settings.template.json` | Source with `{{PAI_DIR}}` placeholders | Tracked |
+| `settings.json` | Generated with absolute paths | Ignored |
 
-**UserPromptSubmit:**
-- **UpdateTabTitle.hook.ts** — Dynamic tab title from prompt keywords.
-- **SetQuestionTab.hook.ts** — Detects question-type prompts.
-- **AutoWorkCreation.hook.ts** — Creates WORK/ items with Work.md, IdealState.jsonl, TRACE.jsonl.
-- **FormatEnforcer.hook.ts** — Response format reminders, tracks compliance streaks.
+**Generate and deploy settings:**
+```bash
+bun scripts/expand-settings.ts           # Generate from template
+cp settings.json ~/.claude/settings.json # Deploy to Claude Code
+```
 
-**Stop:**
-- **StopOrchestrator.hook.ts** — Single entry point, reads transcript once, distributes to handlers:
-  - `voice.ts` — Extracts 🗣️ line for voice server
-  - `capture.ts` — Updates WORK/ items
-  - `tab-state.ts` — Resets tab to default
-  - `SystemIntegrity.ts` — Detects PAI changes, spawns maintenance
-- **WorkCompletionLearning.hook.ts** — Extracts learnings, routes to phase directories.
-- **ExplicitRatingCapture.hook.ts** — Captures user satisfaction ratings.
-- **ImplicitSentimentCapture.hook.ts** — Detects implicit satisfaction signals.
-
-**SubagentStop:**
-- **AgentOutputCapture.hook.ts** — Captures Task tool outputs, routes by agent type.
-
-**SessionEnd:**
-- **SessionSummary.hook.ts** — Analyzes session, creates summary in `MEMORY/sessions/`.
-- **QuestionAnswered.hook.ts** — Tracks question resolution.
-
-### Hook Command Escaping (settings.json)
+### PowerShell Command Escaping
 
 PowerShell hook commands require triple backslash-quote (`\\\"`) for paths:
 
@@ -146,200 +211,100 @@ PowerShell hook commands require triple backslash-quote (`\\\"`) for paths:
 }
 ```
 
-**How it parses:**
-
-| Level | Sees |
-|-------|------|
-| JSON string | `pwsh -NoProfile -Command "bun run \"$env:PAI_DIR/hooks/MyHook.hook.ts\""` |
-| Shell | `pwsh -NoProfile -Command "bun run \"$env:PAI_DIR/hooks/MyHook.hook.ts\""` |
-| PowerShell | `bun run "$env:PAI_DIR/hooks/MyHook.hook.ts"` |
-
-**Symptom of incorrect escaping:** Hooks silently fail, PowerShell token errors.
-
-### Settings Setup (Cross-Platform)
-
-Hook paths in `settings.json` must be absolute because Claude Code's shell doesn't reliably expand environment variables like `$PAI_DIR` on all platforms.
-
-**Solution:** Use a template file with placeholders, then expand to absolute paths.
-
-| File | Purpose | Git Status |
-|------|---------|------------|
-| `settings.template.json` | Source with `{{PAI_DIR}}` placeholders | Tracked |
-| `settings.json` | Generated with absolute paths | Ignored |
-
-**Generate settings.json:**
-```bash
-bun scripts/expand-settings.ts
-```
-
-This reads `{{PAI_DIR}}` placeholders and replaces them with the resolved absolute path (e.g., `C:/Users/fujos/pai`).
-
-**Deploy to Claude Code:**
-```bash
-# Copy to global Claude config
-cp settings.json ~/.claude/settings.json
-```
-
-**Full workflow after changes:**
-```bash
-# 1. Edit the template (not settings.json directly)
-#    settings.template.json uses {{PAI_DIR}} placeholders
-
-# 2. Generate settings.json with absolute paths
-bun scripts/expand-settings.ts
-
-# 3. Copy to Claude Code's config directory
-cp settings.json ~/.claude/settings.json
-
-# 4. Restart Claude Code to pick up changes
-```
-
-**Note:** If you move your PAI directory, re-run the expand script and copy again.
-
-### Developing Hooks
+### Hook Development Workflow
 
 1. Set `PAI_DIR` to your worktree
 2. Generate settings: `bun scripts/expand-settings.ts`
 3. Deploy settings: `cp settings.json ~/.claude/settings.json`
 4. Launch Claude Code: `claude`
-5. Verify files write to `$PAI_DIR/MEMORY/`, not `~/pai/MEMORY/`
-6. Remove `~/.claude/settings.json` when done (or restore original)
+5. Verify files write to `$PAI_DIR/MEMORY/`
+6. Restore original settings when done
 
 ### Hook Best Practices
 
 | Practice | Reason |
 |----------|--------|
-| Write to `$PAI_DIR/MEMORY/` | Ensures environment isolation |
+| Write to `$PAI_DIR/MEMORY/` | Environment isolation |
 | Log to stderr, output to stdout | Claude sees stdout only |
-| Exit 0 (allow), 2 (block) | Exit codes control hook behavior |
-| Use `hooks/lib/` utilities | Consistent path resolution, notifications |
-| Support both pwsh and bash | Cross-platform compatibility |
+| Exit 0 (allow), 2 (block) | Exit codes control behavior |
+| Use `hooks/lib/` utilities | Consistent cross-platform behavior |
 
 ---
 
-## Shared Utilities (`hooks/lib/`)
+## Adapting Upstream Code
 
-PAI provides shared utilities in `hooks/lib/` to solve common problems consistently. **Always use these instead of rolling your own solutions.**
+This instance derives from [danielmiessler/PAI](https://github.com/danielmiessler/PAI) which runs on Linux. Adapt code for Windows compatibility when pulling features.
 
-### Why These Exist
+### Platform Differences
 
-| Problem | Naive Approach | What Goes Wrong | Utility Solution |
-|---------|----------------|-----------------|------------------|
-| Path comparison | `pathA === pathB` | Fails on Windows (case-insensitive, backslashes) | `normalizePathForComparison()` |
-| Line splitting | `content.split('\n')` | Leaves `\r` on Windows (CRLF) | `splitLines()` |
-| Platform check | `process.platform === 'win32'` | Scattered, inconsistent | `isWindows()`, `isUnix()` |
-| Environment expansion | Hardcode paths | `$HOME` not expanded by Claude Code | `expandPath()`, `getPaiDir()` |
-| Process spawning | `Bun.spawn()` or `Bun.$` | Bun-specific, breaks in Node.js | `crossSpawn()`, `shellExec()` |
-| Kitty terminal features | Always use them | Crashes on Windows (Kitty doesn't exist) | `canUseKitty()`, `isKittyTerminal()` |
-| Identity/config loading | Parse markdown or JSON per-file | Inconsistent, duplicated logic | `getIdentity()`, `getPrincipal()` |
-| Notifications | Direct `osascript` calls | macOS-only, blocks execution | `notify()` with graceful degradation |
+| Area | This Instance | Upstream |
+|------|---------------|----------|
+| Platform | Windows (PowerShell 7) | Linux (Bash) |
+| Root directory | `$PAI_DIR` | `.claude/` folder |
+| Hooks | `.hook.ts` naming, handlers | Different patterns |
+| Skills | Symlinked, adapted | All in `.claude/` |
+| Shell | PowerShell 7 (`pwsh`) | Bash/Zsh |
 
-### Utility Reference
+### Structure Comparison
 
-**`platform.ts`** — Cross-platform detection and path utilities
-
-```typescript
-import { isWindows, isUnix, isMacOS, isLinux } from './lib/platform';
-import { normalizePathForComparison, splitLines, toForwardSlash } from './lib/platform';
-import { getDefaultShell, canUseKitty } from './lib/platform';
-
-// Platform detection
-if (isWindows()) { /* Windows-specific logic */ }
-if (isUnix()) { /* macOS or Linux */ }
-
-// Path comparison (handles case + separators)
-if (normalizePathForComparison(pathA) === normalizePathForComparison(pathB)) { ... }
-
-// Line splitting (handles CRLF)
-const lines = splitLines(fileContent);
-
-// Check before using Kitty features
-if (canUseKitty()) { /* Safe to use Kitty escape codes */ }
+```
+UPSTREAM (.claude/)              THIS INSTANCE ($PAI_DIR/)
+├── hooks/                        ├── hooks/
+│   └── *.ts                      │   ├── *.hook.ts
+│                                 │   ├── handlers/
+│                                 │   └── lib/          ← Cross-platform utilities
+├── Observability/                ├── Observability/
+├── skills/ (inline)              ├── skills/           ← Can be symlinked
+├── settings.json                 ├── settings.template.json
+│                                 ├── settings.json     ← Generated
+└── PAIInstallWizard.ts           └── scripts/setup.ts
 ```
 
-**`paths.ts`** — Environment-aware path resolution
+### Adaptation Mapping
 
-```typescript
-import { getPaiDir, paiPath, expandPath, getSettingsPath } from './lib/paths';
+| Upstream Pattern | Local Replacement |
+|------------------|-------------------|
+| `~/.claude/settings.json` | `getSettingsPath()` |
+| `/home/user/.claude` | `toForwardSlash()` or `path.join()` |
+| `$HOME`, `$PAI_DIR` | `expandPath()`, `getPaiDir()` |
+| Exact path matching | `normalizePathForComparison()` |
+| `content.split('\n')` | `splitLines()` |
+| `.sh` shell scripts | Convert to TypeScript |
+| `Bun.$\`command\`` | `shellExec()` |
+| `process.platform === 'linux'` | `isLinux()` |
+| `chmod +x` | Usually not needed |
+| `osascript` | Guard with `isMacOS()` |
+| `/dev/null` | Platform-aware redirect |
+| Kitty terminal codes | Guard with `canUseKitty()` |
 
-// Always use these instead of hardcoding paths
-const paiDir = getPaiDir();                    // Expands PAI_DIR or defaults to ~/pai
-const memoryDir = paiPath('MEMORY');           // $PAI_DIR/MEMORY
-const settingsPath = getSettingsPath();        // $PAI_DIR/settings.json
+### Adaptation Checklist
 
-// Expand user home in any path (handles $HOME, ~, %USERPROFILE%)
-const expanded = expandPath('$HOME/Documents');
-```
+Before starting:
+- [ ] Read upstream code completely
+- [ ] Identify path references, shell commands, environment variable usage
 
-**`spawn.ts`** — Cross-platform, cross-runtime process execution
+Required adaptations:
+- [ ] Replace hardcoded paths with `hooks/lib/paths.ts` functions
+- [ ] Replace `process.platform` with `hooks/lib/platform.ts` functions
+- [ ] Replace `Bun.$` with `shellExec()` from `hooks/lib/spawn.ts`
+- [ ] Replace `.split('\n')` with `splitLines()` from `hooks/lib/platform.ts`
+- [ ] Convert shell scripts to TypeScript
+- [ ] Replace `~/.claude` with `$PAI_DIR` equivalents
 
-```typescript
-import { crossSpawnSync, shellExec, runScript, getRuntime } from './lib/spawn';
+Verification:
+- [ ] `bun test` passes
+- [ ] `bun run tools/PaiDirLinter.ts` shows no violations
+- [ ] Hooks work in PowerShell 7 context
 
-// Sync command execution (replaces Bun.spawnSync)
-const result = crossSpawnSync('git', ['status']);
-if (result.success) console.log(result.stdout);
+### Upstream Resources
 
-// Shell command (replaces Bun.$)
-const output = await shellExec('echo "hello" && ls');
+| Resource | Location |
+|----------|----------|
+| Local clone | `C:\Users\fujos\Github\Personal_AI_Infrastructure` |
+| GitHub | https://github.com/danielmiessler/Personal_AI_Infrastructure |
+| Versioned releases | `\\wsl.localhost\Ubuntu-24.04\root\PAI_Releases\Releases\` |
 
-// Run script with current runtime (auto-detects bun/node/deno)
-runScript('./my-script.ts', ['--flag']);
-
-// Check runtime if needed
-if (getRuntime() === 'bun') { /* Bun-specific optimization */ }
-```
-
-**`terminal.ts`** — Terminal feature detection
-
-```typescript
-import { isKittyTerminal, getPlatformName } from './lib/terminal';
-
-// Check if actually running in Kitty (not just if platform supports it)
-if (isKittyTerminal()) {
-  // Safe to use Kitty-specific escape sequences
-  process.stdout.write('\x1b]30;Tab Title\x07');
-}
-```
-
-**`identity.ts`** — Centralized identity and settings
-
-```typescript
-import { getIdentity, getPrincipal, getDAName } from './lib/identity';
-
-const ai = getIdentity();      // { name, fullName, voiceId, color }
-const user = getPrincipal();   // { name, pronunciation, timezone }
-const name = getDAName();      // Just the AI name string
-```
-
-**`notifications.ts`** — Multi-channel notifications with graceful degradation
-
-```typescript
-import { notify, notifyTaskComplete, notifyError } from './lib/notifications';
-
-// Smart routing based on event type and configured channels
-await notify('taskComplete', 'Build finished');
-await notifyError('Compilation failed', { priority: 'high' });
-
-// Desktop notifications gracefully skip on non-macOS
-// ntfy/Discord/SMS only fire if configured
-```
-
-### Anti-Patterns
-
-```typescript
-// ❌ Wrong - platform-specific, inconsistent
-if (process.platform === 'win32') { ... }
-const lines = content.split('\n');
-const paiDir = process.env.PAI_DIR || `${os.homedir()}/pai`;
-await Bun.$`some command`;
-
-// ✅ Correct - use shared utilities
-if (isWindows()) { ... }
-const lines = splitLines(content);
-const paiDir = getPaiDir();
-await shellExec('some command');
-```
+**Sync upstream:** `cd C:\Users\fujos\Github\Personal_AI_Infrastructure && git pull origin main`
 
 ---
 
@@ -353,77 +318,31 @@ bun test --watch                      # Watch mode
 
 ---
 
-## Common Issues
+## Troubleshooting
 
-| Problem | Cause | Solution |
+| Symptom | Cause | Solution |
 |---------|-------|----------|
-| Path not found errors | PAI_DIR not set | Set `$env:PAI_DIR = $PWD.Path` |
-| PowerShell 5 errors | Using `powershell` not `pwsh` | Install PowerShell 7, use `pwsh` |
-| Files in wrong location | PAI_DIR points elsewhere | Verify PAI_DIR matches `pwd` |
-| Missing types/modules | Dependencies not installed | Run `bun install` |
-
----
-
-## Upstream Relationship
-
-This instance derives from [danielmiessler/PAI](https://github.com/danielmiessler/PAI).
-
-| Resource | Location |
-|----------|----------|
-| Local upstream clone | `C:\Users\fujos\Github\Personal_AI_Infrastructure` |
-| GitHub repository | https://github.com/danielmiessler/Personal_AI_Infrastructure |
-
-### Active Development Warning
-
-The upstream project changes frequently. This instance intentionally diverges:
-
-- **Volatile changes** — Upstream may change significantly between pulls
-- **Partial adoption** — We use parts of upstream, not all
-- **Local implementations** — Some features here don't exist upstream
-- **Missing features** — Some upstream features aren't present here
-
-### Key Differences
-
-| Area | This Instance | Upstream |
-|------|---------------|----------|
-| Hooks | `.hook.ts` naming, custom handlers | Different patterns |
-| Memory | Provider-based architecture | Different implementation |
-| Skills | Adapted subset | Full library |
-| Configuration | Personalized | Generic/template |
-
-### Using Upstream as Reference
-
-1. **Source of truth** — How PAI concepts *should* work per original design
-2. **Missing hook reference** — Check upstream for full implementations
-3. **Pattern reference** — Consistent naming, structure, architecture
-4. **Documentation source** — May have docs not incorporated here
-
-**Sync upstream:** `cd C:\Users\fujos\Github\Personal_AI_Infrastructure && git pull origin main`
-
-### Writing Code in This Instance
-
-Paths and structures may differ from upstream. Before writing code:
-
-1. **Verify paths exist locally** — `ls -la "$PAI_DIR/path/you/expect"`
-2. **Search for actual location** — `find "$PAI_DIR" -name "filename.ts"`
-3. **Adapt imports** — Upstream's `../lib/utils` might be `hooks/lib/` here
-4. **Don't copy blindly** — Adapt code to local paths and patterns
+| Path not found errors | PAI_DIR not set | `$env:PAI_DIR = $PWD.Path` |
+| PowerShell 5 errors | Using `powershell` | Install PowerShell 7, use `pwsh` |
+| Files in wrong location | PAI_DIR mismatch | Verify PAI_DIR matches `pwd` |
+| Missing types/modules | Dependencies | Run `bun install` |
+| Hooks silently fail | Escaping errors | Check triple backslash-quote |
 
 ---
 
 ## Deployment Checklist
 
-**Pre-Deploy:**
+**Pre-deploy:**
 - [ ] `bun test` passes
-- [ ] `bun run tools/PaiDirLinter.ts` shows no violations
+- [ ] `bun run tools/PaiDirLinter.ts` clean
 - [ ] No debug code in production files
 
 **Deploy:**
 - [ ] Set `$env:PAI_DIR = "$HOME/pai"`
-- [ ] Copy files to production location
+- [ ] Copy files to production
 - [ ] Update `.claude/settings.json`
 - [ ] Run smoke tests
 
-**Post-Deploy:**
+**Post-deploy:**
 - [ ] Monitor logs
 - [ ] Verify files write to correct locations

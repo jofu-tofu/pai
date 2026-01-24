@@ -1,6 +1,6 @@
 # SpawnParallelAgents Workflow
 
-**Launches multiple generic Intern agents for parallel grunt work (NOT custom agents).**
+**Launches multiple generic general-purpose agents for parallel grunt work (NOT custom agents).**
 
 ## When to Use
 
@@ -10,7 +10,7 @@
 - "Create agents to analyze these files" (no "custom")
 - "Use interns to check these URLs"
 
-**KEY: No "custom" keyword = generic Intern agents (same voice, fast parallel execution)**
+**KEY: No "custom" keyword = generic general-purpose agents (fast parallel execution)**
 
 ## The Workflow
 
@@ -59,19 +59,19 @@ Company A: Acme AI Security Corp
 Task({
   description: "Research Company A",
   prompt: agent1Prompt,
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "haiku"  // or "sonnet" depending on complexity
 })
 Task({
   description: "Research Company B",
   prompt: agent2Prompt,
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "haiku"
 })
 Task({
   description: "Research Company C",
   prompt: agent3Prompt,
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "haiku"
 })
 // ... up to N agents
@@ -99,7 +99,7 @@ Check for:
 4. Recommendations for follow-up research
 
 Provide a brief assessment and any issues found.`,
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "haiku"
 })
 ```
@@ -126,31 +126,31 @@ Provide a brief assessment and any issues found.`,
 Task({
   description: "Research Acme AI Security",
   prompt: "Research Acme AI Security Corp: products, market, partnerships, tech stack",
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "sonnet"
 })
 Task({
   description: "Research Bolt Security AI",
   prompt: "Research Bolt Security AI: products, market, partnerships, tech stack",
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "sonnet"
 })
 Task({
   description: "Research Cipher AI Defense",
   prompt: "Research Cipher AI Defense: products, market, partnerships, tech stack",
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "sonnet"
 })
 Task({
   description: "Research Delta Threat Intel",
   prompt: "Research Delta Threat Intelligence: products, market, partnerships, tech stack",
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "sonnet"
 })
 Task({
   description: "Research Echo AI Protection",
   prompt: "Research Echo AI Protection Systems: products, market, partnerships, tech stack",
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "sonnet"
 })
 
@@ -158,7 +158,7 @@ Task({
 Task({
   description: "Spotcheck company research",
   prompt: "Review these 5 company research results for consistency and gaps: [results]",
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "haiku"
 })
 ```
@@ -181,7 +181,7 @@ items.forEach(item => {
   Task({
     description: `Process ${item}`,
     prompt: `Analyze ${item} for: [criteria]`,
-    subagent_type: "Intern",
+    subagent_type: "general-purpose",
     model: "haiku"
   });
 });
@@ -201,7 +201,7 @@ files.forEach(file => {
   Task({
     description: `Analyze ${file}`,
     prompt: `Review ${file} for security issues, focusing on: [checklist]`,
-    subagent_type: "Intern",
+    subagent_type: "general-purpose",
     model: "sonnet"
   });
 });
@@ -227,7 +227,7 @@ questions.forEach(q => {
   Task({
     description: `Research: ${q}`,
     prompt: `Find reliable answer to: ${q}. Include sources.`,
-    subagent_type: "Intern",
+    subagent_type: "general-purpose",
     model: "haiku"
   });
 });
@@ -256,7 +256,7 @@ Verify:
 - No conflicting data
 
 Flag any issues for follow-up.`,
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "haiku"  // Fast spotcheck
 })
 ```
@@ -280,10 +280,10 @@ Task({ ... })  // Agent 3
 // All run simultaneously
 ```
 
-**❌ WRONG: Using AgentFactory for generic agents**
+**❌ WRONG: Using ComposeAgent for generic agents**
 ```bash
 # Overkill for simple parallel work
-bun run AgentFactory.ts --traits "research,analytical"
+bun run ComposeAgent.ts --traits "research,analytical"
 ```
 
 **✅ RIGHT: Direct Intern launch**
@@ -292,7 +292,7 @@ bun run AgentFactory.ts --traits "research,analytical"
 Task({
   description: "Research X",
   prompt: "Research X and report findings",
-  subagent_type: "Intern",
+  subagent_type: "general-purpose",
   model: "haiku"
 })
 ```
@@ -329,7 +329,7 @@ Task({ ..., model: "haiku" })
 
 ## Voice Output
 
-All generic Intern agents use the same voice:
+All generic general-purpose agents use the same voice:
 - **Dev Patel** (d3MFdIuCfbAIwiu7jC4a)
 - High-energy genius generalist
 - 270 wpm speaking rate

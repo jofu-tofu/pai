@@ -1,12 +1,20 @@
 # Traits.yaml - Composable Agent Traits
-# Version: 1.0.0
+# Version: 2.0.0
 #
 # This file defines the building blocks for dynamic agent composition.
 # Agents are composed by combining: expertise + personality + approach
 #
+# Configuration:
+#   Base traits:  $PAI_DIR/skills/Agents/Data/Traits.yaml (this file)
+#   User traits:  $PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml
+#
+# User traits are merged over base - user values take priority.
+# Add custom voices, personalities, and prosody settings in the user file.
+#
 # Usage:
-#   bun run $PAI_DIR/Skills/Agents/Tools/AgentFactory.ts --task "Review security architecture"
-#   bun run $PAI_DIR/Skills/Agents/Tools/AgentFactory.ts --traits "security,skeptical,thorough"
+#   bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --task "Review security architecture"
+#   bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --traits "security,skeptical,thorough"
+#   bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --list
 
 # ==============================================================================
 # EXPERTISE AREAS - Domain knowledge and specialization

@@ -130,3 +130,9 @@ _bmad-output/
 bin/trufflehog
 bin/trufflehog.exe
 hooks/subagent-stop-debug.log
+
+# AIW Installation
+_cc-native/
+
+# Generated output
+_output/

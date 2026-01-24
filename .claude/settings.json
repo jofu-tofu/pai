@@ -1,0 +1,55 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python _cc-native/hooks/suggest-fresh-perspective.py",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python _cc-native/hooks/add_plan_context.py",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python _cc-native/hooks/set_plan_state.py",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "python _cc-native/hooks/cc-native-plan-review.py",
+            "timeout": 600000
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python _cc-native/hooks/archive_plan.py",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  }
+}
