@@ -1,7 +1,7 @@
 /**
  * Ideal State Utilities
  * Shared functions for reading/writing IdealState.jsonl in work items
- * Part of THE ALGORITHM's nervous system for dynamic success criteria tracking
+ * Part of the PAI Algorithm's nervous system for dynamic success criteria tracking
  */
 
 import { existsSync, readFileSync, appendFileSync, readdirSync } from 'fs';
@@ -19,7 +19,7 @@ export type CriterionStatus = 'pending' | 'pass' | 'fail' | 'adjusted';
 
 // ============================================================
 // DIMENSION TYPES - The core unit of ideal state
-// From THEALGORITHM.md: "A dimension is one aspect of what ideal looks like"
+// From PAI CORE documentation: "A dimension is one aspect of what ideal looks like"
 // ============================================================
 
 export type DimensionType = 'Functional' | 'Quality' | 'Scope' | 'Implicit' | 'Verification';
@@ -29,7 +29,7 @@ export type DimensionStatus = 'unknown' | 'resolved' | 'in_progress' | 'achieved
 /**
  * Dimension: One aspect of what "ideal" looks like
  *
- * From THEALGORITHM.md:
+ * From PAI CORE documentation:
  * - Functional: What must work?
  * - Quality: How well must it work?
  * - Scope: What's in/out?
