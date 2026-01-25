@@ -18,7 +18,7 @@ import { fileURLToPath } from "url";
 import { spawnSync } from "child_process";
 import { pipeline } from "stream/promises";
 import { Readable } from "stream";
-import { isWindows, getBinaryExtension, commandExistsSync, getPlatformString, getArchitecture, getPlatformDisplayName, getWindowsSyncSpawnOptions } from "../hooks/lib/platform";
+import { isWindows, getBinaryExtension, commandExistsSync, getPlatformString, getArchitecture, getPlatformDisplayName, getWindowsSyncSpawnOptions } from "../hooks/core/platform";
 
 const GITHUB_API_URL = "https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest";
 

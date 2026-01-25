@@ -35,6 +35,7 @@
  * - capture.ts: Updates current-work.json and WORK/ items
  * - tab-state.ts: Resets Kitty tab to default UL blue
  * - SystemIntegrity.ts: Detects PAI changes, spawns IntegrityMaintenance.ts
+ * - ISCValidator.ts: Validates IdealState.jsonl was populated during algorithm execution
  *
  * ERROR HANDLING:
  * - Missing transcript: Exits gracefully
@@ -58,6 +59,7 @@ import { handleVoice } from './handlers/voice';
 import { handleCapture } from './handlers/capture';
 import { handleTabState } from './handlers/tab-state';
 import { handleSystemIntegrity } from './handlers/SystemIntegrity';
+import { handleISCValidation } from './handlers/ISCValidator';
 
 interface HookInput {
   session_id: string;
@@ -113,11 +115,12 @@ async function main() {
     handleCapture(parsed, hookInput),
     handleTabState(parsed),
     handleSystemIntegrity(parsed, hookInput),
+    handleISCValidation(parsed, hookInput),
   ]);
 
   // Log any failures
   results.forEach((result, index) => {
-    const handlerNames = ['Voice', 'Capture', 'TabState', 'SystemIntegrity'];
+    const handlerNames = ['Voice', 'Capture', 'TabState', 'SystemIntegrity', 'ISCValidator'];
     if (result.status === 'rejected') {
       console.error(`[StopOrchestrator] ${handlerNames[index]} handler failed:`, result.reason);
     }

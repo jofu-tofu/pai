@@ -14,7 +14,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 
 import { join, basename } from 'path';
 import { parse as parseYAML, stringify as stringifyYAML } from 'yaml';
 import { homedir } from 'os';
-import { parseFrontmatter as parseFrontmatterUtil, splitLines, getEnvVar } from '../../../hooks/lib/platform';
+import { parseFrontmatter as parseFrontmatterUtil, splitLines, getEnvVar } from '../../../hooks/core/platform';
 
 // Types
 interface PlatformSchema {

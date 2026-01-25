@@ -14,8 +14,8 @@ import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { parseArgs } from 'util';
-import { shellExec } from '../../../hooks/lib/spawn';
-import { paiPath } from '../../../hooks/lib/paths';
+import { shellExec } from '../../../hooks/core/spawn';
+import { paiPath } from '../../../hooks/core/paths';
 
 const EVALS_DIR = paiPath('skills', 'Evals');
 const RESULTS_DIR = join(EVALS_DIR, 'Results');

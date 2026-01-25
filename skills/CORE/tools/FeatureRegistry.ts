@@ -12,7 +12,7 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import { getPaiDir } from '../../../hooks/lib/paths';
+import { getPaiDir } from '../../../hooks/core/paths';
 
 type FeatureStatus = 'pending' | 'in_progress' | 'passing' | 'failing' | 'blocked';
 type Priority = 'P1' | 'P2' | 'P3';

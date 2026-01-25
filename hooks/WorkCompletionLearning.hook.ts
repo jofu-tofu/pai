@@ -52,11 +52,11 @@
 
 import { writeFileSync, existsSync, readFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
-import { getISOTimestamp, getPSTDate } from './lib/time';
-import { getLearningCategory } from './lib/learning-utils';
-import { getMemoryDir } from './lib/paths';
-import { splitLines } from './lib/platform';
-import { getSession, type SessionWork } from './utils/current-work';
+import { getISOTimestamp, getPSTDate } from './core/time';
+import { getLearningCategory } from './core/learning-utils';
+import { getMemoryDir } from './core/paths';
+import { splitLines } from './core/platform';
+import { getSession, type SessionWork } from './core/current-work';
 
 const MEMORY_DIR = getMemoryDir();
 const WORK_DIR = join(MEMORY_DIR, 'WORK');

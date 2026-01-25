@@ -20,8 +20,8 @@
 import { existsSync, statSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, basename, dirname } from 'path';
 import { spawnSync, type SpawnSyncOptions } from 'child_process';
-import { isWindows, isMacOS, getEnvVar, splitLines, getWindowsSyncSpawnOptions, isNoColorSet } from '../hooks/lib/platform';
-import { getPaiDir } from '../hooks/lib/paths';
+import { isWindows, isMacOS, getEnvVar, splitLines, getWindowsSyncSpawnOptions, isNoColorSet } from '../hooks/core/platform';
+import { getPaiDir } from '../hooks/core/paths';
 
 // Helper for cross-platform spawn options with windowsHide
 function getSpawnOpts(timeout = 2000): SpawnSyncOptions {

@@ -7,12 +7,12 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { getPaiDir } from '../lib/paths';
-import { sendEventToObservability, getCurrentTimestamp, getSourceApp } from '../lib/observability';
-import { notifyTaskComplete, notifyError, getSessionDurationMinutes } from '../lib/notifications';
-import { getLearningCategory, isLearningCapture } from '../lib/learning-utils';
-import { getPSTTimestamp, getPSTDate, getYearMonth, getISOTimestamp } from '../lib/time';
-import { getSession, type SessionWork } from '../utils/current-work';
+import { getPaiDir } from '../core/paths';
+import { sendEventToObservability, getCurrentTimestamp, getSourceApp } from '../core/observability';
+import { notifyTaskComplete, notifyError, getSessionDurationMinutes } from '../core/notifications';
+import { getLearningCategory, isLearningCapture } from '../core/learning-utils';
+import { getPSTTimestamp, getPSTDate, getYearMonth, getISOTimestamp } from '../core/time';
+import { getSession, type SessionWork } from '../core/current-work';
 import type { ParsedTranscript, StructuredResponse } from '../../skills/CORE/Tools/TranscriptParser';
 
 const BASE_DIR = getPaiDir();

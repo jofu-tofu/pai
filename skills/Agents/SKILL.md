@@ -299,5 +299,5 @@ Always specify the appropriate model:
   - Added full prosody settings (style, speed, volume)
   - Added agent color generation
   - Changed subagent_type from "Intern" to "general-purpose"
-  - Cross-platform path handling via hooks/lib utilities
+  - Cross-platform path handling via hooks/core utilities
 - **v1.0.0** (2025-12-16): Initial creation - consolidated all agent infrastructure into discrete skill

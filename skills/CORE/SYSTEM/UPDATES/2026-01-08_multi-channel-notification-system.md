@@ -43,7 +43,7 @@ US carriers require A2P 10DLC registration since December 2024. Recommendation: 
 
 ## Files Affected
 
-- `hooks/lib/notifications.ts` - Core notification service
+- `hooks/core/notifications.ts` - Core notification service
 - `hooks/LoadContext.hook.ts` - Session start timestamp
 - `hooks/VoiceAndHistoryCapture.hook.ts` - Duration-aware routing
 - `hooks/AgentOutputCapture.hook.ts` - Background agent alerts

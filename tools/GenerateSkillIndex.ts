@@ -10,8 +10,8 @@
 import { readdir, readFile, writeFile } from 'fs/promises';
 import { join, relative } from 'path';
 import { existsSync } from 'fs';
-import { getPaiDir } from '../hooks/lib/paths';
-import { parseFrontmatter as parseFrontmatterUtil } from '../hooks/lib/platform';
+import { getPaiDir } from '../hooks/core/paths';
+import { parseFrontmatter as parseFrontmatterUtil } from '../hooks/core/platform';
 
 const PAI_DIR = getPaiDir();
 const SKILLS_DIR = join(PAI_DIR, 'skills');

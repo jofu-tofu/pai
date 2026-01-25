@@ -10,7 +10,7 @@
  * - All paths are normalized to the platform's native separator
  *
  * Usage:
- *   import { getPaiDir, getSettingsPath } from './lib/paths';
+ *   import { getPaiDir, getSettingsPath } from './core/paths';
  *   const paiDir = getPaiDir(); // Always returns expanded absolute path
  */
 

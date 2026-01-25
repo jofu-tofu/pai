@@ -173,7 +173,7 @@ Executing the **WorkflowName** workflow within the **SkillName** skill...
 ## Notification Library
 
 ```typescript
-// hooks/lib/notifications.ts
+// hooks/core/notifications.ts
 
 export async function notify(message: string, channel: 'voice' | 'push' | 'desktop' = 'voice') {
   try {

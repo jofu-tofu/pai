@@ -8,7 +8,7 @@
 
 import type { Transcript, Turn, ToolCall, TranscriptMetrics } from '../Types/index.ts';
 import { readFileSync } from 'fs';
-import { splitLines } from '../../../hooks/lib/platform';
+import { splitLines } from '../../../hooks/core/platform';
 
 export class TranscriptCapture {
   private taskId: string;

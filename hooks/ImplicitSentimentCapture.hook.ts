@@ -64,12 +64,12 @@
 import { appendFileSync, mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { inference } from '../skills/CORE/Tools/Inference';
-import { getIdentity, getPrincipal } from './lib/identity';
-import { getLearningCategory } from './lib/learning-utils';
-import { getISOTimestamp, getPSTComponents } from './lib/time';
-import { getPaiDir } from './lib/paths';
-import { splitLines, joinLines } from './lib/platform';
-import { runScriptDetached } from './lib/spawn';
+import { getIdentity, getPrincipal } from './core/identity';
+import { getLearningCategory } from './core/learning-utils';
+import { getISOTimestamp, getPSTComponents } from './core/time';
+import { getPaiDir } from './core/paths';
+import { splitLines, joinLines } from './core/platform';
+import { runScriptDetached } from './core/spawn';
 
 const PRINCIPAL_NAME = getPrincipal().name;
 const ASSISTANT_NAME = getIdentity().name;

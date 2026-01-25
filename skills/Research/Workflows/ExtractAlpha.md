@@ -124,10 +124,14 @@ Capture the subtle genius buried in the content.
 $PAI_DIR/MEMORY/WORK/{current_work}/scratch/
 ```
 
-**To get the current work directory:**
-1. Read `$PAI_DIR/MEMORY/STATE/current-work.json`
-2. Extract the `work_dir` value
-3. Use `$PAI_DIR/MEMORY/WORK/{work_dir}/scratch/` for temporary artifacts
+**To get the current work directory (multi-session aware):**
+```bash
+# Using CLI helper (recommended)
+WORK_DIR=$(bun run $PAI_DIR/hooks/core/get-work-dir.ts)
+# Or fallback to most recent:
+WORK_DIR=$(ls -td $PAI_DIR/MEMORY/WORK/*/ 2>/dev/null | head -1 | xargs basename)
+```
+Use `$PAI_DIR/MEMORY/WORK/$WORK_DIR/scratch/` for temporary artifacts.
 
 **What goes in scratch/:**
 - Raw transcripts from fabric -y
@@ -235,8 +239,8 @@ Create a README.md in the history directory documenting the research:
 #### Complete Workflow Example
 
 ```bash
-# 1. Get current work directory
-WORK_DIR=$(jq -r '.work_dir' $PAI_DIR/MEMORY/STATE/current-work.json)
+# 1. Get current work directory (multi-session aware)
+WORK_DIR=$(bun run $PAI_DIR/hooks/core/get-work-dir.ts 2>/dev/null || ls -td $PAI_DIR/MEMORY/WORK/*/ | head -1 | xargs basename)
 
 # 2. Create scratch workspace in current work item
 mkdir -p $PAI_DIR/MEMORY/WORK/${WORK_DIR}/scratch/
@@ -372,7 +376,7 @@ fabric -y "https://youtu.be/VIDEO_ID"
 When this skill activates, PAI should:
 
 1. **Load content** via appropriate method (fabric -y, WebFetch, Read, or paste)
-2. **Get current work directory** - Read `$PAI_DIR/MEMORY/STATE/current-work.json` for `work_dir`
+2. **Get current work directory** - Use `get-work-dir.ts` CLI or most recent WORK directory
 3. **Create scratch workspace** - Work in `$PAI_DIR/MEMORY/WORK/{work_dir}/scratch/`
 4. **Engage deep thinking mode** - Deep extended thinking through all 10 dimensions
 5. **Extract insights** - Extract 24-30 highest-alpha ideas focusing on low-probability brilliant insights

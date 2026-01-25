@@ -52,9 +52,9 @@
 
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { getPaiDir } from './lib/paths';
-import { getIdentity, getPrincipal } from './lib/identity';
-import { getEnvVar, pathContainsSegment } from './lib/platform';
+import { getPaiDir } from './core/paths';
+import { getIdentity, getPrincipal } from './core/identity';
+import { getEnvVar, pathContainsSegment } from './core/platform';
 
 const FORMAT_SPEC_PATH = join(getPaiDir(), 'skills/CORE/SYSTEM/RESPONSEFORMAT.md');
 

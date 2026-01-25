@@ -11,7 +11,7 @@ import { existsSync, mkdirSync, readdirSync, writeFileSync, readFileSync, unlink
 import { join, basename } from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { parseArgs } from 'util';
-import { paiPath } from '../../../hooks/lib/paths';
+import { paiPath } from '../../../hooks/core/paths';
 
 const EVALS_DIR = paiPath('skills', 'Evals');
 const SUITES_DIR = join(EVALS_DIR, 'Suites');

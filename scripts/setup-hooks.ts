@@ -14,7 +14,7 @@
 
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
-import { toForwardSlash, getEnvVar } from '../hooks/lib/platform';
+import { toForwardSlash, getEnvVar } from '../hooks/core/platform';
 
 interface HookConfig {
   type: string;

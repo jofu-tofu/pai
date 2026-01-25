@@ -70,7 +70,7 @@
 
 import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { getPSTComponents, getISOTimestamp } from './lib/time';
+import { getPSTComponents, getISOTimestamp } from './core/time';
 import { inference } from '../skills/CORE/Tools/Inference';
 
 interface HookInput {
@@ -81,7 +81,7 @@ interface HookInput {
   hook_event_name: string;
 }
 
-import { getSession, setSession, type SessionWork } from './utils/current-work';
+import { getSession, setSession, type SessionWork } from './core/current-work';
 
 interface WorkClassification {
   type: 'work' | 'question' | 'conversational';
@@ -89,7 +89,7 @@ interface WorkClassification {
   effort: 'TRIVIAL' | 'QUICK' | 'STANDARD' | 'THOROUGH';
 }
 
-import { getPaiDir } from './lib/paths';
+import { getPaiDir } from './core/paths';
 
 const BASE_DIR = getPaiDir();
 const WORK_DIR = join(BASE_DIR, 'MEMORY', 'WORK');

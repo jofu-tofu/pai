@@ -53,9 +53,9 @@
 
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { getPaiDir } from './lib/paths';
-import { recordSessionStart } from './lib/notifications';
-import { getEnvVarSyntax, getEnvVar, pathContainsSegment } from './lib/platform';
+import { getPaiDir } from './core/paths';
+import { recordSessionStart } from './core/notifications';
+import { getEnvVarSyntax, getEnvVar, pathContainsSegment } from './core/platform';
 
 function getCurrentDateTime(): string {
   const now = new Date();

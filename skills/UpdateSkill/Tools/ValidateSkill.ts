@@ -14,7 +14,7 @@ import { readdir, readFile } from 'fs/promises';
 import { join, basename } from 'path';
 import { existsSync } from 'fs';
 import { homedir } from 'os';
-import { parseFrontmatter as parseFrontmatterUtil, getEnvVar } from '../../../hooks/lib/platform';
+import { parseFrontmatter as parseFrontmatterUtil, getEnvVar } from '../../../hooks/core/platform';
 
 const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
 const SKILLS_DIR = join(PAI_DIR, 'skills');

@@ -7,11 +7,11 @@
 
 import { existsSync, appendFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import { paiPath } from '../lib/paths';
-import { getIdentity } from '../lib/identity';
-import { getISOTimestamp } from '../lib/time';
-import { isValidVoiceCompletion, getVoiceFallback } from '../lib/response-format';
-import { getSession } from '../utils/current-work';
+import { paiPath } from '../core/paths';
+import { getIdentity } from '../core/identity';
+import { getISOTimestamp } from '../core/time';
+import { isValidVoiceCompletion, getVoiceFallback } from '../core/response-format';
+import { getSession } from '../core/current-work';
 import type { ParsedTranscript } from '../../skills/CORE/Tools/TranscriptParser';
 
 const DA_IDENTITY = getIdentity();

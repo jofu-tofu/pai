@@ -1,145 +1,213 @@
 ---
 name: FirstPrinciples
-description: Reasoning from fundamental truths rather than analogies. USE WHEN challenge assumptions, fundamental analysis, first principles thinking, OR need to rebuild from basics. Deconstructs problems to irreducible facts, challenges inherited constraints, rebuilds solutions optimally.
+description: First principles analysis. USE WHEN first principles, fundamental, root cause, decompose. SkillSearch('firstprinciples') for docs.
 ---
 
-# FirstPrinciples - Fundamental Truth Reasoning
+## Customization
 
-**Invoke when:** Deconstructing problems, challenging assumptions, rebuilding from fundamentals, escaping local maxima, or applying physics-based reasoning.
+**Before executing, check for user customizations at:**
+`~/.claude/skills/CORE/USER/SKILLCUSTOMIZATIONS/FirstPrinciples/`
 
----
+If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 
-## Overview
 
-The FirstPrinciples skill implements systematic reasoning from fundamental truths rather than analogy. It shifts thinking from "How did we solve similar problems?" to "What are the actual fundamental truths here?"
+## 🚨 MANDATORY: Voice Notification (REQUIRED BEFORE ANY ACTION)
 
-**Core Insight:** Only hard constraints (physics/reality) are truly immutable. Soft constraints (policy/choice) and assumptions (unvalidated beliefs) should be challenged.
+**You MUST send this notification BEFORE doing anything else when this skill is invoked.**
 
----
+1. **Send voice notification**:
+   ```bash
+   curl -s -X POST http://localhost:8888/notify \
+     -H "Content-Type: application/json" \
+     -d '{"message": "Running the WORKFLOWNAME workflow in the FirstPrinciples skill to ACTION"}' \
+     > /dev/null 2>&1 &
+   ```
 
-## The 3-Step Framework
+2. **Output text notification**:
+   ```
+   Running the **WorkflowName** workflow in the **FirstPrinciples** skill to ACTION...
+   ```
 
-### 1. Deconstruct
-Break problems into constituent parts and identify fundamental truths.
-- What is this actually made of?
-- What are the irreducible components?
-- What are the raw materials/inputs?
+**This is not optional. Execute this curl command immediately upon skill invocation.**
 
-### 2. Challenge
-Classify each constraint as hard, soft, or assumption.
-- **Hard**: Physics/math/reality - cannot change
-- **Soft**: Policy/choice - can be modified
-- **Assumption**: Unvalidated belief - may be false
+# FirstPrinciples Skill
 
-### 3. Reconstruct
-Build optimal solutions using only hard constraints and fundamental truths.
-- What would we build knowing only the irreducible facts?
-- What becomes possible when we remove false constraints?
+Foundational reasoning methodology based on Elon Musk's physics-based thinking framework. Deconstructs problems to fundamental truths rather than reasoning by analogy.
 
----
+## Core Concept
 
-## Workflow Routing
+**Reasoning by Analogy** (default, often wrong):
+- "How did we solve something similar?"
+- "What do others do?"
+- Copies existing solutions with slight variations
 
-| Workflow | Trigger | File |
-|----------|---------|------|
-| **Deconstruct** | "break down to fundamentals", "what is this really" | `Workflows/Deconstruct.md` |
-| **Challenge** | "challenge assumptions", "classify constraints" | `Workflows/Challenge.md` |
-| **Reconstruct** | "rebuild from scratch", "optimal solution" | `Workflows/Reconstruct.md` |
-
----
+**Reasoning from First Principles** (this skill):
+- "What are the fundamental truths here?"
+- "What is this actually made of?"
+- Rebuilds solutions from irreducible facts
 
 ## When to Use
 
-**Use FirstPrinciples when:**
-- Inherited assumptions may be limiting solutions
-- "We can't do X" is stated without evidence
-- Stuck on a problem and need to rebuild from basics
-- Evaluating whether constraints are real or assumed
-- Architects questioning unstated constraints
-- Security professionals identifying actual vs assumed boundaries
-- Engineers needing to escape conventional approaches
+- **Architects**: Challenge "is this actually a constraint or just how we've always done it?"
+- **Pentesters**: Identify actual attack surfaces vs. assumed security boundaries
+- **RedTeam**: Sharpen adversarial analysis by deconstructing assumptions
+- **Engineers**: When stuck, rebuild from fundamentals
+- **Any skill**: When inherited assumptions may be limiting the solution space
 
----
+
+## Workflow Routing
+
+Route to the appropriate workflow based on the request.
+
+**When executing a workflow, output this notification directly:**
+
+```
+Running the **WorkflowName** workflow in the **FirstPrinciples** skill to ACTION...
+```
+
+  - Break problem into fundamental parts → `Workflows/Deconstruct.md`
+  - Challenge assumptions systematically → `Workflows/Challenge.md`
+  - Rebuild solution from fundamentals → `Workflows/Reconstruct.md`
+
+## The 3-Step Framework
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  STEP 1: DECONSTRUCT                                    │
+│  "What is this really made of?"                         │
+│  Break down to constituent parts and fundamental truths │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  STEP 2: CHALLENGE                                      │
+│  "Is this a real constraint or an assumption?"          │
+│  Classify each element as hard/soft constraint          │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  STEP 3: RECONSTRUCT                                    │
+│  "Given only the truths, what's optimal?"               │
+│  Build new solution from fundamentals, ignoring form    │
+└─────────────────────────────────────────────────────────┘
+```
+
+## Key Questions
+
+### Deconstruction Questions
+- What is this actually made of?
+- What are the constituent parts?
+- What is the actual cost/value of each part?
+- What would a physicist say about this?
+
+### Challenge Questions
+- Is this a hard constraint (physics/reality) or soft constraint (policy/choice)?
+- What if we removed this constraint entirely?
+- Who decided this was a constraint and why?
+- What evidence supports this assumption?
+
+### Reconstruction Questions
+- If we started from scratch with only the fundamental truths, what would we build?
+- What field has solved an analogous problem differently?
+- Are we optimizing function or form?
+- What's the simplest solution that satisfies only the hard constraints?
 
 ## Constraint Classification
 
-Understanding constraint types is critical:
+When analyzing any system, classify constraints:
 
-| Type | Definition | Example | Changeable? |
+| Type | Definition | Example | Can Change? |
 |------|------------|---------|-------------|
-| **HARD** | Physics/math/reality | Speed of light, thermodynamics | NO |
-| **SOFT** | Policy/choice/convention | "We use AWS", budget limits | YES |
-| **ASSUMPTION** | Unvalidated belief | "Users won't accept that" | TEST IT |
+| **Hard** | Physics/reality | "Data can't travel faster than light" | No |
+| **Soft** | Policy/choice | "We always use REST APIs" | Yes |
+| **Assumption** | Unvalidated belief | "Users won't accept that UX" | Maybe false |
 
----
+**Rule**: Only hard constraints are truly immutable. Soft constraints and assumptions should be challenged.
 
-## Integration with Algorithm
+## Integration Pattern
 
-FirstPrinciples integrates with THE ALGORITHM skill:
-- **analysis.first_principles** capability (STANDARD+ effort)
-- Used in THINK phase to challenge assumptions
-- Complements Council (collaborative debate) and RedTeam (adversarial analysis)
+Other skills invoke FirstPrinciples like this:
 
----
+```markdown
+## Before Analysis
+→ Use FirstPrinciples/Challenge on all stated constraints
+→ Classify each as hard/soft/assumption
+
+## When Stuck
+→ Use FirstPrinciples/Deconstruct to break down the problem
+→ Use FirstPrinciples/Reconstruct to rebuild from fundamentals
+
+## For Adversarial Analysis
+→ RedTeam uses FirstPrinciples/Challenge to attack assumptions
+→ Pentester uses FirstPrinciples/Deconstruct on security model
+```
 
 ## Examples
 
-**Example 1: Cost optimization**
-```
-User: "Our cloud bill is $10k/month and we can't reduce it"
-→ Deconstruct: What are we actually paying for?
-→ Challenge: Is each service necessary? What's truly immutable?
-→ Reconstruct: Build solution from actual requirements only
-→ Result: Identify $7k in non-fundamental costs
-```
+### Example 1: Architecture Decision
+**Problem**: "We need microservices because that's how modern apps are built"
 
-**Example 2: Architecture decision**
-```
-User: "We need microservices for scale"
-→ Deconstruct: What's the actual requirement? (Independent deployment)
-→ Challenge: Is microservices a hard constraint or convention?
-→ Reconstruct: Modular monolith achieves function with less complexity
-→ Result: Simpler solution that meets actual needs
-```
+**First Principles Analysis**:
+1. **Deconstruct**: What does this app actually need? (team size, scale, complexity)
+2. **Challenge**: Is "microservices" a hard constraint? No - it's reasoning by analogy
+3. **Reconstruct**: Given our 3-person team and moderate scale, a modular monolith optimizes for our actual constraints
 
-**Example 3: Security assessment**
-```
-User: "We're secure because we have a firewall"
-→ Deconstruct: What does the firewall actually protect?
-→ Challenge: Is firewall sufficient or just assumed?
-→ Reconstruct: What would comprehensive defense look like?
-→ Result: Identify gaps in security model
-```
+### Example 2: Security Assessment
+**Problem**: "The firewall protects the internal network"
 
----
+**First Principles Analysis**:
+1. **Deconstruct**: What is the firewall actually doing? (packet filtering on specific ports)
+2. **Challenge**: Does packet filtering = protection? What about authorized ports? Insider threats?
+3. **Reconstruct**: Protection requires defense in depth - firewall is one layer, not "the" protection
+
+### Example 3: Cost Optimization
+**Problem**: "Cloud hosting costs $10,000/month - that's just what it costs"
+
+**First Principles Analysis**:
+1. **Deconstruct**: What are we actually paying for? (compute, storage, bandwidth, managed services)
+2. **Challenge**: Is managed Kubernetes a hard requirement? Is this region required?
+3. **Reconstruct**: Actual compute needs = $2,000. The other $8,000 is convenience we're choosing to pay for
 
 ## Output Format
 
-FirstPrinciples analyses include:
+When using FirstPrinciples, output should include:
 
 ```markdown
-## [Analysis Subject]
+## First Principles Analysis: [Topic]
 
-### Fundamental Truths (Irreducible)
-- [Hard constraint 1]
-- [Hard constraint 2]
+### Deconstruction
+- **Constituent Parts**: [List fundamental elements]
+- **Actual Values**: [Real costs/metrics, not market prices]
 
 ### Constraint Classification
-| Constraint | Type | Reason | Changeable |
-|------------|------|--------|------------|
-| [X] | HARD/SOFT/ASSUMPTION | [Why] | [Yes/No] |
+| Constraint | Type | Evidence | Challenge |
+|------------|------|----------|-----------|
+| [X] | Hard/Soft/Assumption | [Why] | [What if removed?] |
 
-### Reconstruction Proposal
-- Function to optimize: [Outcome]
-- Proposed solution: [Approach from fundamentals]
-- What changes: [Difference from current]
-- What's eliminated: [Non-fundamental complexity]
+### Reconstruction
+- **Fundamental Truths**: [Only the hard constraints]
+- **Optimal Solution**: [Built from fundamentals]
+- **Form vs Function**: [Are we optimizing the right thing?]
+
+### Key Insight
+[One sentence: what assumption was limiting us?]
 ```
+
+## Principles
+
+1. **Physics First** - Real constraints come from physics/reality, not convention
+2. **Function Over Form** - Optimize what you're trying to accomplish, not how it's traditionally done
+3. **Question Everything** - Every assumption is guilty until proven innocent
+4. **Cross-Domain Synthesis** - Solutions from unrelated fields often apply
+5. **Rebuild, Don't Patch** - When assumptions are wrong, start fresh rather than fixing
+
+## Anti-Patterns to Avoid
+
+- **Reasoning by Analogy**: "Company X does it this way, so should we"
+- **Accepting Market Prices**: "Batteries cost $600/kWh" without checking material costs
+- **Form Fixation**: Improving the suitcase instead of inventing wheels
+- **Soft Constraint Worship**: Treating policies as physics
+- **Premature Optimization**: Optimizing before understanding fundamentals
 
 ---
 
-## Key Principle
-
-**"If we knew nothing about how this is currently done, and only knew the fundamental truths, what would we build?"**
-
-This is about optimizing function (what you're trying to accomplish) rather than form (how it's traditionally done).
+**Attribution**: Framework derived from Elon Musk's first principles methodology as documented by James Clear, Mayo Oshin, and public interviews.

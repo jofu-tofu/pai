@@ -62,10 +62,10 @@
 
 import { readFileSync } from 'fs';
 import { inference } from '../skills/CORE/Tools/Inference';
-import { isValidTabSummary, getTabFallback } from './lib/response-format';
-import { crossSpawnSync } from './lib/spawn';
-import { isKittyTerminal, isWindowsTerminal, supportsAnsiTitles } from './lib/terminal';
-import { isWindows, splitLines, isNoColorSet, getEnvVar, joinLines } from './lib/platform';
+import { isValidTabSummary, getTabFallback } from './core/response-format';
+import { crossSpawnSync } from './core/spawn';
+import { isKittyTerminal, isWindowsTerminal, supportsAnsiTitles } from './core/terminal';
+import { isWindows, splitLines, isNoColorSet, getEnvVar, joinLines } from './core/platform';
 
 // Tab colors - different states
 const TAB_WORKING_BG = '#804000';      // Dark orange - actively working

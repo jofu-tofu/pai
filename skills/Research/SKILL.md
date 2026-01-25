@@ -119,8 +119,18 @@ Route to the appropriate workflow based on the request.
 ## File Organization
 
 **Scratch (temporary work artifacts):** `$PAI_DIR/MEMORY/WORK/{current_work}/scratch/`
-- Read `$PAI_DIR/MEMORY/STATE/current-work.json` to get the `work_dir` value
-- All iterative work artifacts go in the current work item's scratch/ subdirectory
-- This ties research artifacts to the work item for learning and context
 
-**History (permanent):** `$PAI_DIR/History/research/YYYY-MM/YYYY-MM-DD_[topic]/`
+To get the current work directory (multi-session aware):
+```bash
+# Get scratch path directly (recommended)
+bun run $PAI_DIR/hooks/core/get-work-dir.ts --scratch
+
+# Get just the work_dir name
+bun run $PAI_DIR/hooks/core/get-work-dir.ts
+
+# If bun unavailable, fall back to most recent directory:
+ls -td $PAI_DIR/MEMORY/WORK/*/ 2>/dev/null | head -1
+```
+
+All iterative work artifacts go in the current work item's scratch/ subdirectory.
+This ties research artifacts to the work item for learning and context.

@@ -17,8 +17,8 @@
  */
 
 import { readFileSync } from 'fs';
-import { getIdentity } from '../../../hooks/lib/identity';
-import { splitLines } from '../../../hooks/lib/platform';
+import { getIdentity } from '../../../hooks/core/identity';
+import { splitLines } from '../../../hooks/core/platform';
 
 const DA_IDENTITY = getIdentity();
 

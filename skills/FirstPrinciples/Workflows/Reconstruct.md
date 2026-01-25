@@ -2,6 +2,19 @@
 
 **Purpose**: Build an optimal solution from scratch using only the fundamental truths and hard constraints identified through Deconstruct and Challenge.
 
+## Voice Notification
+
+```bash
+curl -s -X POST http://localhost:8888/notify \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Running the Reconstruct workflow in the FirstPrinciples skill to build optimal solution"}' \
+  > /dev/null 2>&1 &
+```
+
+Running the **Reconstruct** workflow in the **FirstPrinciples** skill to build optimal solution...
+
+---
+
 **When to Use**:
 - After completing Deconstruct and Challenge workflows
 - When existing solutions are clearly suboptimal
@@ -227,21 +240,21 @@ Why: 90% of applications never exceed single-machine capacity. SQLite is simpler
 
 ### Pattern: "Do We Even Need This?"
 Often the reconstructed solution eliminates entire components:
-- "We need a message queue" -> Direct function calls work fine at our scale
-- "We need Kubernetes" -> A single server handles our load
-- "We need a SPA framework" -> Server-rendered HTML is simpler and faster
+- "We need a message queue" → Direct function calls work fine at our scale
+- "We need Kubernetes" → A single server handles our load
+- "We need a SPA framework" → Server-rendered HTML is simpler and faster
 
 ### Pattern: "Different Technology, Same Function"
 The function stays, but the form changes completely:
-- "Web app" -> "CLI tool" (if users are technical)
-- "Mobile app" -> "PWA" (if native features aren't needed)
-- "Custom solution" -> "Spreadsheet" (if that's actually sufficient)
+- "Web app" → "CLI tool" (if users are technical)
+- "Mobile app" → "PWA" (if native features aren't needed)
+- "Custom solution" → "Spreadsheet" (if that's actually sufficient)
 
 ### Pattern: "Combine Steps"
 Removing soft constraints often allows combining what were separate steps:
-- "Microservices" -> "Modular monolith" (one deployment, multiple modules)
-- "ETL pipeline" -> "Query on read" (if data volume permits)
-- "Async workflow" -> "Synchronous" (if latency isn't critical)
+- "Microservices" → "Modular monolith" (one deployment, multiple modules)
+- "ETL pipeline" → "Query on read" (if data volume permits)
+- "Async workflow" → "Synchronous" (if latency isn't critical)
 
 ---
 
@@ -249,15 +262,15 @@ Removing soft constraints often allows combining what were separate steps:
 
 **Full First Principles Flow**:
 ```
-Deconstruct -> Challenge -> Reconstruct
-     |            |            |
+Deconstruct → Challenge → Reconstruct
+     ↓            ↓            ↓
   (Parts)    (Classify)    (Build new)
 ```
 
 **Standalone Use**:
 Can use Reconstruct directly if you already know the hard constraints:
 ```
--> FirstPrinciples/Reconstruct given constraints [X, Y, Z]
+→ FirstPrinciples/Reconstruct given constraints [X, Y, Z]
 ```
 
 **With Other Skills**:

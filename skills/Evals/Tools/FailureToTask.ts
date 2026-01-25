@@ -12,8 +12,8 @@ import { existsSync, mkdirSync, writeFileSync, readFileSync, appendFileSync } fr
 import { join } from 'path';
 import { stringify as stringifyYaml } from 'yaml';
 import { parseArgs } from 'util';
-import { paiPath } from '../../../hooks/lib/paths';
-import { splitLines } from '../../../hooks/lib/platform';
+import { paiPath } from '../../../hooks/core/paths';
+import { splitLines } from '../../../hooks/core/platform';
 
 const EVALS_DIR = paiPath('skills', 'Evals');
 const FAILURES_LOG = join(EVALS_DIR, 'Data', 'failures.jsonl');

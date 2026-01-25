@@ -48,9 +48,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-import { getPaiDir, getSettingsPath } from './lib/paths';
-import { runScript, getRuntimeCommand } from './lib/spawn';
-import { pathContainsSegment, getEnvVar } from './lib/platform';
+import { getPaiDir, getSettingsPath } from './core/paths';
+import { runScript, getRuntimeCommand } from './core/spawn';
+import { pathContainsSegment, getEnvVar } from './core/platform';
 
 const paiDir = getPaiDir();
 const settingsPath = getSettingsPath();

@@ -36,8 +36,8 @@
 
 import { readFileSync, writeFileSync, copyFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { getPrincipal } from '../../../hooks/lib/identity';
-import { paiPath } from '../../../hooks/lib/paths';
+import { getPrincipal } from '../../../hooks/core/identity';
+import { paiPath } from '../../../hooks/core/paths';
 
 // TELOS content lives in skills/CORE/USER/TELOS/ (not context/life/telos)
 const TELOS_DIR = paiPath('skills', 'CORE', 'USER', 'TELOS');

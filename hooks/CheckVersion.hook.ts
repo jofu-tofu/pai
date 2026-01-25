@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
-import { crossSpawnSync } from './lib/spawn';
-import { pathContainsSegment, getEnvVar } from './lib/platform';
+import { crossSpawnSync } from './core/spawn';
+import { pathContainsSegment, getEnvVar } from './core/platform';
 /**
  * CheckVersion.hook.ts - Check for Claude Code Updates (SessionStart)
  *

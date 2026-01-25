@@ -41,8 +41,8 @@
  * - Typical execution: <50ms
  */
 
-import { isKittyTerminal } from './lib/terminal';
-import { crossSpawnSync } from './lib/spawn';
+import { isKittyTerminal } from './core/terminal';
+import { crossSpawnSync } from './core/spawn';
 
 const TAB_AWAITING_BG = '#085050';  // Dark teal - waiting for user input
 const ACTIVE_TAB_BG = '#002B80';    // Dark blue - active tab always

@@ -7,15 +7,15 @@
  * Large terminals (85+ cols): Navy, Electric, Teal, Ice themes
  * Small terminals (<85 cols): Minimal, Vertical, Wrapping layouts
  *
- * Adapted to use centralized path resolution from hooks/lib/paths.ts
+ * Adapted to use centralized path resolution from hooks/core/paths.ts
  */
 
 import { readdirSync, existsSync, readFileSync } from "fs";
 import { join, dirname } from "path";
 import { spawnSync } from "child_process";
 import { homedir } from "os";
-import { isWindows, isMacOS, getPlatformDisplayName, supportsAnsiColors, splitLines, getArchitecture, joinLines, canUseKitty, getWindowsShellOptions, getEnvVar } from '../../../hooks/lib/platform';
-import { getPaiDir } from '../../../hooks/lib/paths';
+import { isWindows, isMacOS, getPlatformDisplayName, supportsAnsiColors, splitLines, getArchitecture, joinLines, canUseKitty, getWindowsShellOptions, getEnvVar } from '../../../hooks/core/platform';
+import { getPaiDir } from '../../../hooks/core/paths';
 
 const PAI_DIR = getPaiDir();
 

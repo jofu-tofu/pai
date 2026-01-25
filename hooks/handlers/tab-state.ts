@@ -5,9 +5,9 @@
  * No I/O for transcript reading - that's done by orchestrator.
  */
 
-import { isValidVoiceCompletion, getTabFallback } from '../lib/response-format';
-import { isKittyTerminal } from '../lib/terminal';
-import { crossSpawnSync } from '../lib/spawn';
+import { isValidVoiceCompletion, getTabFallback } from '../core/response-format';
+import { isKittyTerminal } from '../core/terminal';
+import { crossSpawnSync } from '../core/spawn';
 import type { ParsedTranscript, ResponseState } from '../../skills/CORE/Tools/TranscriptParser';
 
 // Tab color states for visual feedback (inactive tab only - active tab stays dark blue)

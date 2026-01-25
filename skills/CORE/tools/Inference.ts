@@ -10,7 +10,7 @@
  */
 
 import { spawn } from 'child_process';
-import { getKillSignal, getWindowsShellOptions } from '../../../hooks/lib/platform';
+import { getKillSignal, getWindowsShellOptions } from '../../../hooks/core/platform';
 
 type InferenceLevel = 'fast' | 'standard' | 'smart';
 

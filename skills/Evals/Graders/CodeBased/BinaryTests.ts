@@ -7,7 +7,7 @@
 
 import { BaseGrader, registerGrader, type GraderContext } from '../Base.ts';
 import type { GraderConfig, GraderResult, BinaryTestsParams } from '../../Types/index.ts';
-import { shellExec } from '../../../../hooks/lib/spawn';
+import { shellExec } from '../../../../hooks/core/spawn';
 
 export class BinaryTestsGrader extends BaseGrader {
   type = 'binary_tests' as const;

@@ -23,7 +23,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { toForwardSlash, isNoColorSet } from '../hooks/lib/platform';
+import { toForwardSlash, isNoColorSet } from '../hooks/core/platform';
 
 // Respects NO_COLOR environment variable: https://no-color.org
 const NO_COLOR = isNoColorSet();

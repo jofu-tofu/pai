@@ -36,8 +36,8 @@
  * - Kitty unavailable: Silent failure
  */
 
-import { isKittyTerminal } from './lib/terminal';
-import { crossSpawnSync } from './lib/spawn';
+import { isKittyTerminal } from './core/terminal';
+import { crossSpawnSync } from './core/spawn';
 
 const TAB_WORKING_BG = '#804000';      // Dark orange - actively working
 const ACTIVE_TAB_BG = '#002B80';       // Dark blue - active tab always

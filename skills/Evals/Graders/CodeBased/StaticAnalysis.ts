@@ -7,7 +7,7 @@
 
 import { BaseGrader, registerGrader, type GraderContext } from '../Base.ts';
 import type { GraderConfig, GraderResult, StaticAnalysisParams } from '../../Types/index.ts';
-import { shellExec } from '../../../../hooks/lib/spawn';
+import { shellExec } from '../../../../hooks/core/spawn';
 
 export class StaticAnalysisGrader extends BaseGrader {
   type = 'static_analysis' as const;

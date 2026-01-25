@@ -1,6 +1,19 @@
-# Challenge Workflow - Complete Content
+# Challenge Workflow
 
 **Purpose**: Systematically challenge every assumption and constraint, classifying each as hard constraint (physics), soft constraint (choice), or unvalidated assumption.
+
+## Voice Notification
+
+```bash
+curl -s -X POST http://localhost:8888/notify \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Running the Challenge workflow in the FirstPrinciples skill to test assumptions"}' \
+  > /dev/null 2>&1 &
+```
+
+Running the **Challenge** workflow in the **FirstPrinciples** skill to test assumptions...
+
+---
 
 **When to Use**:
 - After Deconstruct, to evaluate what's actually fixed
@@ -207,20 +220,20 @@ The most dangerous constraints are the ones so assumed they're never stated.
 
 **RedTeam**: Use Challenge to attack the assumptions behind any idea
 ```
--> FirstPrinciples/Challenge on stated security controls
--> FirstPrinciples/Challenge on business model assumptions
+→ FirstPrinciples/Challenge on stated security controls
+→ FirstPrinciples/Challenge on business model assumptions
 ```
 
 **Pentester**: Use Challenge to find real vs. assumed security boundaries
 ```
--> FirstPrinciples/Challenge on "the firewall protects us"
--> FirstPrinciples/Challenge on trust boundaries
+→ FirstPrinciples/Challenge on "the firewall protects us"
+→ FirstPrinciples/Challenge on trust boundaries
 ```
 
 **Architect**: Use Challenge before accepting any requirement
 ```
--> FirstPrinciples/Challenge on NFRs (non-functional requirements)
--> FirstPrinciples/Challenge on technology choices
+→ FirstPrinciples/Challenge on NFRs (non-functional requirements)
+→ FirstPrinciples/Challenge on technology choices
 ```
 
 ---
@@ -228,5 +241,5 @@ The most dangerous constraints are the ones so assumed they're never stated.
 ## After Challenge
 
 Flow to:
-- **Reconstruct** -> Build solution using only hard constraints
+- **Reconstruct** → Build solution using only hard constraints
 - Back to requester with constraint analysis for decision-making

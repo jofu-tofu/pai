@@ -17,8 +17,8 @@
 import { existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { getBinaryExtension } from "../hooks/lib/platform";
-import { crossSpawnSync } from "../hooks/lib/spawn";
+import { getBinaryExtension } from "../hooks/core/platform";
+import { crossSpawnSync } from "../hooks/core/spawn";
 
 /**
  * Get the binary filename for the current platform

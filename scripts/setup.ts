@@ -10,7 +10,7 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, readdirSync, statSync, symlinkSync } from 'fs';
 import { join, dirname } from 'path';
-// Using os.platform() directly because this script runs before hooks/lib/platform.ts is available.
+// Using os.platform() directly because this script runs before hooks/core/platform.ts is available.
 // This is intentional - setup.ts is a bootstrap script that cannot depend on other PAI utilities.
 import { homedir, platform } from 'os';
 // Note: Using Bun.spawnSync instead of Bun.$ for reliable cross-platform behavior
@@ -26,7 +26,7 @@ const CLAUDE_DIR = join(homedir(), 'pai');
 const CLAUDE_SETTINGS = join(CLAUDE_DIR, 'settings.json');
 
 // Platform detection - centralized for this bootstrap script
-// (Cannot use hooks/lib/platform.ts as setup.ts runs before it's available)
+// (Cannot use hooks/core/platform.ts as setup.ts runs before it's available)
 const IS_WINDOWS = platform() === 'win32';
 const IS_MACOS = platform() === 'darwin';
 

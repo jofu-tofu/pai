@@ -18,8 +18,8 @@
 
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
-import { paiPath } from '../lib/paths';
-import { crossSpawn, getRuntimeCommand } from '../lib/spawn';
+import { paiPath } from '../core/paths';
+import { crossSpawn, getRuntimeCommand } from '../core/spawn';
 import {
   parseToolUseBlocks,
   isSignificantChange,
@@ -31,7 +31,7 @@ import {
   inferChangeType,
   generateDescriptiveTitle,
   type FileChange,
-} from '../lib/change-detection';
+} from '../core/change-detection';
 import type { ParsedTranscript } from '../../skills/CORE/Tools/TranscriptParser';
 
 interface HookInput {

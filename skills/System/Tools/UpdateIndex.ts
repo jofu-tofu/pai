@@ -11,7 +11,7 @@ import { readdir, readFile, writeFile, stat } from "fs/promises";
 import { join, basename, relative } from "path";
 import { parse as parseYaml } from "yaml";
 import { homedir } from "os";
-import { toForwardSlash, parseFrontmatter as parseFrontmatterUtil, extractLineAfterPattern, joinLines, formatPathForDisplay, getEnvVarSyntax, getEnvVar } from "../../../hooks/lib/platform";
+import { toForwardSlash, parseFrontmatter as parseFrontmatterUtil, extractLineAfterPattern, joinLines, formatPathForDisplay, getEnvVarSyntax, getEnvVar } from "../../../hooks/core/platform";
 
 const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
 const UPDATES_DIR = join(PAI_DIR, "MEMORY", "PAISYSTEMUPDATES");

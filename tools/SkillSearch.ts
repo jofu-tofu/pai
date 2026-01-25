@@ -12,7 +12,7 @@
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
-import { getPaiDir } from '../hooks/lib/paths';
+import { getPaiDir } from '../hooks/core/paths';
 
 const PAI_DIR = getPaiDir();
 const INDEX_FILE = join(PAI_DIR, 'skills', 'skill-index.json');

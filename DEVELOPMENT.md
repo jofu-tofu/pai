@@ -52,8 +52,8 @@ Claude Code's `~/.claude` is separate from PAI. All PAI paths resolve from `$PAI
 // Use process.env.PAI_DIR
 const settingsPath = path.join(process.env.PAI_DIR!, '.claude', 'settings.json');
 
-// Use hooks/lib/paths.ts utilities
-import { getSettingsPath, paiPath } from './lib/paths';
+// Use hooks/core/paths.ts utilities
+import { getSettingsPath, paiPath } from './core/paths';
 const settingsPath = getSettingsPath();
 const memoryDir = paiPath('MEMORY');
 ```
@@ -89,7 +89,7 @@ $PAI_DIR/
 ├── .claude/settings.json     ← Hook configuration
 ├── hooks/                    ← Hook system (*.hook.ts)
 │   ├── handlers/             ← Handler modules
-│   └── lib/                  ← Cross-platform utilities (use these)
+│   └── core/                 ← Cross-platform utilities (use these)
 ├── skills/                   ← Skill definitions
 ├── tools/                    ← Linters, generators
 ├── scripts/                  ← Setup scripts
@@ -101,7 +101,7 @@ $PAI_DIR/
 
 ## Cross-Platform Utilities
 
-Use `hooks/lib/` utilities for all platform-dependent operations. These handle Windows/Linux differences automatically.
+Use `hooks/core/` utilities for all platform-dependent operations. These handle Windows/Linux differences automatically.
 
 ### Why These Matter
 
@@ -120,20 +120,20 @@ Direct approaches fail across platforms:
 
 ```typescript
 // Platform detection
-import { isWindows, isUnix, isMacOS, isLinux } from './lib/platform';
+import { isWindows, isUnix, isMacOS, isLinux } from './core/platform';
 
 // Path handling
-import { normalizePathForComparison, splitLines, toForwardSlash } from './lib/platform';
-import { getPaiDir, paiPath, expandPath, getSettingsPath } from './lib/paths';
+import { normalizePathForComparison, splitLines, toForwardSlash } from './core/platform';
+import { getPaiDir, paiPath, expandPath, getSettingsPath } from './core/paths';
 
 // Process execution
-import { crossSpawnSync, shellExec, runScript } from './lib/spawn';
+import { crossSpawnSync, shellExec, runScript } from './core/spawn';
 
 // Terminal features
-import { canUseKitty, supportsAnsiColors, getTerminalWidth } from './lib/platform';
+import { canUseKitty, supportsAnsiColors, getTerminalWidth } from './core/platform';
 
 // Environment variables
-import { getEnvVar, expandEnvVars } from './lib/platform';
+import { getEnvVar, expandEnvVars } from './core/platform';
 ```
 
 ### Usage Examples
@@ -227,7 +227,7 @@ PowerShell hook commands require triple backslash-quote (`\\\"`) for paths:
 | Write to `$PAI_DIR/MEMORY/` | Environment isolation |
 | Log to stderr, output to stdout | Claude sees stdout only |
 | Exit 0 (allow), 2 (block) | Exit codes control behavior |
-| Use `hooks/lib/` utilities | Consistent cross-platform behavior |
+| Use `hooks/core/` utilities | Consistent cross-platform behavior |
 
 ---
 
@@ -252,7 +252,7 @@ UPSTREAM (.claude/)              THIS INSTANCE ($PAI_DIR/)
 ├── hooks/                        ├── hooks/
 │   └── *.ts                      │   ├── *.hook.ts
 │                                 │   ├── handlers/
-│                                 │   └── lib/          ← Cross-platform utilities
+│                                 │   └── core/         ← Cross-platform utilities
 ├── Observability/                ├── Observability/
 ├── skills/ (inline)              ├── skills/           ← Can be symlinked
 ├── settings.json                 ├── settings.template.json
@@ -284,10 +284,10 @@ Before starting:
 - [ ] Identify path references, shell commands, environment variable usage
 
 Required adaptations:
-- [ ] Replace hardcoded paths with `hooks/lib/paths.ts` functions
-- [ ] Replace `process.platform` with `hooks/lib/platform.ts` functions
-- [ ] Replace `Bun.$` with `shellExec()` from `hooks/lib/spawn.ts`
-- [ ] Replace `.split('\n')` with `splitLines()` from `hooks/lib/platform.ts`
+- [ ] Replace hardcoded paths with `hooks/core/paths.ts` functions
+- [ ] Replace `process.platform` with `hooks/core/platform.ts` functions
+- [ ] Replace `Bun.$` with `shellExec()` from `hooks/core/spawn.ts`
+- [ ] Replace `.split('\n')` with `splitLines()` from `hooks/core/platform.ts`
 - [ ] Convert shell scripts to TypeScript
 - [ ] Replace `~/.claude` with `$PAI_DIR` equivalents
 
@@ -312,7 +312,7 @@ Verification:
 
 ```bash
 bun test                              # All tests
-bun test hooks/lib/paths.test.ts      # Specific file
+bun test hooks/core/paths.test.ts      # Specific file
 bun test --watch                      # Watch mode
 ```
 

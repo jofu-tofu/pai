@@ -63,8 +63,8 @@
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { join, dirname, sep } from 'path';
 import { parse as parseYaml } from 'yaml';
-import { paiPath, expandPath } from './lib/paths';
-import { isCaseInsensitiveFilesystem, ensureTrailingSeparator } from './lib/platform';
+import { paiPath, expandPath } from './core/paths';
+import { isCaseInsensitiveFilesystem, ensureTrailingSeparator } from './core/platform';
 
 // ========================================
 // Security Event Logging

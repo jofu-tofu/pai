@@ -47,11 +47,11 @@
 
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import { paiPath } from './lib/paths';
-import { splitLines, getEnvVar, joinLines } from './lib/platform';
-import { sendEventToObservability, getCurrentTimestamp, getSourceApp } from './lib/observability';
-import { extractAgentInstanceId } from './lib/metadata-extraction';
-import { notifyBackgroundAgent } from './lib/notifications';
+import { paiPath } from './core/paths';
+import { splitLines, getEnvVar, joinLines } from './core/platform';
+import { sendEventToObservability, getCurrentTimestamp, getSourceApp } from './core/observability';
+import { extractAgentInstanceId } from './core/metadata-extraction';
+import { notifyBackgroundAgent } from './core/notifications';
 
 /**
  * Get current timestamp in configured timezone

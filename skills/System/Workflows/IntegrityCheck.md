@@ -40,7 +40,7 @@ Use the Task tool to launch agents in a SINGLE message (parallel execution). Eac
 | # | Focus Area | Scope | Check For |
 |---|------------|-------|-----------|
 | 1 | CORE SKILL.md | `skills/CORE/SKILL.md` | Broken file references, outdated paths |
-| 2 | Identity System | `hooks/lib/identity.ts`, `settings.json` | Config consistency |
+| 2 | Identity System | `hooks/core/identity.ts`, `settings.json` | Config consistency |
 | 3 | Hook Scripts | `hooks/*.hook.ts` | Imports, identity usage |
 | 4 | System Docs | `skills/CORE/SYSTEM/*.md` | Cross-references, broken links |
 | 5 | User Docs | `skills/CORE/USER/*.md` | Personal config references |

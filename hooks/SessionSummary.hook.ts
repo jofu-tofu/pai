@@ -49,9 +49,9 @@
 
 import { writeFileSync, existsSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { getISOTimestamp } from './lib/time';
-import { getMemoryDir } from './lib/paths';
-import { getSession, removeSession } from './utils/current-work';
+import { getISOTimestamp } from './core/time';
+import { getMemoryDir } from './core/paths';
+import { getSession, removeSession } from './core/current-work';
 
 const MEMORY_DIR = getMemoryDir();
 const WORK_DIR = join(MEMORY_DIR, 'WORK');

@@ -57,12 +57,12 @@
 
 import { appendFileSync, mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { getLearningCategory } from './lib/learning-utils';
-import { getPrincipalName } from './lib/identity';
-import { getISOTimestamp, getPSTComponents } from './lib/time';
-import { getPaiDir } from './lib/paths';
-import { splitLines } from './lib/platform';
-import { runScriptDetached } from './lib/spawn';
+import { getLearningCategory } from './core/learning-utils';
+import { getPrincipalName } from './core/identity';
+import { getISOTimestamp, getPSTComponents } from './core/time';
+import { getPaiDir } from './core/paths';
+import { splitLines } from './core/platform';
+import { runScriptDetached } from './core/spawn';
 
 interface HookInput {
   session_id: string;

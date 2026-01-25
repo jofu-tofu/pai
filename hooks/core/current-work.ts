@@ -24,7 +24,7 @@
 
 import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync, renameSync } from 'fs';
 import { join, dirname } from 'path';
-import { getPaiDir } from '../lib/paths';
+import { getPaiDir } from './paths';
 
 // === Constants ===
 const STALE_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24 hours
