@@ -143,7 +143,10 @@ const SKIP_PATTERNS = [
   /agentic_logs/,
   /MEMORY\/sessions/,
   /MEMORY\/Work/,
-  /MEMORY\/Learning/,
+  /MEMORY\/LEARNING/,    // Historical learning files (all caps)
+  /MEMORY\/learnings/,   // Historical learnings (lowercase variant)
+  /MEMORY\/research/,    // Historical research files
+  /MEMORY\/State/,       // State tracking and integrity reports
   /backups/,
   /\.map$/,
   /\.d\.ts$/,
@@ -151,6 +154,7 @@ const SKIP_PATTERNS = [
   /history\//, // Historical learning files
   /DEVELOPMENT\.md$/, // Documentation showing examples of bad patterns
   /tools\/README\.md$/, // Documentation showing bad patterns
+  /\/README\.md$/, // Installation instructions with example paths (any README.md)
 ];
 
 /**

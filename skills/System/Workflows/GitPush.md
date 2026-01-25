@@ -1,6 +1,6 @@
 # PushToPAI Workflow
 
-**Purpose:** Git commit and push changes to your PRIVATE PAI repository (~/.claude). This is the final step after any documentation update.
+**Purpose:** Git commit and push changes to your PRIVATE PAI repository ($PAI_DIR). This is the final step after any documentation update.
 
 **Triggers:** "push to PAI", "push to repo", "commit and push", "push changes"
 
@@ -22,8 +22,8 @@ Running the **PushToPAI** workflow from the **System** skill...
 ## CRITICAL: PRIVATE REPO ONLY
 
 This workflow operates on your **PRIVATE** PAI repository:
-- **Remote:** Your private git repo (e.g., `git@github.com:{username}/.claude.git`)
-- **Directory:** `~/.claude/` (or `$PAI_HOME`)
+- **Remote:** Your private git repo (e.g., `git@github.com:{username}/pai.git`)
+- **Directory:** `$PAI_DIR`
 
 **NEVER** confuse this with the **PUBLIC** PAI template repository:
 - Public repo is at `~/Projects/PAI/`
@@ -39,8 +39,8 @@ This workflow operates on your **PRIVATE** PAI repository:
 
 ```bash
 # Verify we're in the correct directory
-cd ~/.claude && pwd
-# Expected: $HOME/.claude (your home directory + .claude)
+cd $PAI_DIR && pwd
+# Expected: Your PAI directory (e.g., $HOME/pai)
 
 # Verify the remote is YOUR PRIVATE repo
 git remote -v
@@ -48,14 +48,14 @@ git remote -v
 ```
 
 **STOP IMMEDIATELY if:**
-- Directory is NOT `~/.claude` (or your PAI_HOME)
+- Directory is NOT `$PAI_DIR`
 - Remote shows `danielmiessler/PAI.git` (public template repo)
 - Any uncertainty about which repo you're in
 
 ### Step 2: Check What's Changed
 
 ```bash
-cd ~/.claude
+cd $PAI_DIR
 git status
 ```
 
@@ -145,7 +145,7 @@ Before every push, verify:
 
 | Check | Expected |
 |-------|----------|
-| Directory | `$HOME/.claude` (your PAI installation) |
+| Directory | `$PAI_DIR` (your PAI installation) |
 | Remote | Your private repo URL, NOT `danielmiessler/PAI.git` |
 | Branch | `main` |
 | No secrets | No API keys or credentials in diff |

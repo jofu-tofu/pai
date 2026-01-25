@@ -34,12 +34,12 @@ Running the **DocumentRecent** workflow from the **System** skill...
 
 ```bash
 # Get the most recent update timestamp from index
-cat ~/.claude/MEMORY/PAISYSTEMUPDATES/index.json | jq '.updates[0].timestamp'
+cat $PAI_DIR/MEMORY/PAISYSTEMUPDATES/index.json | jq '.updates[0].timestamp'
 ```
 
 Or parse from the most recent file:
 ```bash
-ls -t ~/.claude/MEMORY/PAISYSTEMUPDATES/*/\*/*.md | head -1
+ls -t $PAI_DIR/MEMORY/PAISYSTEMUPDATES/*/\*/*.md | head -1
 ```
 
 ### Step 2: Find Changes Since Then
@@ -85,7 +85,7 @@ echo '{
     "future_impact": "Documentation is now current.",
     "confidence": "medium"
   }
-}' | bun ~/.claude/skills/System/Tools/CreateUpdate.ts --stdin
+}' | bun $PAI_DIR/skills/System/Tools/CreateUpdate.ts --stdin
 ```
 
 ### Step 5: Multiple Entries for Large Gaps

@@ -6,11 +6,11 @@
  * Use this when you need to find which skill handles a specific task.
  *
  * Usage:
- *   bun run ~/.claude/skills/CORE/Tools/SkillSearch.ts <query>
- *   bun run ~/.claude/skills/CORE/Tools/SkillSearch.ts "scrape instagram"
- *   bun run ~/.claude/skills/CORE/Tools/SkillSearch.ts --list           # List all skills
- *   bun run ~/.claude/skills/CORE/Tools/SkillSearch.ts --tier always    # List always-loaded skills
- *   bun run ~/.claude/skills/CORE/Tools/SkillSearch.ts --tier deferred  # List deferred skills
+ *   bun run $PAI_DIR/skills/CORE/Tools/SkillSearch.ts <query>
+ *   bun run $PAI_DIR/skills/CORE/Tools/SkillSearch.ts "scrape instagram"
+ *   bun run $PAI_DIR/skills/CORE/Tools/SkillSearch.ts --list           # List all skills
+ *   bun run $PAI_DIR/skills/CORE/Tools/SkillSearch.ts --tier always    # List always-loaded skills
+ *   bun run $PAI_DIR/skills/CORE/Tools/SkillSearch.ts --tier deferred  # List deferred skills
  *
  * Output: Matching skills with full descriptions and workflows
  */
@@ -149,7 +149,7 @@ async function main() {
   // Check if index exists
   if (!existsSync(INDEX_FILE)) {
     console.error('❌ Skill index not found. Run GenerateSkillIndex.ts first:');
-    console.error('   bun run ~/.claude/skills/CORE/Tools/GenerateSkillIndex.ts');
+    console.error('   bun run $PAI_DIR/skills/CORE/Tools/GenerateSkillIndex.ts');
     process.exit(1);
   }
 

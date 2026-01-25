@@ -6,7 +6,7 @@ description: System maintenance with four core operations - integrity check (fin
 ## Customization
 
 **Before executing, check for user customizations at:**
-`~/.claude/skills/CORE/USER/SKILLCUSTOMIZATIONS/System/`
+`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/System/`
 
 If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 
@@ -81,7 +81,7 @@ This skill runs in the foreground so you can see all output, progress, and hear 
 ```
 User: "Run an integrity check"
 → Invokes IntegrityCheck workflow
-→ Spawns parallel agents to audit ~/.claude
+→ Spawns parallel agents to audit $PAI_DIR
 → Finds broken references, missing files
 → Returns list of issues found/fixed
 ```

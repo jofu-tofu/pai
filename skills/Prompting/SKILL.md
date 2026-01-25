@@ -6,7 +6,7 @@ description: Meta-prompting system for dynamic prompt generation using templates
 ## Customization
 
 **Before executing, check for user customizations at:**
-`~/.claude/skills/CORE/USER/SKILLCUSTOMIZATIONS/Prompting/`
+`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Prompting/`
 
 If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 
@@ -63,7 +63,7 @@ Complete prompt engineering documentation based on:
 
 ```typescript
 // skills/Agents/Tools/AgentFactory.ts
-import { renderTemplate } from '~/.claude/skills/Prompting/Tools/RenderTemplate.ts';
+import { renderTemplate } from '$PAI_DIR/skills/Prompting/Tools/RenderTemplate.ts';
 
 const prompt = renderTemplate('Primitives/Briefing.hbs', {
   briefing: { type: 'research' },

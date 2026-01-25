@@ -78,7 +78,7 @@ echo '{
     "verification_steps": ["How we verified the change works"],
     "confidence": "high"
   }
-}' | bun ~/.claude/skills/System/Tools/CreateUpdate.ts --stdin
+}' | bun $PAI_DIR/skills/System/Tools/CreateUpdate.ts --stdin
 ```
 
 ### Step 4: Significance Levels

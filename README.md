@@ -20,11 +20,11 @@ This is the **Memory System Development Worktree** (`pai-memory-work` branch).
 ## Quick Install
 
 ```bash
-# Clone the repository
-git clone https://github.com/jofu-tofu/pai.git ~/pai
+# Clone the repository (default location: $HOME/pai)
+git clone https://github.com/jofu-tofu/pai.git $HOME/pai
 
 # Run setup
-cd ~/pai && bun run scripts/setup.ts
+cd $HOME/pai && bun run scripts/setup.ts
 ```
 
 ## Prerequisites

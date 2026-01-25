@@ -99,7 +99,7 @@ After agents complete:
 # Integrity Check Report
 
 **Date:** [DATE]
-**Scope:** ~/.claude/
+**Scope:** $PAI_DIR
 
 ## Critical Issues
 | Component | Issue | File |
@@ -118,7 +118,7 @@ After agents complete:
 ### Step 5: Save Report (Optional)
 
 ```
-~/.claude/MEMORY/STATE/integrity/YYYY-MM-DD.md
+$PAI_DIR/MEMORY/STATE/integrity/YYYY-MM-DD.md
 ```
 
 ### Step 6: Completion
