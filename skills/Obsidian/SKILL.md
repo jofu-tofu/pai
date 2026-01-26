@@ -37,6 +37,8 @@ PAI has direct read/write access.
 | Workflow | Trigger | File |
 |----------|---------|------|
 | **SaveNote** | "save to obsidian", "create note", "add to vault" | `Workflows/SaveNote.md` |
+| **CreateExcalidrawDiagram** | "create excalidraw", "draw diagram", "sketch this" | `Workflows/CreateExcalidrawDiagram.md` |
+| **ExcalidrawToMermaid** | "convert to mermaid", "make this code-based" | `Workflows/ExcalidrawToMermaid.md` |
 
 ## Context Files
 
@@ -51,7 +53,7 @@ Load these on-demand when specific reference is needed:
 | `Dataview.md` | Query syntax, TABLE/LIST/TASK/CALENDAR |
 | `Templater.md` | Dynamic templates, tp object reference |
 | `WorkflowPatterns.md` | Zettelkasten, PARA, GTD, MOCs |
-| `Excalidraw.md` | Hand-drawn diagrams, API |
+| `Excalidraw.md` | Hand-drawn diagrams overview, quick reference (see workflows/Excalidraw/ for full docs) |
 | `Plugins.md` | Core and community plugin reference |
 
 ## Examples
@@ -77,6 +79,15 @@ User: "Create a flowchart for this process"
 User: "How do I find all notes tagged #project?"
 → Loads Dataview.md for query syntax
 → Provides: dataview query with FROM and WHERE clauses
+```
+
+**Example 4: Create Excalidraw diagram**
+```
+User: "Create an architecture diagram in Excalidraw"
+→ Invokes CreateExcalidrawDiagram workflow
+→ Loads workflows/Excalidraw/ docs as needed
+→ Generates .excalidraw file via API
+→ Returns: file path, elements created, embed syntax
 ```
 
 ## Quick Reference
