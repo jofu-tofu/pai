@@ -183,25 +183,29 @@ Write-File "temp_excalidraw_script.js" with generated code
 
 **Option B: Manual File Creation (Always Works)**
 
-Create the `.excalidraw` file directly as JSON:
+Create the `.excalidraw` file as **plain JSON** (no markdown wrapper):
+
 ```javascript
 const diagramJSON = {
   type: "excalidraw",
   version: 2,
   source: "https://excalidraw.com",
   elements: [
-    // Generated elements
+    // Generated elements - each needs full property set
   ],
   appState: {
-    viewBackgroundColor: "#ffffff"
+    viewBackgroundColor: "#ffffff",
+    gridSize: null
   },
   files: {}
 };
 
-// Write to file
+// Write PLAIN JSON to .excalidraw file (NOT .excalidraw.md)
 const filePath = "C:\\Users\\fujos\\Obsidian\\Diagrams\\[name].excalidraw";
-const content = `---\nexcalidraw-plugin: parsed\n---\n${JSON.stringify(diagramJSON, null, 2)}`;
+const content = JSON.stringify(diagramJSON, null, 2);
 ```
+
+**IMPORTANT:** Do NOT use `.excalidraw.md` format with YAML frontmatter for programmatic creation - it causes JSON parsing errors. The Excalidraw plugin expects plain JSON in `.excalidraw` files.
 
 ### Step 5: Save to Vault
 
@@ -291,6 +295,8 @@ EMBED: ![[ProjectPlanning.excalidraw]]
 | **Invalid element properties** | Incorrect API usage | Refer to AutomateAPI.md for correct syntax |
 | **File write failed** | Permissions or path issue | Verify vault path, check permissions |
 | **Empty diagram generated** | No elements created | Check diagram generation logic |
+| **"no number after minus sign" JSON error** | Used `.excalidraw.md` with frontmatter | Use plain `.excalidraw` with raw JSON only |
+| **JSON parsing error at position 1** | Markdown wrapper around JSON | Remove frontmatter/markdown, use plain JSON |
 
 ## Best Practices
 
@@ -301,7 +307,8 @@ EMBED: ![[ProjectPlanning.excalidraw]]
 5. **Add title text** for clarity (fontSize: 32, fontFamily: 2)
 6. **Group related elements** for easier manipulation
 7. **Use frames** for presentation-style diagrams
-8. **Add frontmatter** with `excalidraw-plugin: parsed` for linter compatibility
+8. **Use plain `.excalidraw` extension** (not `.excalidraw.md`) for programmatic creation
+9. **Include all required element properties** (version, versionNonce, isDeleted, seed, groupIds, frameId, boundElements, updated, link, locked)
 
 ## Voice Notification
 

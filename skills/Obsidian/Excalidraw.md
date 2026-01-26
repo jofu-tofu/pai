@@ -130,22 +130,37 @@ For full API documentation, see: [workflows/Excalidraw/AutomateAPI.md](workflows
 
 ---
 
-## Linter Compatibility
+## File Formats
 
-**Important:** Add this frontmatter to all `.excalidraw` files to prevent Obsidian Linter from corrupting them:
+### Plain `.excalidraw` (Recommended for Programmatic Creation)
 
-```yaml
----
-excalidraw-plugin: parsed
----
+When creating Excalidraw files programmatically, use **plain JSON** with `.excalidraw` extension:
+
+```json
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [...],
+  "appState": { "viewBackgroundColor": "#ffffff" },
+  "files": {}
+}
 ```
 
-The Excalidraw plugin automatically adds this when creating diagrams. If creating files programmatically, always include this frontmatter.
+This format is reliably parsed by the Excalidraw plugin.
 
-**Alternative:** Exclude `.excalidraw` files in Linter settings:
+### `.excalidraw.md` (Plugin-Created Only)
+
+The Excalidraw plugin creates `.excalidraw.md` files with YAML frontmatter when you create diagrams interactively in Obsidian. **Do NOT create this format programmatically** - it causes JSON parsing errors ("no number after minus sign").
+
+### Linter Compatibility
+
+**Important:** Exclude `.excalidraw` files in Linter settings to prevent corruption:
 ```
 Exclude files: **/*.excalidraw
 ```
+
+The Excalidraw plugin manages its own files - let it handle formatting.
 
 ---
 
