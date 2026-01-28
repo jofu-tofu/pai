@@ -1,12 +1,93 @@
 {
+  "permissions": {
+    "allow": [],
+    "deny": []
+  },
+  "env": {},
+  "enabledPlugins": {},
+  "fileSuggestion": {
+    "type": "command",
+    "command": "python .aiwcli/_shared/hooks/file-suggestion.py"
+  },
+  "methods": {
+    "cc-native": {
+      "ides": [
+        "claude"
+      ],
+      "installedAt": "2026-01-28T23:22:21.668Z"
+    }
+  },
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .aiwcli/_shared/hooks/user_prompt_submit.py",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
+      {
+        "matcher": "Task|Read|Bash|WebFetch|Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .aiwcli/_shared/hooks/context_monitor.py",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "TaskCreate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .aiwcli/_shared/hooks/task_create_capture.py",
+            "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "TaskUpdate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .aiwcli/_shared/hooks/task_update_capture.py",
+            "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .aiwcli/_shared/hooks/archive_plan.py",
+            "timeout": 5000
+          }
+        ]
+      },
       {
         "matcher": "Bash|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "python _cc-native/hooks/suggest-fresh-perspective.py",
+            "command": "python .aiwcli/_cc-native/hooks/suggest-fresh-perspective.py",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .aiwcli/_shared/hooks/archive_plan.py",
             "timeout": 5000
           }
         ]
@@ -18,7 +99,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python _cc-native/hooks/add_plan_context.py",
+            "command": "python .aiwcli/_cc-native/hooks/add_plan_context.py",
             "timeout": 5000
           }
         ]
@@ -28,34 +109,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python _cc-native/hooks/set_plan_state.py",
-            "timeout": 5000
-          },
-          {
-            "type": "command",
-            "command": "python _cc-native/hooks/cc-native-plan-review.py",
+            "command": "python .aiwcli/_cc-native/hooks/cc-native-plan-review.py",
             "timeout": 600000
           }
         ]
       }
-    ],
-    "PermissionRequest": [
-      {
-        "matcher": "ExitPlanMode",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python _cc-native/hooks/archive_plan.py",
-            "timeout": 5000
-          }
-        ]
-      }
     ]
-  },
-  "permissions": {
-    "allow": [],
-    "deny": []
-  },
-  "env": {},
-  "enabledPlugins": {}
+  }
 }

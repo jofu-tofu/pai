@@ -1,6 +1,7 @@
 ---
 name: FirstPrinciples
 description: First principles analysis. USE WHEN first principles, fundamental, root cause, decompose. SkillSearch('firstprinciples') for docs.
+context: fork
 ---
 
 ## Customization
