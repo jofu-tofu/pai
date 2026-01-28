@@ -1,81 +1,110 @@
 ---
 name: TestDriven
-description: Test-driven development philosophy and smart testing methodology. USE WHEN writing tests OR designing test strategy OR refactoring code with tests OR reviewing test quality OR discussing TDD OR characterization testing OR catching regressions OR tests keep breaking after refactoring. Contains 16 principles for writing tests that survive refactoring.
+description: Test-driven development philosophy and smart testing methodology. USE WHEN writing tests OR designing test strategy OR refactoring code with tests OR reviewing test quality OR discussing TDD OR characterization testing OR catching regressions OR tests keep breaking after refactoring OR AI refactored code OR AI generated tests. Contains 5 core principles from authoritative sources for writing tests that survive refactoring.
 ---
 
 # TestDriven
 
-Philosophy and methodology for writing tests that **survive refactoring and catch real regressions**. 16 principles across 5 categories.
+5 core principles from authoritative sources for writing tests that **survive refactoring and catch real regressions**.
 
 **Core insight:** If you have to change your tests to make them pass after a legitimate refactoring, your tests are testing the wrong thing.
 
-## Skill Type: Reference Only
+## Skill Type: Reference + Workflow
 
-This is a **reference-only skill** - it provides principles and guidance, not active workflows. When this skill activates:
+This skill provides **principles for test quality** plus **four actionable workflows** for common testing scenarios.
 
-1. Use the **Quick Decision Tree** to identify relevant category
-2. Read the specific principle file from `Rules/`
-3. Apply the principle's guidance to your testing task
+---
 
-## When to Apply This Skill
+## Workflow Routing
 
-**Automatic triggers:**
-- Writing new tests for any code
-- Designing test strategy for a feature or system
-- Refactoring code that has existing tests
-- Reviewing test quality or test coverage
-- Tests breaking after refactoring (symptom of implementation coupling)
-- Working with legacy code that lacks tests
-- Discussing TDD philosophy or best practices
+| Trigger | Workflow | Use When |
+|---------|----------|----------|
+| "write tests", "add tests", "test this", "how do I test" | `Workflows/WriteTests.md` | Writing tests for new or existing code |
+| "review tests", "test quality", "PR review", "audit tests" | `Workflows/ReviewTests.md` | Evaluating test quality in code review |
+| "diagnose test", "fix test", "test breaking", "test failing after refactor" | `Workflows/DiagnoseTest.md` | Fixing broken or flaky tests |
+| "AI refactored", "AI generated", "validate AI", "copilot", "claude refactored" | `Workflows/AIValidation.md` | Validating AI-refactored code or AI-generated tests |
+
+**Philosophy questions, test strategy, learning** → Use Reference Mode (see Core Principles below)
+
+---
+
+## Core Principles
+
+| # | Principle | Source | Key Question |
+|---|-----------|--------|--------------|
+| 1 | **FIRST** | Robert C. Martin, "Clean Code" (2008) | Fast, Independent, Repeatable, Self-Validating, Timely? |
+| 2 | **Behavior Over Implementation** | Kent Beck, Michael Feathers | Would test pass if I rewrote with different algorithm? |
+| 3 | **Test Pyramid** | Martin Fowler (2012) | Many unit, fewer integration, even fewer E2E? |
+| 4 | **Characterization Tests** | Michael Feathers, "Working Effectively with Legacy Code" (2004) | Am I changing code I don't understand? |
+| 5 | **Red-Green-Refactor** | Kent Beck, "TDD by Example" (2002) | Did I write failing test first? |
+
+---
 
 ## Quick Decision Tree
 
 **Start here when testing:**
 
-1. **Starting new development?** → Category 1: Philosophy (Red-Green-Refactor)
-2. **Deciding what to test?** → Category 2: What to Test (CRITICAL)
-3. **Tests breaking on refactoring?** → Category 3: Test Resilience (CRITICAL)
-4. **Working with legacy code?** → Category 4: Characterization & Legacy
-5. **Reviewing test quality?** → Category 5: Anti-Patterns
+```
+Is this legacy/unfamiliar code?
+├─ YES → Characterization Tests (Rules/CharacterizationTests.md)
+│        Capture behavior before changing
+│
+└─ NO → Is this new development?
+        ├─ YES → Red-Green-Refactor (Rules/RedGreenRefactor.md)
+        │        Write failing test first, then implement
+        │
+        └─ NO → Are tests breaking on refactoring?
+                ├─ YES → Behavior Over Implementation (Rules/BehaviorOverImplementation.md)
+                │        Tests are coupled to implementation
+                │
+                └─ NO → Is test suite slow/flaky?
+                        ├─ YES → Test Pyramid (Rules/TestPyramid.md)
+                        │        Likely ice cream cone anti-pattern
+                        │
+                        └─ NO → FIRST (Rules/FIRST.md)
+                                Evaluate individual test quality
+```
 
-**For detailed implementation:** Read the specific principle file from `Rules/` folder.
+---
 
-## Core Philosophy
+## Priority When Stuck
 
-| Principle | Key Question |
-|-----------|--------------|
-| Test behavior, not implementation | "If I rewrote this with a different algorithm, should the test still pass?" |
-| Test at abstraction boundaries | "Is this part of the public API, or could I delete it during refactoring?" |
-| Tests should survive refactoring | "Will this test break if I restructure internals without changing behavior?" |
+When multiple principles apply and conflict:
 
-## Priority Hierarchy
+1. **Behavior Over Implementation** (wins for new/understood code)
+2. **Characterization Tests** (wins for legacy/unknown code)
+3. **Test Pyramid** (wins for test suite design)
+4. **FIRST** (wins for individual test quality)
+5. **Red-Green-Refactor** (wins for development workflow)
 
-| Priority | Category | Impact | Key Principle |
-|----------|----------|--------|---------------|
-| 1 | What to Test | CRITICAL | Test behavior through public interfaces |
-| 2 | Test Resilience | CRITICAL | Avoid implementation coupling |
-| 3 | Philosophy | FOUNDATION | Red-Green-Refactor cycle |
-| 4 | Characterization | HIGH | Safety net for legacy code |
-| 5 | Anti-Patterns | HIGH | Avoid common testing mistakes |
+---
 
-## Top 10 High-Impact Principles
+## Notable Anti-Pattern
 
-These provide the most value for test quality:
+**Don't Mock What You Don't Own** (Gerard Meszaros, "xUnit Test Patterns")
 
-1. **BehaviorNotImplementation** - Test WHAT, not HOW (survives any rewrite)
-2. **AbstractionBoundaries** - Test public APIs, not internal classes
-3. **SurviveRefactoring** - Tests that break on refactoring are wrong
-4. **AvoidImplementationCoupling** - Don't mock internals or assert on private state
-5. **TestTheContract** - Input/output, not internal mechanics
-6. **RedGreenRefactor** - Failing test → pass → improve design
-7. **CharacterizationTests** - Capture legacy behavior before changing
-8. **DontMockWhatYouDontOwn** - Wrap third-party APIs
-9. **HigherLevelStability** - Integration tests survive restructuring
-10. **SkipPrivateHelpers** - Test through public interface only
+Don't mock third-party libraries directly. When the library changes, your mocks become lies. Wrap external dependencies and mock your wrapper.
+
+```pseudocode
+// BAD: Mocking third-party library
+twilio = mock()
+twilio.messages.create.returns({sid: "123"})
+
+// GOOD: Wrap and mock your wrapper
+class SmsGateway:
+    function send(to, message): ...
+
+fake_gateway = FakeSmsGateway()  // Mock your own interface
+```
+
+See: `Rules/BehaviorOverImplementation.md` (Mock at Boundaries section)
+
+---
 
 ## Examples
 
 **Example 1: Implementation-Coupled Test (Bad)**
+
 ```pseudocode
 // This test breaks when you change the SQL query or add caching
 function test_get_users():
@@ -89,9 +118,10 @@ function test_get_users():
     assert db.execute.was_called_with("SELECT * FROM users WHERE active = 1")
 ```
 → Problem: Tests HOW (the query), not WHAT (returns active users)
-→ See: Rules/BehaviorNotImplementation.md
+→ See: `Rules/BehaviorOverImplementation.md`
 
 **Example 2: Behavior-Based Test (Good)**
+
 ```pseudocode
 // This test survives query changes, ORM migration, caching, etc.
 function test_get_active_users_returns_only_active():
@@ -106,9 +136,10 @@ function test_get_active_users_returns_only_active():
     assert result[0].name == "alice"
 ```
 → Survives: query rewrites, ORM changes, caching layer, database migration
-→ See: Rules/BehaviorNotImplementation.md, Rules/AbstractionBoundaries.md
+→ See: `Rules/BehaviorOverImplementation.md`
 
 **Example 3: Characterization Test for Legacy Code**
+
 ```pseudocode
 // Unknown legacy code - capture current behavior first
 function test_process_order_characterization():
@@ -116,77 +147,54 @@ function test_process_order_characterization():
 
     for order in sample_orders:
         result = process_order(order)
-        // Golden master - detect ANY behavioral change
         assert result == load_expected_result(order.id)
 
 // Now you can refactor safely - test detects unintended changes
 ```
 → Use: When inheriting code you don't fully understand
-→ See: Rules/CharacterizationTests.md, Rules/GoldenMaster.md
+→ See: `Rules/CharacterizationTests.md`
 
-## Reference Documentation
+---
 
-**All 16 principles are in individual files in `Rules/` folder for efficient loading.**
+## Principle Files
 
-### How to Use Rules
-
-**Pattern:** When applying a principle, read its specific file from Rules/.
-
-```
-Decision tree identifies: Category 2 (What to Test)
-Quick ref shows: BehaviorNotImplementation
-Action: Read Rules/BehaviorNotImplementation.md
-Result: Complete explanation with examples
-```
-
-### What's in Each Principle File
-
-Each principle file (`Rules/PrincipleName.md`) includes:
+Each principle file in `Rules/` includes:
+- Source attribution
 - Impact level and why it matters
 - Problem: Anti-pattern with code example
 - Solution: Correct pattern with code example
-- "The Test" - Self-check question to evaluate your tests
-- Edge cases or when the principle doesn't apply
+- "The Test Question" - Self-check to evaluate your tests
 
-### Rule File Naming Convention
+### Rule File Index
 
-Rules use TitleCase naming:
-- `RedGreenRefactor.md`
-- `BehaviorNotImplementation.md`
-- `CharacterizationTests.md`
+| File | Principle | When to Read |
+|------|-----------|--------------|
+| `Rules/FIRST.md` | Fast, Independent, Repeatable, Self-Validating, Timely | Evaluating individual test quality |
+| `Rules/BehaviorOverImplementation.md` | Test WHAT, not HOW | Tests break after refactoring |
+| `Rules/TestPyramid.md` | Many unit, few E2E | Test suite slow or flaky |
+| `Rules/CharacterizationTests.md` | Capture before changing | Working with legacy code |
+| `Rules/RedGreenRefactor.md` | Red → Green → Refactor | TDD workflow |
 
-## Complete Principle Index
+---
 
-### 1. Philosophy (FOUNDATION)
-- RedGreenRefactor - Write failing test → make it pass → improve design
-- TestsAsSpecs - Tests are executable specifications and living documentation
-- CleanCodeThatWorks - TDD delivers correctness and maintainability together
+## Integration with Other Skills
 
-### 2. What to Test (CRITICAL)
-- BehaviorNotImplementation - Test WHAT the code does, not HOW
-- AbstractionBoundaries - Test public interfaces, not internal classes
-- TestTheContract - Test input/output, not internal mechanics
-- SkipPrivateHelpers - Test through public API; helpers are implementation details
+TestDriven provides testing philosophy that complements language-specific coding skills:
 
-### 3. Test Resilience (CRITICAL)
-- SurviveRefactoring - Tests should not break when behavior is unchanged
-- AvoidImplementationCoupling - Don't mock internals or assert on private state
-- HigherLevelStability - Higher-level tests survive structural changes better
-
-### 4. Characterization & Legacy (HIGH)
-- CharacterizationTests - Record existing behavior before changing unknown code
-- GoldenMaster - Compare output snapshots to detect any behavioral change
-- ReplaceAfterUnderstanding - Upgrade to proper tests once you understand the system
-
-### 5. Anti-Patterns (HIGH)
-- AvoidIceCreamCone - Too many E2E tests, too few unit tests = slow and flaky
-- DontMockWhatYouDontOwn - Wrap third-party APIs; mock your wrapper
-- TestsAreUntestedCode - Keep tests simple; complexity in tests is hidden risk
-
-## Integration
-
-This skill provides testing philosophy that complements language-specific coding skills (PythonCoding, CSharp, VercelReact). Those skills cover syntax and patterns; this skill covers what and how to test.
+- `skills/PythonCoding/` - Python syntax and pytest patterns
+- `skills/CSharp/` - C# syntax and xUnit/NUnit patterns
+- `skills/VercelReact/` - React Testing Library patterns
 
 **When writing tests:** Apply TestDriven principles first (WHAT to test), then language-specific skill patterns (HOW to write it).
 
-**Source:** Kent Beck (TDD), Michael Feathers (Legacy Code), Google SWE Book, xUnit Patterns
+---
+
+## Authoritative Sources
+
+| Source | Author | Year | Key Contribution |
+|--------|--------|------|------------------|
+| Test-Driven Development by Example | Kent Beck | 2002 | Red-Green-Refactor, behavior testing |
+| Working Effectively with Legacy Code | Michael Feathers | 2004 | Characterization tests, seams |
+| Clean Code, Chapter 9 | Robert C. Martin | 2008 | FIRST principles |
+| TestPyramid | Martin Fowler | 2012 | Test distribution model |
+| xUnit Test Patterns | Gerard Meszaros | 2007 | Test doubles, anti-patterns |
