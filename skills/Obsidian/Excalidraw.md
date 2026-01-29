@@ -4,6 +4,88 @@ Excalidraw is a whiteboard plugin for hand-drawn diagrams with powerful automati
 
 ---
 
+## Creating a Diagram
+
+You will create Excalidraw diagrams by working through five decisions. Each decision builds on the previous one, and by the end you will have a clear plan to execute.
+
+### Decision 1: What is the ONE idea?
+
+Before drawing anything, identify the single concept you are communicating. A diagram that tries to show everything communicates nothing.
+
+Ask yourself: *"If someone looks at this for 5 seconds, what should they understand?"*
+
+Write this down as a single sentence. This is your north star.
+
+**Why this matters:** Diagrams exploit parallel visual processing (10M bits/sec) vs sequential reading (200 words/min). That power only works when there's one clear message.
+
+### Decision 2: What type of diagram?
+
+Match your prompt to a diagram pattern. Scan for keywords:
+
+| Your prompt mentions... | You will create... | Using these shapes | With roughness |
+|-------------------------|--------------------|--------------------|----------------|
+| architecture, system, components, services | Architecture diagram | Rectangles (services) + Ellipses (databases) | 0 (clean) |
+| flow, process, workflow, steps, sequence | Flowchart | Rectangles (actions) + Diamonds (decisions) | 0-1 |
+| brainstorm, ideas, sketch, whiteboard | Whiteboard sketch | Ellipses + Freedraw | 2 (sketchy) |
+| user journey, path, experience | User flow | Sequential rectangles | 1 |
+| concept map, mind map, relationships | Mind map | Ellipses in radial layout | 1-2 |
+| presentation, slides, deck | Presentation | Frames containing groups | 0 |
+
+**Default:** Architecture with roughness 1 if unclear.
+
+For detailed patterns with code examples, see [UseCaseGuide.md](Workflows/Excalidraw/UseCaseGuide.md).
+
+### Decision 3: What do elements mean?
+
+Assign semantic colors to element categories. Same color = same meaning, always.
+
+| Element category | Background | Stroke | Examples |
+|------------------|------------|--------|----------|
+| Information/Input | #a5d8ff | #1971c2 | User input, data sources, API requests |
+| Success/Output | #b2f2bb | #2f9e44 | Databases, results, completed states |
+| Warning/Decision | #ffec99 | #f08c00 | Decision nodes, branching, processes |
+| Error/Critical | #ffc9c9 | #e03131 | Error states, stops, critical paths |
+| External/Special | #d0bfff | #9c36b5 | Third-party services, external systems |
+| Neutral/Context | #e9ecef | #868e96 | Annotations, labels, background info |
+
+**The 60-30-10 rule:** 60% whitespace, 30% primary elements, 10% accent highlights. If your diagram feels crowded, add more whitespace.
+
+For complete styling reference, see [StylingSystem.md](Workflows/Excalidraw/StylingSystem.md).
+
+### Decision 4: Build the file
+
+Create the `.excalidraw` file using these specifications:
+
+| Setting | Value | Why |
+|---------|-------|-----|
+| Spacing | 50px grid (50, 100, 150, 200) | Consistent visual rhythm |
+| Shape minimum | 80×60 | Readable labels |
+| Standard box | 120×80 | Balanced proportion |
+| Container | 160×100+ | Room for grouped content |
+| Font (formal) | Helvetica (fontFamily: 2) | Professional documentation |
+| Font (sketch) | Virgil (fontFamily: 1) | Hand-drawn aesthetic |
+| Font (code) | Cascadia (fontFamily: 3) | Monospace for technical |
+
+**File location:** `Diagrams/{Category}/{DescriptiveName}.excalidraw`
+
+For API methods and JSON structure, see [AutomateAPI.md](Workflows/Excalidraw/AutomateAPI.md).
+
+### Decision 5: Verify quality
+
+Before delivering, run these tests:
+
+| Test | How to run | Pass criteria |
+|------|------------|---------------|
+| Squint test | Blur your vision or step back | Hierarchy remains obvious |
+| 5-second test | Imagine showing to someone new | They would state the main idea |
+| Removal test | Consider each element | Nothing can be removed |
+
+**Why verification matters:** These tests catch the most common failure mode—adding complexity that feels helpful but actually obscures the message.
+
+For the full philosophy and additional tests, see [Philosophy.md](Workflows/Excalidraw/Philosophy.md).
+
+---
+
 ## Quick Start
 
 ### Embedding Diagrams

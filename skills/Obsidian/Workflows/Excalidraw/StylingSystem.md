@@ -1,54 +1,73 @@
 # Styling System
 
-Visual properties for Excalidraw elements: colors, strokes, fills, fonts.
+This document provides the visual specifications for Excalidraw elements. Use it when you need exact values for colors, strokes, fills, and fonts.
 
 ---
 
-## Color System
+## Color Assignment
 
-Excalidraw uses **hex color codes** for all color properties.
+You will assign colors based on what each element represents. This creates visual consistency that helps viewers understand relationships instantly.
 
-### Core Color Properties
+### Semantic Color Palette
+
+When creating elements, select colors by meaning:
+
+| This element represents... | Use background | Use stroke | Example |
+|----------------------------|----------------|------------|---------|
+| Information, input, user data | #a5d8ff | #1971c2 | User requests, API inputs, form data |
+| Success, output, storage | #b2f2bb | #2f9e44 | Databases, results, completed states |
+| Warning, decision, process | #ffec99 | #f08c00 | Decision diamonds, processing steps |
+| Error, stop, critical | #ffc9c9 | #e03131 | Error states, blocked flows, alerts |
+| External, special, third-party | #d0bfff | #9c36b5 | External APIs, third-party services |
+| Neutral, annotation, context | #e9ecef | #868e96 | Labels, notes, background info |
+
+### Color Application Code
+
 ```javascript
-{
-  strokeColor: "#000000",      // Border/outline color
-  backgroundColor: "#ffffff"    // Fill color (shapes only)
-}
-```
-
-### Common Color Palette
-```javascript
-// Neutral
-"#000000"  // Black
-"#ffffff"  // White
-"#e0e0e0"  // Light gray
-"#757575"  // Dark gray
-
-// Primary
-"#1e90ff"  // Blue
-"#4caf50"  // Green
-"#f44336"  // Red
-"#ffc107"  // Amber
-
-// Accents
-"#9c27b0"  // Purple
-"#ff6b6b"  // Coral
-"#e0f7fa"  // Cyan tint
-"#fff9c4"  // Yellow tint
-```
-
-### Setting Colors via API
-```javascript
-// At creation
+// Information elements (blue)
 ea.addRect(x, y, w, h, {
-  strokeColor: "#1e90ff",
-  backgroundColor: "#e0f7fa"
+  backgroundColor: "#a5d8ff",
+  strokeColor: "#1971c2"
 });
 
-// After creation
-ea.setStrokeColor("#ff6b6b", elementId);
-ea.setBackgroundColor("#fff9c4", elementId);
+// Success/storage elements (green)
+ea.addEllipse(x, y, w, h, {
+  backgroundColor: "#b2f2bb",
+  strokeColor: "#2f9e44"
+});
+
+// Decision elements (yellow)
+ea.addDiamond(x, y, w, h, {
+  backgroundColor: "#ffec99",
+  strokeColor: "#f08c00"
+});
+
+// Error/critical elements (red)
+ea.addRect(x, y, w, h, {
+  backgroundColor: "#ffc9c9",
+  strokeColor: "#e03131"
+});
 ```
+
+### Color Consistency Rules
+
+These rules maintain visual clarity:
+
+| Rule | What it means | Why it matters |
+|------|---------------|----------------|
+| Same color = same meaning | If two things are blue, they represent the same category | Viewers learn the visual language once |
+| Maximum 3-5 colors per diagram | Limit the palette | More colors create cognitive overhead |
+| Color supplements, never carries | Meaning survives without color | Accessibility and printing |
+
+### The 60-30-10 Ratio
+
+Balance your diagram composition:
+
+| Percentage | What fills it | What to check |
+|------------|---------------|---------------|
+| **60%** | Whitespace/background | If diagram feels cramped, add whitespace |
+| **30%** | Primary elements | Main boxes, shapes, connectors |
+| **10%** | Accent highlights | Critical paths, emphasis elements |
 
 ---
 

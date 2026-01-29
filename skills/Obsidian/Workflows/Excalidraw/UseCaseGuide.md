@@ -1,10 +1,66 @@
 # Use Case Guide
 
-When and how to use Excalidraw for different diagram types and scenarios.
+This document helps you select the right diagram pattern based on what the user asked for. Scan the prompt for keywords, then follow the pattern for that diagram type.
 
 ---
 
-## Decision Tree: Excalidraw vs Mermaid
+## Pattern Selection
+
+### Step 1: Identify keywords in the prompt
+
+Read the user's request and find the matching category:
+
+| The prompt mentions... | You will create... | Using... | With roughness... |
+|------------------------|--------------------| ---------|-------------------|
+| architecture, system, components, services, infrastructure | Architecture diagram | Rectangles (services) + Ellipses (databases) | 0 |
+| flow, process, workflow, steps, sequence, pipeline | Flowchart | Rectangles (actions) + Diamonds (decisions) | 0-1 |
+| brainstorm, ideas, sketch, whiteboard, thinking | Whiteboard sketch | Ellipses + Freedraw + Lines | 2 |
+| concept, mind map, relationships, connections | Mind map | Sized ellipses in radial layout | 1-2 |
+| presentation, slides, deck, talk | Presentation | Frames containing content groups | 0 |
+| network, database, technical, schema, server | Technical diagram | Rectangles + Icons/Images | 0 |
+| UI, mockup, wireframe, screen, interface | UI mockup | Rounded rectangles in device frames | 0-1 |
+| data flow, ETL, pipeline, transformation | Data flow | Ellipses (sources) → Rectangles (processes) | 0-1 |
+
+**When keywords are unclear:** Default to Architecture pattern with roughness 1.
+
+### Step 2: Apply the shape grammar
+
+Each diagram type has a visual grammar—shapes have specific meanings:
+
+| Diagram Type | Shape | Means |
+|--------------|-------|-------|
+| **Architecture** | Rectangle | Service, component, module |
+| | Ellipse | Database, data store |
+| | Arrow | Data flow, dependency |
+| **Flowchart** | Rectangle | Action, process step |
+| | Diamond | Decision point |
+| | Ellipse | Start/End |
+| | Arrow | Flow direction |
+| **Mind Map** | Large ellipse (center) | Main concept |
+| | Medium ellipse | Primary branches |
+| | Small ellipse | Sub-branches |
+| | Line (no arrow) | Relationship |
+| **Data Flow** | Ellipse | External entity |
+| | Rectangle | Process |
+| | Open rectangle | Data store |
+| | Arrow | Data movement |
+
+### Step 3: Choose layout direction
+
+| Diagram Type | Arrange elements... | Because... |
+|--------------|---------------------|------------|
+| Architecture | Left→right in horizontal layers | Matches data flow direction |
+| Flowchart | Top→bottom | Natural reading flow |
+| Mind Map | Radial from center | Emphasizes central concept |
+| Presentation | Sequential frames | Slide-by-slide progression |
+| Technical | Grid-based | Shows system topology |
+| UI/UX | Within device frames | Represents actual screens |
+| Data Flow | Left→right | Matches transformation pipeline |
+| Whiteboard | Organic clusters | Mirrors natural brainstorming |
+
+---
+
+## Excalidraw vs Mermaid
 
 ```
 Need a diagram?
