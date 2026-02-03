@@ -21,7 +21,7 @@ context: fork
 ## Customization
 
 **Before executing, check for user customizations at:**
-`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Research/`
+`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Research/`
 
 If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 
@@ -54,7 +54,7 @@ Research agents hallucinate URLs. A single broken link is a catastrophic failure
    Running the **WorkflowName** workflow from the **Research** skill...
    ```
 
-**Full documentation:** `$PAI_DIR/skills/CORE/SYSTEM/THENOTIFICATIONSYSTEM.md`
+**Full documentation:** `$PAI_DIR/skills/PAI/SYSTEM/THENOTIFICATIONSYSTEM.md`
 
 ## Workflow Routing
 

@@ -35,7 +35,8 @@
  * - capture.ts: Updates current-work.json and WORK/ items
  * - tab-state.ts: Resets Kitty tab to default UL blue
  * - SystemIntegrity.ts: Detects PAI changes, spawns IntegrityMaintenance.ts
- * - ISCValidator.ts: Validates IdealState.jsonl was populated during algorithm execution
+ * - UpdateCounts.ts: Updates settings.json counts section
+ * - RebuildSkill.ts: Rebuilds PAI SKILL.md if Components changed
  *
  * ERROR HANDLING:
  * - Missing transcript: Exits gracefully
@@ -54,12 +55,13 @@
  * - Isolated failures (Promise.allSettled)
  */
 
-import { parseTranscript } from '../skills/CORE/Tools/TranscriptParser';
+import { parseTranscript } from '../skills/PAI/Tools/TranscriptParser';
 import { handleVoice } from './handlers/voice';
 import { handleCapture } from './handlers/capture';
 import { handleTabState } from './handlers/tab-state';
 import { handleSystemIntegrity } from './handlers/SystemIntegrity';
-import { handleISCValidation } from './handlers/ISCValidator';
+import { handleUpdateCounts } from './handlers/UpdateCounts';
+import { handleRebuildSkill } from './handlers/RebuildSkill';
 
 interface HookInput {
   session_id: string;
@@ -115,12 +117,13 @@ async function main() {
     handleCapture(parsed, hookInput),
     handleTabState(parsed),
     handleSystemIntegrity(parsed, hookInput),
-    handleISCValidation(parsed, hookInput),
+    handleUpdateCounts(),
+    handleRebuildSkill(),
   ]);
 
   // Log any failures
   results.forEach((result, index) => {
-    const handlerNames = ['Voice', 'Capture', 'TabState', 'SystemIntegrity', 'ISCValidator'];
+    const handlerNames = ['Voice', 'Capture', 'TabState', 'SystemIntegrity', 'UpdateCounts', 'RebuildSkill'];
     if (result.status === 'rejected') {
       console.error(`[StopOrchestrator] ${handlerNames[index]} handler failed:`, result.reason);
     }

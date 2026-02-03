@@ -179,8 +179,8 @@ The template includes a complete file management system for TELOS files (markdow
 - `getAllTelosData()` - Scans TELOS directory and returns all files
 - `getTelosFileCount()` - Returns total file count
 - `getTelosFileList()` - Returns array of filenames
-- Searches `$PAI_DIR/skills/CORE/USER/TELOS/` for `.md` files
-- Searches `$PAI_DIR/skills/CORE/USER/TELOS/data/` for `.csv` files
+- Searches `$PAI_DIR/skills/PAI/USER/TELOS/` for `.md` files
+- Searches `$PAI_DIR/skills/PAI/USER/TELOS/data/` for `.csv` files
 
 ### File Upload
 **Page**: `app/add-file/page.tsx`

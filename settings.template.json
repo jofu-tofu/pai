@@ -21,7 +21,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|Edit|Write|Read",
         "hooks": [
           {
             "type": "command",
@@ -71,7 +71,7 @@
           },
           {
             "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/FormatEnforcer.hook.ts"
+            "command": "bun {{PAI_DIR}}/hooks/FormatReminder.hook.ts"
           }
         ]
       }

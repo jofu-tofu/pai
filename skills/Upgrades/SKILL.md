@@ -25,7 +25,7 @@ Monitor Anthropic ecosystem AND AI development YouTube channels for updates that
    Running the **WorkflowName** workflow from the **Upgrades** skill...
    ```
 
-**Full documentation:** `$PAI_DIR/skills/CORE/SkillNotifications.md`
+**Full documentation:** `$PAI_DIR/skills/PAI/SkillNotifications.md`
 
 ## Workflow Routing
 
@@ -117,11 +117,11 @@ See `$PAI_DIR/SKILLCUSTOMIZATIONS/Upgrades/` for user-specific channels.
 - `EXTEND.yaml` - Extension manifest
 - `youtube-channels.json` - User's personal YouTube channels
 
-Use `bun $PAI_DIR/skills/CORE/Tools/LoadSkillConfig.ts` to load configs with customizations merged.
+Use `bun $PAI_DIR/skills/PAI/Tools/LoadSkillConfig.ts` to load configs with customizations merged.
 
 ## Integration
 
 Uses **VideoTranscript** skill for transcript extraction:
 ```bash
-bun $PAI_DIR/skills/CORE/Tools/GetTranscript.ts "<youtube-url>"
+bun $PAI_DIR/skills/PAI/Tools/GetTranscript.ts "<youtube-url>"
 ```

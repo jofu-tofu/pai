@@ -627,13 +627,13 @@ async function checkHooksWork(): Promise<CheckResult> {
 }
 
 async function checkSkills(): Promise<CheckResult> {
-  const coreSkill = join(PAI_DIR, 'skills', 'CORE', 'SKILL.md');
+  const paiSkill = join(PAI_DIR, 'skills', 'PAI', 'SKILL.md');
 
-  if (!existsSync(coreSkill)) {
+  if (!existsSync(paiSkill)) {
     return {
-      name: 'Core Skill',
+      name: 'PAI Skill',
       status: 'fail',
-      message: 'CORE skill not found',
+      message: 'PAI skill not found',
     };
   }
 

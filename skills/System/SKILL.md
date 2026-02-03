@@ -6,7 +6,7 @@ description: System maintenance with four core operations - integrity check (fin
 ## Customization
 
 **Before executing, check for user customizations at:**
-`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/System/`
+`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/System/`
 
 If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 

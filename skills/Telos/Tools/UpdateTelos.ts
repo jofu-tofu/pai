@@ -39,8 +39,8 @@ import { join } from 'path';
 import { getPrincipal } from '../../../hooks/core/identity';
 import { paiPath } from '../../../hooks/core/paths';
 
-// TELOS content lives in skills/CORE/USER/TELOS/ (not context/life/telos)
-const TELOS_DIR = paiPath('skills', 'CORE', 'USER', 'TELOS');
+// TELOS content lives in skills/PAI/USER/TELOS/ (not context/life/telos)
+const TELOS_DIR = paiPath('skills', 'PAI', 'USER', 'TELOS');
 const BACKUPS_DIR = join(TELOS_DIR, 'Backups');
 const UPDATES_FILE = join(TELOS_DIR, 'updates.md');
 

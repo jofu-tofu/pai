@@ -11,7 +11,7 @@ export interface TelosFile {
 }
 
 const PAI_DIR = getEnvVar('PAI_DIR') || path.join(os.homedir(), 'pai')
-const TELOS_DIR = path.join(PAI_DIR, 'skills', 'CORE', 'USER', 'TELOS')
+const TELOS_DIR = path.join(PAI_DIR, 'skills', 'PAI', 'USER', 'TELOS')
 
 export function getAllTelosData(): TelosFile[] {
   const files: TelosFile[] = []

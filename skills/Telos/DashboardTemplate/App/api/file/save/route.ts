@@ -25,7 +25,7 @@ function isValidFilename(name: string): { valid: boolean; reason?: string } {
 }
 
 const PAI_DIR = getEnvVar('PAI_DIR') || path.join(os.homedir(), 'pai')
-const TELOS_DIR = path.join(PAI_DIR, 'skills', 'CORE', 'USER', 'TELOS')
+const TELOS_DIR = path.join(PAI_DIR, 'skills', 'PAI', 'USER', 'TELOS')
 
 export async function POST(request: Request) {
   try {

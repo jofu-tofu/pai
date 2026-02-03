@@ -9,7 +9,7 @@
 **REQUIRED FIRST:** Read the canonical structure:
 
 ```
-$PAI_DIR/skills/CORE/SYSTEM/SKILLSYSTEM.md
+$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md
 ```
 
 ---

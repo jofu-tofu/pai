@@ -6,7 +6,7 @@
 
 - **Risk Framework:** `../RiskFramework.md`
 - **Validation Checklist:** `../ValidationChecklist.md`
-- **Authoritative Spec:** `$PAI_DIR/skills/CORE/SYSTEM/SKILLSYSTEM.md`
+- **Authoritative Spec:** `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md`
 
 ## Purpose
 
@@ -20,7 +20,7 @@ Skills improve through real-world usage feedback. When a skill requires multiple
 
 - A completed session where at least one skill was invoked
 - Target skill exists in `$PAI_DIR/skills/`
-- Read `$PAI_DIR/skills/CORE/SkillSystem.md` for structure requirements
+- Read `$PAI_DIR/skills/PAI/SkillSystem.md` for structure requirements
 
 ## Workflow Steps
 

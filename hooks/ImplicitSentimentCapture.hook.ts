@@ -63,7 +63,7 @@
 
 import { appendFileSync, mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { inference } from '../skills/CORE/Tools/Inference';
+import { inference } from '../skills/PAI/Tools/Inference';
 import { getIdentity, getPrincipal } from './core/identity';
 import { getLearningCategory } from './core/learning-utils';
 import { getISOTimestamp, getPSTComponents } from './core/time';

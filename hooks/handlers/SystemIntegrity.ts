@@ -32,7 +32,7 @@ import {
   generateDescriptiveTitle,
   type FileChange,
 } from '../core/change-detection';
-import type { ParsedTranscript } from '../../skills/CORE/Tools/TranscriptParser';
+import type { ParsedTranscript } from '../../skills/PAI/Tools/TranscriptParser';
 
 interface HookInput {
   session_id: string;

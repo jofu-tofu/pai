@@ -31,8 +31,8 @@ Running the **PrivacyCheck** workflow from the **System** skill...
 
 | Directory | Contains | Protection Level |
 |-----------|----------|------------------|
-| `skills/CORE/USER/` | Personal data, finances, health, contacts | RESTRICTED |
-| `skills/CORE/WORK/` | Customer data, consulting, client deliverables | RESTRICTED |
+| `skills/PAI/USER/` | Personal data, finances, health, contacts | RESTRICTED |
+| `skills/PAI/WORK/` | Customer data, consulting, client deliverables | RESTRICTED |
 
 **Rule:** Content from these directories must NEVER appear outside of them.
 
@@ -46,10 +46,10 @@ Build a list of sensitive patterns to search for:
 
 ```bash
 # Extract potentially sensitive identifiers from USER/
-cd "$PAI_DIR/skills/CORE/USER"
+cd "$PAI_DIR/skills/PAI/USER"
 
 # Customer names (if any)
-CUSTOMERS=$(ls "$PAI_DIR/skills/CORE/WORK/Customers/" 2>/dev/null | head -10)
+CUSTOMERS=$(ls "$PAI_DIR/skills/PAI/WORK/Customers/" 2>/dev/null | head -10)
 
 # Email patterns
 EMAILS=$(grep -roh '[a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]*\.[a-zA-Z]\{2,\}' . 2>/dev/null | sort -u | head -20)
@@ -89,8 +89,8 @@ cd "$PAI_DIR"
 echo "=== Checking for customer data outside WORK/ ==="
 
 # If we have customer directories, check their names don't appear elsewhere
-if [ -d "skills/CORE/WORK/Customers" ]; then
-  for customer in skills/CORE/WORK/Customers/*/; do
+if [ -d "skills/PAI/WORK/Customers" ]; then
+  for customer in skills/PAI/WORK/Customers/*/; do
     CUST_NAME=$(basename "$customer")
     # Search outside of WORK for this customer name
     if grep -ri "$CUST_NAME" skills/ --exclude-dir="CORE/WORK" --exclude-dir=".git" 2>/dev/null | head -1; then

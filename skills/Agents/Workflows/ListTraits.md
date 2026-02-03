@@ -210,7 +210,7 @@ Popular Combos:
 ## User Customization Note
 
 **v2.0 Feature:** Users can add custom traits by creating:
-`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml`
+`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml`
 
 Custom traits are merged over base traits - user definitions take priority. This allows adding:
 - New expertise areas
@@ -226,6 +226,6 @@ Custom traits are merged over base traits - user definitions take priority. This
 ## References
 
 - Full trait definitions: `$PAI_DIR/skills/Agents/Data/Traits.yaml`
-- User customizations: `$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml`
+- User customizations: `$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml`
 - Voice mappings: Lines 349-794 in Traits.yaml
 - ComposeAgent tool: `$PAI_DIR/skills/Agents/Tools/ComposeAgent.ts`

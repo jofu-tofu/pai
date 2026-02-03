@@ -9,7 +9,7 @@
 **REQUIRED FIRST:** Read the canonical structure:
 
 ```
-$PAI_DIR/skills/CORE/SYSTEM/SKILLSYSTEM.md
+$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md
 ```
 
 ---
@@ -176,7 +176,7 @@ grep -l "Intent-to-Flag" $PAI_DIR/skills/[SkillName]/Workflows/*.md
 | (default) | `--model sonnet` | Balanced |
 ```
 
-**Reference:** `$PAI_DIR/skills/CORE/SYSTEM/CLIFIRSTARCHITECTURE.md`
+**Reference:** `$PAI_DIR/skills/PAI/SYSTEM/CLIFIRSTARCHITECTURE.md`
 
 ---
 

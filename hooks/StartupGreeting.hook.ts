@@ -69,7 +69,7 @@ try {
   }
 
   // Run the banner tool using the current runtime (bun/node/deno)
-  const bannerPath = join(paiDir, 'skills', 'CORE', 'tools', 'Banner.ts');
+  const bannerPath = join(paiDir, 'skills', 'PAI', 'Tools', 'Banner.ts');
   const result = runScript(bannerPath, ['run'], {
     env: {
       ...process.env,

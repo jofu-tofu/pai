@@ -13,7 +13,7 @@ import { notifyTaskComplete, notifyError, getSessionDurationMinutes } from '../c
 import { getLearningCategory, isLearningCapture } from '../core/learning-utils';
 import { getPSTTimestamp, getPSTDate, getYearMonth, getISOTimestamp } from '../core/time';
 import { getSession, type SessionWork } from '../core/current-work';
-import type { ParsedTranscript, StructuredResponse } from '../../skills/CORE/Tools/TranscriptParser';
+import type { ParsedTranscript, StructuredResponse } from '../../skills/PAI/Tools/TranscriptParser';
 
 const BASE_DIR = getPaiDir();
 const WORK_DIR = join(BASE_DIR, 'MEMORY', 'WORK');

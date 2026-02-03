@@ -9,7 +9,7 @@ Structured framework for updating, modifying, and maintaining existing skills in
 
 ## Authoritative Source
 
-**Before modifying ANY skill, READ:** `$PAI_DIR/skills/CORE/SYSTEM/SKILLSYSTEM.md`
+**Before modifying ANY skill, READ:** `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md`
 
 This ensures all changes comply with:
 - TitleCase naming conventions

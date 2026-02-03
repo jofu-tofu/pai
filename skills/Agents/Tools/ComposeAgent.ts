@@ -8,7 +8,7 @@
  *
  * Configuration files:
  *   Base:  $PAI_DIR/skills/Agents/Data/Traits.yaml
- *   User:  $PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml
+ *   User:  $PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml
  *
  * Usage:
  *   # Infer traits from task description
@@ -39,7 +39,7 @@ import { getPaiDir, paiPath } from "../../../hooks/core/paths";
 // Paths - Cross-platform via PAI utilities
 const PAI_DIR = getPaiDir();
 const BASE_TRAITS_PATH = paiPath('skills', 'Agents', 'Data', 'Traits.yaml');
-const USER_TRAITS_PATH = paiPath('skills', 'CORE', 'USER', 'SKILLCUSTOMIZATIONS', 'Agents', 'Traits.yaml');
+const USER_TRAITS_PATH = paiPath('skills', 'PAI', 'USER', 'SKILLCUSTOMIZATIONS', 'Agents', 'Traits.yaml');
 const TEMPLATE_PATH = paiPath('skills', 'Agents', 'Templates', 'DynamicAgent.hbs');
 
 // Types
@@ -508,7 +508,7 @@ OPTIONS:
 
 CONFIGURATION:
   Base traits:  $PAI_DIR/skills/Agents/Data/Traits.yaml
-  User traits:  $PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml
+  User traits:  $PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml
 
   User traits are merged over base (user takes priority).
   Add your custom voices, personalities, and prosody settings in the user file.

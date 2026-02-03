@@ -24,12 +24,12 @@ description: Dynamic agent composition and management system. USE WHEN user says
    Running the **WorkflowName** workflow from the **Agents** skill...
    ```
 
-**Full documentation:** `$PAI_DIR/skills/CORE/SkillNotifications.md`
+**Full documentation:** `$PAI_DIR/skills/PAI/SkillNotifications.md`
 
 ## Customization
 
 **Before executing, check for user customizations at:**
-`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/`
+`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/`
 
 If this directory exists, load and apply:
 - `PREFERENCES.md` - Named agent roster summary
@@ -194,7 +194,7 @@ bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --task "..." --output json
 | Path | Purpose |
 |------|---------|
 | `$PAI_DIR/skills/Agents/Data/Traits.yaml` | Base traits (ships with PAI) |
-| `$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml` | User trait customizations |
+| `$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml` | User trait customizations |
 
 User traits are **merged over** base traits - user values take priority. This allows adding custom voices, personalities, and prosody settings without modifying base files.
 
@@ -227,7 +227,7 @@ User traits are **merged over** base traits - user values take priority. This al
 - **NEW:** Uses prosody settings for voice quality tuning
 - Delivers personality-driven voice notifications
 
-**CORE Skill** (`$PAI_DIR/skills/CORE/`)
+**CORE Skill** (`$PAI_DIR/skills/PAI/`)
 - References Agents skill for custom agent creation
 - Documents the custom vs generic distinction
 - Includes agent creation in delegation patterns

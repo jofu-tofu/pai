@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 /**
- * LoadContext.hook.ts - Inject CORE Skill into Claude's Context (SessionStart)
+ * LoadContext.hook.ts - Inject PAI Skill into Claude's Context (SessionStart)
  *
  * PURPOSE:
- * The foundational context injection hook. Reads the CORE SKILL.md and outputs
+ * The foundational context injection hook. Reads the PAI SKILL.md and outputs
  * it as a <system-reminder> to stdout, which Claude Code captures and includes
  * in the model's context. This is how the AI receives identity, preferences,
  * response format rules, workflow routing, and security guidelines.
@@ -12,17 +12,17 @@
  *
  * INPUT:
  * - Environment: PAI_DIR, TZ
- * - Files: skills/CORE/SKILL.md, MEMORY/STATE/progress/*.json
+ * - Files: skills/PAI/SKILL.md, MEMORY/STATE/progress/*.json
  *
  * OUTPUT:
- * - stdout: <system-reminder> containing full CORE skill content
+ * - stdout: <system-reminder> containing full PAI skill content
  * - stdout: Active work summary if previous sessions have pending work
  * - stderr: Status messages and errors
  * - exit(0): Normal completion
  * - exit(1): Critical failure (SKILL.md not found)
  *
  * SIDE EFFECTS:
- * - Reads CORE skill file and injects into context
+ * - Reads PAI skill file and injects into context
  * - Records session start time for notification timing
  * - Reads progress files to display active work
  *
@@ -143,8 +143,8 @@ async function checkActiveProgress(paiDir: string): Promise<string | null> {
 
     // Use platform-appropriate env var syntax for user-facing commands
     const paiVar = getEnvVarSyntax('PAI_DIR');
-    summary += `\n💡 To resume: \`bun run ${paiVar}/skills/CORE/Tools/SessionProgress.ts resume <project>\`\n`;
-    summary += `💡 To complete: \`bun run ${paiVar}/skills/CORE/Tools/SessionProgress.ts complete <project>\`\n`;
+    summary += `\n💡 To resume: \`bun run ${paiVar}/skills/PAI/Tools/SessionProgress.ts resume <project>\`\n`;
+    summary += `💡 To complete: \`bun run ${paiVar}/skills/PAI/Tools/SessionProgress.ts complete <project>\`\n`;
 
     return summary;
   } catch (error) {
@@ -172,7 +172,7 @@ async function main() {
     console.error('⏱️ Session start time recorded for notification timing');
 
     const paiDir = getPaiDir();
-    const paiSkillPath = join(paiDir, 'skills', 'CORE', 'SKILL.md');
+    const paiSkillPath = join(paiDir, 'skills', 'PAI', 'SKILL.md');
 
     // Verify PAI skill file exists
     if (!existsSync(paiSkillPath)) {

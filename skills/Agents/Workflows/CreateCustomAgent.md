@@ -267,7 +267,7 @@ Colors are deterministic - same trait combination always produces the same color
 ## References
 
 - Trait definitions: `$PAI_DIR/skills/Agents/Data/Traits.yaml`
-- User customizations: `$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml`
+- User customizations: `$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml`
 - Agent template: `$PAI_DIR/skills/Agents/Templates/DynamicAgent.hbs`
 - ComposeAgent tool: `$PAI_DIR/skills/Agents/Tools/ComposeAgent.ts`
 - Voice mappings: `$PAI_DIR/skills/Agents/AgentPersonalities.md`

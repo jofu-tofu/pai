@@ -137,3 +137,6 @@ _cc-native/
 
 # Generated output
 _output/
+
+# Release builds
+Releases/

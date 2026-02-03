@@ -152,7 +152,7 @@ $PAI_DIR/
 
 ### Customizing CORE
 
-Edit `skills/CORE/SKILL.md` to customize:
+Edit `skills/PAI/SKILL.md` to customize:
 - Assistant name and identity
 - Response format
 - Personality traits

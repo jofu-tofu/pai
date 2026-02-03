@@ -13,7 +13,7 @@ Skills evolve as usage patterns emerge. When frontmatter becomes stale, routing 
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Read `$PAI_DIR/skills/CORE/SkillSystem.md` for structure requirements
+- Read `$PAI_DIR/skills/PAI/SkillSystem.md` for structure requirements
 
 ## Workflow Steps
 

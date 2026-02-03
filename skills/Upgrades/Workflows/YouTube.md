@@ -11,7 +11,7 @@ See `$PAI_DIR/SKILLCUSTOMIZATIONS/Upgrades/` for user-specific channels.
 
 Load channels using the config loader (merges base + user customizations):
 ```bash
-bun $PAI_DIR/skills/CORE/Tools/LoadSkillConfig.ts $PAI_DIR/skills/Upgrades youtube-channels.json
+bun $PAI_DIR/skills/PAI/Tools/LoadSkillConfig.ts $PAI_DIR/skills/Upgrades youtube-channels.json
 ```
 
 ### Step 2: Check Each Channel for New Videos
@@ -34,7 +34,7 @@ Compare video IDs to identify NEW videos not in the seen list.
 
 For each new video, use the **VideoTranscript** skill:
 ```bash
-bun $PAI_DIR/skills/CORE/Tools/GetTranscript.ts "<video-url>"
+bun $PAI_DIR/skills/PAI/Tools/GetTranscript.ts "<video-url>"
 ```
 
 ### Step 5: Update State

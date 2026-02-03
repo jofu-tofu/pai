@@ -11,19 +11,19 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { getPaiDir } from './paths';
 
-const CORE_SKILL_PATH = join(getPaiDir(), 'skills/CORE/SKILL.md');
+const PAI_SKILL_PATH = join(getPaiDir(), 'skills/PAI/SKILL.md');
 
 // Cache the format spec
 let formatSpec: string | null = null;
 
 /**
- * Load response format spec from CORE skill
+ * Load response format spec from PAI skill
  * Used for reference when debugging or extending validation
  */
 export function getResponseFormatSpec(): string {
   if (!formatSpec) {
     try {
-      const content = readFileSync(CORE_SKILL_PATH, 'utf-8');
+      const content = readFileSync(PAI_SKILL_PATH, 'utf-8');
       // Extract the Response Format section
       const match = content.match(/## 🚨 Response Format[\s\S]*?(?=\n## |$)/);
       formatSpec = match ? match[0] : '';

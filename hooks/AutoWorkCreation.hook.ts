@@ -71,7 +71,7 @@
 import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { getPSTComponents, getISOTimestamp } from './core/time';
-import { inference } from '../skills/CORE/Tools/Inference';
+import { inference } from '../skills/PAI/Tools/Inference';
 
 interface HookInput {
   session_id: string;

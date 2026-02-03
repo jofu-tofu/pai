@@ -12,7 +12,7 @@ import { getIdentity } from '../core/identity';
 import { getISOTimestamp } from '../core/time';
 import { isValidVoiceCompletion, getVoiceFallback } from '../core/response-format';
 import { getSession } from '../core/current-work';
-import type { ParsedTranscript } from '../../skills/CORE/Tools/TranscriptParser';
+import type { ParsedTranscript } from '../../skills/PAI/Tools/TranscriptParser';
 
 const DA_IDENTITY = getIdentity();
 

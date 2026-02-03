@@ -159,7 +159,7 @@ describe('PaiDirLinter Pattern Matching', () => {
     });
 
     test('should match markdown code blocks with ~/pai', () => {
-      const text = 'The file is at `~/pai/skills/CORE/SKILL.md`';
+      const text = 'The file is at `~/pai/skills/PAI/SKILL.md`';
       const hasMatch = patterns.some(p => {
         p.lastIndex = 0;
         return p.test(text);
@@ -197,7 +197,7 @@ describe('PaiDirLinter Pattern Matching', () => {
 
   describe('Edge cases', () => {
     test('should not match PAI_DIR usage', () => {
-      const text = '${PAI_DIR}/skills/CORE';
+      const text = '${PAI_DIR}/skills/PAI';
       const allPatterns = Object.values(PATH_VIOLATIONS).flatMap(v => v.patterns);
       const hasMatch = allPatterns.some(p => {
         p.lastIndex = 0;

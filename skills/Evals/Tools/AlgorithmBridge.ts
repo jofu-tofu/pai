@@ -158,11 +158,11 @@ export function formatForISC(result: AlgorithmEvalResult): string {
 
 /**
  * Update ISC row with eval result
- * Note: ISC integration requires CORE skill to be available
+ * Note: ISC integration requires PAI skill to be available
  */
 export async function updateISCWithResult(result: AlgorithmEvalResult): Promise<void> {
   const status = result.passed ? 'DONE' : 'BLOCKED';
-  const iscManagerPath = paiPath('skills', 'CORE', 'tools', 'ISCManager.ts');
+  const iscManagerPath = paiPath('skills', 'PAI', 'Tools', 'ISCManager.ts');
 
   await shellExec(`bun run ${iscManagerPath} update --row ${result.isc_row} --status ${status} --note "${formatForISC(result)}"`);
 }

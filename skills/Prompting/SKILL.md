@@ -6,7 +6,7 @@ description: Meta-prompting system for dynamic prompt generation using templates
 ## Customization
 
 **Before executing, check for user customizations at:**
-`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Prompting/`
+`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Prompting/`
 
 If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 

@@ -152,7 +152,7 @@ bun run AgentFactory.ts --traits "..."  # Overkill for generic parallel work
 
 ## Named Agent Architecture
 
-- **Location**: `$PAI_DIR/skills/CORE/AgentPersonalities.md` (this file)
+- **Location**: `$PAI_DIR/skills/PAI/AgentPersonalities.md` (this file)
 - **Consumer**: `$PAI_DIR/VoiceServer/server.ts` extracts JSON config from this file
 - **Format**: Human-readable markdown with embedded JSON configuration
 

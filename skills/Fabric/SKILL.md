@@ -6,7 +6,7 @@ description: Intelligent prompt pattern system with 240+ specialized patterns fo
 ## Customization
 
 **Before executing, check for user customizations at:**
-`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Fabric/`
+`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Fabric/`
 
 If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 
@@ -27,7 +27,7 @@ If this directory exists, load and apply any PREFERENCES.md, configurations, or 
    Running the **WorkflowName** workflow in the **Fabric** skill to ACTION...
    ```
 
-**Full documentation:** `$PAI_DIR/skills/CORE/SYSTEM/THENOTIFICATIONSYSTEM.md`
+**Full documentation:** `$PAI_DIR/skills/PAI/SYSTEM/THENOTIFICATIONSYSTEM.md`
 
 # Fabric
 

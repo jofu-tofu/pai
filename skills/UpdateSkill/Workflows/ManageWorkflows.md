@@ -13,7 +13,7 @@ Skills grow and change as new capabilities are needed or existing workflows beco
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Read `$PAI_DIR/skills/CORE/SkillSystem.md` for workflow conventions
+- Read `$PAI_DIR/skills/PAI/SkillSystem.md` for workflow conventions
 
 ## Workflow Steps
 

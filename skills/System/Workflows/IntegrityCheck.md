@@ -39,11 +39,11 @@ Use the Task tool to launch agents in a SINGLE message (parallel execution). Eac
 
 | # | Focus Area | Scope | Check For |
 |---|------------|-------|-----------|
-| 1 | CORE SKILL.md | `skills/CORE/SKILL.md` | Broken file references, outdated paths |
+| 1 | CORE SKILL.md | `skills/PAI/SKILL.md` | Broken file references, outdated paths |
 | 2 | Identity System | `hooks/core/identity.ts`, `settings.json` | Config consistency |
 | 3 | Hook Scripts | `hooks/*.hook.ts` | Imports, identity usage |
-| 4 | System Docs | `skills/CORE/SYSTEM/*.md` | Cross-references, broken links |
-| 5 | User Docs | `skills/CORE/USER/*.md` | Personal config references |
+| 4 | System Docs | `skills/PAI/SYSTEM/*.md` | Cross-references, broken links |
+| 5 | User Docs | `skills/PAI/USER/*.md` | Personal config references |
 | 6 | Workflows | `skills/*/Workflows/*.md` | File paths, tool references |
 | 7 | Tools | `skills/*/Tools/*.ts` | Imports, hardcoded paths |
 | 8 | Settings | `settings.json` | Schema validity |

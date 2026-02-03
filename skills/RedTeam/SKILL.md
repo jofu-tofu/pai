@@ -7,7 +7,7 @@ context: fork
 ## Customization
 
 **Before executing, check for user customizations at:**
-`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/RedTeam/`
+`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/RedTeam/`
 
 If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 
@@ -33,7 +33,7 @@ Military-grade adversarial analysis using parallel agent deployment. Breaks argu
    Running the **WorkflowName** workflow from the **RedTeam** skill...
    ```
 
-**Full documentation:** `$PAI_DIR/skills/CORE/SkillNotifications.md`
+**Full documentation:** `$PAI_DIR/skills/PAI/SkillNotifications.md`
 
 ## Workflow Routing
 

@@ -66,7 +66,7 @@ fi
 # CRITICAL: Scan public repo for any leaked secrets
 PUBLIC_PAI="$HOME/Projects/PAI"
 if [ -d "$PUBLIC_PAI" ]; then
-  bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" "$PUBLIC_PAI" --verbose
+  bun "$PAI_DIR/skills/PAI/Tools/SecretScan.ts" "$PUBLIC_PAI" --verbose
 fi
 ```
 

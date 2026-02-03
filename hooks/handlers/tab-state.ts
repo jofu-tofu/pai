@@ -8,7 +8,7 @@
 import { isValidVoiceCompletion, getTabFallback } from '../core/response-format';
 import { isKittyTerminal } from '../core/terminal';
 import { crossSpawnSync } from '../core/spawn';
-import type { ParsedTranscript, ResponseState } from '../../skills/CORE/Tools/TranscriptParser';
+import type { ParsedTranscript, ResponseState } from '../../skills/PAI/Tools/TranscriptParser';
 
 // Tab color states for visual feedback (inactive tab only - active tab stays dark blue)
 const TAB_COLORS = {

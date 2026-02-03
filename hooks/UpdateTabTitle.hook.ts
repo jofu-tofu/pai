@@ -61,7 +61,7 @@
  */
 
 import { readFileSync } from 'fs';
-import { inference } from '../skills/CORE/Tools/Inference';
+import { inference } from '../skills/PAI/Tools/Inference';
 import { isValidTabSummary, getTabFallback } from './core/response-format';
 import { crossSpawnSync } from './core/spawn';
 import { isKittyTerminal, isWindowsTerminal, supportsAnsiTitles } from './core/terminal';

@@ -6,7 +6,7 @@ Create a new skill following the canonical structure with proper TitleCase namin
 
 **REQUIRED FIRST:**
 
-1. Read the skill system documentation: `$PAI_DIR/skills/CORE/SYSTEM/SKILLSYSTEM.md`
+1. Read the skill system documentation: `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md`
 2. Read the canonical example: `$PAI_DIR/skills/_BLOGGING/SKILL.md` (if exists)
 
 ## Step 2: Understand the Request
@@ -141,7 +141,7 @@ bun ToolName.ts \
 - Workflows should expose this flexibility, not hardcode single patterns
 - Users speak naturally; workflows translate to precise CLI
 
-**Reference:** `$PAI_DIR/skills/CORE/SYSTEM/CLIFIRSTARCHITECTURE.md` (Workflow-to-Tool Integration section)
+**Reference:** `$PAI_DIR/skills/PAI/SYSTEM/CLIFIRSTARCHITECTURE.md` (Workflow-to-Tool Integration section)
 
 **Examples (TitleCase):**
 ```bash

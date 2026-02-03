@@ -8,7 +8,7 @@ science_cycle_time: meso
 ## Customization
 
 **Before executing, check for user customizations at:**
-`$PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Council/`
+`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Council/`
 
 If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 
@@ -36,7 +36,7 @@ Multi-agent debate system where specialized agents discuss topics in rounds, res
    Running the **WorkflowName** workflow from the **Council** skill...
    ```
 
-**Full documentation:** `$PAI_DIR/skills/CORE/SkillNotifications.md`
+**Full documentation:** `$PAI_DIR/skills/PAI/SkillNotifications.md`
 
 ## Workflow Routing
 

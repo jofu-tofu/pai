@@ -168,7 +168,7 @@ cd $PAI_DIR
 git checkout v2.5.0
 # Or to just undo templating:
 rm -rf Templates/
-git checkout v2.5.0 -- skills/CORE/Prompting.md
+git checkout v2.5.0 -- skills/PAI/Prompting.md
 ```
 
 ## Token Savings
@@ -304,7 +304,7 @@ This system is based on research from:
 
 ## Related Documentation
 
-- `$PAI_DIR/skills/CORE/Prompting.md` (Templating section)
+- `$PAI_DIR/skills/PAI/Prompting.md` (Templating section)
 - `$PAI_DIR/History/research/2025-12/2025-12-09-templating-system-research.md`
 - `$PAI_DIR/History/learnings/2025-12/2025-12-09-021700_LEARNING_complete-templating-system-and-evals-integration.md`
 - `$PAI_DIR/skills/Evals/SKILL.md`

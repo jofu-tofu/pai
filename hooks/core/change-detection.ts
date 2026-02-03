@@ -71,8 +71,8 @@ const EXCLUDED_PATHS = [
 
 // High-priority paths that always warrant documentation
 const HIGH_PRIORITY_PATHS = [
-  'skills/CORE/SYSTEM/',
-  'skills/CORE/USER/',
+  'skills/PAI/SYSTEM/',
+  'skills/PAI/USER/',
   'PAISYSTEMARCHITECTURE.md',
   'SKILLSYSTEM.md',
   'MEMORYSYSTEM.md',
@@ -84,8 +84,8 @@ const HIGH_PRIORITY_PATHS = [
 
 // Philosophical/architectural patterns in paths
 const PHILOSOPHICAL_PATTERNS = [
-  /CORE\/SYSTEM\//i,
-  /CORE\/USER\//i,
+  /PAI\/SYSTEM\//i,
+  /PAI\/USER\//i,
   /ARCHITECTURE/i,
   /PRINCIPLES/i,
   /FOUNDING/i,
@@ -244,7 +244,7 @@ export function categorizeChange(inputPath: string): ChangeCategory | null {
   // Categorize by path pattern
   if (path.includes('skills/')) {
     if (pathContainsSegment(path, 'Workflows')) return 'workflow';
-    if (path.includes('CORE/SYSTEM/')) return 'core-system';
+    if (path.includes('PAI/SYSTEM/')) return 'core-system';
     return 'skill';
   }
 
@@ -530,7 +530,7 @@ export function generateDescriptiveTitle(changes: FileChange[]): string {
   const skillNames = new Set<string>();
   for (const p of paths) {
     const match = p.match(/skills\/([^/]+)\//);
-    if (match && match[1] !== 'CORE') skillNames.add(match[1]);
+    if (match && match[1] !== 'PAI') skillNames.add(match[1]);
   }
 
   // Detect file types (use pathContainsSegment for cross-platform compatibility)
@@ -539,8 +539,8 @@ export function generateDescriptiveTitle(changes: FileChange[]): string {
   const hasTools = paths.some(p => pathContainsSegment(p, 'Tools') && p.endsWith('.ts'));
   const hasHooks = paths.some(p => pathContainsSegment(p, 'hooks'));
   const hasConfig = paths.some(p => p.endsWith('settings.json'));
-  const hasCoreSystem = paths.some(p => pathContainsSegment(p, 'CORE/SYSTEM'));
-  const hasCoreUser = paths.some(p => pathContainsSegment(p, 'CORE/USER'));
+  const hasCoreSystem = paths.some(p => pathContainsSegment(p, 'PAI/SYSTEM'));
+  const hasCoreUser = paths.some(p => pathContainsSegment(p, 'PAI/USER'));
 
   let title = '';
 
@@ -596,7 +596,7 @@ export function generateDescriptiveTitle(changes: FileChange[]): string {
   // Core system changes
   else if (hasCoreSystem) {
     const docNames = paths
-      .filter(p => pathContainsSegment(p, 'CORE/SYSTEM'))
+      .filter(p => pathContainsSegment(p, 'PAI/SYSTEM'))
       .map(p => basename(p, '.md'));
     if (docNames.length === 1) {
       title = `${docNames[0]} Documentation Updated`;
@@ -607,7 +607,7 @@ export function generateDescriptiveTitle(changes: FileChange[]): string {
   // Core user changes
   else if (hasCoreUser) {
     const docNames = paths
-      .filter(p => pathContainsSegment(p, 'CORE/USER'))
+      .filter(p => pathContainsSegment(p, 'PAI/USER'))
       .map(p => basename(p, '.md'));
     if (docNames.length === 1) {
       title = `${docNames[0]} User Config Updated`;

@@ -28,7 +28,7 @@ Running the **SecretScanning** workflow from the **System** skill...
 
 ## Tool Location
 
-**Scanner:** `$PAI_DIR/skills/CORE/Tools/SecretScan.ts`
+**Scanner:** `$PAI_DIR/skills/PAI/Tools/SecretScan.ts`
 
 ---
 
@@ -36,19 +36,19 @@ Running the **SecretScanning** workflow from the **System** skill...
 
 ```bash
 # Scan current directory
-bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts"
+bun "$PAI_DIR/skills/PAI/Tools/SecretScan.ts"
 
 # Scan specific directory
-bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" /path/to/project
+bun "$PAI_DIR/skills/PAI/Tools/SecretScan.ts" /path/to/project
 
 # Verbose output (show redacted secrets)
-bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" /path/to/project --verbose
+bun "$PAI_DIR/skills/PAI/Tools/SecretScan.ts" /path/to/project --verbose
 
 # JSON output for parsing
-bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" /path/to/project --json
+bun "$PAI_DIR/skills/PAI/Tools/SecretScan.ts" /path/to/project --json
 
 # Verify if credentials are active
-bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" /path/to/project --verify
+bun "$PAI_DIR/skills/PAI/Tools/SecretScan.ts" /path/to/project --verify
 ```
 
 ---
@@ -76,13 +76,13 @@ TruffleHog detects 700+ credential types:
 Before pushing to any repository:
 
 ```bash
-bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" .
+bun "$PAI_DIR/skills/PAI/Tools/SecretScan.ts" .
 ```
 
 ### 2. Audit Private PAI Instance
 
 ```bash
-bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" "$PAI_DIR" --verbose
+bun "$PAI_DIR/skills/PAI/Tools/SecretScan.ts" "$PAI_DIR" --verbose
 ```
 
 ### 3. Audit Public PAI Before Push
@@ -91,13 +91,13 @@ bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" "$PAI_DIR" --verbose
 
 ```bash
 # Replace with your public PAI repository path
-bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" "$HOME/Projects/PAI" --verbose
+bun "$PAI_DIR/skills/PAI/Tools/SecretScan.ts" "$HOME/Projects/PAI" --verbose
 ```
 
 ### 4. Full Verification (Active Credential Check)
 
 ```bash
-bun "$PAI_DIR/skills/CORE/Tools/SecretScan.ts" . --verify
+bun "$PAI_DIR/skills/PAI/Tools/SecretScan.ts" . --verify
 ```
 
 ---
