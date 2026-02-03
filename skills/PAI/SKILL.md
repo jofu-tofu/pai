@@ -2,7 +2,7 @@
   GENERATED FILE - Do not edit directly
   Edit:   Components/ directory
   Build:  bun skills/PAI/Tools/CreateDynamicCore.ts
-  Built:  2 February 2026 17:26:27
+  Built:  2 February 2026 21:14:49
 -->
 ---
 name: PAI
@@ -72,22 +72,14 @@ FULL is the default. MINIMAL is rare — only pure social interaction with zero 
 
 ---
 
-## Voice Phase Announcements
-
-Each phase transition triggers a voice announcement via the voice server. Execute the curl command at each phase entry so the user hears progress.
-
----
-
 ## FULL Mode Format
 
 ```
 🤖 Entering the PAI ALGORITHM... (v0.2.25 | github.com/danielmiessler/TheAlgorithm) ═════════════
-🔊 `curl -s -X POST http://localhost:8888/notify -H "Content-Type: application/json" -d '{"message": "Entering the PAI Algorithm", "voice_id": "gJx1vCzNCD1EQHT212Ls"}'`
 
 🗒️ TASK: [8 word description]
 
 ━━━ 👁️ OBSERVE ━━━ 1/7
-🔊 `curl -s -X POST http://localhost:8888/notify -H "Content-Type: application/json" -d '{"message": "Entering the Observe phase", "voice_id": "gJx1vCzNCD1EQHT212Ls"}'`
 
 🔎 **Reverse Engineering:**
 - [What they asked]
@@ -101,7 +93,6 @@ Each phase transition triggers a voice announcement via the voice server. Execut
 [INVOKE TaskList - NO manual tables]
 
 ━━━ 🧠 THINK ━━━ 2/7
-🔊 `curl -s -X POST http://localhost:8888/notify -H "Content-Type: application/json" -d '{"message": "Entering the Think phase", "voice_id": "gJx1vCzNCD1EQHT212Ls"}'`
 
 🔍 **THINKING TOOLS ASSESSMENT** (justify exclusion):
 │ Council:          [INCLUDE/EXCLUDE] — [reason tied to ISC]
@@ -128,23 +119,18 @@ Each phase transition triggers a voice announcement via the voice server. Execut
 [Expand ISC using selected capabilities]
 
 ━━━ 📋 PLAN ━━━ 3/7
-🔊 `curl -s -X POST http://localhost:8888/notify -H "Content-Type: application/json" -d '{"message": "Entering the Plan phase", "voice_id": "gJx1vCzNCD1EQHT212Ls"}'`
 [Finalize approach]
 
 ━━━ 🔨 BUILD ━━━ 4/7
-🔊 `curl -s -X POST http://localhost:8888/notify -H "Content-Type: application/json" -d '{"message": "Entering the Build phase", "voice_id": "gJx1vCzNCD1EQHT212Ls"}'`
 [Create artifacts]
 
 ━━━ ⚡ EXECUTE ━━━ 5/7
-🔊 `curl -s -X POST http://localhost:8888/notify -H "Content-Type: application/json" -d '{"message": "Entering the Execute phase", "voice_id": "gJx1vCzNCD1EQHT212Ls"}'`
 [Run the work using selected capabilities]
 
 ━━━ ✅ VERIFY ━━━ 6/7 (THE CULMINATION)
-🔊 `curl -s -X POST http://localhost:8888/notify -H "Content-Type: application/json" -d '{"message": "Entering the Verify phase. This is the culmination.", "voice_id": "gJx1vCzNCD1EQHT212Ls"}'`
 [INVOKE TaskList, TaskUpdate with evidence for each]
 
 ━━━ 📚 LEARN ━━━ 7/7
-🔊 `curl -s -X POST http://localhost:8888/notify -H "Content-Type: application/json" -d '{"message": "Entering the Learn phase", "voice_id": "gJx1vCzNCD1EQHT212Ls"}'`
 [What to improve next time]
 
 🗣️ PAI: [Spoken summary]
@@ -385,7 +371,6 @@ Complex tasks may warrant recursive Algorithm execution where subtasks run their
 | **Manual verification table** | TaskList is source of truth |
 | **"8/8 PASSED" without TaskUpdate** | No evidence recorded |
 | **Skipping capabilities** | Agents do better work |
-| **No voice phase announcements** | User can't hear progress |
 | **No Capability Selection block in THINK** | Capabilities chosen implicitly, not justified |
 | **Overriding hook's depth classification** | Hook uses AI inference. Your override lost to its analysis. |
 | **Treating "just" or short prompts as casual** | Effort ≠ length. AI inference assesses intent. |
