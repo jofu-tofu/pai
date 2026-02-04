@@ -2,40 +2,40 @@
  * current-work.ts - Multi-session work state management
  *
  * PURPOSE:
- * Provides atomic, multi-session state management for current-work.json.
- * Allows multiple Claude Code sessions to run concurrently without
- * overwriting each other's state.
+ * Provides concurrent-safe, multi-session state management using per-session files.
+ * Each session writes to its own file, eliminating read-modify-write race conditions.
  *
  * FEATURES:
+ * - Per-session files (no race conditions)
  * - Atomic writes (temp file + rename pattern)
- * - Legacy format migration (v1 → v2)
- * - Corruption recovery with backup
- * - Stale session cleanup (24h threshold, on new session only)
+ * - Stale session cleanup (24h threshold, opportunistic)
  *
- * DATA FORMAT (v2):
- * {
- *   "_version": 2,
- *   "sessions": {
- *     "session-id-1": { work_dir, created_at, item_count },
- *     "session-id-2": { work_dir, created_at, item_count }
- *   }
- * }
+ * STORAGE FORMAT:
+ * MEMORY/STATE/sessions/
+ *   {sessionId}.json → { work_dir, created_at, item_count }
  */
 
-import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync, renameSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync, renameSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { getPaiDir } from './paths';
 
 // === Constants ===
 const STALE_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24 hours
+const SESSIONS_DIR = 'sessions';
 
 // Lazy-evaluated paths (allows PAI_DIR override in tests)
 function getStateDir(): string {
   return join(getPaiDir(), 'MEMORY', 'STATE');
 }
 
-function getCurrentWorkFile(): string {
-  return join(getStateDir(), 'current-work.json');
+function getSessionsDir(): string {
+  return join(getStateDir(), SESSIONS_DIR);
+}
+
+function getSessionFile(sessionId: string): string {
+  // Sanitize sessionId to prevent path traversal
+  const safeId = sessionId.replace(/[^a-zA-Z0-9-]/g, '_');
+  return join(getSessionsDir(), `${safeId}.json`);
 }
 
 // === Types ===
@@ -45,20 +45,6 @@ export interface SessionWork {
   work_dir: string;
   created_at: string;
   item_count: number;
-}
-
-/** Legacy v1 format (single session, no version field) */
-interface LegacyFormat {
-  session_id: string;
-  work_dir: string;
-  created_at: string;
-  item_count: number;
-}
-
-/** Current v2 format (multi-session with version) */
-interface CurrentWorkState {
-  _version: 2;
-  sessions: Record<string, SessionWork>;
 }
 
 // === Atomic Write ===
@@ -78,97 +64,39 @@ function atomicWrite(filePath: string, data: string): void {
   renameSync(tempPath, filePath);
 }
 
-// === Format Detection & Migration ===
-
-/**
- * Check if data is in legacy v1 format (has session_id, no _version).
- */
-function isLegacyFormat(data: unknown): data is LegacyFormat {
-  return !!data && typeof data === 'object' &&
-         'session_id' in data && !('_version' in data);
-}
-
-/**
- * Migrate legacy v1 format to v2 multi-session format.
- */
-function migrateLegacy(legacy: LegacyFormat): CurrentWorkState {
-  return {
-    _version: 2,
-    sessions: {
-      [legacy.session_id]: {
-        work_dir: legacy.work_dir,
-        created_at: legacy.created_at,
-        item_count: legacy.item_count
-      }
-    }
-  };
-}
-
 // === Stale Cleanup ===
 
 /**
  * Remove sessions older than 24 hours.
- * Only called on new session start to minimize race window.
+ * Called opportunistically on new session creation.
  */
-function cleanupStale(sessions: Record<string, SessionWork>): Record<string, SessionWork> {
+function cleanupStaleSessions(): void {
+  const sessionsDir = getSessionsDir();
+  if (!existsSync(sessionsDir)) return;
+
   const now = Date.now();
-  const cleaned: Record<string, SessionWork> = {};
-
-  for (const [id, session] of Object.entries(sessions)) {
-    const createdAt = new Date(session.created_at).getTime();
-    // Keep if timestamp invalid (be safe) or not stale
-    if (isNaN(createdAt) || now - createdAt < STALE_THRESHOLD_MS) {
-      cleaned[id] = session;
-    } else {
-      console.error(`[CurrentWork] Cleaned stale session: ${id}`);
-    }
-  }
-
-  return cleaned;
-}
-
-// === Core Operations ===
-
-/**
- * Read and parse current work state.
- * Handles missing file, legacy migration, and corruption recovery.
- */
-function readState(): CurrentWorkState {
-  if (!existsSync(getCurrentWorkFile())) {
-    return { _version: 2, sessions: {} };
-  }
 
   try {
-    const content = readFileSync(getCurrentWorkFile(), 'utf-8');
-    const data = JSON.parse(content);
+    const files = readdirSync(sessionsDir).filter(f => f.endsWith('.json'));
 
-    // Handle legacy format migration
-    if (isLegacyFormat(data)) {
-      console.error('[CurrentWork] Migrating legacy format to v2');
-      const migrated = migrateLegacy(data);
-      atomicWrite(getCurrentWorkFile(), JSON.stringify(migrated, null, 2));
-      return migrated;
-    }
+    for (const file of files) {
+      try {
+        const filePath = join(sessionsDir, file);
+        const content = readFileSync(filePath, 'utf-8');
+        const session = JSON.parse(content) as SessionWork;
+        const createdAt = new Date(session.created_at).getTime();
 
-    return data as CurrentWorkState;
-  } catch (err) {
-    // Backup corrupt file, don't overwrite
-    const backupPath = `${getCurrentWorkFile()}.corrupt.${Date.now()}`;
-    console.error(`[CurrentWork] Parse error, backing up to ${backupPath}`);
-    try {
-      renameSync(getCurrentWorkFile(), backupPath);
-    } catch {
-      // Ignore backup failure - file may already be gone
+        if (!isNaN(createdAt) && now - createdAt > STALE_THRESHOLD_MS) {
+          unlinkSync(filePath);
+          console.error(`[CurrentWork] Cleaned stale session: ${file}`);
+        }
+      } catch {
+        // Skip files that fail to parse or delete
+      }
     }
-    return { _version: 2, sessions: {} };
+  } catch {
+    // Ignore directory read errors
   }
-}
-
-/**
- * Write current work state atomically.
- */
-function writeState(state: CurrentWorkState): void {
-  atomicWrite(getCurrentWorkFile(), JSON.stringify(state, null, 2));
 }
 
 // === Public API ===
@@ -178,61 +106,91 @@ function writeState(state: CurrentWorkState): void {
  * Returns null if session doesn't exist.
  */
 export function getSession(sessionId: string): SessionWork | null {
-  const state = readState();
-  return state.sessions[sessionId] || null;
+  const filePath = getSessionFile(sessionId);
+  if (!existsSync(filePath)) {
+    return null;
+  }
+
+  try {
+    const content = readFileSync(filePath, 'utf-8');
+    return JSON.parse(content) as SessionWork;
+  } catch {
+    return null;
+  }
 }
 
 /**
  * Set session work state.
- * Runs stale cleanup on new session creation only.
+ * Each session writes ONLY to its own file - no race condition.
+ * Runs stale cleanup opportunistically on new session creation.
  */
 export function setSession(sessionId: string, session: SessionWork): void {
-  const state = readState();
-  const isNewSession = !(sessionId in state.sessions);
-
-  // Only cleanup on new session start (not every write)
-  if (isNewSession) {
-    state.sessions = cleanupStale(state.sessions);
+  const sessionsDir = getSessionsDir();
+  if (!existsSync(sessionsDir)) {
+    mkdirSync(sessionsDir, { recursive: true });
   }
 
-  state.sessions[sessionId] = session;
-  writeState(state);
+  const filePath = getSessionFile(sessionId);
+  const isNewSession = !existsSync(filePath);
+
+  // Each session writes ONLY to its own file - no race condition
+  atomicWrite(filePath, JSON.stringify(session, null, 2));
+
+  // Run stale cleanup opportunistically on new session creation only
+  if (isNewSession) {
+    cleanupStaleSessions();
+  }
 }
 
 /**
  * Remove session from state.
- * Deletes file if this was the last session.
+ * Deletes the session's file.
  */
 export function removeSession(sessionId: string): void {
-  const state = readState();
-  delete state.sessions[sessionId];
-
-  if (Object.keys(state.sessions).length === 0) {
-    // No sessions left - delete the file
-    if (existsSync(getCurrentWorkFile())) {
-      try {
-        unlinkSync(getCurrentWorkFile());
-      } catch {
-        // Ignore deletion failure
-      }
+  const filePath = getSessionFile(sessionId);
+  if (existsSync(filePath)) {
+    try {
+      unlinkSync(filePath);
+    } catch {
+      // Ignore deletion failure
     }
-  } else {
-    writeState(state);
   }
 }
 
 /**
  * Get all active sessions.
- * Useful for debugging/diagnostics.
+ * Aggregates from individual session files.
  */
 export function getAllSessions(): Record<string, SessionWork> {
-  return readState().sessions;
+  const sessionsDir = getSessionsDir();
+  if (!existsSync(sessionsDir)) {
+    return {};
+  }
+
+  const sessions: Record<string, SessionWork> = {};
+
+  try {
+    const files = readdirSync(sessionsDir).filter(f => f.endsWith('.json'));
+
+    for (const file of files) {
+      const sessionId = file.replace('.json', '');
+      try {
+        const content = readFileSync(join(sessionsDir, file), 'utf-8');
+        sessions[sessionId] = JSON.parse(content) as SessionWork;
+      } catch {
+        // Skip corrupt files
+      }
+    }
+  } catch {
+    // Return empty on directory read error
+  }
+
+  return sessions;
 }
 
 /**
  * Check if a session exists.
  */
 export function hasSession(sessionId: string): boolean {
-  const state = readState();
-  return sessionId in state.sessions;
+  return existsSync(getSessionFile(sessionId));
 }

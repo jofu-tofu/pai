@@ -1,10 +1,12 @@
 /**
  * current-work.test.ts - Multi-session work state management tests
+ *
+ * Tests the per-session file storage pattern that eliminates race conditions.
  */
 
 import { describe, test, expect, beforeEach, afterEach } from 'bun:test';
-import { existsSync, mkdirSync, writeFileSync, unlinkSync, rmSync, readFileSync } from 'fs';
-import { join, dirname } from 'path';
+import { existsSync, mkdirSync, writeFileSync, rmSync, readdirSync } from 'fs';
+import { join } from 'path';
 import { getSession, setSession, removeSession, getAllSessions, hasSession, type SessionWork } from './current-work';
 
 // Test in isolated temp directory
@@ -16,8 +18,13 @@ function getTestStateDir(): string {
   return join(TEST_DIR, 'MEMORY', 'STATE');
 }
 
-function getTestCurrentWorkFile(): string {
-  return join(getTestStateDir(), 'current-work.json');
+function getTestSessionsDir(): string {
+  return join(getTestStateDir(), 'sessions');
+}
+
+function getTestSessionFile(sessionId: string): string {
+  const safeId = sessionId.replace(/[^a-zA-Z0-9-]/g, '_');
+  return join(getTestSessionsDir(), `${safeId}.json`);
 }
 
 // Override getPaiDir for tests
@@ -44,13 +51,13 @@ afterEach(() => {
   }
 });
 
-describe('current-work multi-session', () => {
+describe('current-work per-session files', () => {
   test('getSession returns null for missing session', () => {
     const result = getSession('nonexistent');
     expect(result).toBeNull();
   });
 
-  test('setSession creates new session', () => {
+  test('setSession creates session file', () => {
     const session: SessionWork = {
       work_dir: '20260124-test-work',
       created_at: new Date().toISOString(),
@@ -59,13 +66,16 @@ describe('current-work multi-session', () => {
 
     setSession('session-1', session);
 
+    // Verify file was created
+    expect(existsSync(getTestSessionFile('session-1'))).toBe(true);
+
     const result = getSession('session-1');
     expect(result).not.toBeNull();
     expect(result!.work_dir).toBe('20260124-test-work');
     expect(result!.item_count).toBe(1);
   });
 
-  test('setSession updates existing session', () => {
+  test('setSession updates existing session file', () => {
     const session: SessionWork = {
       work_dir: '20260124-test-work',
       created_at: new Date().toISOString(),
@@ -82,7 +92,7 @@ describe('current-work multi-session', () => {
     expect(result!.item_count).toBe(5);
   });
 
-  test('multiple sessions are independent', () => {
+  test('multiple sessions are independent files', () => {
     const session1: SessionWork = {
       work_dir: '20260124-session1-work',
       created_at: new Date().toISOString(),
@@ -97,6 +107,10 @@ describe('current-work multi-session', () => {
 
     setSession('session-1', session1);
     setSession('session-2', session2);
+
+    // Verify separate files
+    expect(existsSync(getTestSessionFile('session-1'))).toBe(true);
+    expect(existsSync(getTestSessionFile('session-2'))).toBe(true);
 
     const result1 = getSession('session-1');
     const result2 = getSession('session-2');
@@ -107,7 +121,7 @@ describe('current-work multi-session', () => {
     expect(result2!.item_count).toBe(3);
   });
 
-  test('removeSession removes only specified session', () => {
+  test('removeSession removes only specified session file', () => {
     const session1: SessionWork = {
       work_dir: '20260124-session1-work',
       created_at: new Date().toISOString(),
@@ -125,25 +139,13 @@ describe('current-work multi-session', () => {
 
     removeSession('session-1');
 
+    expect(existsSync(getTestSessionFile('session-1'))).toBe(false);
+    expect(existsSync(getTestSessionFile('session-2'))).toBe(true);
     expect(getSession('session-1')).toBeNull();
     expect(getSession('session-2')).not.toBeNull();
   });
 
-  test('removeSession deletes file when last session removed', () => {
-    const session: SessionWork = {
-      work_dir: '20260124-test-work',
-      created_at: new Date().toISOString(),
-      item_count: 1
-    };
-
-    setSession('session-1', session);
-    expect(existsSync(getTestCurrentWorkFile())).toBe(true);
-
-    removeSession('session-1');
-    expect(existsSync(getTestCurrentWorkFile())).toBe(false);
-  });
-
-  test('getAllSessions returns all sessions', () => {
+  test('getAllSessions aggregates from all session files', () => {
     const session1: SessionWork = {
       work_dir: '20260124-session1-work',
       created_at: new Date().toISOString(),
@@ -179,75 +181,73 @@ describe('current-work multi-session', () => {
     expect(hasSession('session-1')).toBe(true);
     expect(hasSession('session-2')).toBe(false);
   });
-});
 
-describe('legacy migration', () => {
-  test('migrates v1 format to v2', () => {
-    // Write legacy format directly
-    const legacy = {
-      session_id: 'legacy-session',
-      work_dir: '20260124-legacy-work',
+  test('sessionId is sanitized to prevent path traversal', () => {
+    const session: SessionWork = {
+      work_dir: '20260124-test-work',
       created_at: new Date().toISOString(),
-      item_count: 5
+      item_count: 1
     };
 
-    writeFileSync(getTestCurrentWorkFile(), JSON.stringify(legacy, null, 2));
+    // Attempt path traversal in session ID
+    setSession('../../../evil', session);
 
-    // Read should trigger migration
-    const result = getSession('legacy-session');
-
-    expect(result).not.toBeNull();
-    expect(result!.work_dir).toBe('20260124-legacy-work');
-    expect(result!.item_count).toBe(5);
-
-    // Verify file is now v2 format
-    const content = JSON.parse(readFileSync(getTestCurrentWorkFile(), 'utf-8'));
-    expect(content._version).toBe(2);
-    expect(content.sessions).toBeDefined();
-    expect(content.sessions['legacy-session']).toBeDefined();
+    // Should be sanitized to safe filename (../ becomes ___ for each segment)
+    const files = readdirSync(getTestSessionsDir());
+    expect(files).toContain('_________evil.json');
+    expect(files.some(f => f.includes('..'))).toBe(false);
   });
 });
 
 describe('corruption recovery', () => {
-  test('recovers from corrupted JSON', () => {
-    // Write invalid JSON
-    writeFileSync(getTestCurrentWorkFile(), 'not valid json {{{');
+  test('handles corrupt session file gracefully', () => {
+    // Create sessions directory and write invalid JSON
+    mkdirSync(getTestSessionsDir(), { recursive: true });
+    writeFileSync(getTestSessionFile('corrupt-session'), 'not valid json {{{');
 
     // Should recover gracefully
-    const result = getSession('any-session');
+    const result = getSession('corrupt-session');
     expect(result).toBeNull();
+  });
 
-    // Should have backed up corrupt file
-    const files = require('fs').readdirSync(getTestStateDir());
-    const backupFiles = files.filter((f: string) => f.includes('.corrupt.'));
-    expect(backupFiles.length).toBeGreaterThan(0);
+  test('getAllSessions skips corrupt files', () => {
+    const validSession: SessionWork = {
+      work_dir: '20260124-valid-work',
+      created_at: new Date().toISOString(),
+      item_count: 1
+    };
+
+    setSession('valid-session', validSession);
+
+    // Write corrupt file
+    writeFileSync(getTestSessionFile('corrupt-session'), 'not valid json');
+
+    const all = getAllSessions();
+    expect(Object.keys(all).length).toBe(1);
+    expect(all['valid-session']).toBeDefined();
   });
 });
 
 describe('stale cleanup', () => {
-  test('cleans stale sessions on new session creation', () => {
-    // Create a session with old timestamp
+  test('cleans stale session files on new session creation', () => {
+    // Create sessions directory first
+    mkdirSync(getTestSessionsDir(), { recursive: true });
+
+    // Write stale session file directly
     const staleSession: SessionWork = {
       work_dir: '20260120-stale-work',
       created_at: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(), // 25 hours ago
       item_count: 1
     };
+    writeFileSync(getTestSessionFile('stale-session'), JSON.stringify(staleSession, null, 2));
 
+    // Write fresh session file directly
     const freshSession: SessionWork = {
       work_dir: '20260124-fresh-work',
       created_at: new Date().toISOString(),
       item_count: 1
     };
-
-    // Write stale session directly to bypass cleanup
-    const state = {
-      _version: 2,
-      sessions: {
-        'stale-session': staleSession,
-        'fresh-session': freshSession
-      }
-    };
-    writeFileSync(getTestCurrentWorkFile(), JSON.stringify(state, null, 2));
+    writeFileSync(getTestSessionFile('fresh-session'), JSON.stringify(freshSession, null, 2));
 
     // Creating a new session should trigger cleanup
     const newSession: SessionWork = {
@@ -258,43 +258,120 @@ describe('stale cleanup', () => {
     setSession('new-session', newSession);
 
     // Stale session should be cleaned
-    expect(getSession('stale-session')).toBeNull();
+    expect(existsSync(getTestSessionFile('stale-session'))).toBe(false);
     // Fresh session should remain
-    expect(getSession('fresh-session')).not.toBeNull();
+    expect(existsSync(getTestSessionFile('fresh-session'))).toBe(true);
     // New session should exist
-    expect(getSession('new-session')).not.toBeNull();
+    expect(existsSync(getTestSessionFile('new-session'))).toBe(true);
   });
 
   test('does not clean sessions on update (not new)', () => {
-    // Create a session with old timestamp
+    // Create sessions directory first
+    mkdirSync(getTestSessionsDir(), { recursive: true });
+
+    // Write stale session file directly
     const staleSession: SessionWork = {
       work_dir: '20260120-stale-work',
       created_at: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(), // 25 hours ago
       item_count: 1
     };
+    writeFileSync(getTestSessionFile('stale-session'), JSON.stringify(staleSession, null, 2));
 
+    // Create existing session (this triggers cleanup once)
     const existingSession: SessionWork = {
       work_dir: '20260124-existing-work',
       created_at: new Date().toISOString(),
       item_count: 1
     };
+    setSession('existing-session', existingSession);
 
-    // Write both sessions directly
-    const state = {
-      _version: 2,
-      sessions: {
-        'stale-session': staleSession,
-        'existing-session': existingSession
-      }
+    // Write another stale session directly (after first cleanup)
+    const staleSession2: SessionWork = {
+      work_dir: '20260120-stale-work-2',
+      created_at: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
+      item_count: 1
     };
-    writeFileSync(getTestCurrentWorkFile(), JSON.stringify(state, null, 2));
+    writeFileSync(getTestSessionFile('stale-session-2'), JSON.stringify(staleSession2, null, 2));
 
     // Update existing session (not new)
     existingSession.item_count = 5;
     setSession('existing-session', existingSession);
 
-    // Stale session should NOT be cleaned on update
-    expect(getSession('stale-session')).not.toBeNull();
+    // Stale session 2 should NOT be cleaned on update
+    expect(existsSync(getTestSessionFile('stale-session-2'))).toBe(true);
     expect(getSession('existing-session')!.item_count).toBe(5);
+  });
+});
+
+describe('concurrency safety', () => {
+  test('concurrent setSession calls do not lose entries', async () => {
+    // Spawn 10 concurrent setSession calls
+    const promises = Array.from({ length: 10 }, (_, i) =>
+      new Promise<void>(resolve => {
+        setSession(`concurrent-${i}`, {
+          work_dir: `work-${i}`,
+          created_at: new Date().toISOString(),
+          item_count: i
+        });
+        resolve();
+      })
+    );
+
+    await Promise.all(promises);
+
+    // All 10 sessions should exist
+    const all = getAllSessions();
+    expect(Object.keys(all).length).toBe(10);
+
+    // Verify each session
+    for (let i = 0; i < 10; i++) {
+      expect(all[`concurrent-${i}`]).toBeDefined();
+      expect(all[`concurrent-${i}`].work_dir).toBe(`work-${i}`);
+    }
+  });
+
+  test('concurrent read and write do not interfere', async () => {
+    // Create some initial sessions
+    for (let i = 0; i < 5; i++) {
+      setSession(`initial-${i}`, {
+        work_dir: `initial-work-${i}`,
+        created_at: new Date().toISOString(),
+        item_count: i
+      });
+    }
+
+    // Mix of concurrent reads and writes
+    const operations: Promise<void>[] = [];
+
+    // Reads
+    for (let i = 0; i < 5; i++) {
+      operations.push(
+        new Promise<void>(resolve => {
+          const session = getSession(`initial-${i}`);
+          expect(session).not.toBeNull();
+          resolve();
+        })
+      );
+    }
+
+    // Writes
+    for (let i = 5; i < 10; i++) {
+      operations.push(
+        new Promise<void>(resolve => {
+          setSession(`new-${i}`, {
+            work_dir: `new-work-${i}`,
+            created_at: new Date().toISOString(),
+            item_count: i
+          });
+          resolve();
+        })
+      );
+    }
+
+    await Promise.all(operations);
+
+    // All sessions should exist
+    const all = getAllSessions();
+    expect(Object.keys(all).length).toBe(10);
   });
 });
