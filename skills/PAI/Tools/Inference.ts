@@ -32,9 +32,9 @@ interface InferenceResult {
 }
 
 const LEVEL_CONFIG: Record<InferenceLevel, { model: string; timeout: number }> = {
-  fast: { model: 'claude-3-haiku-20240307', timeout: 15000 },
-  standard: { model: 'claude-3-5-sonnet-20241022', timeout: 30000 },
-  smart: { model: 'claude-3-opus-20240229', timeout: 90000 }
+  fast: { model: 'haiku', timeout: 15000 },
+  standard: { model: 'sonnet', timeout: 30000 },
+  smart: { model: 'opus', timeout: 90000 }
 };
 
 export async function inference(options: InferenceOptions): Promise<InferenceResult> {

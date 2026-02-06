@@ -190,7 +190,7 @@ function getStats(): SystemStats {
     learnings: learnings || 0,
     userFiles: userFiles || 0,
     sessions: sessions || 0,
-    model: "Opus 4.5",
+    model: "Opus 4.6",
     platform,
     arch,
     ccVersion,

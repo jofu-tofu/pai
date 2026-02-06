@@ -324,7 +324,7 @@ function getStats(): SystemStats {
     workItems: countWorkItems(),
     learnings: countLearnings(),
     userFiles: countUserFiles(),
-    model: "Opus 4.5",
+    model: "Opus 4.6",
   };
 }
 

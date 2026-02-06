@@ -30,6 +30,7 @@ export class LLMRubricGrader extends BaseGrader {
       'claude-haiku-4-5-20251001': 'fast',
       'claude-sonnet-4-20250514': 'standard',
       'claude-opus-4-20250514': 'smart',
+      'claude-opus-4-6': 'smart',
     };
     const level: InferenceLevel = levelMap[params.judge_model ?? ''] ?? 'standard';
 

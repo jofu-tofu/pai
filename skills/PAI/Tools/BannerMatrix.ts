@@ -349,7 +349,7 @@ function getStats(): SystemStats {
     hooks: countHooks(),
     workItems: countWorkItems(),
     learnings: countLearnings(),
-    model: "Opus 4.5",
+    model: "Opus 4.6",
   };
 }
 

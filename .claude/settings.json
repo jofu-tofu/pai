@@ -14,7 +14,7 @@
       "ides": [
         "claude"
       ],
-      "installedAt": "2026-01-28T23:22:21.668Z"
+      "installedAt": "2026-02-05T23:44:08.107Z"
     }
   },
   "hooks": {
@@ -81,6 +81,17 @@
         ]
       }
     ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .aiwcli/_shared/hooks/session_start.py",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
     "PermissionRequest": [
       {
         "matcher": "ExitPlanMode",
@@ -94,6 +105,16 @@
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "TaskCreate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .aiwcli/_shared/hooks/task_create_atomicity.py",
+            "timeout": 15000
+          }
+        ]
+      },
       {
         "matcher": "Write",
         "hooks": [

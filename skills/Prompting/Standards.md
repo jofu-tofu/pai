@@ -38,7 +38,7 @@ description: Prompt engineering standards based on Anthropic's Claude 4.x best p
 
 ## Tool Usage Patterns
 
-- **Opus 4.5 may overtrigger tools:** Dial back aggressive language
+- **Opus 4.6 may overtrigger tools:** Dial back aggressive language
 - **Change:** "CRITICAL: You MUST use this tool" → "Use this tool when..."
 - **Softer framing:** Reduces excessive tool invocation
 
@@ -373,7 +373,7 @@ Avoid generic, on-distribution outputs. Make creative, distinctive frontends tha
 
 # Vision Capabilities
 
-- **Opus 4.5 has improved image processing and data extraction**
+- **Opus 4.6 has improved image processing and data extraction**
 - Particularly strong with multiple images in context
 - Enhanced computer use with reliable screenshot interpretation
 - Analyze videos by breaking into frames
@@ -549,11 +549,11 @@ Each tool should:
 
 ❌ **Bad:** `process_order(order_data)` - Too broad, unclear what it does
 
-## Tool Description Language (Claude 4.5 Specific)
+## Tool Description Language (Claude 4.x Specific)
 
 - **Avoid:** "CRITICAL: You MUST use this tool"
 - **Prefer:** "Use this tool when..."
-- Softer framing reduces overtriggering in Opus 4.5
+- Softer framing reduces overtriggering in Opus 4.6
 
 ---
 

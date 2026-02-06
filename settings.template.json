@@ -82,6 +82,10 @@
           {
             "type": "command",
             "command": "bun {{PAI_DIR}}/hooks/StopOrchestrator.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/RelationshipMemory.hook.ts"
           }
         ]
       }
@@ -106,6 +110,10 @@
           {
             "type": "command",
             "command": "bun {{PAI_DIR}}/hooks/WorkCompletionLearning.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/SoulEvolution.hook.ts"
           }
         ]
       }

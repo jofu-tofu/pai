@@ -985,6 +985,7 @@ function renderContext(
 
   // Format model name for display (shorten common prefixes)
   const shortModel = modelName
+    .replace('claude-opus-4-6', 'opus-4.6')
     .replace('claude-opus-4-5', 'opus-4.5')
     .replace('claude-sonnet-4', 'sonnet-4')
     .replace('claude-3-5-sonnet', 'sonnet-3.5')
