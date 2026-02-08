@@ -17,9 +17,12 @@
  * TRIGGER: UserPromptSubmit
  */
 
+import { readdirSync, readFileSync } from 'fs';
+import { join } from 'path';
 import { inference } from './core/inference';
 import { getDAName } from './core/identity';
 import { getEnvVar, pathContainsSegment } from './core/platform';
+import { getSkillsDir } from './core/paths';
 
 // Maps inference capability names → output format for the reminder
 const CAPABILITY_MAP: Record<string, { name: string; agents: string }> = {
@@ -42,7 +45,53 @@ const THINKING_MAP: Record<string, { name: string; description: string }> = {
   prompting: { name: 'Prompting', description: 'Meta-prompting, prompt generation at scale' },
 };
 
-const CLASSIFICATION_SYSTEM_PROMPT = `You classify user prompts for an AI assistant's response depth, required capabilities, relevant skills, and thinking tools.
+/**
+ * Dynamically scan skills/*/SKILL.md files to build the skill list for classification.
+ * Extracts name and description from YAML frontmatter.
+ * Falls back to empty list on any error (non-fatal).
+ */
+function scanSkills(): string {
+  try {
+    const skillsDir = getSkillsDir();
+    const entries = readdirSync(skillsDir, { withFileTypes: true });
+    const skills: string[] = [];
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const skillMdPath = join(skillsDir, entry.name, 'SKILL.md');
+      try {
+        const content = readFileSync(skillMdPath, 'utf-8');
+        // Extract YAML frontmatter between --- delimiters
+        const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
+        if (!match) continue;
+
+        const frontmatter = match[1];
+        const nameMatch = frontmatter.match(/^name:\s*(.+)$/m);
+        const descMatch = frontmatter.match(/^description:\s*(.+)$/m);
+
+        if (nameMatch && descMatch) {
+          const name = nameMatch[1].trim();
+          const desc = descMatch[1].trim();
+          // Extract USE WHEN triggers for concise classification hint
+          const useWhenMatch = desc.match(/USE WHEN\s+(.+?)(?:\.|$)/i);
+          const triggers = useWhenMatch ? useWhenMatch[1].trim() : desc.slice(0, 100);
+          skills.push(`- ${name}: ${triggers}`);
+        }
+      } catch {
+        // SKILL.md doesn't exist or can't be read — skip silently
+      }
+    }
+
+    return skills.length > 0 ? skills.join('\n') : '(no skills found)';
+  } catch {
+    return '(skills directory not accessible)';
+  }
+}
+
+function buildClassificationPrompt(): string {
+  const skillsList = scanSkills();
+
+  return `You classify user prompts for an AI assistant's response depth, required capabilities, relevant skills, and thinking tools.
 
 DEPTH LEVELS (choose exactly one):
 - FULL: Any non-trivial work. Problem-solving, analysis, implementation, design, planning, thinking, evaluation, creation. This is the DEFAULT. Use it unless the request CLEARLY fits ITERATION or MINIMAL.
@@ -57,28 +106,7 @@ CAPABILITIES (choose zero or more that would help):
 - qa: Testing, verification, validation, quality checks, browser verification
 
 SKILLS (choose zero or more matching skills — use "SkillName" or "SkillName:WorkflowName"):
-- AccessibleUI: WCAG accessibility, inclusive design, a11y. Triggers: accessibility, WCAG, ARIA, screen reader, focus management
-- Agents: Agent composition, custom agents. Triggers: create custom agents, agent personalities, agent voices
-- BeCreative: Extended thinking, creative divergence. Triggers: be creative, deep thinking, extended reasoning
-- PAI: PAI system reference (auto-loaded). Triggers: system, identity, configuration
-- Council: Multi-agent debate. Triggers: council, debate, perspectives, agents discuss
-- CreateSkill: Skill creation/validation. Triggers: create skill, new skill, canonicalize
-- CSharp: C# coding guidelines. Triggers: C#, .NET, async patterns, null safety
-- Evals: Agent evaluation framework. Triggers: eval, evaluate, test agent, benchmark, regression test
-- Fabric: 240+ prompt patterns. Triggers: use fabric, fabric pattern, extract wisdom, summarize
-- FirstPrinciples: Fundamental analysis. Triggers: first principles, root cause, challenge assumptions
-- Obsidian: Knowledge management. Triggers: obsidian, notes, vault, research, mermaid diagrams
-- Prompting: Meta-prompting system. Triggers: meta-prompting, template generation, prompt optimization
-- PythonCoding: Python code quality. Triggers: Python code, Python review, Python refactoring
-- RedTeam: Adversarial analysis. Triggers: red team, attack idea, counterarguments, critique, stress test
-- Research: Comprehensive research. Triggers: research, investigate, find information, analyze content
-- SkillTranslate: Cross-platform skill translation. Triggers: translate skill, convert workflow, cross-platform
-- System: System maintenance. Triggers: integrity check, document session, security scan, git push
-- Telos: Life OS and project analysis. Triggers: TELOS, life goals, projects, dependencies
-- TestDriven: TDD methodology. Triggers: test, TDD, unit test, refactoring, characterization testing
-- UpdateSkill: Skill modification. Triggers: update skill, edit skill, modify skill, skill maintenance
-- Upgrades: PAI upgrade tracking. Triggers: upgrades, improvement tracking
-- VercelReact: React/Next.js optimization. Triggers: React, Next.js, Vercel, performance, server components
+${skillsList}
 
 THINKING TOOLS (choose zero or more — these are DRAFT hints, the main agent validates in THINK phase):
 - council: Multiple valid approaches exist. Need to weigh tradeoffs. Design decisions with no clear winner.
@@ -101,6 +129,7 @@ CRITICAL RULES:
 
 Return ONLY valid JSON. No explanation, no markdown, no wrapping:
 {"depth":"FULL","capabilities":["analyst","engineer"],"skills":["CreateSkill:UpdateSkill"],"thinking":["council"]}`;
+}
 
 // Read stdin with timeout
 async function readStdin(timeout = 3000): Promise<string> {
@@ -121,7 +150,7 @@ async function classifyPrompt(prompt: string): Promise<{
   thinking: string[];
 }> {
   const result = await inference({
-    systemPrompt: CLASSIFICATION_SYSTEM_PROMPT,
+    systemPrompt: buildClassificationPrompt(),
     userPrompt: prompt,
     level: 'standard',
     expectJson: true,
