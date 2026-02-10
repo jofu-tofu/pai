@@ -46,7 +46,7 @@ const THINKING_MAP: Record<string, { name: string; description: string }> = {
 };
 
 /**
- * Dynamically scan skills/*/SKILL.md files to build the skill list for classification.
+ * Dynamically scan skills/{name}/SKILL.md files to build the skill list for classification.
  * Extracts name and description from YAML frontmatter.
  * Falls back to empty list on any error (non-fatal).
  */

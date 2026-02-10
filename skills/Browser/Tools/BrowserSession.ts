@@ -1,14 +1,16 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 /**
- * Browser Session Server v2.0.0 - Debug-First Persistent Browser
+ * Browser Session Server v2.0.1 - Debug-First Persistent Browser
  *
  * Persistent Playwright browser with ALWAYS-ON event capture.
  * Console logs, network requests, and errors captured from launch.
+ * Cross-runtime: Works with both Bun and Node (tsx).
  * Windows-compatible: Uses cross-platform temp paths.
  *
  * Usage:
  *   # Started automatically by Browse.ts (not directly)
  *   BROWSER_PORT=9222 bun run BrowserSession.ts
+ *   BROWSER_PORT=9222 npx tsx BrowserSession.ts
  *
  * New API (v2.0.0):
  *   GET  /diagnostics  - Full diagnostic summary (errors, warnings, failed requests)
@@ -30,6 +32,7 @@
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { PlaywrightBrowser } from '../index.ts'
+import { writeFileCompat, fileExists, removeFile, serve } from './compat.ts'
 
 const CONFIG = {
   port: parseInt(process.env.BROWSER_PORT || '9222'),
@@ -61,7 +64,7 @@ async function saveState(): Promise<void> {
       headless: CONFIG.headless,
       url: browser.getUrl()
     }
-    await Bun.write(CONFIG.stateFile, JSON.stringify(state, null, 2))
+    await writeFileCompat(CONFIG.stateFile, JSON.stringify(state, null, 2))
   } catch (error) {
     console.error('Failed to save state:', error)
   }
@@ -73,11 +76,8 @@ async function cleanup(): Promise<void> {
     await browser.close()
   } catch {}
   try {
-    const file = Bun.file(CONFIG.stateFile)
-    if (await file.exists()) {
-      await Bun.write(CONFIG.stateFile, '')
-      const fs = await import('fs/promises')
-      await fs.unlink(CONFIG.stateFile)
+    if (await fileExists(CONFIG.stateFile)) {
+      await removeFile(CONFIG.stateFile)
     }
   } catch {}
   console.log('Session closed.')
@@ -142,7 +142,7 @@ await browser.launch({
 // HTTP SERVER
 // ============================================
 
-const server = Bun.serve({
+const server = serve({
   port: CONFIG.port,
 
   async fetch(req) {

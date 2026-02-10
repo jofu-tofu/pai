@@ -47,7 +47,7 @@ export async function inference(options: InferenceOptions): Promise<InferenceRes
     const args = [
       '--model', config.model,
       '--print',
-      '--no-hooks',
+      '--setting-sources', '',
       '-p', `${options.systemPrompt}\n\n${options.userPrompt}`
     ];
 

@@ -1,13 +1,15 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 /**
- * Browse CLI Tool v2.0.0 - Debug-First Browser Automation
+ * Browse CLI Tool v2.0.1 - Debug-First Browser Automation
  *
  * Browser automation with debugging visibility by DEFAULT.
  * Console logs, network requests, and errors are always captured.
+ * Cross-runtime: Works with both Bun and Node (tsx).
  * Windows-compatible: Uses cross-platform temp paths and settings.
  *
  * Usage:
  *   bun run Browse.ts <url>                    # Navigate with full diagnostics
+ *   npx tsx Browse.ts <url>                    # Same, using Node
  *   bun run Browse.ts errors                   # Show console errors
  *   bun run Browse.ts network                  # Show network activity
  *   bun run Browse.ts failed                   # Show failed requests (4xx, 5xx)
@@ -21,9 +23,8 @@
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { PlaywrightBrowser } from '../index.ts'
+import { fileExists, readFileCompat, sleep, isWindows } from './compat.ts'
 
-// Cross-platform imports for path handling
-const isWindows = process.platform === 'win32'
 const isMacOS = process.platform === 'darwin'
 
 const VOICE_SERVER = 'http://localhost:8888/notify'
@@ -59,9 +60,8 @@ interface Settings {
 
 async function getSettings(): Promise<Settings> {
   try {
-    const file = Bun.file(SETTINGS_PATH)
-    if (await file.exists()) {
-      return JSON.parse(await file.text())
+    if (await fileExists(SETTINGS_PATH)) {
+      return JSON.parse(await readFileCompat(SETTINGS_PATH))
     }
   } catch {}
   return {}
@@ -145,9 +145,8 @@ function truncate(str: string, maxLen: number): string {
 
 async function getSessionState(): Promise<SessionState | null> {
   try {
-    const file = Bun.file(STATE_FILE)
-    if (await file.exists()) {
-      const content = await file.text()
+    if (await fileExists(STATE_FILE)) {
+      const content = await readFileCompat(STATE_FILE)
       if (content.trim()) {
         return JSON.parse(content)
       }
@@ -217,17 +216,25 @@ async function ensureSession(): Promise<number> {
     BROWSER_HEADLESS: 'false'  // VISIBLE BY DEFAULT per user preference
   }
 
-  const child = spawn('bun', ['run', normalizedPath], {
+  // On Windows, Bun + Playwright chromium.launch() hangs.
+  // Use npx tsx (Node) on Windows, bun on other platforms.
+  const runner = isWindows ? 'npx' : 'bun'
+  const runnerArgs = isWindows
+    ? ['tsx', normalizedPath]
+    : ['run', normalizedPath]
+
+  const child = spawn(runner, runnerArgs, {
     detached: true,
     stdio: 'ignore',
     env,
-    ...(isWindows ? { windowsHide: true } : {})
+    ...(isWindows ? { shell: true, windowsHide: true } : {})
   })
   child.unref()
 
-  // Wait for server to be ready
-  for (let i = 0; i < 30; i++) {
-    await Bun.sleep(200)
+  // Wait for server to be ready (longer timeout on Windows due to npx cold start)
+  const maxAttempts = isWindows ? 50 : 30
+  for (let i = 0; i < maxAttempts; i++) {
+    await sleep(200)
     try {
       const res = await fetch(`http://localhost:${port}/health`, {
         signal: AbortSignal.timeout(1000)
@@ -515,7 +522,7 @@ async function restart(): Promise<void> {
         method: 'POST',
         signal: AbortSignal.timeout(2000)
       })
-      await Bun.sleep(500)
+      await sleep(500)
     }
   } catch {}
 
