@@ -10,7 +10,7 @@
  */
 
 import { spawn } from 'child_process';
-import { getKillSignal, getWindowsShellOptions } from '../../../hooks/core/platform';
+import { getKillSignal } from '../../../hooks/core/platform';
 
 type InferenceLevel = 'fast' | 'standard' | 'smart';
 
@@ -19,6 +19,7 @@ interface InferenceOptions {
   userPrompt: string;
   level?: InferenceLevel;
   json?: boolean;
+  expectJson?: boolean;  // Alias for json (matches core/inference API)
   timeout?: number;
 }
 
@@ -44,23 +45,46 @@ export async function inference(options: InferenceOptions): Promise<InferenceRes
   const startTime = Date.now();
 
   return new Promise((resolve) => {
+    // Windows cmd.exe quoting: with shell:true, Node.js sets
+    // windowsVerbatimArguments — args are joined with spaces, NOT quoted.
+    // We must manually wrap multi-word/special-char args in "..." for cmd.exe.
+    // Inside double quotes: "" = literal ", and |&<> are safe (not interpreted).
+    const isWin = process.platform === 'win32';
+
+    let sysPromptArg = options.systemPrompt.replace(/\r?\n/g, ' ');
+    if (isWin) {
+      sysPromptArg = '"' + sysPromptArg.replace(/"/g, '""') + '"';
+    }
+
+    // On Windows with shell:true, empty '' is dropped by cmd.exe.
+    // Use '""' which cmd.exe interprets as actual empty string.
+    const empty = isWin ? '""' : '';
+
     const args = [
-      '--model', config.model,
       '--print',
-      '--setting-sources', '',
-      '-p', `${options.systemPrompt}\n\n${options.userPrompt}`
+      '--model', config.model,
+      '--output-format', 'text',
+      '--setting-sources', empty,  // Disable hooks to prevent recursion
+      '--system-prompt', sysPromptArg,
     ];
 
     // Remove API key from env to force subscription auth
     const env = { ...process.env };
     delete env.ANTHROPIC_API_KEY;
 
+    // shell:true needed on Windows for .cmd shim resolution.
+    // Args are manually quoted above to survive cmd.exe parsing.
+    // User prompt piped via stdin to avoid arg-length limits.
     const proc = spawn('claude', args, {
       env,
-      stdio: ['ignore', 'pipe', 'pipe'],
-      // Windows needs shell: true for command resolution and windowsHide to prevent console popup
-      ...getWindowsShellOptions(),
+      stdio: ['pipe', 'pipe', 'pipe'],
+      shell: true,
+      windowsHide: true,
     });
+
+    // Pipe user prompt via stdin
+    proc.stdin.write(options.userPrompt);
+    proc.stdin.end();
 
     let stdout = '';
     let stderr = '';
@@ -70,6 +94,16 @@ export async function inference(options: InferenceOptions): Promise<InferenceRes
       timedOut = true;
       // Use platform-appropriate signal (Windows doesn't support POSIX signals)
       proc.kill(getKillSignal());
+      // Resolve immediately — on Windows with shell:true, proc.kill() only kills
+      // cmd.exe, not the grandchild claude process. The 'close' event waits for
+      // stdio pipes to close, which may never happen if the grandchild survives.
+      resolve({
+        success: false,
+        output: stdout,
+        error: `Timeout after ${timeout}ms`,
+        level,
+        latencyMs: Date.now() - startTime
+      });
     }, timeout);
 
     proc.stdout.on('data', (data) => {
@@ -107,7 +141,7 @@ export async function inference(options: InferenceOptions): Promise<InferenceRes
       }
 
       let parsed: unknown = undefined;
-      if (options.json) {
+      if (options.json || options.expectJson) {
         try {
           // Extract JSON from response
           const jsonMatch = stdout.match(/\{[\s\S]*\}/);

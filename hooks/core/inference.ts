@@ -66,24 +66,45 @@ export async function inference(options: InferenceOptions): Promise<InferenceRes
     const env = { ...process.env };
     delete env.ANTHROPIC_API_KEY;
 
+    // Windows cmd.exe quoting: with shell:true, Node.js sets
+    // windowsVerbatimArguments — args are joined with spaces, NOT quoted.
+    // We must manually wrap multi-word/special-char args in "..." for cmd.exe.
+    // Inside double quotes: "" = literal ", and |&<> are safe (not interpreted).
+    const isWin = process.platform === 'win32';
+
+    let sysPromptArg = options.systemPrompt.replace(/\r?\n/g, ' ');
+    if (isWin) {
+      sysPromptArg = '"' + sysPromptArg.replace(/"/g, '""') + '"';
+    }
+
+    // On Windows with shell:true, empty '' is dropped by cmd.exe.
+    // Use '""' which cmd.exe interprets as actual empty string.
+    const empty = isWin ? '""' : '';
+
     const args = [
       '--print',
       '--model', config.model,
-      '--tools', '',  // Disable tools for faster response
+      '--tools', empty,  // Disable tools for faster response
       '--output-format', 'text',
-      '--setting-sources', '',  // Disable hooks to prevent recursion
-      '--system-prompt', options.systemPrompt,
-      options.userPrompt,
+      '--setting-sources', empty,  // Disable hooks to prevent recursion
+      '--system-prompt', sysPromptArg,
     ];
 
     let stdout = '';
     let stderr = '';
 
+    // shell:true needed for .cmd resolution on Windows. User prompt piped
+    // via stdin to bypass cmd.exe interpretation of special chars in prompt.
     const proc = spawn('claude', args, {
       env,
-      stdio: ['ignore', 'pipe', 'pipe'],
-      shell: true,  // Required for Windows compatibility
+      stdio: ['pipe', 'pipe', 'pipe'],
+      shell: true,
+      windowsHide: true,
     });
+
+    // Pipe user prompt via stdin (avoids arg parsing issues on Windows)
+    proc.stdin.write(options.userPrompt);
+    proc.stdin.end();
 
     proc.stdout.on('data', (data) => {
       stdout += data.toString();

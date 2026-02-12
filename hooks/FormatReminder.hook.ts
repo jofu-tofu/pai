@@ -152,7 +152,7 @@ async function classifyPrompt(prompt: string): Promise<{
   const result = await inference({
     systemPrompt: buildClassificationPrompt(),
     userPrompt: prompt,
-    level: 'standard',
+    level: 'fast',
     expectJson: true,
     timeout: 10000, // 10s — if Sonnet can't classify in 10s, fall back to FULL
   });

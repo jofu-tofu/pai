@@ -1,15 +1,149 @@
 {
-  "permissions": {
-    "allow": [],
-    "deny": []
+  "statusLine": {
+    "type": "command",
+    "command": "bun .aiwcli/_shared/scripts/status_line.ts"
   },
-  "env": {},
-  "enabledPlugins": {},
   "fileSuggestion": {
     "type": "command",
-    "command": "python .aiwcli/_shared/hooks/file-suggestion.py"
+    "command": "bun .aiwcli/_shared/hooks-ts/file-suggestion.ts"
   },
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_shared/hooks-ts/user_prompt_submit.ts",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_shared/hooks-ts/user_prompt_submit.ts",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_cc-native/hooks/plan_questions_early.ts",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Task|Read|Bash|WebFetch|Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_shared/hooks-ts/context_monitor.ts",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "TaskCreate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_shared/hooks-ts/task_create_capture.ts",
+            "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "TaskUpdate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_shared/hooks-ts/task_update_capture.ts",
+            "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_shared/hooks-ts/archive_plan.ts",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_shared/hooks-ts/context_monitor.ts",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_cc-native/hooks/add_plan_context.ts",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_shared/hooks-ts/session_start.ts",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_shared/hooks-ts/session_end.ts",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_shared/hooks-ts/pre_compact.ts",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_shared/hooks-ts/archive_plan.ts",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "^TaskCreate$",
@@ -34,7 +168,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python .aiwcli/_cc-native/hooks/add_plan_context.py",
+            "command": "bun .aiwcli/_cc-native/hooks/add_plan_context.ts",
             "timeout": 5000
           }
         ]
@@ -44,169 +178,25 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python .aiwcli/_cc-native/hooks/cc-native-plan-review.py",
+            "command": "bun .aiwcli/_cc-native/hooks/cc-native-plan-review.ts",
             "timeout": 600000
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_shared/hooks/user_prompt_submit.py",
-            "timeout": 5000
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_shared/hooks/user_prompt_submit.py",
-            "timeout": 10000
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_cc-native/hooks/plan_questions_early.py",
-            "timeout": 3000
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Task|Read|Bash|WebFetch|Edit|Write|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_shared/hooks/context_monitor.py",
-            "timeout": 5000
-          }
-        ]
-      },
-      {
-        "matcher": "TaskCreate",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_shared/hooks/task_create_capture.py",
-            "timeout": 3000
-          }
-        ]
-      },
-      {
-        "matcher": "TaskUpdate",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_shared/hooks/task_update_capture.py",
-            "timeout": 3000
-          }
-        ]
-      },
-      {
-        "matcher": "ExitPlanMode",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_shared/hooks/archive_plan.py",
-            "timeout": 5000
-          }
-        ]
-      },
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_shared/hooks/context_monitor.py",
-            "timeout": 5000
-          }
-        ]
-      },
-      {
-        "matcher": "Bash|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_cc-native/hooks/suggest-fresh-perspective.py",
-            "timeout": 5000
-          }
-        ]
-      },
-      {
-        "matcher": "AskUserQuestion",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_cc-native/hooks/add_plan_context.py",
-            "timeout": 3000
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_shared/hooks/session_start.py",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_shared/hooks/session_end.py",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_shared/hooks/pre_compact.py",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "matcher": "ExitPlanMode",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python .aiwcli/_shared/hooks/archive_plan.py",
-            "timeout": 5000
           }
         ]
       }
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "python .aiwcli/_shared/scripts/status_line.py"
+  "permissions": {
+    "allow": [],
+    "deny": []
   },
+  "env": {},
+  "enabledPlugins": {},
   "methods": {
     "cc-native": {
       "ides": [
         "claude"
       ],
-      "installedAt": "2026-02-08T18:11:24.038Z"
+      "installedAt": "2026-02-12T02:21:36.899Z"
     }
   }
 }
