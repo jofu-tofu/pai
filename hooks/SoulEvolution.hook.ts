@@ -27,8 +27,8 @@
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { execSync } from 'child_process';
 import { getPaiDir, paiPath } from './core/paths';
+import { sendPush } from './core/notifications';
 import { getISOTimestamp, getPSTComponents } from './core/time';
 
 interface HookInput {
@@ -280,13 +280,11 @@ function applySoulUpdate(paiDir: string, update: SoulUpdate): boolean {
 function sendEvolutionNotification(update: SoulUpdate): void {
   const message = `Soul Evolution: ${update.section.replace('_', ' ')} - ${update.reason}`;
 
-  // Use ntfy if available
-  try {
-    execSync(`curl -s -d "${message}" ntfy.sh/\${NTFY_TOPIC} 2>/dev/null || true`, {
-      stdio: 'ignore',
-      timeout: 3000
-    });
-  } catch {}
+  // Use cross-platform notification system (ntfy via fetch, not curl)
+  sendPush(message, {
+    title: 'Soul Evolution',
+    tags: ['brain', 'sparkles'],
+  }).catch(() => {});
 
   // Log to stderr
   console.error(`[SoulEvolution] ${message}`);
