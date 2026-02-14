@@ -5,7 +5,7 @@ description: TypeScript type system, error handling, and compiler strictness gui
 
 # TypeScript
 
-Framework-agnostic TypeScript best practices synthesized from Matt Pocock (Total TypeScript) and Steve Kinney's guidelines. **20 rules across 10 categories, prioritized by impact.** Focuses on the type system, error handling, and compiler strictness — complementing VercelReact's performance-focused rules.
+Framework-agnostic TypeScript best practices synthesized from Matt Pocock (Total TypeScript) and Steve Kinney's guidelines. **20 rules across 10 categories, prioritized by impact.** Focuses on the type system, error handling, and compiler strictness — complementing React skill's performance-focused rules.
 
 ## When to Apply This Skill
 
@@ -165,6 +165,6 @@ Rules use TitleCase naming for PAI compliance:
 
 This skill integrates with PAI's code generation and review workflows. When writing or reviewing TypeScript code, these patterns ensure type-safe, maintainable, and defensive code.
 
-**Complements VercelReact:** VercelReact covers performance patterns (Promise.all, data structures, caching). This skill covers the type system — no duplication, full coverage.
+**Complements React:** React skill covers component architecture and performance patterns (composition, Promise.all, data structures, caching). This skill covers the type system — no duplication, full coverage.
 
 **Sources:** Matt Pocock (Total TypeScript), Steve Kinney (Frontend Masters), TypeScript community consensus

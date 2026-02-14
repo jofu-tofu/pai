@@ -183,7 +183,7 @@ TestDriven provides testing philosophy that complements language-specific coding
 
 - `skills/PythonCoding/` - Python syntax and pytest patterns
 - `skills/CSharp/` - C# syntax and xUnit/NUnit patterns
-- `skills/VercelReact/` - React Testing Library patterns
+- `skills/React/` - React Testing Library patterns
 
 **When writing tests:** Apply TestDriven principles first (WHAT to test), then language-specific skill patterns (HOW to write it).
 

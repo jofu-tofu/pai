@@ -24,11 +24,7 @@
             "type": "command",
             "command": "bun .aiwcli/_shared/hooks-ts/user_prompt_submit.ts",
             "timeout": 10000
-          }
-        ]
-      },
-      {
-        "hooks": [
+          },
           {
             "type": "command",
             "command": "bun .aiwcli/_cc-native/hooks/plan_questions_early.ts",
@@ -93,8 +89,29 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun .aiwcli/_cc-native/hooks/add_plan_context.ts",
+            "command": "bun .aiwcli/_cc-native/hooks/mark_questions_asked.ts",
             "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_cc-native/hooks/enhance_plan_post_write.ts",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "^Task$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .aiwcli/_cc-native/hooks/enhance_plan_post_subagent.ts",
+            "timeout": 10000,
+            "blockOnFail": false
           }
         ]
       }
@@ -164,22 +181,12 @@
         ]
       },
       {
-        "matcher": "^Task$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun .aiwcli/_cc-native/hooks/add_plan_context.ts",
-            "timeout": 5000
-          }
-        ]
-      },
-      {
         "matcher": "ExitPlanMode",
         "hooks": [
           {
             "type": "command",
             "command": "bun .aiwcli/_cc-native/hooks/cc-native-plan-review.ts",
-            "timeout": 600000
+            "timeout": 5000
           }
         ]
       }
@@ -196,7 +203,7 @@
       "ides": [
         "claude"
       ],
-      "installedAt": "2026-02-12T02:21:36.899Z"
+      "installedAt": "2026-02-14T21:57:03.412Z"
     }
   }
 }
