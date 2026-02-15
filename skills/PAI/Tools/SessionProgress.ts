@@ -11,7 +11,7 @@
 
 import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import { getPaiDir } from '../../../hooks/core/paths';
+import { getPaiDir } from '../../../hooks/lib/paths';
 
 interface Decision {
   timestamp: string;

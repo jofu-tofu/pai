@@ -28,7 +28,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { createHash } from 'crypto';
 import { join } from 'path';
 import { homedir } from 'os';
-import { splitLines, getEnvVar } from '../../../hooks/core/platform';
+import { splitLines, getEnvVar } from '../../../hooks/lib/platform';
 
 // Types
 interface Source {

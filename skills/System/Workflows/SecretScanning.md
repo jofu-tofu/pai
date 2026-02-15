@@ -14,18 +14,6 @@ All commands use `$PAI_DIR` for cross-platform compatibility:
 
 ---
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running secret scanning workflow"}' 2>/dev/null &
-```
-
-Running the **SecretScanning** workflow from the **System** skill...
-
----
-
 ## Tool Location
 
 **Scanner:** `$PAI_DIR/skills/PAI/Tools/SecretScan.ts`

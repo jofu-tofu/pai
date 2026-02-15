@@ -14,7 +14,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYAML } from 'yaml';
 import { homedir } from 'os';
-import { getEnvVar } from '../../../hooks/core/platform';
+import { getEnvVar } from '../../../hooks/lib/platform';
 
 // Configuration
 const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');

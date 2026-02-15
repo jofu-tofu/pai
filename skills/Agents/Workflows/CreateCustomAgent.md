@@ -98,21 +98,7 @@ Task({
 
 **Note:** Store the voice_id and color from ComposeAgent output - you'll need them for voicing results and UI.
 
-### Step 5: Voice Agent Results
-
-**Agents self-voice in v2.0 - they include their voice_id in their prompt.**
-
-After receiving agent results, if additional voicing is needed:
-1. Extract the `🎯 COMPLETED:` line from each agent's output
-2. Send voice notification using that agent's voice_id:
-
-```bash
-curl -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message":"<COMPLETED line content>","voice_id":"<agent_voice_id>","title":"<agent_name>"}'
-```
-
-### Step 6: Spotcheck (Optional but Recommended)
+### Step 5: Spotcheck (Optional but Recommended)
 
 After all agents complete, launch one more to verify consistency:
 

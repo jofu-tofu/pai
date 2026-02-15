@@ -7,26 +7,9 @@ description: Life OS and project analysis. USE WHEN TELOS, life goals, projects,
 
 **TELOS** (Telic Evolution and Life Operating System) is a comprehensive context-gathering system with two applications:
 
-1. **Personal TELOS** - {principal.name}'s life context system (beliefs, goals, lessons, wisdom) at `$PAI_DIR/skills/PAI/USER/TELOS/`
+1. **Personal TELOS** - {PRINCIPAL.NAME}'s life context system (beliefs, goals, lessons, wisdom) at `$PAI_DIR/skills/PAI/USER/TELOS/`
 2. **Project TELOS** - Analysis framework for organizations/projects (relationships, dependencies, goals, progress)
 
-
-## Voice Notification
-
-**When executing a workflow, do BOTH:**
-
-1. **Send voice notification**:
-   ```bash
-   curl -s -X POST http://localhost:8888/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow from the Telos skill"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Output text notification**:
-   ```
-   Running the **WorkflowName** workflow from the **Telos** skill...
-   ```
 
 ## Workflow Routing
 
@@ -97,7 +80,7 @@ User: "write a TELOS report for Acme Corp"
 
 ## Context Detection
 
-**How {daidentity.name} determines which TELOS context:**
+**How {DAIDENTITY.NAME} determines which TELOS context:**
 
 | User Request | Context | Location |
 |--------------|---------|----------|
@@ -107,7 +90,7 @@ User: "write a TELOS report for Acme Corp"
 
 ---
 
-# Part 1: Personal TELOS ({principal.name}'s Life)
+# Part 1: Personal TELOS ({PRINCIPAL.NAME}'s Life)
 
 ## Location
 
@@ -131,8 +114,8 @@ All files located in `$PAI_DIR/skills/PAI/USER/TELOS/`:
 ### Life Data
 - **BOOKS.md** - Favorite books
 - **MOVIES.md** - Favorite movies
-- **LESSONS.md** - Lessons learned over time
-- **WRONG.md** - Things {principal.name} was wrong about (growth tracking)
+- **LEARNED.md** - Lessons learned over time
+- **WRONG.md** - Things {PRINCIPAL.NAME} was wrong about (growth tracking)
 
 ### Mental Models
 - **FRAMES.md** - Mental frames and perspectives
@@ -177,7 +160,7 @@ The workflow provides:
 - Proper formatting and structure
 
 **Valid files for updates:**
-BELIEFS.md, BOOKS.md, CHALLENGES.md, FRAMES.md, GOALS.md, LESSONS.md, MISSION.md, MODELS.md, MOVIES.md, NARRATIVES.md, PREDICTIONS.md, PROBLEMS.md, PROJECTS.md, STRATEGIES.md, TELOS.md, TRAUMAS.md, WISDOM.md, WRONG.md
+BELIEFS.md, BOOKS.md, CHALLENGES.md, FRAMES.md, GOALS.md, LEARNED.md, MISSION.md, MODELS.md, MOVIES.md, NARRATIVES.md, PREDICTIONS.md, PROBLEMS.md, PROJECTS.md, STRATEGIES.md, TELOS.md, TRAUMAS.md, WISDOM.md, WRONG.md
 
 ---
 
@@ -201,9 +184,9 @@ For any project directory, TELOS provides:
 ```bash
 # User specifies directory
 "Analyze ~/Cloud/Projects/TELOSAPP"
---> {daidentity.name} scans for .md and .csv files anywhere in tree
+--> {DAIDENTITY.NAME} scans for .md and .csv files anywhere in tree
 
-# {daidentity.name} automatically finds all .md and .csv files regardless of structure
+# {DAIDENTITY.NAME} automatically finds all .md and .csv files regardless of structure
 ```
 
 ## Analysis Workflow
@@ -213,7 +196,7 @@ For any project directory, TELOS provides:
 **Auto-detection:**
 - User mentions project name (TELOSAPP, Alma, etc.)
 - User provides path explicitly
-- {daidentity.name} looks for common project locations
+- {DAIDENTITY.NAME} looks for common project locations
 
 ### Step 2: Scan Files
 
@@ -384,6 +367,6 @@ Engineer 10: Integration and testing
 
 ---
 
-**TELOS is {principal.name}'s life operating system AND project analysis framework. One skill, two powerful contexts.**
+**TELOS is {PRINCIPAL.NAME}'s life operating system AND project analysis framework. One skill, two powerful contexts.**
 
 **Remember:** Personal TELOS files live at `$PAI_DIR/skills/PAI/USER/TELOS/` (in the CORE USER directory)

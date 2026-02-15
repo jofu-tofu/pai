@@ -1,15 +1,5 @@
 # Interact Workflow
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:8888/notify -H "Content-Type: application/json" -d "{\"message\": \"Running the Interact workflow in the Browser skill to interact with elements\"}" > nul 2>&1
-```
-
-Running **Interact** in **Browser**...
-
----
-
 Fill forms, click buttons, and interact with page elements.
 
 ## Steps

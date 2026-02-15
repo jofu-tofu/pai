@@ -6,7 +6,7 @@ science_cycle_time: meso
 context: fork
 ---
 
-## MANDATORY TRIGGER
+## ⚠️ MANDATORY TRIGGER
 
 **When user says "research" (in any form), ALWAYS invoke this skill.**
 
@@ -15,6 +15,7 @@ context: fork
 | "research" / "do research" / "research this" | → Standard mode (2 agents) |
 | "quick research" / "minor research" | → Quick mode (1 agent) |
 | "extensive research" / "deep research" | → Extensive mode (9 agents) |
+| "deep investigation" / "investigate [topic]" / "map the [X] landscape" | → Deep Investigation (iterative) |
 
 **"Research" alone = Standard mode. No exceptions.**
 
@@ -37,25 +38,6 @@ Research agents hallucinate URLs. A single broken link is a catastrophic failure
 
 ---
 
-## Voice Notification
-
-**When executing a workflow, do BOTH:**
-
-1. **Send voice notification**:
-   ```bash
-   curl -s -X POST http://localhost:8888/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow from the Research skill"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Output text notification**:
-   ```
-   Running the **WorkflowName** workflow from the **Research** skill...
-   ```
-
-**Full documentation:** `$PAI_DIR/skills/PAI/SYSTEM/THENOTIFICATIONSYSTEM.md`
-
 ## Workflow Routing
 
 Route to the appropriate workflow based on the request.
@@ -66,6 +48,7 @@ Route to the appropriate workflow based on the request.
 - Quick/minor research (1 Claude, 1 query) -> `Workflows/QuickResearch.md`
 - Standard research - DEFAULT (2 agents: Claude + Gemini) -> `Workflows/StandardResearch.md`
 - Extensive research (3 types x 3 threads = 9 agents) -> `Workflows/ExtensiveResearch.md`
+- Deep investigation / iterative research (progressive deepening, loop-compatible) -> `Workflows/DeepInvestigation.md`
 
 ### Deep Content Analysis
 - Extract alpha / deep analysis / highest-alpha insights -> `Workflows/ExtractAlpha.md`
@@ -98,6 +81,7 @@ Route to the appropriate workflow based on the request.
 | "quick research" | 1 Claude agent | ~10-15s |
 | "do research" | 2 agents (default) | ~15-30s |
 | "extensive research" | 9 agents | ~60-90s |
+| "deep investigation" | Progressive iteration | ~3-60min |
 
 ---
 
@@ -113,6 +97,32 @@ Route to the appropriate workflow based on the request.
 - **OSINT** - MANDATORY for company/people comprehensive research
 - **BrightData MCP** - CAPTCHA solving, advanced scraping
 - **Apify MCP** - RAG browser, specialized site scrapers
+
+---
+
+## Deep Investigation Mode
+
+**Progressive iterative research** that builds a persistent knowledge vault. Works in both single-run (one cycle) and loop mode (Algorithm-driven iterations).
+
+**Concept:** Broad landscape → discover entities → score importance/effort → deep-dive one at a time → loop until coverage complete.
+
+**Domain template packs** customize the investigation for specific domains:
+- `Templates/MarketResearch.md` — Companies, Products, People, Technologies, Trends, Investors
+- `Templates/ThreatLandscape.md` — Threat Actors, Campaigns, TTPs, Vulnerabilities, Tools, Defenders
+- No template? The workflow creates entity categories dynamically from the landscape research.
+
+**Example invocation:**
+```
+"Do a deep investigation of the AI agent market"
+→ Loads MarketResearch.md template
+→ Iteration 1: Broad landscape + first entity deep-dive
+→ Loop mode: Each iteration deep-dives the next highest-priority entity
+→ Exit: When all CRITICAL/HIGH entities researched + all categories covered
+```
+
+**Artifacts persist** at `$PAI_DIR/MEMORY/RESEARCH/{date}_{topic}/` — the vault survives across sessions.
+
+See `Workflows/DeepInvestigation.md` for full workflow details.
 
 ---
 

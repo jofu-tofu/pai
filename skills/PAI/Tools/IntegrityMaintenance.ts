@@ -23,7 +23,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join, basename, dirname } from 'path';
 import { inference } from './Inference';
 import { getIdentity } from '../../../hooks/lib/identity';
-import { getWindowsShellOptions } from '../../../hooks/core/platform';
+import { getWindowsShellOptions } from '../../../hooks/lib/platform';
 
 // ============================================================================
 // Types

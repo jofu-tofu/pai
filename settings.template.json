@@ -1,5 +1,26 @@
 {
-  "model": "opus",
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "PAI_DIR": "$HOME/pai",
+    "PROJECTS_DIR": "$HOME",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "80000",
+    "BASH_DEFAULT_TIMEOUT_MS": "600000",
+    "PAI_CONFIG_DIR": "$HOME/.config/PAI",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "daidentity": {
+    "name": "PAI",
+    "personality": {
+      "enthusiasm": 75,
+      "energy": 80,
+      "precision": 95
+    }
+  },
+  "principal": {
+    "name": "User",
+    "timezone": "America/Chicago"
+  },
+  "model": "sonnet",
   "hooks": {
     "SessionStart": [
       {
@@ -21,7 +42,43 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash|Edit|Write|Read",
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/VoiceGate.hook.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/SecurityValidator.hook.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/SecurityValidator.hook.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/SecurityValidator.hook.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
         "hooks": [
           {
             "type": "command",
@@ -37,6 +94,24 @@
             "command": "bun {{PAI_DIR}}/hooks/SetQuestionTab.hook.ts"
           }
         ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/AgentExecutionGuard.hook.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/SkillGuard.hook.ts"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -48,6 +123,42 @@
             "command": "bun {{PAI_DIR}}/hooks/QuestionAnswered.hook.ts"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/AlgorithmTracker.hook.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "TaskCreate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/AlgorithmTracker.hook.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "TaskUpdate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/AlgorithmTracker.hook.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/AlgorithmTracker.hook.ts"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -55,11 +166,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/UpdateTabTitle.hook.ts"
-          },
-          {
-            "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/ExplicitRatingCapture.hook.ts"
+            "command": "bun {{PAI_DIR}}/hooks/RatingCapture.hook.ts"
           },
           {
             "type": "command",
@@ -67,11 +174,11 @@
           },
           {
             "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/ImplicitSentimentCapture.hook.ts"
+            "command": "bun {{PAI_DIR}}/hooks/UpdateTabTitle.hook.ts"
           },
           {
             "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/FormatReminder.hook.ts"
+            "command": "bun {{PAI_DIR}}/hooks/SessionAutoName.hook.ts"
           }
         ]
       }
@@ -82,20 +189,6 @@
           {
             "type": "command",
             "command": "bun {{PAI_DIR}}/hooks/StopOrchestrator.hook.ts"
-          },
-          {
-            "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/RelationshipMemory.hook.ts"
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/AgentOutputCapture.hook.ts"
           }
         ]
       }
@@ -105,15 +198,23 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/SessionSummary.hook.ts"
-          },
-          {
-            "type": "command",
             "command": "bun {{PAI_DIR}}/hooks/WorkCompletionLearning.hook.ts"
           },
           {
             "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/SoulEvolution.hook.ts"
+            "command": "bun {{PAI_DIR}}/hooks/SessionSummary.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/RelationshipMemory.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/UpdateCounts.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/IntegrityCheck.hook.ts"
           }
         ]
       }
@@ -124,6 +225,17 @@
     "command": "bun {{PAI_DIR}}/tools/statusline.ts"
   },
   "enabledPlugins": {
-    "code-review@claude-plugins-official": true
-  }
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "counts": {
+    "skills": 0,
+    "workflows": 0,
+    "hooks": 0,
+    "signals": 0,
+    "files": 0,
+    "updatedAt": ""
+  },
+  "effortLevel": "medium"
 }

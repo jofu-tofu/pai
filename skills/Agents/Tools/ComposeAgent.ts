@@ -33,8 +33,8 @@ import { parse as parseYaml } from "yaml";
 import Handlebars from "handlebars";
 import { join } from "path";
 import { homedir } from "os";
-import { getEnvVar } from "../../../hooks/core/platform";
-import { getPaiDir, paiPath } from "../../../hooks/core/paths";
+import { getEnvVar } from '../../../hooks/lib/platform";
+import { getPaiDir, paiPath } from '../../../hooks/lib/paths";
 
 // Paths - Cross-platform via PAI utilities
 const PAI_DIR = getPaiDir();

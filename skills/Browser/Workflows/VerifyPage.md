@@ -1,15 +1,5 @@
 # VerifyPage Workflow
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:8888/notify -H "Content-Type: application/json" -d "{\"message\": \"Running the VerifyPage workflow in the Browser skill to verify page loads\"}" > nul 2>&1
-```
-
-Running **VerifyPage** in **Browser**...
-
----
-
 Verify a page loads correctly and check for errors.
 
 ## Steps

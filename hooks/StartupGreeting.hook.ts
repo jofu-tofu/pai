@@ -45,54 +45,82 @@
  * - normal (85+ cols): Full neofetch-style
  */
 
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
+import { spawnSync } from 'child_process';
 
-import { getPaiDir, getSettingsPath } from './core/paths';
-import { runScript, getRuntimeCommand } from './core/spawn';
-import { pathContainsSegment, getEnvVar } from './core/platform';
+import { getPaiDir, getSettingsPath } from './lib/paths';
+import { persistKittySession } from './lib/tab-setter';
 
 const paiDir = getPaiDir();
 const settingsPath = getSettingsPath();
 
-try {
-  const settings = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+(async () => {
+  try {
+    const settings = JSON.parse(readFileSync(settingsPath, 'utf-8'));
 
-  // Check if this is a subagent session - if so, exit silently
-  // Use cross-platform path matching and case-insensitive env access
-  const claudeProjectDir = getEnvVar('CLAUDE_PROJECT_DIR') || '';
-  const isSubagent = pathContainsSegment(claudeProjectDir, '.claude/Agents') ||
-                    getEnvVar('CLAUDE_AGENT_TYPE') !== undefined;
+    // Check if this is a subagent session - if so, exit silently
+    const claudeProjectDir = process.env.CLAUDE_PROJECT_DIR || '';
+    const isSubagent = claudeProjectDir.includes('/.claude/Agents/') ||
+                      process.env.CLAUDE_AGENT_TYPE !== undefined;
 
-  if (isSubagent) {
-    process.exit(0);
-  }
-
-  // Run the banner tool using the current runtime (bun/node/deno)
-  const bannerPath = join(paiDir, 'skills', 'PAI', 'Tools', 'Banner.ts');
-  const result = runScript(bannerPath, ['run'], {
-    env: {
-      ...process.env,
-      // Pass through terminal detection env vars with fallback (case-insensitive access)
-      COLUMNS: getEnvVar('COLUMNS') || String(process.stdout.columns || 80),
-      KITTY_WINDOW_ID: getEnvVar('KITTY_WINDOW_ID'),
+    if (isSubagent) {
+      process.exit(0);
     }
-  });
 
-  // Handle case where runtime is not in PATH or command failed
-  if (!result.success && result.code === null) {
-    const runtime = getRuntimeCommand();
-    console.error(`StartupGreeting: ${runtime} is not installed or not in PATH`);
-    // Don't exit with error - allow Claude Code to continue without banner
+    // Read session_id from stdin (Claude Code passes hook input as JSON)
+    let sessionId: string | null = null;
+    try {
+      const stdinText = await Bun.stdin.text();
+      if (stdinText.trim()) {
+        const hookInput = JSON.parse(stdinText);
+        sessionId = hookInput.session_id || null;
+      }
+    } catch { /* stdin parse failed — proceed without session_id */ }
+
+    // Persist Kitty environment for hooks that run later without terminal context.
+    // Uses per-session mapping so multiple tabs don't overwrite each other's window IDs.
+    const kittyListenOn = process.env.KITTY_LISTEN_ON;
+    const kittyWindowId = process.env.KITTY_WINDOW_ID;
+    if (kittyListenOn && kittyWindowId) {
+      if (sessionId) {
+        persistKittySession(sessionId, kittyListenOn, kittyWindowId);
+      } else {
+        // Fallback: write singleton for backward compat when no session_id available
+        const stateDir = join(paiDir, 'MEMORY', 'STATE');
+        if (!existsSync(stateDir)) mkdirSync(stateDir, { recursive: true });
+        writeFileSync(
+          join(stateDir, 'kitty-env.json'),
+          JSON.stringify({ KITTY_LISTEN_ON: kittyListenOn, KITTY_WINDOW_ID: kittyWindowId }, null, 2)
+        );
+      }
+    }
+
+    // Run the banner tool
+    const bannerPath = join(paiDir, 'skills/PAI/Tools/Banner.ts');
+    const result = spawnSync('bun', ['run', bannerPath], {
+      encoding: 'utf-8',
+      stdio: ['inherit', 'pipe', 'pipe'],
+      env: {
+        ...process.env,
+        // Pass through terminal detection env vars
+        COLUMNS: process.env.COLUMNS,
+        KITTY_WINDOW_ID: process.env.KITTY_WINDOW_ID,
+      }
+    });
+
+    if (result.stdout) {
+      console.log(result.stdout);
+    }
+
+    // Voice greeting removed — Banner.ts already displays the catchphrase visually.
+    // Having both caused duplicate "{DA_NAME} here, ready to go" output.
+    // Voice-at-startup should be handled by Banner.ts or a dedicated voice-only mechanism
+    // if re-added, to avoid visual duplication.
+
     process.exit(0);
+  } catch (error) {
+    console.error('StartupGreeting: Failed to display banner', error);
+    process.exit(1);
   }
-
-  if (result.stdout) {
-    console.log(result.stdout);
-  }
-
-  process.exit(0);
-} catch (error) {
-  console.error('StartupGreeting: Failed to display banner', error);
-  process.exit(1);
-}
+})();

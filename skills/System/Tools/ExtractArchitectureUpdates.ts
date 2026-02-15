@@ -12,7 +12,7 @@
 import { readFile, writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { homedir } from "os";
-import { joinLines, getEnvVar } from "../../../hooks/core/platform";
+import { joinLines, getEnvVar } from '../../../hooks/lib/platform";
 
 const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
 const ARCHITECTURE_PATH = join(PAI_DIR, "skills", "CORE", "SYSTEM", "ARCHITECTURE.md");

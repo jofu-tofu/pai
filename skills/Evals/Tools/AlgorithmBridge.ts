@@ -14,8 +14,11 @@ import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { parseArgs } from 'util';
-import { shellExec } from '../../../hooks/core/spawn';
-import { paiPath } from '../../../hooks/core/paths';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { paiPath } from '../../../hooks/lib/paths';
+
+const execAsync = promisify(exec);
 
 const EVALS_DIR = paiPath('skills', 'Evals');
 const RESULTS_DIR = join(EVALS_DIR, 'Results');
@@ -164,7 +167,7 @@ export async function updateISCWithResult(result: AlgorithmEvalResult): Promise<
   const status = result.passed ? 'DONE' : 'BLOCKED';
   const iscManagerPath = paiPath('skills', 'PAI', 'Tools', 'ISCManager.ts');
 
-  await shellExec(`bun run ${iscManagerPath} update --row ${result.isc_row} --status ${status} --note "${formatForISC(result)}"`);
+  await execAsync(`bun run ${iscManagerPath} update --row ${result.isc_row} --status ${status} --note "${formatForISC(result)}"`);
 }
 
 // CLI interface

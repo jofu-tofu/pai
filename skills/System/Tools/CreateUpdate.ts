@@ -20,7 +20,7 @@ import { writeFile, mkdir, readFile } from "fs/promises";
 import { join } from "path";
 import { parseArgs } from "util";
 import { homedir } from "os";
-import { splitLines, joinLines } from '../../../hooks/core/platform';
+import { splitLines, joinLines } from '../../../hooks/lib/platform';
 
 const PAI_DIR = process.env.PAI_DIR || join(homedir(), 'pai');
 const UPDATES_DIR = join(PAI_DIR, "MEMORY", "PAISYSTEMUPDATES");

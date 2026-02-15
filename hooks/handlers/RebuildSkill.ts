@@ -21,14 +21,14 @@
 
 import { statSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { spawnSync } from 'child_process';
-import { paiPath } from '../core/paths';
+import { homedir } from 'os';
+import { spawn } from 'child_process';
 
 export async function handleRebuildSkill(): Promise<void> {
-  const PAI_DIR = paiPath('skills', 'PAI');
-  const COMPONENTS_DIR = join(PAI_DIR, 'Components');
-  const SKILL_MD = join(PAI_DIR, 'SKILL.md');
-  const BUILD_SCRIPT = join(PAI_DIR, 'Tools/CreateDynamicCore.ts');
+  const CORE_DIR = join(homedir(), '.claude/skills/PAI');
+  const COMPONENTS_DIR = join(CORE_DIR, 'Components');
+  const SKILL_MD = join(CORE_DIR, 'SKILL.md');
+  const BUILD_SCRIPT = join(CORE_DIR, 'Tools/RebuildPAI.ts');
 
   try {
     // Check if SKILL.md exists
@@ -38,7 +38,7 @@ export async function handleRebuildSkill(): Promise<void> {
     } catch {
       // SKILL.md doesn't exist - rebuild needed
       console.error('[RebuildSkill] SKILL.md missing - rebuilding');
-      rebuild(BUILD_SCRIPT, PAI_DIR);
+      await rebuild(BUILD_SCRIPT);
       return;
     }
 
@@ -52,7 +52,7 @@ export async function handleRebuildSkill(): Promise<void> {
 
     if (anyNewer) {
       console.error('[RebuildSkill] Components modified - rebuilding SKILL.md');
-      rebuild(BUILD_SCRIPT, PAI_DIR);
+      await rebuild(BUILD_SCRIPT);
     } else {
       console.error('[RebuildSkill] SKILL.md is current - no rebuild needed');
     }
@@ -61,15 +61,37 @@ export async function handleRebuildSkill(): Promise<void> {
   }
 }
 
-function rebuild(buildScript: string, cwd: string): void {
-  const result = spawnSync('bun', [buildScript], {
-    cwd,
-    encoding: 'utf-8',
-  });
+function rebuild(buildScript: string): Promise<void> {
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => {
+      child.kill('SIGTERM');
+      console.error('[RebuildSkill] Build timed out after 10s');
+      resolve();
+    }, 10000);
 
-  if (result.error) {
-    console.error('[RebuildSkill] Build failed:', result.error);
-  } else {
-    console.error('[RebuildSkill]', result.stdout?.trim() || 'Build completed');
-  }
+    const child = spawn('bun', [buildScript], {
+      cwd: join(homedir(), '.claude/skills/PAI'),
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    let stdout = '';
+    child.stdout?.on('data', (d: Buffer) => { stdout += d.toString(); });
+    child.stderr?.on('data', (d: Buffer) => { console.error(d.toString()); });
+
+    child.on('close', (code) => {
+      clearTimeout(timeout);
+      if (code !== 0) {
+        console.error(`[RebuildSkill] Build exited with code ${code}`);
+      } else {
+        console.error('[RebuildSkill]', stdout.trim() || 'Build completed');
+      }
+      resolve();
+    });
+
+    child.on('error', (err) => {
+      clearTimeout(timeout);
+      console.error('[RebuildSkill] Build failed:', err);
+      resolve();
+    });
+  });
 }

@@ -110,10 +110,3 @@ To modify the tab title behavior, edit `${PAI_DIR}/hooks/stop-hook.ts`:
 - **Task History** - Tab titles persist as a record of completed work
 - **No Manual Updates** - Fully automatic, runs on every task completion
 
-## Integration with Voice System
-
-The terminal tab system works alongside the voice notification system:
-- Both extract information from the COMPLETED line
-- Tab gets a 4-word visual summary
-- Voice speaks the completion message
-- Both provide immediate feedback through different channels

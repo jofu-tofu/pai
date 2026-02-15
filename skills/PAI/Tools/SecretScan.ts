@@ -31,7 +31,7 @@
 
 import { spawn } from 'child_process';
 import { existsSync } from 'fs';
-import { getWindowsShellOptions } from '../../../hooks/core/platform';
+import { getWindowsShellOptions } from '../../../hooks/lib/platform';
 
 interface TruffleHogFinding {
   SourceMetadata: {

@@ -1,90 +1,44 @@
 #!/usr/bin/env bun
 /**
- * UpdateTabTitle.hook.ts - Tab Title + Voice Announcement (UserPromptSubmit)
- *
- * PURPOSE:
- * Provides real-time visual and audio feedback for user prompts. Uses AI inference
- * to generate a concise 3-4 word summary, updates the terminal tab title with color
- * coding, and announces the task via the voice server.
+ * UpdateTabTitle.hook.ts - Tab Title on Prompt Receipt (UserPromptSubmit)
  *
  * TRIGGER: UserPromptSubmit
  *
- * INPUT:
- * - stdin: Hook input JSON with prompt, session_id, transcript_path
+ * PRIME DIRECTIVE:
+ * Show what this session is working on, at a glance, across multiple tabs.
  *
- * OUTPUT:
- * - stdout: None
- * - stderr: Status and debug messages
- * - exit(0): Always (non-blocking)
+ * TITLE RULES (enforced by isValidWorkingTitle):
+ * 1. Starts with a gerund (-ing verb)
+ * 2. 2-4 words total (ONE sentence)
+ * 3. Ends with a period
+ * 4. Grammatically complete — no dangling articles/prepositions/conjunctions
+ * 5. Specific — names the actual object being acted on
+ * 6. No generic garbage ("Completing task", "Processing request")
+ * 7. No first-person pronouns
  *
- * SIDE EFFECTS:
- * - Kitty remote control: Sets tab title and color
- * - Voice server HTTP request: Announces task
- * - Haiku inference API call: Generates summary
- * - Reads transcript for conversation context
+ * FLOW:
+ * 1. Extract quick title from prompt (deterministic, instant) → 🧠 purple
+ * 2. Run inference for better summary → validate with isValidWorkingTitle
+ * 3. Show validated title → ⚙️ orange
+ * 4. If validation fails both paths → getWorkingFallback()
  *
- * INTER-HOOK RELATIONSHIPS:
- * - DEPENDS ON: None
- * - COORDINATES WITH: SetQuestionTab (shares tab color management)
- * - COORDINATES WITH: StopOrchestrator/tab-state (resets color on completion)
- * - MUST RUN BEFORE: None
- * - MUST RUN AFTER: None
- *
- * TAB COLOR SCHEME (inactive tab only - active tab stays dark blue):
- * - Dark purple (#1E0A3C): AI inference/thinking (🧠 prefix)
- * - Dark orange (#804000): Actively working (⚙️ prefix)
- * - Dark teal (#085050): Waiting for user input (SetQuestionTab)
- * - Dark blue (#002B80): Active tab always uses this
- *
- * SUMMARY GENERATION:
- * 1. Immediately shows "Processing…" with purple color
- * 2. Uses Haiku with conversation context to generate summary
- * 3. Validates summary (rejects garbage like "I appreciate...")
- * 4. Updates tab to gerund-based summary (e.g., "Fixing auth bug")
- * 5. Announces via voice server
- *
- * VOICE FORMAT:
- * - Always starts with gerund (Checking, Fixing, Creating, etc.)
- * - 3-4 words maximum
- * - Examples: "Checking config", "Debugging auth", "Creating component"
- *
- * ERROR HANDLING:
- * - Inference failure: Falls back to "Processing"
- * - Invalid summary: Falls back to quickTitle
- * - Kitty unavailable: Silent failure (escape codes for other terminals)
- * - Voice server unavailable: Silent failure
- *
- * PERFORMANCE:
- * - Non-blocking: Yes (visual feedback)
- * - Typical execution: <500ms (Haiku inference is fast)
- * - Includes 5-second stdin timeout
+ * VOICE: Announces inference-generated summary on prompt receipt.
+ * Task completion voice is separate (StopOrchestrator → VoiceNotification handler).
+ * DO NOT REMOVE voice from this hook — see MEMORY/LEARNING/SYSTEM/2026-01/
+ * 2026-01-15-205500_LEARNING_voice-on-prompt-submit-architecture.md
  */
 
-import { readFileSync } from 'fs';
 import { inference } from '../skills/PAI/Tools/Inference';
-import { isValidTabSummary, getTabFallback } from './core/response-format';
-import { crossSpawnSync } from './core/spawn';
-import { isKittyTerminal, isWindowsTerminal, supportsAnsiTitles } from './core/terminal';
-import { isWindows, splitLines, isNoColorSet, getEnvVar, joinLines } from './core/platform';
-
-// Tab colors - different states
-const TAB_WORKING_BG = '#804000';      // Dark orange - actively working
-const TAB_INFERENCE_BG = '#1E0A3C';    // Very dark purple - inference/AI thinking
-const ACTIVE_TAB_BG = '#002B80';       // Dark blue - active tab base
-const ACTIVE_TEXT = '#FFFFFF';          // White text for active
-const INACTIVE_TEXT = '#A0A0A0';        // Gray text for inactive
-
+import { isValidWorkingTitle, getWorkingFallback } from './lib/output-validators';
+import { setTabState, getSessionOneWord } from './lib/tab-setter';
+import { getIdentity } from './lib/identity';
 
 interface HookInput {
   session_id: string;
   prompt: string;
   transcript_path: string;
-  hook_event_name: string;
 }
 
-/**
- * Read stdin with timeout
- */
 async function readStdinWithTimeout(timeout: number = 5000): Promise<string> {
   return new Promise((resolve, reject) => {
     let data = '';
@@ -95,262 +49,194 @@ async function readStdinWithTimeout(timeout: number = 5000): Promise<string> {
   });
 }
 
+// Common imperative → gerund mappings
+const GERUND_MAP: Record<string, string> = {
+  fix: 'Fixing', update: 'Updating', add: 'Adding', remove: 'Removing',
+  delete: 'Deleting', check: 'Checking', create: 'Creating', build: 'Building',
+  deploy: 'Deploying', debug: 'Debugging', test: 'Testing', review: 'Reviewing',
+  refactor: 'Refactoring', implement: 'Implementing', write: 'Writing',
+  read: 'Reading', find: 'Finding', search: 'Searching', install: 'Installing',
+  configure: 'Configuring', run: 'Running', start: 'Starting', stop: 'Stopping',
+  restart: 'Restarting', open: 'Opening', close: 'Closing', move: 'Moving',
+  rename: 'Renaming', merge: 'Merging', revert: 'Reverting', clean: 'Cleaning',
+  show: 'Showing', list: 'Listing', get: 'Getting', set: 'Setting',
+  make: 'Making', change: 'Changing', modify: 'Modifying', adjust: 'Adjusting',
+  improve: 'Improving', optimize: 'Optimizing', analyze: 'Analyzing',
+  research: 'Researching', investigate: 'Investigating', explain: 'Explaining',
+  push: 'Pushing', pull: 'Pulling', commit: 'Committing', design: 'Designing',
+};
+
+// Words ending in 'ing' that are NOT gerunds — don't treat as working titles
+const FALSE_GERUNDS = new Set([
+  'something', 'nothing', 'anything', 'everything',
+  'morning', 'evening', 'string', 'king', 'ring', 'thing',
+  'bring', 'spring', 'swing', 'wing', 'cling', 'fling', 'sting',
+  'during', 'using', 'being', 'ceiling', 'feeling',
+]);
+
+// Words to filter from prompts (noise, profanity)
+const FILTER_WORDS = new Set([
+  'the', 'a', 'an', 'i', 'my', 'we', 'you', 'your', 'this', 'that', 'it',
+  'is', 'are', 'was', 'were', 'do', 'does', 'did', 'can', 'could', 'should',
+  'would', 'will', 'have', 'has', 'had', 'just', 'also', 'need', 'want',
+  'please', 'why', 'how', 'what', 'when', 'where', 'which', 'who', 'think',
+  'fucking', 'fuck', 'shit', 'damn', 'dumb', 'ass', 'bitch', 'cunt', 'whore',
+]);
+
 /**
- * Quick fallback - just a generic placeholder while inference runs
- * Never extracts words from prompt - always use inference for semantic understanding
- * MUST return a gerund (word ending in "ing") to pass isValidTabSummary validation
+ * Extract a quick title from the prompt text. Deterministic, instant.
+ * Used as immediate feedback while inference runs.
+ * Returns null if no valid gerund title can be extracted.
  */
-function quickTitle(_prompt: string): string {
-  return 'Processing request';
+function extractPromptTitle(prompt: string): string | null {
+  const text = prompt.trim().replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').slice(0, 200);
+  const words = text.split(' ').filter(w => w.length > 1);
+  if (words.length === 0) return null;
+
+  const firstLower = words[0].toLowerCase().replace(/[^a-z]/g, '');
+
+  if (firstLower.endsWith('ing') && firstLower.length > 4 && !FALSE_GERUNDS.has(firstLower)) {
+    const result = words.slice(0, 4).join(' ');
+    return result.endsWith('.') ? result : result + '.';
+  }
+
+  const gerund = GERUND_MAP[firstLower];
+  if (gerund) {
+    const rest = words.slice(1, 3).join(' ');
+    const result = rest ? `${gerund} ${rest}` : gerund;
+    return result.endsWith('.') ? result : result + '.';
+  }
+
+  // No valid gerund extraction possible — return null so caller uses fallback
+  return null;
+}
+
+const SYSTEM_PROMPT = `Create a 2-4 word COMPLETE SENTENCE summarizing the user's CURRENT MESSAGE.
+
+RULES:
+1. Start with a gerund (-ing verb): Fixing, Checking, Updating, etc.
+2. Include the specific OBJECT being acted on
+3. MUST be a COMPLETE sentence (no dangling prepositions or articles)
+4. End with a period
+5. NEVER use generic subjects: "task", "work", "request", "response"
+6. MAXIMUM 4 words total including the gerund
+7. ONLY reference topics EXPLICITLY present in the user's message. If the user didn't mention a topic, it MUST NOT appear in your output.
+
+GOOD: "Fixing auth bug.", "Checking tab code.", "Reviewing config."
+BAD: "Completing the task.", "Fixing the authentication bug in login.", "Working on it."
+
+Output ONLY the sentence. Nothing else.`;
+
+/**
+ * Check if a generated title is relevant to the user's prompt.
+ * Extracts the key nouns from the title (non-gerund words) and checks
+ * if at least one appears in the prompt. If the title introduces a topic
+ * the user never mentioned, it's contamination from the model's context.
+ */
+function isTitleRelevantToPrompt(title: string, prompt: string): boolean {
+  const content = title.replace(/\.$/, '').trim();
+  const words = content.split(/\s+/);
+  if (words.length < 2) return true; // Single-word gerund, can't check
+
+  // Get the non-gerund content words (the topic)
+  const topicWords = words.slice(1)
+    .map(w => w.toLowerCase().replace(/[^a-z]/g, ''))
+    .filter(w => w.length > 2 && !FILTER_WORDS.has(w));
+
+  if (topicWords.length === 0) return true; // No topic words to check
+
+  const promptLower = prompt.toLowerCase();
+
+  // At least one topic word (or 3-char prefix) must appear in the prompt
+  return topicWords.some(word =>
+    promptLower.includes(word) || promptLower.includes(word.slice(0, Math.max(4, Math.floor(word.length * 0.6))))
+  );
 }
 
 /**
- * Get recent conversation context from transcript
- * Returns last N human/assistant turns formatted for context
+ * Generate summary via inference. Returns null on failure.
  */
-function getRecentContext(transcriptPath: string, maxTurns: number = 4): string {
-  try {
-    if (!transcriptPath) return '';
-
-    const content = readFileSync(transcriptPath, 'utf-8');
-    // Handle both Unix (LF) and Windows (CRLF) line endings
-    const lines = splitLines(content.trim());
-
-    const turns: { role: string; text: string }[] = [];
-
-    for (const line of lines) {
-      if (!line.trim()) continue;
-      try {
-        const entry = JSON.parse(line);
-
-        // Handle user messages (skip tool_result, only capture actual text)
-        if (entry.type === 'user' && entry.message?.content) {
-          let text = '';
-          if (typeof entry.message.content === 'string') {
-            text = entry.message.content;
-          } else if (Array.isArray(entry.message.content)) {
-            // Extract only text blocks, skip tool_result blocks
-            text = entry.message.content
-              .filter((c: any) => c.type === 'text')
-              .map((c: any) => c.text)
-              .join(' ');
-          }
-          if (text.trim()) {
-            turns.push({ role: 'User', text: text.slice(0, 500) });
-          }
-        }
-
-        // Handle assistant messages - extract key action/topic
-        if (entry.type === 'assistant' && entry.message?.content) {
-          const text = typeof entry.message.content === 'string'
-            ? entry.message.content
-            : Array.isArray(entry.message.content)
-              ? entry.message.content.filter((c: any) => c.type === 'text').map((c: any) => c.text).join(' ')
-              : '';
-          if (text) {
-            // Extract just the summary line if present, otherwise first 300 chars
-            const summaryMatch = text.match(/SUMMARY:\s*([^\r\n]+)/);
-            const shortText = summaryMatch ? summaryMatch[1] : text.slice(0, 300);
-            turns.push({ role: 'Assistant', text: shortText });
-          }
-        }
-      } catch {
-        // Skip invalid JSON
-      }
-    }
-
-    // Get last N turns
-    const recentTurns = turns.slice(-maxTurns);
-    if (recentTurns.length === 0) return '';
-
-    return joinLines(recentTurns.map(t => `${t.role}: ${t.text}`));
-  } catch (err) {
-    console.error('[UpdateTabTitle] Error reading transcript:', err);
-    return '';
-  }
-}
-
-const SYSTEM_PROMPT = `Summarize what the user wants in 3-4 words max. Start with a gerund:
-- Questions → "Checking config", "Finding file"
-- Commands → "Fixing bug", "Creating component"
-- Investigation → "Debugging auth", "Analyzing logs"
-- Research → "Researching API"
-- Continuation → Use CONTEXT to understand what "it/that" means
-
-CRITICAL: Keep it SHORT - 3-4 words only. Must fit in a tab title.
-If the request uses "it", "that", "this" - use conversation context.
-
-Output ONLY the summary. No quotes, no punctuation.
-Examples: "Checking config", "Fixing auth bug", "Testing cache"`;
-
-/**
- * Generate concise 3-4 word summary using Inference (standard/Sonnet) with conversation context
- */
-async function summarizePrompt(prompt: string, transcriptPath: string): Promise<string> {
-  // Get recent conversation context
-  const context = getRecentContext(transcriptPath);
-
-  // Build user prompt with context if available
-  let userPrompt: string;
-  if (context) {
-    userPrompt = `CONTEXT (recent conversation):
-${context}
-
-CURRENT REQUEST:
-${prompt.slice(0, 800)}`;
-  } else {
-    userPrompt = prompt.slice(0, 1000);
-  }
-
+async function summarizePrompt(prompt: string): Promise<string | null> {
+  const cleanPrompt = prompt.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 1000);
   const result = await inference({
     systemPrompt: SYSTEM_PROMPT,
-    userPrompt,
-    timeout: 15000,
-    level: 'fast',  // Haiku for speed - tab titles need to appear quickly
+    userPrompt: cleanPrompt,
+    timeout: 10000,
+    level: 'fast',
   });
 
   if (result.success && result.output) {
-    const summary = result.output.replace(/^["']|["']$/g, '').replace(/[.!?]$/g, '');
+    let summary = result.output.replace(/<[^>]*>/g, '').replace(/^["']|["']$/g, '').trim();
     const words = summary.split(/\s+/).slice(0, 4);
-    return words.join(' ');
-  }
+    summary = words.join(' ');
+    if (!summary.endsWith('.')) summary += '.';
 
-  return quickTitle(prompt);
-}
+    if (!isValidWorkingTitle(summary)) return null;
 
-type TabState = 'normal' | 'working' | 'inference';
-
-/**
- * Set terminal tab title and color based on state
- * Uses Kitty remote control if available (hooks run without TTY),
- * falls back to escape codes for other terminals
- */
-function setTabTitle(title: string, state: TabState = 'normal'): void {
-  try {
-    // Add "…" suffix for active states
-    const titleWithSuffix = state !== 'normal' ? `${title}…` : title;
-    const truncated = titleWithSuffix.length > 50 ? titleWithSuffix.slice(0, 47) + '…' : titleWithSuffix;
-    const escaped = truncated.replace(/'/g, "'\\''");
-
-    // Use centralized Kitty detection (handles platform checks internally)
-    if (isKittyTerminal()) {
-      // Use Kitty remote control - works even without TTY
-      // Using crossSpawnSync for consistent cross-platform behavior
-      crossSpawnSync('kitty', ['@', 'set-tab-title', escaped], { timeout: 2000 });
-
-      // Set color based on state
-      if (state === 'inference') {
-        // Purple for inference/AI thinking - active tab stays dark blue, inactive shows purple
-        crossSpawnSync('kitten', [
-          '@', 'set-tab-color', '--self',
-          `active_bg=${ACTIVE_TAB_BG}`, `active_fg=${ACTIVE_TEXT}`,
-          `inactive_bg=${TAB_INFERENCE_BG}`, `inactive_fg=${INACTIVE_TEXT}`
-        ], { timeout: 2000 });
-        console.error('[UpdateTabTitle] Set inference color (purple on inactive only)');
-      } else if (state === 'working') {
-        // Orange for actively working - active tab stays dark blue, inactive shows orange
-        crossSpawnSync('kitten', [
-          '@', 'set-tab-color', '--self',
-          `active_bg=${ACTIVE_TAB_BG}`, `active_fg=${ACTIVE_TEXT}`,
-          `inactive_bg=${TAB_WORKING_BG}`, `inactive_fg=${INACTIVE_TEXT}`
-        ], { timeout: 2000 });
-        console.error('[UpdateTabTitle] Set working color (orange on inactive only)');
-      }
-
-      console.error('[UpdateTabTitle] Set via Kitty remote control');
-    } else if (supportsAnsiTitles() && !isNoColorSet()) {
-      // Use ANSI escape codes for terminals that support them
-      // Respects NO_COLOR to avoid any escape sequences when user prefers clean output
-      try {
-        const titleEscaped = truncated.replace(/[^\x20-\x7E]/g, ''); // ASCII printable only
-        process.stderr.write(`\x1b]0;${titleEscaped}\x07`); // OSC sequence for title
-        if (isWindowsTerminal()) {
-          console.error('[UpdateTabTitle] Set via Windows Terminal escape codes');
-        } else {
-          process.stderr.write(`\x1b]2;${titleEscaped}\x07`); // Set window title (alternate)
-          console.error('[UpdateTabTitle] Set via ANSI escape codes');
-        }
-      } catch {
-        // Silently fail if terminal doesn't support escape codes
-      }
+    // Reject titles that introduce topics not in the user's prompt
+    // This catches model hallucination from skill list anchoring
+    if (!isTitleRelevantToPrompt(summary, cleanPrompt)) {
+      console.error(`[UpdateTabTitle] Rejected contaminated title: "${summary}" — topic not in prompt`);
+      return null;
     }
-    // On legacy Windows (cmd.exe, old PowerShell) without Kitty/Windows Terminal, skip title update
-  } catch (err) {
-    console.error(`[UpdateTabTitle] Failed to set title: ${err}`);
-  }
-}
 
-/**
- * Send voice notification
- */
-async function announceVoice(summary: string): Promise<void> {
-  try {
-    // Summary already starts with gerund - use directly, capitalize first letter
-    const message = summary.charAt(0).toUpperCase() + summary.slice(1);
-    // Use URL constructor for proper URL handling
-    const baseUrl = getEnvVar('PAI_VOICE_SERVER') || 'http://localhost:8888';
-    const url = new URL('/notify', baseUrl).toString();
-    const payload = { message };
-
-    await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-  } catch {
-    // Silently fail - notifications are non-critical
+    return summary;
   }
+
+  return null;
 }
 
 async function main() {
   try {
-    console.error('[UpdateTabTitle] Hook started');
     const input = await readStdinWithTimeout();
     const data: HookInput = JSON.parse(input);
     const prompt = data.prompt || '';
-    console.error(`[UpdateTabTitle] Prompt: "${prompt.slice(0, 50)}..."`);
 
-    if (!prompt || prompt.length < 3) {
-      console.error('[UpdateTabTitle] Prompt too short, exiting');
-      process.exit(0);
-    }
+    if (!prompt || prompt.length < 3) process.exit(0);
 
-    // Set quick fallback title immediately with inference state (purple + "…")
-    const quickFallback = quickTitle(prompt);
-    console.error(`[UpdateTabTitle] Quick fallback: "${quickFallback}"`);
-    setTabTitle(`🧠${quickFallback}`, 'inference');  // Brain = AI thinking/inference
+    // Skip ratings (1-10) — preserve current tab title
+    if (/^([1-9]|10)$/.test(prompt.trim())) process.exit(0);
 
-    // Get better summary from Sonnet (standard level with full conversation context)
-    console.error('[UpdateTabTitle] Calling Sonnet inference with context...');
-    const rawSummary = await summarizePrompt(prompt, data.transcript_path);
-    console.error(`[UpdateTabTitle] Raw summary: "${rawSummary}"`);
+    // Session label: two-word ALL CAPS prefix for tab identity
+    const sessionLabel = data.session_id ? getSessionOneWord(data.session_id) : null;
+    const prefix = sessionLabel ? `${sessionLabel} | ` : '';
 
-    // Validate summary - reject garbage like "I appreciate you reaching out"
-    let summary = rawSummary;
-    if (!isValidTabSummary(rawSummary)) {
-      console.error('[UpdateTabTitle] Invalid summary detected, using quickTitle fallback');
-      summary = quickTitle(prompt);
-      // If quickTitle also fails validation, use format-compliant fallback
-      if (!isValidTabSummary(summary)) {
-        console.error('[UpdateTabTitle] quickTitle also invalid, using final fallback');
-        summary = getTabFallback();
+    // Phase 1: Immediate deterministic title (purple = thinking)
+    const quickTitle = extractPromptTitle(prompt);
+    const thinkingTitle = quickTitle || getWorkingFallback();
+    setTabState({ title: `🧠 ${prefix}${thinkingTitle}`, state: 'thinking', sessionId: data.session_id });
+
+    // Phase 2: Inference for a validated title (orange = working)
+    const inferredTitle = await summarizePrompt(prompt);
+    const finalTitle = inferredTitle || (quickTitle && isValidWorkingTitle(quickTitle) ? quickTitle : getWorkingFallback());
+    setTabState({ title: `⚙️ ${prefix}${finalTitle}`, state: 'working', sessionId: data.session_id });
+
+    // Voice feedback — announce what's being worked on
+    // Only speak inference result (a proper sentence). If inference failed,
+    // stay silent — silence is better than speaking prompt word fragments.
+    const voiceContent = inferredTitle;
+    if (voiceContent) {
+      const identity = getIdentity();
+      try {
+        await fetch('http://localhost:8888/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: voiceContent.replace(/\.$/, ''),
+            voice_id: identity.mainDAVoiceID,
+            voice_enabled: true,
+          }),
+          signal: AbortSignal.timeout(5000),
+        });
+        console.error(`[UpdateTabTitle] Voice sent: "${voiceContent}"`);
+      } catch {
+        console.error(`[UpdateTabTitle] Voice failed (server down or timeout)`);
       }
-    }
-    console.error(`[UpdateTabTitle] Final summary: "${summary}"`);
-
-    // Update tab with SHORT title (4 words max - gerund + topic) + working state
-    const shortTitle = summary.split(/\s+/).slice(0, 4).join(' ');
-    setTabTitle(`⚙️${shortTitle}`, 'working');  // Orange = actively working on task
-
-    // Voice announcement - validated to prevent garbage
-    if (isValidTabSummary(summary)) {
-      await announceVoice(summary);
-      console.error(`[UpdateTabTitle] Voice: "${summary}"`);
     } else {
-      console.error(`[UpdateTabTitle] Skipped voice - invalid summary: "${summary}"`);
+      console.error(`[UpdateTabTitle] No meaningful voice content, skipping`);
     }
-    console.error('[UpdateTabTitle] Complete');
 
+    console.error(`[UpdateTabTitle] "${finalTitle}"`);
     process.exit(0);
   } catch (err) {
     console.error(`[UpdateTabTitle] Error: ${err}`);

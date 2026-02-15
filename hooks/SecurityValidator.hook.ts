@@ -61,10 +61,10 @@
  */
 
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
-import { join, dirname, sep } from 'path';
+import { join } from 'path';
+import { homedir } from 'os';
 import { parse as parseYaml } from 'yaml';
-import { paiPath, expandPath } from './core/paths';
-import { isCaseInsensitiveFilesystem, ensureTrailingSeparator } from './core/platform';
+import { paiPath } from './lib/paths';
 
 // ========================================
 // Security Event Logging
@@ -119,7 +119,7 @@ function getSecurityLogPath(event: SecurityEvent): string {
 function logSecurityEvent(event: SecurityEvent): void {
   try {
     const logPath = getSecurityLogPath(event);
-    const dir = dirname(logPath);
+    const dir = logPath.substring(0, logPath.lastIndexOf('/'));
 
     // Ensure directory exists
     if (!existsSync(dir)) {
@@ -177,10 +177,10 @@ interface PatternsConfig {
 // ========================================
 
 // Pattern paths in priority order:
-// 1. USER/PAISECURITYSYSTEM/patterns.yaml (user's custom rules)
-// 2. PAISECURITYSYSTEM/patterns.example.yaml (default template)
-const USER_PATTERNS_PATH = paiPath('USER', 'PAISECURITYSYSTEM', 'patterns.yaml');
-const SYSTEM_PATTERNS_PATH = paiPath('PAISECURITYSYSTEM', 'patterns.example.yaml');
+// 1. skills/PAI/USER/PAISECURITYSYSTEM/patterns.yaml (user's custom rules)
+// 2. skills/PAI/PAISECURITYSYSTEM/patterns.example.yaml (default template)
+const USER_PATTERNS_PATH = paiPath('skills', 'PAI', 'USER', 'PAISECURITYSYSTEM', 'patterns.yaml');
+const SYSTEM_PATTERNS_PATH = paiPath('skills', 'PAI', 'PAISECURITYSYSTEM', 'patterns.example.yaml');
 
 let patternsCache: PatternsConfig | null = null;
 let patternsSource: 'user' | 'system' | 'none' = 'none';
@@ -252,6 +252,14 @@ function matchesPattern(command: string, pattern: string): boolean {
   }
 }
 
+function expandPath(path: string): string {
+  // Expand ~ to home directory
+  if (path.startsWith('~')) {
+    return path.replace('~', homedir());
+  }
+  return path;
+}
+
 function matchesPathPattern(filePath: string, pattern: string): boolean {
   const expandedPattern = expandPath(pattern);
   const expandedPath = expandPath(filePath);
@@ -275,21 +283,8 @@ function matchesPathPattern(filePath: string, pattern: string): boolean {
   }
 
   // Exact match or prefix match for directories
-  // Normalize separators for cross-platform comparison
-  let normalizedPath = expandedPath.replace(/[\\/]/g, '/');
-  let normalizedPattern = expandedPattern.replace(/[\\/]/g, '/');
-
-  // On Windows and macOS, path comparison should be case-insensitive
-  // (macOS uses case-insensitive HFS+/APFS by default)
-  const isCaseInsensitive = isCaseInsensitiveFilesystem();
-  if (isCaseInsensitive) {
-    normalizedPath = normalizedPath.toLowerCase();
-    normalizedPattern = normalizedPattern.toLowerCase();
-  }
-
-  // Use ensureTrailingSeparator for consistent path prefix matching
-  return normalizedPath === normalizedPattern ||
-         normalizedPath.startsWith(ensureTrailingSeparator(normalizedPattern));
+  return expandedPath === expandedPattern ||
+         expandedPath.startsWith(expandedPattern.endsWith('/') ? expandedPattern : expandedPattern + '/');
 }
 
 // ========================================
@@ -397,7 +392,7 @@ function handleBash(input: HookInput): void {
         reason: result.reason,
         action_taken: 'Hard block - exit 2'
       });
-      console.error(`🚨 BLOCKED: ${result.reason}`);
+      console.error(`[PAI SECURITY] 🚨 BLOCKED: ${result.reason}`);
       console.error(`Command: ${command.slice(0, 100)}`);
       process.exit(2);
       break;
@@ -415,7 +410,7 @@ function handleBash(input: HookInput): void {
       });
       console.log(JSON.stringify({
         decision: 'ask',
-        message: `⚠️ ${result.reason}\n\nCommand: ${command.slice(0, 200)}\n\nProceed?`
+        message: `[PAI SECURITY] ⚠️ ${result.reason}\n\nCommand: ${command.slice(0, 200)}\n\nProceed?`
       }));
       break;
 
@@ -430,7 +425,7 @@ function handleBash(input: HookInput): void {
         reason: result.reason,
         action_taken: 'Logged alert, allowed execution'
       });
-      console.error(`⚠️ ALERT: ${result.reason}`);
+      console.error(`[PAI SECURITY] ⚠️ ALERT: ${result.reason}`);
       console.error(`Command: ${command.slice(0, 100)}`);
       console.log(JSON.stringify({ continue: true }));
       break;
@@ -464,7 +459,7 @@ function handleEdit(input: HookInput): void {
         reason: result.reason,
         action_taken: 'Hard block - exit 2'
       });
-      console.error(`🚨 BLOCKED: ${result.reason}`);
+      console.error(`[PAI SECURITY] 🚨 BLOCKED: ${result.reason}`);
       console.error(`Path: ${filePath}`);
       process.exit(2);
       break;
@@ -482,7 +477,7 @@ function handleEdit(input: HookInput): void {
       });
       console.log(JSON.stringify({
         decision: 'ask',
-        message: `⚠️ ${result.reason}\n\nPath: ${filePath}\n\nProceed?`
+        message: `[PAI SECURITY] ⚠️ ${result.reason}\n\nPath: ${filePath}\n\nProceed?`
       }));
       break;
 
@@ -515,7 +510,7 @@ function handleWrite(input: HookInput): void {
         reason: result.reason,
         action_taken: 'Hard block - exit 2'
       });
-      console.error(`🚨 BLOCKED: ${result.reason}`);
+      console.error(`[PAI SECURITY] 🚨 BLOCKED: ${result.reason}`);
       console.error(`Path: ${filePath}`);
       process.exit(2);
       break;
@@ -533,7 +528,7 @@ function handleWrite(input: HookInput): void {
       });
       console.log(JSON.stringify({
         decision: 'ask',
-        message: `⚠️ ${result.reason}\n\nPath: ${filePath}\n\nProceed?`
+        message: `[PAI SECURITY] ⚠️ ${result.reason}\n\nPath: ${filePath}\n\nProceed?`
       }));
       break;
 
@@ -566,7 +561,7 @@ function handleRead(input: HookInput): void {
         reason: result.reason,
         action_taken: 'Hard block - exit 2'
       });
-      console.error(`🚨 BLOCKED: ${result.reason}`);
+      console.error(`[PAI SECURITY] 🚨 BLOCKED: ${result.reason}`);
       console.error(`Path: ${filePath}`);
       process.exit(2);
       break;

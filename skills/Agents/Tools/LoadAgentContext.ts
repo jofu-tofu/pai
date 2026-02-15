@@ -13,7 +13,7 @@
 import { readFileSync, existsSync, readdirSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
-import { getEnvVar } from "../../../hooks/core/platform";
+import { getEnvVar } from '../../../hooks/lib/platform";
 
 interface AgentContext {
   agentType: string;

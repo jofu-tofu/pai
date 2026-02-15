@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
-import { getEnvVar, isWindows } from '../../../../../hooks/core/platform'
+import { getEnvVar, isWindows } from '../../../../../hooks/lib/platform'
 
 // Windows filename validation
 // Invalid characters: < > : " / \ | ? *

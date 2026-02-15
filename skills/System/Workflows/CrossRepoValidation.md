@@ -14,18 +14,6 @@ All commands use `$PAI_DIR` and `$HOME` for cross-platform compatibility:
 
 ---
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running cross-repo validation between private and public PAI"}' 2>/dev/null &
-```
-
-Running the **CrossRepoValidation** workflow from the **System** skill...
-
----
-
 ## Critical Paths
 
 | Repository | Path | Purpose |

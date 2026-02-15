@@ -120,25 +120,6 @@ science_cycle_time: meso
 
 [Brief description of what the skill does]
 
-## Voice Notification
-
-**When executing a workflow, do BOTH:**
-
-1. **Send voice notification**:
-   ```bash
-   curl -s -X POST ${VOICE_SERVER_URL}/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow from the SKILLNAME skill"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Output text notification**:
-   ```
-   Running the **WorkflowName** workflow from the **SkillName** skill...
-   ```
-
-**Full documentation:** `${PAI_DIR}/skills/PAI/SYSTEM/THENOTIFICATIONSYSTEM.md`
-
 ## Workflow Routing
 
 The notification announces workflow execution. The routing table tells Claude which workflow to execute:
@@ -174,11 +155,6 @@ User: "[Another typical request]"
 - Workflow names in **TitleCase** matching file names
 - Simple trigger description
 - File path in backticks
-
-**When to show the workflow message:**
-- ONLY output the message when actually loading and executing a workflow file
-- If the skill handles the request directly without calling a workflow, do NOT show the message
-- The message indicates "I'm reading and following instructions from a workflow file"
 
 ---
 

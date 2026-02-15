@@ -19,10 +19,10 @@
 
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { inference } from './core/inference';
-import { getDAName } from './core/identity';
-import { getEnvVar, pathContainsSegment } from './core/platform';
-import { getSkillsDir } from './core/paths';
+import { inference } from './lib/inference';
+import { getDAName } from './lib/identity';
+import { getEnvVar, pathContainsSegment } from './lib/platform';
+import { getSkillsDir } from './lib/paths';
 
 // Maps inference capability names → output format for the reminder
 const CAPABILITY_MAP: Record<string, { name: string; agents: string }> = {

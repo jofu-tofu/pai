@@ -2,19 +2,6 @@
 
 **Purpose**: Evaluate an existing design document against the 4 Pillars of great design. Produce structured, constructive feedback using the "Yes, if" framing.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the ReviewDesign workflow in the Design skill to review a design document"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **ReviewDesign** workflow in the **Design** skill to review a design document...
-
----
-
 **When to Use**:
 - "Review this design", "critique", "what's missing"
 - Evaluating someone else's design document

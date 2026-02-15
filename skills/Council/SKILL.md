@@ -19,25 +19,6 @@ Multi-agent debate system where specialized agents discuss topics in rounds, res
 **Key Differentiator from RedTeam:** Council is collaborative-adversarial (debate to find best path), while RedTeam is purely adversarial (attack the idea). Council produces visible conversation transcripts; RedTeam produces steelman + counter-argument.
 
 
-## Voice Notification
-
-**When executing a workflow, do BOTH:**
-
-1. **Send voice notification**:
-   ```bash
-   curl -s -X POST http://localhost:8888/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow from the Council skill"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Output text notification**:
-   ```
-   Running the **WorkflowName** workflow from the **Council** skill...
-   ```
-
-**Full documentation:** `$PAI_DIR/skills/PAI/SkillNotifications.md`
-
 ## Workflow Routing
 
 Route to the appropriate workflow based on the request.

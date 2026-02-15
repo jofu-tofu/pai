@@ -10,7 +10,7 @@
  */
 
 import { spawn } from 'child_process';
-import { getKillSignal } from '../../../hooks/core/platform';
+import { getKillSignal } from '../../../hooks/lib/platform';
 
 type InferenceLevel = 'fast' | 'standard' | 'smart';
 

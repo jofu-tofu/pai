@@ -373,17 +373,3 @@ For reverse conversion, use the **CreateExcalidrawDiagram** workflow with Mermai
 - Want text-based editing
 - Need reproducible diagrams
 
-## Voice Notification
-
-When executing this workflow:
-```bash
-curl -s -X POST ${VOICE_SERVER_URL}/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the ExcalidrawToMermaid workflow from the Obsidian skill"}' \
-  > /dev/null 2>&1 &
-```
-
-And output:
-```
-Running the **ExcalidrawToMermaid** workflow from the **Obsidian** skill...
-```

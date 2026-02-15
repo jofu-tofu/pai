@@ -49,9 +49,10 @@
 
 import { writeFileSync, existsSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { getISOTimestamp } from './core/time';
-import { getMemoryDir } from './core/paths';
-import { getSession, removeSession } from './core/current-work';
+import { getISOTimestamp } from './lib/time';
+import { getMemoryDir } from './lib/paths';
+import { getSession, removeSession } from './lib/current-work';
+import { setTabState, cleanupKittySession } from './lib/tab-setter';
 
 const MEMORY_DIR = getMemoryDir();
 const WORK_DIR = join(MEMORY_DIR, 'WORK');
@@ -107,6 +108,20 @@ async function main() {
     // Mark work as complete and clear state for this session
     // NOTE: Does NOT write to SESSIONS/ - WORK/ is the primary system
     clearSessionWork(sessionId);
+
+    // Reset Kitty tab to neutral styling — no lingering colored backgrounds
+    try {
+      setTabState({ title: '', state: 'idle', sessionId });
+      console.error('[SessionSummary] Tab reset to default styling');
+    } catch {
+      console.error('[SessionSummary] Tab reset failed (non-critical)');
+    }
+
+    // Clean up per-session kitty env file (prevents unbounded file accumulation)
+    if (sessionId) {
+      cleanupKittySession(sessionId);
+      console.error(`[SessionSummary] Cleaned up kitty session: ${sessionId}`);
+    }
 
     console.error('[SessionSummary] Session ended, work marked complete');
     process.exit(0);

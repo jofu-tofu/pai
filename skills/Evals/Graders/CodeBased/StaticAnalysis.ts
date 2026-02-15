@@ -7,7 +7,10 @@
 
 import { BaseGrader, registerGrader, type GraderContext } from '../Base.ts';
 import type { GraderConfig, GraderResult, StaticAnalysisParams } from '../../Types/index.ts';
-import { shellExec } from '../../../../hooks/core/spawn';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 export class StaticAnalysisGrader extends BaseGrader {
   type = 'static_analysis' as const;
@@ -28,8 +31,8 @@ export class StaticAnalysisGrader extends BaseGrader {
 
     for (const command of params.commands) {
       try {
-        // Use cross-platform shellExec
-        const result = await shellExec(command, {
+        // Use cross-platform execAsync
+        const result = await execAsync(command, {
           cwd: workingDir,
         });
 

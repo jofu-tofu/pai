@@ -15,23 +15,6 @@ Path: C:\Users\fujos\Obsidian
 
 PAI has direct read/write access.
 
-## Voice Notification
-
-**When executing a workflow, do BOTH:**
-
-1. **Send voice notification**:
-   ```bash
-   curl -s -X POST ${VOICE_SERVER_URL}/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow from the Obsidian skill"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Output text notification**:
-   ```
-   Running the **WorkflowName** workflow from the **Obsidian** skill...
-   ```
-
 ## Workflow Routing
 
 | Workflow | Trigger | File |

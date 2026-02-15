@@ -161,8 +161,7 @@ The `ISC.json` file captures the Ideal State Criteria from PAI Algorithm executi
 
 **What populates it:**
 - `ResponseCapture.hook.ts` (if content qualifies as learning)
-- `ExplicitRatingCapture.hook.ts` (explicit ratings + low-rating learnings)
-- `ImplicitSentimentCapture.hook.ts` (detected frustration)
+- `RatingCapture.hook.ts` (consolidated: explicit ratings, implicit sentiment, low-rating learnings)
 - `WorkCompletionLearning.hook.ts` (significant work session completions)
 - `SessionHarvester.ts` (periodic extraction from projects/ transcripts)
 - `LearningPatternSynthesis.ts` (aggregates ratings into pattern reports)
@@ -264,8 +263,7 @@ This is mutable state that changes during execution - not historical records. If
 | ResponseCapture.hook.ts | Stop | WORK/items, LEARNING/ (if applicable) |
 | WorkCompletionLearning.hook.ts | SessionEnd | LEARNING/ (significant work) |
 | SessionSummary.hook.ts | SessionEnd | WORK/META.yaml (status), clears STATE |
-| ExplicitRatingCapture.hook.ts | UserPromptSubmit | LEARNING/SIGNALS/, LEARNING/, FAILURES/ (1-3) |
-| ImplicitSentimentCapture.hook.ts | UserPromptSubmit | LEARNING/SIGNALS/, LEARNING/, FAILURES/ (1-3) |
+| RatingCapture.hook.ts | UserPromptSubmit | LEARNING/SIGNALS/, LEARNING/, FAILURES/ (1-3) |
 | AgentOutputCapture.hook.ts | SubagentStop | RESEARCH/ |
 | SecurityValidator.hook.ts | PreToolUse | SECURITY/ |
 

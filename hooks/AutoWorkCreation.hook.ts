@@ -1,126 +1,59 @@
 #!/usr/bin/env bun
 /**
- * AutoWorkCreation.hook.ts - Automatic Work Directory Creation (UserPromptSubmit)
+ * AutoWorkCreation.hook.ts - Session/Task Management (UserPromptSubmit)
  *
  * PURPOSE:
- * Automatically creates and manages work directories for each session. Every user
- * prompt is classified and tracked, building a complete record of what was worked
- * on. This enables work resumption, session summaries, and learning extraction.
+ * Creates and manages the session/task hierarchy for each Claude Code session.
+ * - SESSION: One directory per Claude Code session (the primitive)
+ * - TASK: Subdirectories for distinct work items within a session
+ *
+ * Each task has its own algorithm execution context (ISC.json, THREAD.md).
  *
  * TRIGGER: UserPromptSubmit
  *
- * INPUT:
- * - stdin: Hook input JSON with prompt, session_id, transcript_path
- *
- * OUTPUT:
- * - stdout: None
- * - stderr: Status messages
- * - exit(0): Always (non-blocking)
- *
- * SIDE EFFECTS:
- * - Creates: MEMORY/WORK/<timestamp>_<slug>/ directory structure
- * - Creates: META.yaml, IDEAL.md, IdealState.jsonl, items/*.yaml
- * - Updates: MEMORY/STATE/current-work.json (session state)
- * - API call: Haiku inference for prompt classification
- *
- * INTER-HOOK RELATIONSHIPS:
- * - DEPENDS ON: None (creates foundational work structure)
- * - COORDINATES WITH: StopOrchestrator/capture (updates work on completion)
- * - MUST RUN BEFORE: All other UserPromptSubmit hooks (establishes work context)
- * - MUST RUN AFTER: None
- *
- * SESSION MODEL:
- * - First prompt: Creates work directory + first item
- * - Subsequent prompts: Adds items to existing work directory
- * - Session end: SessionSummary marks COMPLETED and clears state
- *
- * CLASSIFICATION TYPES:
- * - work: Any task/imperative (fix, add, create, etc.)
- * - question: Information requests (what, how, why, etc.)
- * - conversational: Greetings, thanks, confirmations
- *
- * EFFORT LEVELS:
- * - TRIVIAL: <5 min (single line change)
- * - QUICK: 5-30 min (small task)
- * - STANDARD: 30 min - 2 hrs (normal task)
- * - THOROUGH: 2+ hrs (complex task)
- *
- * DIRECTORY STRUCTURE CREATED:
- * WORK/<timestamp>_<slug>/
- * ├── META.yaml (work metadata)
- * ├── IDEAL.md (ideal state criteria)
- * ├── IdealState.jsonl (ALGORITHM tracking)
- * ├── items/ (individual prompt items)
- * ├── verification/ (test results)
- * ├── research/ (research artifacts)
- * ├── agents/ (agent work)
- * │   ├── claimed/
- * │   └── completed/
- * └── children/ (spawned sub-work)
- *
- * ERROR HANDLING:
- * - Empty prompt: Silent exit
- * - Classification failure: Falls back to 'work' type
- * - File operation failures: Logged, continues
- *
- * PERFORMANCE:
- * - Non-blocking: Yes (work tracking shouldn't delay response)
- * - Typical execution: <200ms (includes Haiku classification)
+ * STRUCTURE CREATED:
+ * WORK/{timestamp}_{session-title}/
+ * ├── META.yaml                    # Session metadata
+ * ├── tasks/
+ * │   ├── 001_{task-slug}/
+ * │   │   ├── ISC.json             # Task's Ideal State Criteria
+ * │   │   └── THREAD.md            # Task's algorithm log (includes metadata in frontmatter)
+ * │   └── current -> 001_...       # Symlink to active task
+ * └── scratch/                     # Temporary files
  */
 
-import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
+import { mkdirSync, existsSync, readFileSync, writeFileSync, symlinkSync, unlinkSync, lstatSync } from 'fs';
 import { join } from 'path';
-import { getPSTComponents, getISOTimestamp } from './core/time';
-import { inference } from '../skills/PAI/Tools/Inference';
-
+import { getPSTComponents, getISOTimestamp } from './lib/time';
 interface HookInput {
   session_id: string;
-  prompt?: string;        // Actual field name from Claude Code
-  user_prompt?: string;   // Legacy field name
-  transcript_path: string;
-  hook_event_name: string;
+  prompt?: string;
+  user_prompt?: string;
 }
 
-import { getSession, setSession, type SessionWork } from './core/current-work';
+interface CurrentWork {
+  session_id: string;
+  session_dir: string;
+  current_task: string;
+  task_title: string;
+  task_count: number;
+  created_at: string;
+}
 
-interface WorkClassification {
+interface PromptClassification {
   type: 'work' | 'question' | 'conversational';
   title: string;
   effort: 'TRIVIAL' | 'QUICK' | 'STANDARD' | 'THOROUGH';
+  is_new_topic: boolean;
 }
 
-import { getPaiDir } from './core/paths';
-
-const BASE_DIR = getPaiDir();
+const BASE_DIR = process.env.PAI_DIR || join(process.env.HOME!, '.claude');
 const WORK_DIR = join(BASE_DIR, 'MEMORY', 'WORK');
+const STATE_DIR = join(BASE_DIR, 'MEMORY', 'STATE');
+const CURRENT_WORK_FILE = join(STATE_DIR, 'current-work.json');
 
-const CLASSIFICATION_PROMPT = `Classify this user request. Return ONLY valid JSON:
-{
-  "type": "work" | "question" | "conversational",
-  "title": "<3-8 word title for work items, empty for questions/conversational>",
-  "effort": "TRIVIAL" | "QUICK" | "STANDARD" | "THOROUGH"
-}
+// No more inference — simple heuristic classification
 
-DEFINITIONS:
-- work: Any task/imperative (fix, add, create, update, check, run, deploy, implement, etc.)
-- question: Asking for information (what, how, why, explain, etc. - ends with ?)
-- conversational: Greetings, thanks, confirmations, short follow-ups (yes, no, ok, thanks)
-
-EFFORT LEVELS:
-- TRIVIAL: Single line change, simple lookup (<5 min)
-- QUICK: Small task, few files (5-30 min)
-- STANDARD: Normal task, multiple steps (30 min - 2 hrs)
-- THOROUGH: Complex task, research needed (2+ hrs)
-
-EXAMPLES:
-"Fix the login bug" → {"type": "work", "title": "Fix login bug", "effort": "QUICK"}
-"What is the codebase structure?" → {"type": "question", "title": "", "effort": "TRIVIAL"}
-"Thanks" → {"type": "conversational", "title": "", "effort": "TRIVIAL"}
-"Add user authentication with JWT" → {"type": "work", "title": "Add JWT authentication", "effort": "STANDARD"}`;
-
-/**
- * Read stdin with timeout
- */
 async function readStdinWithTimeout(timeout: number = 5000): Promise<string> {
   return new Promise((resolve, reject) => {
     let data = '';
@@ -131,224 +64,259 @@ async function readStdinWithTimeout(timeout: number = 5000): Promise<string> {
   });
 }
 
+function readCurrentWork(): CurrentWork | null {
+  try {
+    if (!existsSync(CURRENT_WORK_FILE)) return null;
+    return JSON.parse(readFileSync(CURRENT_WORK_FILE, 'utf-8'));
+  } catch {
+    return null;
+  }
+}
 
-/**
- * Generate work directory name
- */
-function generateWorkDirName(title: string): string {
+function writeCurrentWork(state: CurrentWork): void {
+  if (!existsSync(STATE_DIR)) mkdirSync(STATE_DIR, { recursive: true });
+  writeFileSync(CURRENT_WORK_FILE, JSON.stringify(state, null, 2), 'utf-8');
+}
+
+function slugify(text: string, maxLen: number = 40): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .substring(0, maxLen)
+    .replace(/-$/, '') || 'task';
+}
+
+function generateSessionDirName(title: string): string {
   const { year, month, day, hours, minutes, seconds } = getPSTComponents();
   const timestamp = `${year}${month}${day}-${hours}${minutes}${seconds}`;
-
-  // Slugify title
-  const slug = title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .substring(0, 50)
-    .replace(/-$/, '');
-
-  return `${timestamp}_${slug || 'session-work'}`;
+  return `${timestamp}_${slugify(title, 50)}`;
 }
 
 /**
- * Create work directory structure
+ * Create session directory structure
  */
-function createWorkDirectory(workDirName: string, sessionId: string, title: string): void {
-  const workPath = join(WORK_DIR, workDirName);
+function createSessionDirectory(sessionDirName: string, sessionId: string, title: string): string {
+  const sessionPath = join(WORK_DIR, sessionDirName);
+  const timestamp = getISOTimestamp();
 
-  // Create all subdirectories
-  const subdirs = [
-    '',
-    'items',
-    'verification',
-    'research',
-    'agents',
-    'agents/claimed',
-    'agents/completed',
-    'children',
-  ];
+  // Create session structure
+  mkdirSync(join(sessionPath, 'tasks'), { recursive: true });
+  mkdirSync(join(sessionPath, 'scratch'), { recursive: true });
 
-  for (const subdir of subdirs) {
-    const dirPath = join(workPath, subdir);
-    if (!existsSync(dirPath)) {
-      mkdirSync(dirPath, { recursive: true });
-    }
-  }
-
-  // Create META.yaml
-  const meta = `id: "${workDirName}"
+  // Session META.yaml
+  const meta = `id: "${sessionDirName}"
 title: "${title}"
-created_at: "${getISOTimestamp()}"
-completed_at: null
-source: "SESSION"
-status: "ACTIVE"
 session_id: "${sessionId}"
-lineage:
-  tools_used: []
-  files_changed: []
-  agents_spawned: []
-parent: null
-`;
-  writeFileSync(join(workPath, 'META.yaml'), meta, 'utf-8');
-
-  // Create IDEAL.md (empty placeholder for ALGORITHM)
-  writeFileSync(join(workPath, 'IDEAL.md'), `# Ideal State\n\nTo be defined.\n`, 'utf-8');
-
-  // Create empty IdealState.jsonl (ready for ALGORITHM)
-  writeFileSync(join(workPath, 'IdealState.jsonl'), '', 'utf-8');
-
-  console.error(`[AutoWorkCreation] Created work directory: ${workPath}`);
-}
-
-/**
- * Add item to work directory
- */
-function addItemToWork(workDirName: string, itemNumber: number, prompt: string, classification: WorkClassification): void {
-  const workPath = join(WORK_DIR, workDirName);
-  const itemsPath = join(workPath, 'items');
-
-  // Generate item filename
-  const itemId = String(itemNumber).padStart(3, '0');
-  const slug = (classification.title || prompt.substring(0, 30))
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .substring(0, 40)
-    .replace(/-$/, '');
-
-  const itemFilename = `${itemId}-${slug}.yaml`;
-  const itemPath = join(itemsPath, itemFilename);
-
-  // Create item YAML
-  const item = `id: "${itemId}"
-description: "${prompt.replace(/"/g, '\\"').substring(0, 500)}"
-type: "${classification.type}"
-effort: "${classification.effort}"
-source: "USER_PROMPT"
+created_at: "${timestamp}"
 status: "ACTIVE"
-created_at: "${getISOTimestamp()}"
-completed_at: null
-response_summary: null
-lineage:
-  created_by: "user_request"
 `;
-  writeFileSync(itemPath, item, 'utf-8');
+  writeFileSync(join(sessionPath, 'META.yaml'), meta, 'utf-8');
 
-  console.error(`[AutoWorkCreation] Added item ${itemId} to ${workDirName}`);
+  console.error(`[AutoWork] Created session: ${sessionPath}`);
+  return sessionPath;
 }
 
 /**
- * Classify user prompt using Haiku
+ * Create task directory with ISC.json and THREAD.md (with frontmatter metadata)
  */
-async function classifyPrompt(prompt: string): Promise<WorkClassification> {
-  // Quick heuristic checks first
+function createTaskDirectory(
+  sessionPath: string,
+  taskNumber: number,
+  title: string,
+  effort: string,
+  prompt: string
+): string {
+  const taskId = String(taskNumber).padStart(3, '0');
+  const taskSlug = slugify(title);
+  const taskDirName = `${taskId}_${taskSlug}`;
+  const taskPath = join(sessionPath, 'tasks', taskDirName);
+  const timestamp = getISOTimestamp();
+
+  mkdirSync(taskPath, { recursive: true });
+
+  // Task THREAD.md with frontmatter metadata (no separate META.yaml)
+  const thread = `---
+taskId: "${taskDirName}"
+title: "${title}"
+effortLevel: "${effort}"
+status: "IN_PROGRESS"
+createdAt: "${timestamp}"
+prompt: |
+  ${prompt.substring(0, 500).replace(/\n/g, '\n  ')}
+---
+
+# Algorithm Thread: ${title}
+
+## Phase Log
+
+### 👀 OBSERVE Phase
+_Pending..._
+
+### 🧠 THINK Phase
+_Pending..._
+
+### 📋 PLAN Phase
+_Pending..._
+
+### 🔨 BUILD Phase
+_Pending..._
+
+### ▶️ EXECUTE Phase
+_Pending..._
+
+### ✅ VERIFY Phase
+_Pending..._
+
+### 🎓 LEARN Phase
+_Pending..._
+
+---
+
+## ISC Evolution
+
+_Criteria updates logged here..._
+
+---
+
+## Key Observations
+
+_Important observations during execution..._
+`;
+  writeFileSync(join(taskPath, 'THREAD.md'), thread, 'utf-8');
+
+  // Task ISC.json with proper scaffold
+  const isc = {
+    taskId: taskDirName,
+    status: 'PENDING',
+    effortLevel: effort,
+    criteria: [],
+    antiCriteria: [],
+    satisfaction: null,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+  writeFileSync(join(taskPath, 'ISC.json'), JSON.stringify(isc, null, 2), 'utf-8');
+
+  // Update 'current' symlink
+  const currentLink = join(sessionPath, 'tasks', 'current');
+  try {
+    if (existsSync(currentLink) || lstatSync(currentLink)) {
+      unlinkSync(currentLink);
+    }
+  } catch { /* ignore if doesn't exist */ }
+  symlinkSync(taskDirName, currentLink);
+
+  console.error(`[AutoWork] Created task: ${taskPath}`);
+  return taskDirName;
+}
+
+/**
+ * Simple heuristic classification — no inference call.
+ * First prompt = new work. Short confirmations = conversational continuation.
+ * Everything else = continuation of current work.
+ */
+function classifyPrompt(prompt: string, hasExistingSession: boolean): PromptClassification {
   const trimmed = prompt.trim();
 
-  // Very short = conversational
-  if (trimmed.length < 10 && /^(yes|no|ok|okay|thanks|thank you|sure|got it|cool|great)$/i.test(trimmed)) {
-    return { type: 'conversational', title: '', effort: 'TRIVIAL' };
+  // Short confirmations/greetings
+  if (trimmed.length < 20 && /^(yes|no|ok|okay|thanks|proceed|continue|go ahead|sure|got it|hi|hello|hey|good morning|good evening|\d{1,2})$/i.test(trimmed)) {
+    return { type: 'conversational', title: '', effort: 'TRIVIAL', is_new_topic: false };
   }
 
-  // Ends with ? = question (unless it's rhetorical/command)
-  if (trimmed.endsWith('?') && /^(what|how|why|where|when|who|which|can you explain|could you tell)/i.test(trimmed)) {
-    return { type: 'question', title: '', effort: 'TRIVIAL' };
+  // First prompt in session = always new work
+  if (!hasExistingSession) {
+    const title = trimmed.substring(0, 60).replace(/[^a-zA-Z0-9\s]/g, '').trim();
+    return { type: 'work', title, effort: 'STANDARD', is_new_topic: true };
   }
 
-  // Use Haiku for better classification
-  try {
-    const result = await inference({
-      systemPrompt: CLASSIFICATION_PROMPT,
-      userPrompt: prompt,
-      expectJson: true,
-      timeout: 10000,
-      level: 'fast',
-    });
-
-    if (result.success && result.parsed) {
-      const parsed = result.parsed as WorkClassification;
-      // Validate and return
-      if (['work', 'question', 'conversational'].includes(parsed.type)) {
-        return {
-          type: parsed.type,
-          title: parsed.title || '',
-          effort: parsed.effort || 'QUICK',
-        };
-      }
-    }
-  } catch (err) {
-    console.error(`[AutoWorkCreation] Classification failed: ${err}`);
-  }
-
-  // Fallback: assume it's work
-  const fallbackTitle = prompt.substring(0, 50).replace(/[^a-zA-Z0-9\s]/g, '').trim();
-  return { type: 'work', title: fallbackTitle, effort: 'QUICK' };
+  // Existing session — default to continuation
+  return {
+    type: 'work',
+    title: trimmed.substring(0, 60).replace(/[^a-zA-Z0-9\s]/g, '').trim(),
+    effort: 'STANDARD',
+    is_new_topic: false,
+  };
 }
 
 async function main() {
   try {
-    console.error('[AutoWorkCreation] Hook started');
-
     const input = await readStdinWithTimeout();
     const data: HookInput = JSON.parse(input);
-    // The payload uses 'prompt' (Claude Code) - user_prompt is legacy
     const prompt = data.prompt || data.user_prompt || '';
     const sessionId = data.session_id || 'unknown';
 
     if (!prompt || prompt.length < 2) {
-      console.error('[AutoWorkCreation] Empty or very short prompt, skipping');
       process.exit(0);
     }
 
-    // Ensure WORK directory exists
-    if (!existsSync(WORK_DIR)) {
-      mkdirSync(WORK_DIR, { recursive: true });
+    if (!existsSync(WORK_DIR)) mkdirSync(WORK_DIR, { recursive: true });
+
+    let currentWork = readCurrentWork();
+    const isExistingSession = currentWork && currentWork.session_id === sessionId;
+
+    const classification = classifyPrompt(prompt, !!isExistingSession);
+
+    // Skip task creation for pure conversational
+    if (classification.type === 'conversational' && !classification.is_new_topic) {
+      console.error('[AutoWork] Conversational continuation, no new task');
+      process.exit(0);
     }
 
-    // Read current work state for this session
-    let currentWork = getSession(sessionId);
-
-    // Check if we need to create a new work directory for this session
-    if (!currentWork) {
-      // New session - classify and create work directory
-      const classification = await classifyPrompt(prompt);
-
+    if (!isExistingSession) {
+      // New session: create session directory + first task
       const title = classification.title || prompt.substring(0, 50);
-      const workDirName = generateWorkDirName(title);
+      const sessionDirName = generateSessionDirName(title);
+      const sessionPath = createSessionDirectory(sessionDirName, sessionId, title);
 
-      // Create work directory
-      createWorkDirectory(workDirName, sessionId, title);
+      const taskDirName = createTaskDirectory(
+        sessionPath,
+        1,
+        title,
+        classification.effort,
+        prompt
+      );
 
-      // Create first item
-      addItemToWork(workDirName, 1, prompt, classification);
-
-      // Update state (multi-session: stored by session ID key)
       currentWork = {
-        work_dir: workDirName,
+        session_id: sessionId,
+        session_dir: sessionDirName,
+        current_task: taskDirName,
+        task_title: title,
+        task_count: 1,
         created_at: getISOTimestamp(),
-        item_count: 1,
       };
-      setSession(sessionId, currentWork);
+      writeCurrentWork(currentWork);
 
-      console.error(`[AutoWorkCreation] Created new work directory for session ${sessionId}`);
+      console.error(`[AutoWork] New session with task: ${taskDirName}`);
+    } else if (classification.is_new_topic) {
+      // Existing session, new topic: create new task
+      const sessionPath = join(WORK_DIR, currentWork!.session_dir);
+      const newTaskNumber = currentWork!.task_count + 1;
+      const title = classification.title || prompt.substring(0, 50);
+
+      const taskDirName = createTaskDirectory(
+        sessionPath,
+        newTaskNumber,
+        title,
+        classification.effort,
+        prompt
+      );
+
+      currentWork!.current_task = taskDirName;
+      currentWork!.task_title = title;
+      currentWork!.task_count = newTaskNumber;
+      writeCurrentWork(currentWork!);
+
+      console.error(`[AutoWork] New task in session: ${taskDirName}`);
     } else {
-      // Existing session - add item
-      const classification = await classifyPrompt(prompt);
-
-      currentWork.item_count += 1;
-      addItemToWork(currentWork.work_dir, currentWork.item_count, prompt, classification);
-
-      // Update state
-      setSession(sessionId, currentWork);
-
-      console.error(`[AutoWorkCreation] Added item ${currentWork.item_count} to existing work`);
+      // Continuation of current task - no new task needed
+      console.error(`[AutoWork] Continuing task: ${currentWork!.current_task}`);
     }
 
-    console.error('[AutoWorkCreation] Done');
     process.exit(0);
   } catch (err) {
-    console.error(`[AutoWorkCreation] Error: ${err}`);
+    console.error(`[AutoWork] Error: ${err}`);
     process.exit(0);
   }
 }

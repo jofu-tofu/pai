@@ -18,16 +18,16 @@
  * - exit(0): Always (non-blocking)
  *
  * SIDE EFFECTS:
- * - Kitty remote control: Sets tab color to orange (#804000)
- * - Kitty remote control: Sets tab title to working format
+ * - Sets tab color to orange (#804000) via setTabState
+ * - Sets tab title to restored working title or fallback
  *
  * INTER-HOOK RELATIONSHIPS:
- * - DEPENDS ON: SetQuestionTab (runs before this, sets teal)
+ * - DEPENDS ON: SetQuestionTab (runs before this, sets teal + saves previousTitle)
  * - COORDINATES WITH: UpdateTabTitle (shares tab color scheme)
  * - MUST RUN AFTER: SetQuestionTab (resets its teal color)
  *
  * TAB COLOR SCHEME (inactive tab only - active tab stays dark blue):
- * - Dark teal (#085050): Waiting for user input (SetQuestionTab)
+ * - Dark teal (#0D4F4F): Waiting for user input (SetQuestionTab)
  * - Dark orange (#804000): Actively working (this hook + UpdateTabTitle)
  * - Dark purple (#1E0A3C): AI inference/thinking (UpdateTabTitle)
  * - Dark blue (#002B80): Active tab always uses this
@@ -36,32 +36,33 @@
  * - Kitty unavailable: Silent failure
  */
 
-import { isKittyTerminal } from './core/terminal';
-import { crossSpawnSync } from './core/spawn';
-
-const TAB_WORKING_BG = '#804000';      // Dark orange - actively working
-const ACTIVE_TAB_BG = '#002B80';       // Dark blue - active tab always
-const ACTIVE_TEXT = '#FFFFFF';
-const INACTIVE_TEXT = '#A0A0A0';
+import { setTabState, readTabState, stripPrefix } from './lib/tab-setter';
 
 async function main() {
-  // Skip on Windows or non-Kitty terminals
-  if (!isKittyTerminal()) {
-    process.exit(0);
-  }
-
   try {
-    // Set tab color: active stays dark blue, inactive shows orange
-    crossSpawnSync('kitten', [
-      '@', 'set-tab-color', '--self',
-      `active_bg=${ACTIVE_TAB_BG}`,
-      `active_fg=${ACTIVE_TEXT}`,
-      `inactive_bg=${TAB_WORKING_BG}`,
-      `inactive_fg=${INACTIVE_TEXT}`
-    ]);
+    // Extract session_id from stdin for correct tab targeting
+    let sessionId: string | undefined;
+    try {
+      const raw = await Bun.stdin.text();
+      if (raw.trim()) {
+        const parsed = JSON.parse(raw);
+        sessionId = parsed.session_id;
+      }
+    } catch { /* stdin parse failed — continue without session_id */ }
 
-    // Set working title
-    crossSpawnSync('kitty', ['@', 'set-tab-title', '⚙️Processing answer…']);
+    // Read previous working title saved by SetQuestionTab
+    const currentState = readTabState(sessionId);
+    let restoredTitle = 'Processing answer.';
+
+    if (currentState?.previousTitle) {
+      // Strip any emoji prefix from the saved title and re-add working prefix
+      const rawTitle = stripPrefix(currentState.previousTitle);
+      if (rawTitle) {
+        restoredTitle = rawTitle;
+      }
+    }
+
+    setTabState({ title: '⚙️' + restoredTitle, state: 'working', sessionId });
 
     console.error('[QuestionAnswered] Tab reset to working state (orange on inactive only)');
   } catch (error) {

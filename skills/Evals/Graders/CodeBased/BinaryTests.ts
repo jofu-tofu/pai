@@ -7,7 +7,10 @@
 
 import { BaseGrader, registerGrader, type GraderContext } from '../Base.ts';
 import type { GraderConfig, GraderResult, BinaryTestsParams } from '../../Types/index.ts';
-import { shellExec } from '../../../../hooks/core/spawn';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 export class BinaryTestsGrader extends BaseGrader {
   type = 'binary_tests' as const;
@@ -33,8 +36,8 @@ export class BinaryTestsGrader extends BaseGrader {
         const command = params.test_command ?? this.detectTestCommand(testFile);
         const timeoutSec = Math.ceil(timeout / 1000);
 
-        // Use cross-platform shellExec
-        const result = await shellExec(`${command} ${testFile}`, {
+        // Use cross-platform execAsync
+        const result = await execAsync(`${command} ${testFile}`, {
           cwd: workingDir,
           timeout,
         });

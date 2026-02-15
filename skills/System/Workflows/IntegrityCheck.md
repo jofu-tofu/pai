@@ -6,19 +6,6 @@
 
 ---
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running integrity check on the system"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **IntegrityCheck** workflow from the **System** skill...
-
----
-
 ## When to Use
 
 - After major refactoring
@@ -119,15 +106,6 @@ After agents complete:
 
 ```
 $PAI_DIR/MEMORY/STATE/integrity/YYYY-MM-DD.md
-```
-
-### Step 6: Completion
-
-```bash
-curl -s -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Integrity check complete. [X] issues found."}' \
-  > /dev/null 2>&1 &
 ```
 
 ---

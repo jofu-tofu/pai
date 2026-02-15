@@ -122,28 +122,6 @@ main().catch(console.error);
 
 ---
 
-## Voice Notification Integration
-
-Hooks can trigger voice notifications via the voice server:
-
-```typescript
-// Fire and forget voice notification
-await fetch(`${VOICE_SERVER_URL}/notify`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    message: "Task completed",
-    voice_id: process.env.ELEVENLABS_VOICE_ID
-  })
-}).catch(() => {}); // Never fail on notification
-```
-
-**Configuration:**
-- `VOICE_SERVER_URL` - Voice server endpoint (default: `http://localhost:8888`)
-- `ELEVENLABS_VOICE_ID` - Your voice clone ID
-
----
-
 ## Standard Hooks
 
 | Hook | Event | Purpose |

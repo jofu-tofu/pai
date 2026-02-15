@@ -8,7 +8,6 @@
  *
  * SIDE EFFECTS:
  * - Spawns background IntegrityMaintenance.ts process
- * - Voice notification on start
  * - Updates MEMORY/STATE/integrity-state.json
  *
  * THROTTLING:
@@ -17,9 +16,9 @@
  */
 
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { spawn } from 'child_process';
 import { join } from 'path';
-import { paiPath } from '../core/paths';
-import { crossSpawn, getRuntimeCommand } from '../core/spawn';
+import { paiPath } from '../lib/paths';
 import {
   parseToolUseBlocks,
   isSignificantChange,
@@ -31,7 +30,7 @@ import {
   inferChangeType,
   generateDescriptiveTitle,
   type FileChange,
-} from '../core/change-detection';
+} from '../lib/change-detection';
 import type { ParsedTranscript } from '../../skills/PAI/Tools/TranscriptParser';
 
 interface HookInput {
@@ -42,31 +41,8 @@ interface HookInput {
 
 const STATE_DIR = paiPath('MEMORY', 'STATE');
 const STATE_FILE = join(STATE_DIR, 'integrity-state.json');
-const INTEGRITY_SCRIPT = paiPath('tools', 'IntegrityMaintenance.ts');
+const INTEGRITY_SCRIPT = paiPath('skills', 'PAI', 'Tools', 'IntegrityMaintenance.ts');
 
-/**
- * Send voice notification for integrity check start.
- * Fire-and-forget - doesn't block.
- * Includes 4-second delay to let main voice handler finish speaking first.
- */
-async function notifyIntegrityStart(): Promise<void> {
-  try {
-    // Wait 4 seconds for main voice handler to finish speaking
-    await new Promise(resolve => setTimeout(resolve, 4000));
-
-    await fetch('http://localhost:8888/notify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: 'Checking system integrity for recent changes.',
-        voice_enabled: true,
-        priority: 'low',
-      }),
-    });
-  } catch {
-    // Voice server might not be running - silent fail
-  }
-}
 
 /**
  * Update the integrity state file.
@@ -127,9 +103,8 @@ function spawnIntegrityMaintenance(
       })),
     });
 
-    // Spawn detached process using the current runtime
-    const runtime = getRuntimeCommand();
-    const child = crossSpawn(runtime, [INTEGRITY_SCRIPT], {
+    // Spawn detached process
+    const child = spawn('bun', [INTEGRITY_SCRIPT], {
       detached: true,
       stdio: ['pipe', 'ignore', 'inherit'],  // stdin for input, ignore stdout, inherit stderr for logging
       env: { ...process.env },
@@ -206,8 +181,8 @@ export async function handleSystemIntegrity(
   // Update state before spawning
   updateIntegrityState(systemChanges);
 
-  // Send voice notification (fire-and-forget)
-  notifyIntegrityStart().catch(() => {});
+  // Voice notification removed — the "documenting" message from IntegrityMaintenance
+  // already implies the check happened. No need for a separate "checking" announcement.
 
   // Spawn background process
   spawnIntegrityMaintenance(systemChanges, hookInput);

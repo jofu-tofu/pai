@@ -2,19 +2,6 @@
 
 **Purpose**: Capture a single decision as a lightweight Architecture Decision Record (ADR). For quick decisions that don't need a full design document.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the RecordDecision workflow in the Design skill to record a decision"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **RecordDecision** workflow in the **Design** skill to record a decision...
-
----
-
 **When to Use**:
 - "Record this decision", "ADR", "why did we decide", "decision record"
 - Quick-scale design needs (redirected from CreateDesign)

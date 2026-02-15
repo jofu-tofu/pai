@@ -13,7 +13,7 @@
 
 import { readdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
-import { getPaiDir, getSettingsPath } from "../../../hooks/core/paths";
+import { getPaiDir, getSettingsPath } from '../../../hooks/lib/paths";
 
 const PAI_DIR = getPaiDir();
 const CORE_DIR = join(PAI_DIR, "skills/PAI");

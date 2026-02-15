@@ -310,17 +310,3 @@ EMBED: ![[ProjectPlanning.excalidraw]]
 8. **Use plain `.excalidraw` extension** (not `.excalidraw.md`) for programmatic creation
 9. **Include all required element properties** (version, versionNonce, isDeleted, seed, groupIds, frameId, boundElements, updated, link, locked)
 
-## Voice Notification
-
-When executing this workflow:
-```bash
-curl -s -X POST ${VOICE_SERVER_URL}/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the CreateExcalidrawDiagram workflow from the Obsidian skill"}' \
-  > /dev/null 2>&1 &
-```
-
-And output:
-```
-Running the **CreateExcalidrawDiagram** workflow from the **Obsidian** skill...
-```

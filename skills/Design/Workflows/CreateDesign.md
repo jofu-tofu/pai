@@ -2,19 +2,6 @@
 
 **Purpose**: Walk through a structured design process that scales from standard feature designs to full architecture documents. Produces a concrete markdown design artifact.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the CreateDesign workflow in the Design skill to create a design document"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **CreateDesign** workflow in the **Design** skill to create a design document...
-
----
-
 **When to Use**:
 - "Design doc", "write a design", "scope this feature", "proposal"
 - Any request to produce a design document at Standard or Full scale

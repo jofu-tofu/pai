@@ -13,7 +13,7 @@ import { tmpdir } from "os";
 import OpenAI from "openai";
 import { createReadStream } from "fs";
 import { writeFile } from "fs/promises";
-import { getWindowsShellOptions } from '../../../hooks/core/platform';
+import { getWindowsShellOptions } from '../../../hooks/lib/platform';
 
 interface ChunkInfo {
   path: string;

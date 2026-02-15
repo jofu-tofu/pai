@@ -6,19 +6,6 @@
 
 ---
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Pushing to PAI repository"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **PushToPAI** workflow from the **System** skill...
-
----
-
 ## CRITICAL: PRIVATE REPO ONLY
 
 This workflow operates on your **PRIVATE** PAI repository:
@@ -104,15 +91,6 @@ git remote -v
 
 # Push to origin
 git push origin main
-```
-
-### Step 6: Completion
-
-```bash
-curl -s -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Changes pushed to PAI repository"}' \
-  > /dev/null 2>&1 &
 ```
 
 ---

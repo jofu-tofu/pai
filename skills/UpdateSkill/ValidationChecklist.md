@@ -70,7 +70,6 @@ description: [text]    # Must be single line, must contain USE WHEN
 |---------|---------------|
 | `## Workflow Routing` | Workflows exist |
 | `## Examples` | Always (2-3 patterns) |
-| `## Voice Notification` | Always (per SkillSystem.md) |
 
 **Routing Table Format:**
 ```markdown

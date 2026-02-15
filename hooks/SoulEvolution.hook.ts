@@ -27,9 +27,9 @@
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { getPaiDir, paiPath } from './core/paths';
-import { sendPush } from './core/notifications';
-import { getISOTimestamp, getPSTComponents } from './core/time';
+import { getPaiDir, paiPath } from './lib/paths';
+import { sendPush } from './lib/notifications';
+import { getISOTimestamp, getPSTComponents } from './lib/time';
 
 interface HookInput {
   session_id: string;
