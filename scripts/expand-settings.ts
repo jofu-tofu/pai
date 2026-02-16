@@ -20,8 +20,8 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, resolve, dirname, basename, extname } from 'path';
 import { homedir } from 'os';
 import { fileURLToPath } from 'url';
-import { toForwardSlash, formatPathForDisplay, isWindows, getEnvVar } from '../hooks/core/platform';
-import { expandPath } from '../hooks/core/paths';
+import { toForwardSlash, formatPathForDisplay, isWindows, getEnvVar } from '../hooks/lib/platform';
+import { expandPath } from '../hooks/lib/paths';
 
 // ============================================================================
 // Configuration
