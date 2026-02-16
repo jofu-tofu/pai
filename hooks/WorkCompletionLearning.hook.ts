@@ -239,14 +239,21 @@ interface HookInput {
 
 async function main() {
   try {
-    // Read input from stdin (required for hook pattern)
-    const input = await Bun.stdin.text();
-    if (!input || input.trim() === '') {
-      process.exit(0);
+    // Read input from stdin with timeout — SessionEnd hooks may receive
+    // empty or slow stdin. Proceed regardless since state is read from disk.
+    let sessionId: string | undefined;
+    try {
+      const input = await Promise.race([
+        Bun.stdin.text(),
+        new Promise<string>((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+      ]);
+      if (input && input.trim()) {
+        const parsed = JSON.parse(input);
+        sessionId = parsed.session_id;
+      }
+    } catch {
+      // Timeout or parse error — proceed without session_id
     }
-
-    const data: HookInput = JSON.parse(input);
-    const sessionId = data.session_id || 'unknown';
 
     // Get session work state using multi-session utility
     const currentWork = getSession(sessionId);
