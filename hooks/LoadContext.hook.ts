@@ -507,7 +507,7 @@ async function main() {
     if (needsRebuild) {
       console.error('🔨 Rebuilding SKILL.md (components changed)...');
       try {
-        const rebuildPath = join(homedir(), '.claude', 'skills', 'PAI', 'Tools', 'RebuildPAI.ts');
+        const rebuildPath = join(paiDir, 'skills', 'PAI', 'Tools', 'RebuildPAI.ts');
         execSync(`bun "${rebuildPath}"`, {
           cwd: paiDir,
           stdio: 'pipe',

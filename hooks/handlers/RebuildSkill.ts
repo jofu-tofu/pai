@@ -21,14 +21,14 @@
 
 import { statSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { homedir } from 'os';
+import { paiPath } from '../lib/paths';
 import { spawn } from 'child_process';
 
 export async function handleRebuildSkill(): Promise<void> {
-  const CORE_DIR = join(homedir(), '.claude/skills/PAI');
+  const CORE_DIR = paiPath('skills', 'PAI');
   const COMPONENTS_DIR = join(CORE_DIR, 'Components');
   const SKILL_MD = join(CORE_DIR, 'SKILL.md');
-  const BUILD_SCRIPT = join(CORE_DIR, 'Tools/RebuildPAI.ts');
+  const BUILD_SCRIPT = join(CORE_DIR, 'Tools', 'RebuildPAI.ts');
 
   try {
     // Check if SKILL.md exists
@@ -70,7 +70,7 @@ function rebuild(buildScript: string): Promise<void> {
     }, 10000);
 
     const child = spawn('bun', [buildScript], {
-      cwd: join(homedir(), '.claude/skills/PAI'),
+      cwd: paiPath('skills', 'PAI'),
       stdio: ['ignore', 'pipe', 'pipe'],
     });
 

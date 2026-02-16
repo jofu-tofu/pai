@@ -23,7 +23,7 @@ import {
 import type { AlgorithmCriterion, AlgorithmPhase, AlgorithmState } from './lib/algorithm-state';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { homedir } from 'os';
+import { getPaiDir } from './lib/paths';
 import { setPhaseTab } from './lib/tab-setter';
 
 // ── Phase Detection from Voice Curls ──
@@ -70,7 +70,7 @@ function parseCriterion(text: string): { id: string; description: string } | nul
 
 // ── Session Activation (replaces SessionReactivator) ──
 
-const BASE_DIR = process.env.PAI_DIR || join(homedir(), '.claude');
+const BASE_DIR = getPaiDir();
 
 function getSessionName(sid: string): string {
   try {
