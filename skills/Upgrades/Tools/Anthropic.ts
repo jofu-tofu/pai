@@ -80,7 +80,7 @@ interface State {
 
 // Config
 const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
-const SKILL_DIR = join(PAI_DIR, 'skills', 'Upgrades');
+const SKILL_DIR = join(PAI_DIR, 'skills', 'PAIUpgrade');
 const STATE_DIR = join(SKILL_DIR, 'state');
 const STATE_FILE = join(STATE_DIR, 'last-check.json');
 const SOURCES_FILE = join(SKILL_DIR, 'sources.json');
