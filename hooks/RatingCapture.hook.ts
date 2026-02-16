@@ -58,7 +58,6 @@ const ALGORITHM_REMINDER = `<user-prompt-submit-hook>
 START WITH:
 \u{267B}\u{FE0F} Entering the PAI ALGORITHM\u{2026} (v0.4.9 | github.com/danielmiessler/TheAlgorithm) \u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}
 
-EXECUTE VOICE CURLS at each phase (OBSERVE, THINK, PLAN, BUILD, EXECUTE, VERIFY, LEARN)
 
 USE TaskCreate for ISC criteria. USE TaskList to display them. NEVER manual tables.
 
