@@ -18,11 +18,11 @@
  * │   ├── 001_{task-slug}/
  * │   │   ├── ISC.json             # Task's Ideal State Criteria
  * │   │   └── THREAD.md            # Task's algorithm log (includes metadata in frontmatter)
- * │   └── current -> 001_...       # Symlink to active task
+ * │   └── current                  # Plain text file with active task name
  * └── scratch/                     # Temporary files
  */
 
-import { mkdirSync, existsSync, readFileSync, writeFileSync, symlinkSync, unlinkSync, lstatSync } from 'fs';
+import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { getPSTComponents, getISOTimestamp } from './lib/time';
 import { generatePRDTemplate, generatePRDFilename } from './lib/prd-template';
@@ -227,14 +227,9 @@ _Important observations during execution..._
   });
   writeFileSync(join(taskPath, prdFilename), prdContent, 'utf-8');
 
-  // Update 'current' symlink
+  // Update 'current' file (plain text, not symlink - avoids Windows EPERM)
   const currentLink = join(sessionPath, 'tasks', 'current');
-  try {
-    if (existsSync(currentLink) || lstatSync(currentLink)) {
-      unlinkSync(currentLink);
-    }
-  } catch { /* ignore if doesn't exist */ }
-  symlinkSync(taskDirName, currentLink);
+  writeFileSync(currentLink, taskDirName, 'utf-8');
 
   console.error(`[AutoWork] Created task: ${taskPath}`);
   console.error(`[AutoWork] Created PRD: ${prdFilename}`);
