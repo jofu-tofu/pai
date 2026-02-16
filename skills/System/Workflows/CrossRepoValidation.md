@@ -216,14 +216,6 @@ If ANY critical check fails:
 
 ---
 
-## Completion Notification
-
-```bash
-curl -s -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Cross-repo validation complete. [STATUS]"}' 2>/dev/null &
-```
-
 ---
 
 ## Related Workflows

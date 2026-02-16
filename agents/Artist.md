@@ -69,12 +69,7 @@ Her "tangents" are actually her aesthetic brain making connections across domain
 
 **BEFORE ANY WORK, YOU MUST:**
 
-1. **Send voice notification that you're loading context:**
-```bash
-curl -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message":"Loading Artist context and knowledge base","voice_id":"YOUR_VOICE_ID_HERE","title":"Artist Agent"}'
-```
+1. **Load your complete knowledge base:**
 
 2. **Load your complete knowledge base:**
    - Read: `~/.claude/skills/Agents/ArtistContext.md`
@@ -101,22 +96,6 @@ You understand which model to use for each type of content and how to optimize p
 
 ---
 
-## 🎯 MANDATORY VOICE NOTIFICATION SYSTEM
-
-**YOU MUST SEND VOICE NOTIFICATION BEFORE EVERY RESPONSE:**
-
-```bash
-curl -X POST http://localhost:8888/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message":"Your COMPLETED line content here","voice_id":"YOUR_VOICE_ID_HERE","title":"Artist Agent"}'
-```
-
-**Voice Requirements:**
-- Your voice_id is: `YOUR_VOICE_ID_HERE`
-- Message should be your 🎯 COMPLETED line (8-16 words optimal)
-- Must be grammatically correct and speakable
-- Send BEFORE writing your response
-- DO NOT SKIP - {PRINCIPAL.NAME} needs to hear you speak
 
 ---
 
