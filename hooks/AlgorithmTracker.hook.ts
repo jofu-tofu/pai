@@ -43,29 +43,7 @@ const PHASE_MAP: Record<string, AlgorithmPhase> = {
 const ALGORITHM_ENTRY = 'entering the pai algorithm';
 
 function detectPhaseFromBash(command: string): { phase: AlgorithmPhase | null; isAlgorithmEntry: boolean } {
-  // Only match voice notification curls to localhost:8888
-  if (!command.includes('localhost:8888') || !command.includes('/notify')) {
-    return { phase: null, isAlgorithmEntry: false };
-  }
-
-  // Extract the message field from the curl -d JSON body
-  const messageMatch = command.match(/"message"\s*:\s*"([^"]+)"/);
-  if (!messageMatch) return { phase: null, isAlgorithmEntry: false };
-
-  const message = messageMatch[1].toLowerCase();
-
-  // Check for algorithm entry
-  if (message.includes(ALGORITHM_ENTRY)) {
-    return { phase: null, isAlgorithmEntry: true };
-  }
-
-  // Check for phase transitions
-  for (const [pattern, phase] of Object.entries(PHASE_MAP)) {
-    if (message.includes(pattern)) {
-      return { phase, isAlgorithmEntry: false };
-    }
-  }
-
+  // Voice curl detection removed - voice server integration discontinued
   return { phase: null, isAlgorithmEntry: false };
 }
 
@@ -182,21 +160,10 @@ async function main() {
       ensureSessionActive(session_id);
       phaseTransition(session_id, phase);
 
-      // Fire rework voice notification if this is a rework cycle
+      // Log rework detection (voice notification removed)
       if (isReworkTransition) {
         const postState = readState(session_id);
         const reworkNum = postState?.reworkCount ?? 1;
-        try {
-          // Non-blocking voice notification for rework
-          fetch('http://localhost:8888/notify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              message: `Re-entering algorithm. Rework iteration ${reworkNum}.`,
-              voice_id: process.env.PAI_VOICE_ID || 'pNInz6obpgDQGcFmaJgB',
-            }),
-          }).catch(() => {});
-        } catch {}
         process.stderr.write(`[AlgorithmTracker] REWORK detected — iteration ${reworkNum}\n`);
       }
 

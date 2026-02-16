@@ -212,29 +212,7 @@ async function main() {
     setTabState({ title: `⚙️ ${prefix}${finalTitle}`, state: 'working', sessionId: data.session_id });
 
     // Voice feedback — announce what's being worked on
-    // Only speak inference result (a proper sentence). If inference failed,
-    // stay silent — silence is better than speaking prompt word fragments.
-    const voiceContent = inferredTitle;
-    if (voiceContent) {
-      const identity = getIdentity();
-      try {
-        await fetch('http://localhost:8888/notify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: voiceContent.replace(/\.$/, ''),
-            voice_id: identity.mainDAVoiceID,
-            voice_enabled: true,
-          }),
-          signal: AbortSignal.timeout(5000),
-        });
-        console.error(`[UpdateTabTitle] Voice sent: "${voiceContent}"`);
-      } catch {
-        console.error(`[UpdateTabTitle] Voice failed (server down or timeout)`);
-      }
-    } else {
-      console.error(`[UpdateTabTitle] No meaningful voice content, skipping`);
-    }
+    // Voice notifications disabled - voice server integration removed
 
     console.error(`[UpdateTabTitle] "${finalTitle}"`);
     process.exit(0);

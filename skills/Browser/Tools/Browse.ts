@@ -27,7 +27,6 @@ import { fileExists, readFileCompat, sleep, isWindows } from './compat.ts'
 
 const isMacOS = process.platform === 'darwin'
 
-const VOICE_SERVER = 'http://localhost:8888/notify'
 const STATE_FILE = join(tmpdir(), 'browser-session.json')
 const DEFAULT_PORT = 9222
 const SESSION_TIMEOUT = 5000 // 5s to wait for session start
@@ -113,18 +112,6 @@ interface Diagnostics {
 // ============================================
 // UTILITIES
 // ============================================
-
-async function notify(message: string): Promise<void> {
-  try {
-    await fetch(VOICE_SERVER, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
-    })
-  } catch {
-    // Voice server not running - silent fail
-  }
-}
 
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B'

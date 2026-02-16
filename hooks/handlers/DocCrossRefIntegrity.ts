@@ -352,25 +352,6 @@ function checkHookCounts(docsToCheck: string[], actualCount: number): DriftItem[
 }
 
 // ============================================================================
-// Voice Notification (fire-and-forget)
-// ============================================================================
-
-async function notifyVoice(message: string): Promise<void> {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-    await fetch('http://localhost:8888/notify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal: controller.signal,
-      body: JSON.stringify({ message, voice_id: process.env.PAI_VOICE_ID || 'pNInz6obpgDQGcFmaJgB' }),
-    });
-    clearTimeout(timeout);
-  } catch {
-    // Voice server may not be running — silent fail
-  }
-}
-
 // ============================================================================
 // Review Queue (for drift items that need human judgment)
 // ============================================================================
@@ -891,6 +872,5 @@ export async function handleDocCrossRefIntegrity(
 
     const docNames = Array.from(affectedDocs).slice(0, 3).join(', ') || 'system';
     const reason = hasHookChanges ? 'hook system changes' : hasDocChanges ? 'system documentation changes' : 'system file changes';
-    await notifyVoice(`Updated ${docNames} documentation after detecting ${reason}.`);
   }
 }
