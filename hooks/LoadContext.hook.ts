@@ -41,6 +41,7 @@
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
+import { homedir } from 'os';
 import { getPaiDir } from './lib/paths';
 import { recordSessionStart } from './lib/notifications';
 import { setTabState, readTabState } from './lib/tab-setter';
@@ -506,7 +507,8 @@ async function main() {
     if (needsRebuild) {
       console.error('🔨 Rebuilding SKILL.md (components changed)...');
       try {
-        execSync('bun ~/.claude/skills/PAI/Tools/RebuildPAI.ts', {
+        const rebuildPath = join(homedir(), '.claude', 'skills', 'PAI', 'Tools', 'RebuildPAI.ts');
+        execSync(`bun "${rebuildPath}"`, {
           cwd: paiDir,
           stdio: 'pipe',
           timeout: 5000
