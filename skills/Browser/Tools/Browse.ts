@@ -542,6 +542,25 @@ async function stop(): Promise<void> {
   }
 }
 
+async function codegen(url?: string): Promise<void> {
+  const { spawn } = await import('child_process')
+  const args = ['playwright', 'codegen']
+  if (url) args.push(url)
+
+  console.log('Opening Playwright codegen...')
+  console.log('Interact with the browser — code will be generated as you go.')
+  console.log('Close the browser window when done.\n')
+
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn('npx', args, { stdio: 'inherit' })
+    child.on('close', (code) => {
+      if (code === 0 || code === null) resolve()
+      else reject(new Error(`playwright codegen exited with code ${code}`))
+    })
+    child.on('error', reject)
+  })
+}
+
 async function openUrl(url: string): Promise<void> {
   // Use browser from settings.json techStack - cross-platform
   const browser = await getBrowser()
@@ -581,6 +600,7 @@ Usage:
   bun run Browse.ts fill <selector> <value>  Fill input field
   bun run Browse.ts type <selector> <text>   Type with delay
   bun run Browse.ts eval "<javascript>"      Execute JavaScript
+  bun run Browse.ts codegen [url]            Record interactions and generate test code
   bun run Browse.ts open <url>               Open in user's browser
   bun run Browse.ts status                   Show session info
   bun run Browse.ts restart                  Restart session (clear state)
@@ -678,6 +698,10 @@ async function main(): Promise<void> {
           process.exit(1)
         }
         await evaluate(args[1])
+        break
+
+      case 'codegen':
+        await codegen(args[1])
         break
 
       case 'open':
