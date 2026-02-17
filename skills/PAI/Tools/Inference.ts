@@ -83,6 +83,13 @@ export async function inference(options: InferenceOptions): Promise<InferenceRes
     });
 
     // Pipe user prompt via stdin
+    // Handle EPIPE gracefully - process may close stdin before we finish writing
+    proc.stdin.on('error', (err: NodeJS.ErrnoException) => {
+      // EPIPE is benign - just means process closed stdin early
+      if (err.code !== 'EPIPE') {
+        console.error('Stdin write error:', err);
+      }
+    });
     proc.stdin.write(options.userPrompt);
     proc.stdin.end();
 
