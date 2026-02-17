@@ -15,30 +15,6 @@ How PAI sends notifications across various channels.
 
 ## Notification Channels
 
-### Voice (TTS)
-
-Primary spoken feedback via text-to-speech.
-
-**Configuration:**
-```bash
-# Environment variables
-VOICE_SERVER_URL=http://localhost:8888
-ELEVENLABS_VOICE_ID=[YOUR_VOICE_ID]
-```
-
-**Usage:**
-```bash
-curl -s -X POST ${VOICE_SERVER_URL}/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Task completed"}' \
-  > /dev/null 2>&1 &
-```
-
-**Best Practices:**
-- Keep messages under 450 characters
-- Use for immediate feedback
-- Fire in background (don't await)
-
 ### Push (ntfy)
 
 Mobile push notifications via ntfy.sh or self-hosted.
@@ -103,70 +79,10 @@ Route notifications based on event type and priority:
 
 | Event Type | Channels | Priority |
 |------------|----------|----------|
-| Task start | Voice | Low |
-| Task complete | Voice, Push | Medium |
-| Long task (>5min) | Voice, Push, Desktop | High |
-| Error/Failure | Voice, Push, Desktop | Critical |
+| Task complete | Push | Medium |
+| Long task (>5min) | Push, Desktop | High |
+| Error/Failure | Push, Desktop | Critical |
 | Security alert | All channels | Critical |
-
----
-
-## Voice Notification Patterns
-
-### Task Start Announcement
-
-```bash
-# Fire at task start
-curl -s -X POST ${VOICE_SERVER_URL}/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Starting the deployment workflow"}' \
-  > /dev/null 2>&1 &
-```
-
-### Task Completion
-
-```bash
-# Fire when task completes
-curl -s -X POST ${VOICE_SERVER_URL}/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Deployment complete. All tests passing."}' \
-  > /dev/null 2>&1 &
-```
-
-### Context-Aware Messages
-
-| User Request | Announcement |
-|--------------|--------------|
-| "Where is...?" | "Checking...", "Looking up..." |
-| "Fix this" | "Fixing...", "Updating..." |
-| "Why isn't...?" | "Investigating...", "Debugging..." |
-| "Create..." | "Creating...", "Building..." |
-
-### Workflow Invocation Notifications
-
-**For skills with `Workflows/` directories, use "Executing..." format:**
-
-```
-Executing the **WorkflowName** workflow within the **SkillName** skill...
-```
-
-**Examples:**
-- "Executing the **GIT** workflow within the **CORE** skill..."
-- "Executing the **Publish** workflow within the **Blogging** skill..."
-
-**NEVER announce fake workflows:**
-- "Executing the file organization workflow..." - NO SUCH WORKFLOW EXISTS
-- If it's not listed in a skill's Workflow Routing, DON'T use "Executing" format
-- For non-workflow tasks, use context-appropriate gerund
-
-### When to Skip Notifications
-
-**Always skip when:**
-- **Conversational responses** - Greetings, acknowledgments, simple Q&A
-- **Skill has no workflows** - The skill has no `Workflows/` directory
-- **Direct skill handling** - SKILL.md handles request without invoking a workflow file
-- **Quick utility operations** - Simple file reads, status checks
-- **Sub-workflows** - When a workflow calls another workflow (avoid double notification)
 
 ---
 
@@ -175,16 +91,9 @@ Executing the **WorkflowName** workflow within the **SkillName** skill...
 ```typescript
 // hooks/core/notifications.ts
 
-export async function notify(message: string, channel: 'voice' | 'push' | 'desktop' = 'voice') {
+export async function notify(message: string, channel: 'push' | 'desktop' = 'push') {
   try {
     switch (channel) {
-      case 'voice':
-        await fetch(`${process.env.VOICE_SERVER_URL}/notify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message })
-        });
-        break;
       case 'push':
         await fetch(`${process.env.NTFY_SERVER}/${process.env.NTFY_TOPIC}`, {
           method: 'POST',
@@ -208,10 +117,6 @@ export async function notify(message: string, channel: 'voice' | 'push' | 'deskt
 Add to your `.env`:
 
 ```bash
-# Voice
-VOICE_SERVER_URL=http://localhost:8888
-ELEVENLABS_VOICE_ID=your_voice_id_here
-
 # Push (ntfy)
 NTFY_SERVER=https://ntfy.sh
 NTFY_TOPIC=your-topic-here
@@ -228,4 +133,3 @@ SLACK_WEBHOOK_URL=your_webhook_url_here
 - **Hooks:** `THEHOOKSYSTEM.md`
 - **Identity:** `USER/DAIDENTITY.md`
 - **Agents:** `AGENTS.md`
-- **Voice Pack:** `pai-voice-system`
