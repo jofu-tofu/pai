@@ -128,12 +128,11 @@ bin/trufflehog
 bin/trufflehog.exe
 hooks/subagent-stop-debug.log
 
-# AIW Installation
-.aiwcli/
-_cc-native/
-
 # Generated output
 _output/
 
 # Release builds
 Releases/
+
+# AIW Installation
+.aiwcli/
