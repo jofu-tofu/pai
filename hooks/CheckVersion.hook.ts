@@ -37,6 +37,7 @@
  * - Skipped for subagents: Yes
  */
 
+
 async function getCurrentVersion(): Promise<string> {
   try {
     const proc = Bun.spawn(['claude', '--version'], {

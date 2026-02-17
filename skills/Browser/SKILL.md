@@ -11,6 +11,19 @@ version: 2.0.0
 
 If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 
+## Session Memory
+
+**Before running any Browse.ts commands, check for prior session notes at:**
+`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Browser/session-context.md`
+
+If this file exists, read it FIRST. It may contain:
+- Known working selectors for sites you've tested before
+- Site-specific auth requirements or quirks
+- URLs of active dev servers
+- Known errors that are expected/ignorable
+- Page structure notes that save re-discovery iterations
+
+This file is maintained manually or by future automation. If it doesn't exist, proceed normally.
 
 # Browser v2.0.0 - Debug-First Browser Automation
 

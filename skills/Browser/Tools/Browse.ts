@@ -200,7 +200,7 @@ async function ensureSession(): Promise<number> {
   const env: Record<string, string> = {
     ...process.env as Record<string, string>,
     BROWSER_PORT: String(port),
-    BROWSER_HEADLESS: 'false'  // VISIBLE BY DEFAULT per user preference
+    BROWSER_HEADLESS: process.env.BROWSE_HEADLESS === 'true' ? 'true' : 'false'
   }
 
   // On Windows, Bun + Playwright chromium.launch() hangs.
@@ -580,6 +580,40 @@ async function openUrl(url: string): Promise<void> {
 }
 
 // ============================================
+// DEV SERVER DETECTION
+// ============================================
+
+async function detectDevServers(): Promise<void> {
+  const ports = [3000, 3001, 3002, 4200, 5000, 5173, 8000, 8080, 9000, 1234]
+  console.log('Scanning for local dev servers...\n')
+
+  const results = await Promise.all(
+    ports.map(async (port) => {
+      try {
+        const res = await fetch(`http://localhost:${port}`, {
+          signal: AbortSignal.timeout(500)
+        })
+        return { port, status: res.status, ok: true }
+      } catch {
+        return { port, status: 0, ok: false }
+      }
+    })
+  )
+
+  const active = results.filter(r => r.ok)
+  if (active.length === 0) {
+    console.log('No dev servers found on common ports.')
+    console.log(`Scanned: ${ports.join(', ')}`)
+  } else {
+    console.log(`Found ${active.length} active server(s):`)
+    for (const s of active) {
+      console.log(`  http://localhost:${s.port}  [HTTP ${s.status}]`)
+    }
+    console.log(`\nTip: bun run Browse.ts http://localhost:${active[0].port}`)
+  }
+}
+
+// ============================================
 // MAIN
 // ============================================
 
@@ -589,6 +623,8 @@ Browse CLI v2.0.0 - Debug-First Browser Automation
 
 Usage:
   bun run Browse.ts <url>                    Navigate with full diagnostics
+  bun run Browse.ts <url> --headless         Navigate in headless mode (faster, no window)
+  bun run Browse.ts detect                   Scan for local dev servers on common ports
   bun run Browse.ts errors                   Show console errors
   bun run Browse.ts warnings                 Show console warnings
   bun run Browse.ts console                  Show all console output
@@ -607,7 +643,7 @@ Usage:
   bun run Browse.ts stop                     Stop session
 
 Session auto-starts on first use. No explicit start needed.
-Browser window is VISIBLE by default for debugging.
+Browser window is VISIBLE by default for debugging. Use --headless for faster iteration testing.
 
 Examples:
   bun run Browse.ts https://example.com
@@ -618,7 +654,14 @@ Examples:
 }
 
 async function main(): Promise<void> {
-  const args = process.argv.slice(2)
+  const rawArgs = process.argv.slice(2)
+
+  // Parse --headless flag (can appear anywhere)
+  if (rawArgs.includes('--headless')) {
+    process.env.BROWSE_HEADLESS = 'true'
+  }
+  const args = rawArgs.filter(a => a !== '--headless')
+
   const command = args[0]
 
   if (!command || command === 'help' || command === '--help' || command === '-h') {
@@ -722,6 +765,10 @@ async function main(): Promise<void> {
 
       case 'stop':
         await stop()
+        break
+
+      case 'detect':
+        await detectDevServers()
         break
 
       // Legacy session commands (redirect to new interface)
