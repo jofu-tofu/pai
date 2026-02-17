@@ -66,14 +66,8 @@ skills/EpicDesign/
 # ============================================
 # IDE & TOOL SETTINGS
 # ============================================
-# Claude Code local settings (user-specific permissions, credentials)
-**/.claude/settings.local.json
-
-# Skills junction (created by setup.ts fix - points to ../skills)
-.claude/skills
-
-# Local Claude commands (user-specific)
-.claude/commands/
+# Claude Code settings directory (user-specific, generated from template)
+.claude/
 
 # Windsurf IDE settings
 .windsurf/
@@ -87,14 +81,13 @@ _bmad/
 bmad-output/
 **/bmad-output/
 
-# Include .claude/settings.json (hook definitions template with $env:PAI_DIR)
-
 # ============================================
 # USER-SPECIFIC SETTINGS
 # ============================================
 # Root settings.json is generated from settings.template.json by expand-settings.ts
 # Contains absolute paths specific to each user's installation
 /settings.json
+/settings.json.v*
 /settings.backup-*.json
 
 # ============================================
