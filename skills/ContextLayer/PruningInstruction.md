@@ -11,15 +11,35 @@ Do not modify the `---` separators — they are part of the embedded instruction
 ---
 ## Context Maintenance
 
-This file is intentionally slim. When any information here becomes outdated
-or no longer affects agent behavior in this project, remove it immediately —
-do not append alternatives or add explanations. Apply the falsifiability test:
-if removing a line would not change how you work in this project, remove it.
+**Remove** any entry that fails the falsifiability test: if removing a line would not
+change how an agent works in this project, remove it. If a convention here conflicts
+with the actual codebase, the codebase wins — update this file to match, do not work
+around it. Prune aggressively. This file should shrink as the codebase matures.
 
-Additionally: if a convention here conflicts with what you see in the actual
-codebase, the codebase wins. Update this file to match — never work around it.
+**Add** an entry here when you discover something in this directory that:
+- Would cause an agent to fail or produce wrong output if it didn't know this
+- Is not obvious from reading the code directly
+- Is specific enough to belong at this level (not a project-wide rule → root CLAUDE.md)
 
-Prune aggressively. This file should shrink as the codebase matures.
+**Where things belong** — use this decision tree when deciding where to record something:
+
+  Does it affect agents across the whole project?
+  → Yes → root CLAUDE.md (not here)
+  → No, only this directory → this file
+
+  Is it a WHY decision (an architectural choice or trade-off)?
+  → Yes → inline code comment or ADR in docs/decisions/
+  → No, it's a convention or constraint → this file
+
+  Can an agent infer it by reading the code?
+  → Yes → do not add it (noise)
+  → No → add it here
+
+**When to trigger a full Audit or Generate:**
+- After renaming directories or moving files: run Audit
+- After major refactors (>20% of files changed): run Generate
+- After 30+ days without touching this file: run Audit
+- If an agent makes a mistake caused by this file: fix immediately, then run Audit
 ```
 
 ---
@@ -28,17 +48,21 @@ Prune aggressively. This file should shrink as the codebase matures.
 
 - Place at the very bottom of each generated CLAUDE.md, after all content sections
 - The `---` separator before `## Context Maintenance` ensures the heading is clearly scoped
-- Do not add a closing `---` after the block — the file ends after "Prune aggressively."
+- Do not add a closing `---` after the block — the file ends after the last instruction
 
 ---
 
-## Design Note (from RedTeam findings)
+## Design Note
 
 The embedded instruction works as a **Phase 1 bridge** — it instructs the currently-active
-agent to prune opportunistically while reading/editing CLAUDE.md. It does not trigger
-autonomously. Phase 2 will add a `PostToolUse` hook to trigger Audit automatically when
-source files change. Phase 3 adds a `SessionStart` lightweight Prune pass.
+agent to maintain context opportunistically while reading/editing CLAUDE.md. It does not
+trigger autonomously.
 
-The instruction is concept-correct but enforcement-weak by design at this phase — it trades
-automation for simplicity. The explicit Prune and Audit workflows are the primary enforcement
-mechanism; this instruction is a fallback for when those aren't explicitly invoked.
+**Phase 2 (planned):** `PostToolUse` hook on file Write events → lightweight check:
+"Does this change affect a CLAUDE.md claim in this directory?" → trigger Audit if yes.
+
+**Phase 3 (planned):** `SessionStart` hook → quick falsifiability sweep of root CLAUDE.md
+only (fast, no haiku agents, content-only pass like Prune).
+
+Phase 2+3 close the autonomous-trigger gap. Until then, the embedded instruction is the
+primary maintenance mechanism for agents actively working in the project.

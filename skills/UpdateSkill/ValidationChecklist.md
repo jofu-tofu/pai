@@ -2,7 +2,7 @@
 
 Complete validation reference for skill compliance with SkillSystem.md.
 
-**Authoritative Source:** `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md`
+**Authoritative Source:** `SkillSystem.md` (in this skill's root directory)
 
 ---
 

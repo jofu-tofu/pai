@@ -4,7 +4,9 @@
 
 ## Reference Material
 
-- None. (this workflow operates entirely on what the user provides and the target skill's SKILL.md)
+- `PromptingStandards.md` — Wording and trigger phrase quality rules. Read when modifying frontmatter descriptions or trigger phrases.
+- `[target skill]/SkillIntent.md` — Target skill's design intent (if present). Read before modifying to ensure changes don't contradict original purpose or out-of-scope decisions.
+- **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
 
@@ -17,7 +19,7 @@ Skills evolve as usage patterns emerge. When frontmatter becomes stale, routing 
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Read `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md` for structure requirements
+- Read `../SkillSystem.md` for structure requirements
 
 ## Workflow Steps
 
@@ -68,6 +70,26 @@ Identify:
 - Follow existing example format
 - Include User prompt and arrow-denoted steps
 
+### Step 4.5: Prompt Quality Gate (descriptions and trigger phrases only)
+
+**Skip this step if the modification was structural only** (adding a section, updating examples format, renaming a file path). Run this step if the modification touched any of: `description:` field, `USE WHEN` clause, trigger phrases in the routing table.
+
+Read `PromptingStandards.md` (in this skill's root dir) and verify the modified wording against these criteria:
+
+**For USE WHEN / description wording:**
+- [ ] Starts with a clear action verb or "USE WHEN" clause
+- [ ] Specific enough to not over-trigger (no vague terms like "when needed" or "as appropriate")
+- [ ] No XML tags — markdown-first per Claude 4.x patterns
+- [ ] Concrete signal words a user would actually say, not meta-descriptions
+
+**For trigger phrases:**
+- [ ] Each phrase is 2–6 words (shorter = more reliable matching)
+- [ ] No phrase overlaps semantically with another workflow's triggers
+- [ ] Phrase is something a real user would naturally say, not internal jargon
+- [ ] New phrase doesn't create ambiguity with adjacent workflows
+
+Report any gate failures before proceeding to Step 5. If failures found: revise wording and re-check. Do not skip the gate.
+
 ### Step 5: Validate Changes
 
 Run validation checks:
@@ -102,3 +124,14 @@ ACTIONS:
 RESULTS: SKILL.md updated, validation passed
 COMPLETED: Prompting description updated with template generation.
 ```
+
+## Follow-Up
+
+After completing this workflow, evaluate these chain conditions:
+
+| Condition | Chain To | Action |
+|---|---|---|
+| Trigger phrases or USE WHEN clause were modified | PromptQualityAudit | Announce: "Running prompt quality audit on the phrases you just changed..." then execute `Workflows/PromptQualityAudit.md` |
+| Significant structural changes made (not just description edits) | StressTest | Announce: "Running stress test to verify skill integrity..." then execute `Workflows/StressTest.md` |
+
+If no conditions match, skip follow-ups.

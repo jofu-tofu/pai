@@ -84,18 +84,26 @@ From root-level agent results + cross-subsystem knowledge, synthesize root CLAUD
 
 - [hard prohibition or requirement]
 
+## Scope
+
+This file is the root context layer — it contains only things that apply across
+the entire project. Directory-specific conventions belong in that directory's
+CLAUDE.md. Architectural WHY decisions belong in inline comments or ADRs.
+Anything an agent can infer from reading the code belongs nowhere.
+
 ---
 ## Context Maintenance
 
-This file is intentionally slim. When any information here becomes outdated
-or no longer affects agent behavior in this project, remove it immediately —
-do not append alternatives or add explanations. Apply the falsifiability test:
-if removing a line would not change how you work in this project, remove it.
+**Remove** any entry that fails the falsifiability test: if removing a line would not
+change how an agent works in this project, remove it. If a convention here conflicts
+with the actual codebase, the codebase wins — update this file to match, do not work
+around it. Prune aggressively. This file should shrink as the codebase matures.
 
-Additionally: if a convention here conflicts with what you see in the actual
-codebase, the codebase wins. Update this file to match — never work around it.
+**Add** an entry here only if it would cause an agent to fail without knowing it, is
+not obvious from the code, and applies project-wide (not just one directory).
 
-Prune aggressively. This file should shrink as the codebase matures.
+**When to trigger a full Audit or Generate:** after renaming directories, after major
+refactors (>20% of files changed), or after 30+ days without touching this file.
 ```
 
 **Apply falsifiability test** (from `ScanProtocol.md`) to every entry before writing.
@@ -127,10 +135,16 @@ For each subsystem with its own haiku agent result:
 
 - [local constraint]
 
+## Scope
+
+This file covers only conventions and constraints specific to this directory.
+Project-wide rules belong in the root CLAUDE.md. WHY decisions belong in
+inline comments. Anything inferable from reading the code belongs nowhere.
+
 ---
 ## Context Maintenance
 
-This file is intentionally slim. [... same template as root ...]
+This file is intentionally slim. [... same template as root, from PruningInstruction.md ...]
 ```
 
 **Budget check:** Each subdir CLAUDE.md targets 200–500 tokens.

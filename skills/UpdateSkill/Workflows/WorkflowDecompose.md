@@ -1,24 +1,22 @@
 # WorkflowDecompose Workflow
 
-> **Trigger:** "decompose skill", "token audit", "usage analysis", "optimize skill tokens", "analyze skill structure", "how is this skill structured"
+> **Trigger:** "decompose skill", "usage analysis", "analyze skill structure", "how is this skill structured", "audit skill structure"
 
 ## Reference Material
 
-- **Token Budgets:** `../TokenBudgets.md`
-- **Authoritative Spec:** `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md`
+- **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
 
-Analyze a skill's file structure against real user workflow patterns to identify token waste, missing workflows, and sharding opportunities. Produces a concrete optimization report with line-count estimates and optional automated application.
+Analyze a skill's file structure to understand what files exist, which load in which situations, where content is misplaced, and where coverage gaps exist. Produces a concrete structure report with optional remediation.
 
-## Prerequisites
+The goal is **organizational clarity**, not token savings. A skill should be as complete as its content requires. Content should live where it will actually be found and used — that's the standard for placement decisions.
 
-- Target skill exists in `$PAI_DIR/skills/[SkillName]/`
-- Read `../TokenBudgets.md` for budget targets before running phases
+---
 
 ## Workflow Steps
 
-### Phase A — File Inventory & Token Estimation
+### Phase A — File Inventory & Load Map
 
 **Read all files in the target skill directory:**
 
@@ -28,10 +26,10 @@ Analyze a skill's file structure against real user workflow patterns to identify
 
 **For each file, record:**
 - File path (relative to skill root)
-- Line count (use `wc -l` or count lines when reading)
+- Line count (informational — not a budget)
 - File type: `SKILL` | `Workflow` | `Context`
 
-**Output — Token Load Map:**
+**Output — Load Map:**
 ```
 Skill: [SkillName]
 Total files: N | Total lines: X
@@ -39,7 +37,7 @@ Total files: N | Total lines: X
 ALWAYS LOADS:
   SKILL.md — Y lines
 
-WORKFLOW FILES (load per invocation):
+WORKFLOW FILES (load per invocation of that workflow):
   Workflows/WorkflowName.md — N lines
     Loads context: [files from ## Reference Material section, or "None"]
   ...
@@ -49,61 +47,64 @@ CONTEXT FILES (load via workflow reference only):
   ...
 ```
 
-**Missing section handling:** If a workflow file has no `## Reference Material` section, flag it: `⚠️ [WorkflowName]: no ## Reference Material section — token cost unknown; add section to fix`. Count context loads as 0 for that workflow's estimate.
+**Missing section handling:** If a workflow file has no `## Reference Material` section, flag it: `⚠️ [WorkflowName]: no ## Reference Material section — add section to clarify what context this workflow needs`.
 
 **Orphan detection:** A context file is orphaned if it appears in zero `## Reference Material` sections across all workflow files.
+
+---
 
 ### Phase B — User Workflow Matrix
 
 **For each workflow file, infer:**
 - Trigger phrase(s) from the `> **Trigger:**` line
 - User's job-to-be-done (what they get back)
-- Total token cost = SKILL.md lines + workflow file lines + all referenced context file lines
-- Irrelevant loads = context files listed in Reference Material but not needed for this workflow's output
+- Context files that load alongside it
 
 **Output — User Workflow Matrix:**
 
-| Workflow | Trigger Phrases | User Gets | Token Cost (lines) | Issues |
-|----------|----------------|-----------|-------------------|--------|
-| WorkflowName | "trigger phrase" | Description of output | 245 | ContextFile.md loads unnecessarily |
+| Workflow | Trigger Phrases | User Gets | Context Loaded | Issues |
+|----------|----------------|-----------|----------------|--------|
+| WorkflowName | "trigger phrase" | Description of output | [files] or None | [any issues] |
 | ... | ... | ... | ... | ... |
 
 **Gap detection:** Based on the skill's description and USE WHEN clause, are there trigger intent patterns that no workflow handles? List as "Missing workflow: [what trigger → what user expects]".
 
-### Phase C — Sharding Recommendations
+---
 
-**Evaluate each finding against token budget targets:**
-- `SKILL.md`: ≤ 100 lines
-- Workflow files: ≤ 150 lines
-- Context files: ≤ 200 lines
+### Phase C — Organization Signals
 
-**Check these 6 optimization signals:**
+Check these 6 signals for organizational problems. Each signal is about **content clarity and correctness of placement** — not line counts.
 
-1. **SKILL.md bloat** — Content in SKILL.md that should be in a context file (sections > 30 lines that aren't routing or quick reference)
-2. **Context file always-loading** — A context file referenced by ALL workflows → should live in SKILL.md instead
-3. **Workflow too large** — Any workflow > 150 lines → split or extract reference material
-4. **Workflow too small** — Any workflow < 20 lines → merge into SKILL.md Quick Reference
-5. **Missing workflow** — Trigger intent patterns found in Phase B gap detection
-6. **Budget violation** — Any file exceeding its tier limit (flag with exact line count)
+1. **SKILL.md content that belongs elsewhere** — Sections in SKILL.md that are only relevant to specific workflows (not universal to all invocations) should live in a context file or the workflow itself
+2. **Context file used by every workflow** — A context file referenced by ALL workflows is effectively universal; consider whether it belongs in SKILL.md instead
+3. **Workflow doing multiple distinct jobs** — A workflow that serves two conceptually separate user needs should be split into two focused workflows
+4. **Workflow too thin to justify its own file** — A workflow with fewer than ~20 lines may belong folded into SKILL.md Quick Reference
+5. **Missing workflow** — Trigger intent patterns identified in Phase B gap detection
+6. **Orphaned context file** — Context file never referenced by any workflow; should be deleted, integrated, or wired in
 
 For each signal found, produce a numbered recommendation:
 ```
-REC-N: [Action] — [What changes] → saves ~X lines per invocation
+REC-N: [Action] — [What changes and why]
   Files: [affected files]
   Risk: [LOW / MEDIUM / HIGH]
 ```
+
+---
 
 ### Phase D — Report & Optional Execution
 
 **Output the structured report:**
 
 ```markdown
-## Token Optimization Report: [SkillName]
+## Structure Analysis Report: [SkillName]
 
 ### Current State
 - Total files: N | Total lines: X
-- Always-loaded (SKILL.md): Y lines
-- Avg lines per invocation: Z (SKILL.md + typical workflow + typical context)
+- SKILL.md: Y lines
+- Workflows: N files
+
+### Load Map
+[from Phase A]
 
 ### User Workflow Matrix
 [table from Phase B]
@@ -115,9 +116,9 @@ REC-N: [Action] — [What changes] → saves ~X lines per invocation
 [numbered recommendations from Phase C]
 
 ### Summary
-Budget violations: N files over limit
 Orphaned context files: N
-Estimated savings: X% reduction in avg per-invocation token cost
+Coverage gaps: N
+Recommendations: N (LOW: X, MEDIUM: Y, HIGH: Z)
 ```
 
 **Then ask:**
@@ -128,9 +129,8 @@ Apply these recommendations?
   [R] Report only — no changes
 ```
 
-**If applying changes — use the RefactorSkill change documentation template:**
+**If applying changes — document each change:**
 
-For each change, document:
 ```
 CHANGE #: [Title]
 What changes: [Specific files and sections]
@@ -139,45 +139,23 @@ Risk: [LOW/MEDIUM/HIGH]
 Rollback: [Steps to undo]
 ```
 
-Apply changes using Read/Edit/Write tools directly. After all changes:
+Apply changes using Read/Edit/Write tools directly. After all changes, run ValidateSkill on the target skill.
 
-```bash
-bun $PAI_DIR/skills/UpdateSkill/Tools/ValidateSkill.ts [SkillName]
-```
-
-Report final before/after line counts for each modified file.
+---
 
 ## Constraints
 
 - **Read-only by default** — Report mode is the safe default; user must explicitly choose to apply
 - **LOW risk only in auto-apply** — MEDIUM/HIGH risk changes always require per-change confirmation
-- **Concrete numbers required** — Every recommendation must include actual line counts, not vague descriptions
-- **Reference Material is the truth** — Infer load cost from `## Reference Material` sections only; do not guess
-- **No subdirectories** — File moves must stay within existing directory structure (max 2 levels deep)
+- **Concrete reasoning required** — Every recommendation must explain *why* the placement is wrong, not just that it's large
+- **Reference Material is the truth** — Infer what loads when from `## Reference Material` sections only; do not guess
 
-## Example Output
+## Follow-Up
 
-```
-## Token Optimization Report: UpdateSkill
+After completing this workflow, evaluate these chain conditions:
 
-### Current State
-- Total files: 8 | Total lines: 987
-- Always-loaded (SKILL.md): 100 lines
-- Avg lines per invocation: ~380 (SKILL.md + workflow + 1 context file)
+| Condition | Chain To | Action |
+|---|---|---|
+| Analysis reveals structural issues needing action | RefactorSkill | Announce: "Running RefactorSkill to address structural issues found..." then execute `Workflows/RefactorSkill.md` |
 
-### User Workflow Matrix
-| Workflow | Trigger | User Gets | Token Cost | Issues |
-|----------|---------|-----------|------------|--------|
-| Retrospective | "retrospective on skill" | Improvement report | 481 lines | ValidationChecklist.md loads (177 lines) but validation is optional |
-| RefactorSkill | "refactor skill" | Refactoring plan + execution | 467 lines | None |
-| ValidateSkill | "validate skill" | Compliance report | 465 lines | OK |
-
-### Recommendations
-REC-1: Move ValidationChecklist.md reference from Retrospective to ValidateSkill only
-  Files: Workflows/Retrospective.md (remove from Reference Material)
-  Risk: LOW → saves ~177 lines when running retrospective
-
-### Summary
-Budget violations: 0 | Orphaned files: 0
-Estimated savings: 46% reduction for Retrospective invocations
-```
+If no conditions match, skip follow-ups.

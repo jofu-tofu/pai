@@ -1,10 +1,11 @@
 # ManageWorkflows Workflow
 
-> **Trigger:** "add workflow to skill", "remove workflow", "rename workflow", "create workflow"
+> **Trigger:** "add workflow to skill", "add workflow", "remove workflow", "rename workflow", "create workflow"
 
 ## Reference Material
 
-- None. (this workflow operates on the target skill's files directly; no context pre-loading needed)
+- `PromptingStandards.md` — Wording and trigger phrase quality rules (Claude 4.x). Read before writing trigger phrases for new workflows.
+- **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
 
@@ -17,7 +18,7 @@ Skills grow and change as new capabilities are needed or existing workflows beco
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Read `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md` for workflow conventions
+- Read `../SkillSystem.md` for workflow conventions
 
 ## Workflow Steps
 
@@ -81,6 +82,19 @@ RESULTS: [Outcome]
 COMPLETED: [Brief completion message]
 \`\`\`
 ```
+
+### Step A2.5: Trigger Phrase Quality Gate
+
+Before writing trigger phrases into the workflow file or routing table, verify them against `PromptingStandards.md` (in this skill's root dir).
+
+Check each proposed trigger phrase against:
+- [ ] **Length**: 2–6 words. Longer phrases are fragile; single words over-trigger.
+- [ ] **Natural language**: Would a real user say this unprompted? Test by imagining saying it aloud.
+- [ ] **Specificity**: Does the phrase unambiguously indicate THIS workflow and not another?
+- [ ] **Overlap check**: Compare against all existing trigger phrases in the target skill's SKILL.md routing table. No semantic duplicates.
+- [ ] **Verb clarity**: The phrase should make the intended action obvious (add, remove, rename, validate, etc.)
+
+If any phrase fails: revise before proceeding to Step A3. Document the rejected phrase and reason in the summary output.
 
 ### Step A3: Update Routing Table
 
@@ -176,3 +190,14 @@ ACTIONS:
 RESULTS: Workflow added successfully
 COMPLETED: Daemon skill now includes Cleanup workflow.
 ```
+
+## Follow-Up
+
+After completing this workflow, evaluate these chain conditions:
+
+| Condition | Chain To | Action |
+|---|---|---|
+| A workflow was added or removed | StressTest | Announce: "Running stress test to verify skill integrity after workflow change..." then execute `Workflows/StressTest.md` |
+| A new workflow was added | PromptQualityAudit | Announce: "Running prompt quality audit on the new workflow's trigger phrases..." then execute `Workflows/PromptQualityAudit.md` |
+
+If no conditions match, skip follow-ups.

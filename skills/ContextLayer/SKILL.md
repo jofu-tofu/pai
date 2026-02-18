@@ -1,11 +1,12 @@
 ---
 name: ContextLayer
 description: >
-  Generate and maintain slim, high-signal CLAUDE.md context files.
-  USE WHEN user says "update context layer", "prune context layer",
-  "generate CLAUDE.md", "audit my context", "is my CLAUDE.md stale",
-  "slim down CLAUDE.md", "context layer", "update context", OR any
-  request to create or improve project context for AI agents.
+  Generate and maintain slim, high-signal CLAUDE.md context files for AI agents.
+  USE WHEN the request involves creating, reviewing, correcting, shrinking, or
+  refreshing CLAUDE.md files — whether the user says so explicitly or describes
+  symptoms like "agents are confused", "context is stale", "CLAUDE.md is too big",
+  or "just started a new project". Covers the full lifecycle of agent context files.
+  For README, API docs, or non-CLAUDE.md documentation, handle directly without this skill.
 ---
 
 # ContextLayer
@@ -17,13 +18,41 @@ agents to operate with bad context and produce subtly wrong behavior.
 **Context layer = tree**, not a single file. Root CLAUDE.md for global
 orientation; subdirectory CLAUDE.md files for scoped domain context.
 
-## Workflow Routing
+## Workflow Decision
 
-| Trigger | Workflow | When |
-|---------|----------|------|
-| "generate", "create a CLAUDE.md", "set up context", "new project" | `Workflows/Generate.md` | Project has no CLAUDE.md or needs full rebuild |
-| "audit", "update", "is it stale", "review context layer", "update context layer" | `Workflows/Audit.md` | CLAUDE.md exists; verify claims against actual files |
-| "prune", "slim down", "shrink", "remove stale", "prune context layer" | `Workflows/Prune.md` | CLAUDE.md exists; remove redundant/obvious content |
+Choose the workflow based on what state the user's context is in:
+
+**→ Generate** (`Workflows/Generate.md`) when no CLAUDE.md exists yet, or a full
+rebuild is needed. The project is starting fresh, or the existing context is so
+wrong it's better to regenerate than repair. Use this when the user is onboarding
+a new project, adding a new AI agent to a codebase for the first time, or explicitly
+wants to rebuild from scratch.
+
+**→ Audit** (`Workflows/Audit.md`) when a CLAUDE.md exists but may be wrong,
+outdated, or incomplete. The file exists — it just might be lying. Use this when
+the user reports agent confusion, suspects stale information, wants a regular
+health check, or notices the codebase has changed since the context was written.
+
+**→ Prune** (`Workflows/Prune.md`) when a CLAUDE.md exists and has grown too large
+or noisy. The content may be correct, but there's too much of it. Use this when
+the user reports context files getting bloated, hitting token limits, or wanting
+to reduce context overhead without a full audit.
+
+## When It's Ambiguous
+
+Some requests don't clearly signal which workflow to use. Resolve by asking one question:
+
+- **"improve / fix / make better"** → ask: *Is the content wrong, or is it too long?*
+  - Content wrong or outdated → Audit
+  - Too long or noisy → Prune
+
+- **"look at my CLAUDE.md" / bare "context layer"** → ask: *What's the problem you're trying to solve?*
+  - No CLAUDE.md yet → Generate
+  - Might be stale → Audit
+  - Too long → Prune
+
+When genuinely unclear, default to **Audit** — verifying the existing context is the
+most common need and causes no harm if the content was already correct.
 
 ## Quick Reference
 
@@ -44,9 +73,24 @@ orientation; subdirectory CLAUDE.md files for scoped domain context.
 ## Invocation Examples
 
 ```
-"generate a CLAUDE.md for this project"          → Workflows/Generate.md
-"update the context layer"                       → Workflows/Audit.md
-"prune the context layer, it's getting bloated"  → Workflows/Prune.md
-"is my CLAUDE.md stale?"                         → Workflows/Audit.md
-"slim down the CLAUDE.md files"                  → Workflows/Prune.md
+// Explicit triggers
+"generate a CLAUDE.md for this project"          → Generate
+"initialize context for this codebase"           → Generate
+"rebuild the context layer from scratch"         → Generate
+"update the context layer"                       → Audit
+"check my CLAUDE.md for issues"                  → Audit
+"is my CLAUDE.md stale?"                         → Audit
+"prune the context layer, it's getting bloated"  → Prune
+"compress my CLAUDE.md to save tokens"           → Prune
+
+// Diagnostic phrasings (symptom → workflow)
+"agents keep putting files in the wrong place"   → Audit (stale paths)
+"Claude ignores my CLAUDE.md, it's too long"     → Prune
+"just started a new repo, agents have no clue"   → Generate
+"we refactored last week, context is now wrong"  → Audit
+
+// Redirects (handle without ContextLayer)
+"update my README"         → edit the README directly
+"generate API docs"        → use documentation tooling
+"delete context files"     → use the filesystem directly
 ```

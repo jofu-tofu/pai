@@ -5,7 +5,8 @@
 ## Reference Material
 
 - **Full Checklist:** `../ValidationChecklist.md`
-- **Authoritative Spec:** `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md`
+- **Authoritative Spec:** `../SkillSystem.md`
+- **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
 
@@ -18,7 +19,7 @@ Skills must follow SkillSystem.md conventions for the PAI system to route comman
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Reference: `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md`
+- Reference: `../SkillSystem.md`
 
 ## Workflow Steps
 
@@ -185,3 +186,13 @@ ACTIONS:
 RESULTS: All 6 checks passed
 COMPLETED: CreateSkill is valid and compliant.
 ```
+
+## Follow-Up
+
+After completing this workflow, evaluate these chain conditions:
+
+| Condition | Chain To | Action |
+|---|---|---|
+| Validation passed but user reported routing issues or requested deeper assurance | StressTest | Announce: "Running stress test for deeper routing assurance..." then execute `Workflows/StressTest.md` |
+
+If no conditions match, skip follow-ups.

@@ -6,7 +6,9 @@
 
 - **Validation Checklist:** `../ValidationChecklist.md`
 - **Risk Framework:** `../RiskFramework.md`
-- **Authoritative Spec:** `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md`
+- **Authoritative Spec:** `../SkillSystem.md`
+- **Target skill's SkillIntent.md** (if present) — Read before restructuring; changes must not contradict the skill's stated out-of-scope decisions or constraints.
+- **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
 
@@ -19,7 +21,7 @@ Skills accumulate technical debt over time: naming conventions drift, workflows 
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Read `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md` for structure requirements
+- Read `../SkillSystem.md` for structure requirements
 - User approval required before executing changes
 
 ## Workflow Steps
@@ -287,3 +289,12 @@ ACTIONS:
 RESULTS: All validation checks pass
 COMPLETED: Daemon skill refactored - now fully compliant with SkillSystem.md.
 ```
+
+## Follow-Up
+
+After completing this workflow, execute these chains:
+
+| Condition | Chain To | Action |
+|---|---|---|
+| ALWAYS after restructuring | ValidateSkill | Announce: "Running validation after restructuring..." then execute `Workflows/ValidateSkill.md` |
+| ALWAYS after restructuring | StressTest | Announce: "Running stress test after restructuring..." then execute `Workflows/StressTest.md` |

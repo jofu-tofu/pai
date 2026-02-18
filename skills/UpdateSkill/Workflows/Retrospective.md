@@ -6,7 +6,9 @@
 
 - **Risk Framework:** `../RiskFramework.md`
 - **Validation Checklist:** `../ValidationChecklist.md`
-- **Authoritative Spec:** `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md`
+- **Authoritative Spec:** `../SkillSystem.md`
+- **Target skill's SkillIntent.md** (if present) — Read before proposing improvements; recommendations must align with the skill's original purpose and must not contradict its constraints.
+- **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
 
@@ -20,7 +22,7 @@ Skills improve through real-world usage feedback. When a skill requires multiple
 
 - A completed session where at least one skill was invoked
 - Target skill exists in `$PAI_DIR/skills/`
-- Read `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md` for structure requirements
+- Read `../SkillSystem.md` for structure requirements
 
 ## Workflow Steps
 
@@ -288,3 +290,13 @@ Modified:
 Removed:
   - None
 ```
+
+## Follow-Up
+
+After completing this workflow, evaluate these chain conditions:
+
+| Condition | Chain To | Action |
+|---|---|---|
+| Improvement recommendations require content changes | ModifyContent | Announce: "Running ModifyContent to apply recommended changes..." then execute `Workflows/ModifyContent.md` |
+
+If no conditions match, skip follow-ups.
