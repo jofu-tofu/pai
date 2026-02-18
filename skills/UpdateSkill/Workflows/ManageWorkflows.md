@@ -2,6 +2,10 @@
 
 > **Trigger:** "add workflow to skill", "remove workflow", "rename workflow", "create workflow"
 
+## Reference Material
+
+- None. (this workflow operates on the target skill's files directly; no context pre-loading needed)
+
 ## Purpose
 
 Add, remove, or rename workflow files within an existing skill, and update the SKILL.md routing table accordingly.
@@ -13,7 +17,7 @@ Skills grow and change as new capabilities are needed or existing workflows beco
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Read `$PAI_DIR/skills/PAI/SkillSystem.md` for workflow conventions
+- Read `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md` for workflow conventions
 
 ## Workflow Steps
 

@@ -18,7 +18,7 @@ Skills must follow SkillSystem.md conventions for the PAI system to route comman
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Reference: `$PAI_DIR/skills/PAI/SkillSystem.md`
+- Reference: `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md`
 
 ## Workflow Steps
 

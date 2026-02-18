@@ -59,6 +59,8 @@ Return JSON:
 **Scope:** Each agent reads ONLY the files/paths referenced in its assigned CLAUDE.md.
 Do NOT scan the full project — only what the CLAUDE.md claims to know about.
 
+**Missing path handling:** If a referenced path (file or directory) no longer exists on disk, do NOT attempt to read it. Instead, immediately mark every CLAUDE.md entry that references that path as stale with reason "path no longer exists on disk" and fix set to empty string (remove the entry). Do not wait for the haiku agent to discover this — check path existence before dispatching.
+
 ### Step 4 — Synthesize and Update
 
 For each CLAUDE.md, apply agent results:
@@ -66,6 +68,7 @@ For each CLAUDE.md, apply agent results:
 2. **Stale entries with empty fix** → remove the entry entirely
 3. **Missing entries** → add to appropriate section (apply falsifiability test first)
    **Important:** Before adding "missing" entries, check if the CLAUDE.md intentionally delegates to another file (e.g., "read DEVELOPMENT.md first"). If so, entries found in that delegated file should NOT be added here — they already live in the right place. Adding them would duplicate content and create a maintenance burden.
+   **Config-data directories:** If the audited directory contains only config/data files (`.json`, `.yaml`, `.toml`, `.env`, `.ini`) with no code patterns, commands, or naming conventions, the `missing` field will likely be empty or contain only data values. Data values (port numbers, timeout settings, pool sizes) fail the falsifiability test — do NOT add them. If an entire audit produces only data values in `missing`, add nothing.
 4. **Still accurate entries** → keep unchanged
 
 ### Step 5 — Auto-Apply All Changes

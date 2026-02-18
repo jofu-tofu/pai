@@ -20,7 +20,7 @@ Skills improve through real-world usage feedback. When a skill requires multiple
 
 - A completed session where at least one skill was invoked
 - Target skill exists in `$PAI_DIR/skills/`
-- Read `$PAI_DIR/skills/PAI/SkillSystem.md` for structure requirements
+- Read `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md` for structure requirements
 
 ## Workflow Steps
 
@@ -224,6 +224,23 @@ Modified:
 Removed:
   - [Deleted content, if any]
 ```
+
+### Step 10.5: Token Optimization Check
+
+After applying session-based improvements, run a quick token budget check on the updated skill:
+
+- Has `SKILL.md` grown beyond 100 lines?
+- Have any workflow files exceeded 150 lines?
+- Are there context files that grew beyond 200 lines?
+- Are there context files referenced from SKILL.md directly (instead of from specific workflows)?
+
+If **any** answer is yes:
+```
+Token budget exceeded — consider running WorkflowDecompose to optimize structure.
+Would you like to run WorkflowDecompose on [SkillName] now? (yes / no / later)
+```
+
+If all answers are no: skip silently — no output needed.
 
 ## Constraints
 

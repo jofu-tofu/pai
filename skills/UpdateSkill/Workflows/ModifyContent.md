@@ -2,6 +2,10 @@
 
 > **Trigger:** "update skill content", "edit skill description", "change skill frontmatter"
 
+## Reference Material
+
+- None. (this workflow operates entirely on what the user provides and the target skill's SKILL.md)
+
 ## Purpose
 
 Modify the content of an existing skill's SKILL.md file, including frontmatter, description, routing table, or examples section.
@@ -13,7 +17,7 @@ Skills evolve as usage patterns emerge. When frontmatter becomes stale, routing 
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Read `$PAI_DIR/skills/PAI/SkillSystem.md` for structure requirements
+- Read `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md` for structure requirements
 
 ## Workflow Steps
 

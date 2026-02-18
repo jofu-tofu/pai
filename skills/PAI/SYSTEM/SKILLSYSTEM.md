@@ -113,6 +113,33 @@ science_cycle_time: meso
 | `meso` | Hours-Days | Explicit when stuck | Evals, Research, Development |
 | `macro` | Weeks-Months | Formal documentation | Major architecture work |
 
+### Workflow File Structure
+
+Every `Workflows/*.md` file MUST include a `## Reference Material` section at the top of the file, immediately after the trigger line:
+
+```markdown
+# WorkflowName Workflow
+
+> **Trigger:** "trigger phrase", "another phrase"
+
+## Reference Material
+
+- **Context File Name:** `../ContextFile.md`
+- **Another Resource:** `../OtherFile.md`
+- **Authoritative Spec:** `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md`
+```
+
+**Rules:**
+- Section appears BEFORE `## Purpose`
+- Lists every context file the workflow reads (relative paths like `../ContextFile.md`)
+- If no additional files are needed: `- None.`
+- This section is the **load manifest** — tools like `WorkflowDecompose` infer per-invocation token costs from it
+- Context files NOT listed here should NOT be loaded when this workflow runs
+
+**Why this section matters:** Without it, token cost analysis is impossible and future workflow authors won't know what context each workflow requires.
+
+---
+
 ### 2. Markdown Body (Workflow Routing + Examples + Documentation)
 
 ```markdown
@@ -155,6 +182,15 @@ User: "[Another typical request]"
 - Workflow names in **TitleCase** matching file names
 - Simple trigger description
 - File path in backticks
+
+**CRITICAL — Explicit routing instruction required:** The routing table alone is NOT sufficient. Every SKILL.md MUST include an explicit instruction sentence above the table telling the agent to read and follow the matched workflow file. Without it, an agent may see the table but not know to read the file.
+
+Required pattern — place above the routing table:
+```
+When a workflow is matched, **read its file and follow the steps within it.**
+```
+
+**Why this matters:** SKILL.md is the ONLY file that loads automatically when a skill is invoked. Workflow files load only when explicitly read by the agent following instructions. A routing table without an explicit "read this file" instruction leaves the agent inferring the load from convention — which fails for less convention-aware agents and in agentic contexts.
 
 ---
 

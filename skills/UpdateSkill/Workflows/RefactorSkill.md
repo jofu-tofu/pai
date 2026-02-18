@@ -19,7 +19,7 @@ Skills accumulate technical debt over time: naming conventions drift, workflows 
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Read `$PAI_DIR/skills/PAI/SkillSystem.md` for structure requirements
+- Read `$PAI_DIR/skills/PAI/SYSTEM/SKILLSYSTEM.md` for structure requirements
 - User approval required before executing changes
 
 ## Workflow Steps

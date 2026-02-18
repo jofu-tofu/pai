@@ -43,8 +43,11 @@ Five scenarios run against the PAI codebase using real parallel haiku agent disp
 | S3: Haiku agent dispatch | **Retry required** — Both dispatched agents returned markdown fences despite explicit "no fences" instruction; content was correct, format failed | `HaikuAgentPattern.md`: Step 0 fence-strip added before JSON.parse(); retry protocol confirmed to work |
 | S4: Generate overwrite behavior | **Hole confirmed** — Generate.md had no explicit "overwrite vs. merge" instruction for existing CLAUDE.md files | `Generate.md` Step 6: explicit overwrite behavior documented |
 | S5: Scale cap | **Hole confirmed** — No agent cap; PAI's 31 skill subdirectories would have triggered 31 simultaneous haiku agents | `ScanProtocol.md`: 8-agent batch cap added with priority rule (most files first) |
+| S6: Audit + deleted directory | **Hole confirmed** — Audit would dispatch haiku agent to read a directory that no longer exists; spec had no "path not found" handling; agent could silently pass stale entries | `Audit.md` Step 3: pre-flight path existence check; missing paths immediately marked stale without dispatching agent |
+| S7: Audit + config-only directory | **Partial** — Spec's falsifiability test handles this correctly but no explicit guidance for config-data directories with no code patterns; agent might add data values that fail falsifiability | `Audit.md` Step 4: explicit note that data values (port numbers, timeouts) from config files fail falsifiability — do not add them |
+| S8: Generate + binary files | **Hole confirmed** — Binary files (`.png`, `.ico`, `.db`, etc.) not in skip list; haiku agent dispatched to read binary content would produce garbage or malformed JSON | `ScanProtocol.md`: binary file extension exclusion list added; binary-only directory rule: skip agent, root notes "static assets only" |
 
-**Additional finding:** Haiku agents consistently use absolute paths in `key_files` despite schema example showing relative paths. Schema now explicitly requires relative paths and Output Validation Step 4 strips project root prefix.
+**Additional finding (S1-S5 batch):** Haiku agents consistently use absolute paths in `key_files` despite schema example showing relative paths. Schema now explicitly requires relative paths and Output Validation Step 4 strips project root prefix.
 
 ---
 

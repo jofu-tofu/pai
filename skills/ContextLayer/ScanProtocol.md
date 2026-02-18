@@ -57,8 +57,11 @@ This prevents unbounded agent spawning on large projects (e.g., a project with 3
 2. Include: the main entry file (`index.ts`, `__init__.py`, `mod.rs`, etc.)
 3. Include: 1-2 representative implementation files (not test files)
 4. Skip: test files, generated files, `node_modules`, `.git` contents
+5. **Skip binary files:** `.png`, `.jpg`, `.jpeg`, `.gif`, `.ico`, `.svg`, `.woff`, `.woff2`, `.ttf`, `.eot`, `.otf`, `.mp4`, `.mp3`, `.wav`, `.pdf`, `.db`, `.sqlite`, `.bin`, `.exe`, `.so`, `.dylib`, `.class`, `.pyc`, `.o`. Haiku agents cannot extract useful patterns from binary content.
 
-**Maximum files per agent:** 6. If a directory has more, prioritize: entry file > config > most recently modified files.
+**Maximum files per agent:** 6. If a directory has more, prioritize: entry file > config > most recently modified text files.
+
+**Binary-only directory rule:** If all files in a qualifying directory are binary (no text files remain after skipping), do NOT dispatch a haiku agent for that directory. The root-level agent should note the directory exists with a single line: "public/ — static assets (binary files only)".
 
 **Prompt each agent with:** The verbatim template from `HaikuAgentPattern.md`.
 

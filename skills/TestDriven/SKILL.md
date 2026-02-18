@@ -1,11 +1,11 @@
 ---
 name: TestDriven
-description: Test-driven development philosophy and smart testing methodology. USE WHEN writing tests OR designing test strategy OR refactoring code with tests OR reviewing test quality OR discussing TDD OR characterization testing OR catching regressions OR tests keep breaking after refactoring OR AI refactored code OR AI generated tests. Contains 5 core principles from authoritative sources for writing tests that survive refactoring.
+description: Test-driven development philosophy and smart testing methodology. USE WHEN writing tests OR designing test strategy OR refactoring code with tests OR reviewing test quality OR discussing TDD OR characterization testing OR catching regressions OR tests keep breaking after refactoring OR AI refactored code OR AI generated tests OR testing async code OR testing microservices OR testing LLM output OR mutation testing OR stub vs mock OR contract testing. Contains 10 core principles from authoritative sources for writing tests that survive refactoring.
 ---
 
 # TestDriven
 
-5 core principles from authoritative sources for writing tests that **survive refactoring and catch real regressions**.
+10 core principles from authoritative sources for writing tests that **survive refactoring and catch real regressions**.
 
 **Core insight:** If you have to change your tests to make them pass after a legitimate refactoring, your tests are testing the wrong thing.
 
@@ -23,6 +23,10 @@ This skill provides **principles for test quality** plus **four actionable workf
 | "review tests", "test quality", "PR review", "audit tests" | `Workflows/ReviewTests.md` | Evaluating test quality in code review |
 | "diagnose test", "fix test", "test breaking", "test failing after refactor" | `Workflows/DiagnoseTest.md` | Fixing broken or flaky tests |
 | "AI refactored", "AI generated", "validate AI", "copilot", "claude refactored" | `Workflows/AIValidation.md` | Validating AI-refactored code or AI-generated tests |
+| "test async", "test promises", "test callbacks", "await in tests", "async test" | `Workflows/AsyncTesting.md` | Testing asynchronous operations and Promises |
+| "contract test", "test microservices", "consumer-driven", "pact", "test services without running them" | `Workflows/ContractTesting.md` | Testing service interfaces without running all services |
+| "test LLM", "test AI output", "prompt testing", "evaluate AI", "test language model" | `Workflows/LLMTesting.md` | Testing language model components and AI pipelines |
+| "mutation test", "test my tests", "verify test quality", "do my tests catch bugs" | `Workflows/MutationTesting.md` | Verifying test suite actually catches bugs |
 
 **Philosophy questions, test strategy, learning** → Use Reference Mode (see Core Principles below)
 
@@ -37,6 +41,11 @@ This skill provides **principles for test quality** plus **four actionable workf
 | 3 | **Test Pyramid** | Martin Fowler (2012) | Many unit, fewer integration, even fewer E2E? |
 | 4 | **Characterization Tests** | Michael Feathers, "Working Effectively with Legacy Code" (2004) | Am I changing code I don't understand? |
 | 5 | **Red-Green-Refactor** | Kent Beck, "TDD by Example" (2002) | Did I write failing test first? |
+| 6 | **Test Double Taxonomy** | Gerard Meszaros, "xUnit Test Patterns" (2007) | Am I using the right double — dummy, stub, spy, mock, or fake? |
+| 7 | **Contract Testing** | Martin Fowler / Ian Robinson (2011) | Do my services agree on the interface without running together? |
+| 8 | **Mutation Testing** | Richard Lipton (1971) / PiTest / Stryker | If I break this line, does a test fail? |
+| 9 | **Property-Based Testing** | John Hughes, QuickCheck (1999) | What must be true for ALL valid inputs, not just examples I thought of? |
+| 10 | **Test Data Builders** | Nat Pryce / GOOS (2009) | Do my tests only override what matters for each specific case? |
 
 ---
 
@@ -79,25 +88,17 @@ When multiple principles apply and conflict:
 
 ---
 
-## Notable Anti-Pattern
+## Anti-Patterns
 
-**Don't Mock What You Don't Own** (Gerard Meszaros, "xUnit Test Patterns")
+See `Rules/AntiPatterns.md` for all 7 anti-patterns including:
 
-Don't mock third-party libraries directly. When the library changes, your mocks become lies. Wrap external dependencies and mock your wrapper.
-
-```pseudocode
-// BAD: Mocking third-party library
-twilio = mock()
-twilio.messages.create.returns({sid: "123"})
-
-// GOOD: Wrap and mock your wrapper
-class SmsGateway:
-    function send(to, message): ...
-
-fake_gateway = FakeSmsGateway()  // Mock your own interface
-```
-
-See: `Rules/BehaviorOverImplementation.md` (Mock at Boundaries section)
+- **The Ice Cream Cone** — inverted test pyramid (too many E2E, too few unit)
+- **Wet Tests** — duplicated setup code across many tests
+- **The Liar** — always-passing test whose assertion never runs
+- **Over-Mocked Tests** — testing wiring instead of behavior
+- **Time-Dependent Tests** — tests that fail at midnight, month boundaries, or DST changes
+- **God Test** — one test verifying too many unrelated behaviors
+- **Don't Mock What You Don't Own** — mocking third-party libraries that can silently drift
 
 ---
 
@@ -174,6 +175,12 @@ Each principle file in `Rules/` includes:
 | `Rules/TestPyramid.md` | Many unit, few E2E | Test suite slow or flaky |
 | `Rules/CharacterizationTests.md` | Capture before changing | Working with legacy code |
 | `Rules/RedGreenRefactor.md` | Red → Green → Refactor | TDD workflow |
+| `Rules/TestDoubleTaxonomy.md` | Dummy, Stub, Spy, Mock, Fake | Choosing the right test double type |
+| `Rules/ContractTesting.md` | Consumer-driven interface agreements | Testing distributed services |
+| `Rules/MutationTesting.md` | Does your test suite catch bugs? | Evaluating test suite quality |
+| `Rules/PropertyBasedTesting.md` | Properties that hold for all inputs | Testing algorithms and pure functions |
+| `Rules/TestDataBuilders.md` | Resilient test setup patterns | Reducing test maintenance cost |
+| `Rules/AntiPatterns.md` | 7 common testing anti-patterns | Diagnosing test quality problems |
 
 ---
 
@@ -181,9 +188,16 @@ Each principle file in `Rules/` includes:
 
 TestDriven provides testing philosophy that complements language-specific coding skills:
 
-- `skills/PythonCoding/` - Python syntax and pytest patterns
-- `skills/CSharp/` - C# syntax and xUnit/NUnit patterns
-- `skills/React/` - React Testing Library patterns
+| TestDriven provides | Pairs with | For |
+|---------------------|-----------|-----|
+| WHAT to test (principles) | `PythonCoding` | Python syntax and pytest patterns |
+| WHAT to test (principles) | `CSharp` | C# syntax and xUnit/NUnit patterns |
+| WHAT to test (principles) | `React` | React Testing Library patterns |
+| Testing philosophy | `TypeScript` | TypeScript-specific type-safe testing |
+| LLMTesting workflow | `Evals` | Model-graded evaluation and pass@k metrics |
+| RedGreenRefactor | `Design` | Test-first design and API design |
+| Mutation/Property testing | `Science` | Hypothesis-driven quality analysis |
+| Anti-patterns | `RedTeam` | Adversarial test quality review |
 
 **When writing tests:** Apply TestDriven principles first (WHAT to test), then language-specific skill patterns (HOW to write it).
 
@@ -198,3 +212,7 @@ TestDriven provides testing philosophy that complements language-specific coding
 | Clean Code, Chapter 9 | Robert C. Martin | 2008 | FIRST principles |
 | TestPyramid | Martin Fowler | 2012 | Test distribution model |
 | xUnit Test Patterns | Gerard Meszaros | 2007 | Test doubles, anti-patterns |
+| QuickCheck | John Hughes | 1999 | Property-based testing |
+| Growing Object-Oriented Software (GOOS) | Pryce & Freeman | 2009 | Test Data Builders, mock design |
+| Consumer-Driven Contracts | Ian Robinson / Martin Fowler | 2011 | Contract testing approach |
+| Fault Diagnosis of Computer Programs | Richard Lipton | 1971 | Mutation testing theory |
