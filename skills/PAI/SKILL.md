@@ -1,13 +1,13 @@
+---
+name: PAI
+description: Personal AI Infrastructure core. The authoritative reference for how PAI works.
+---
 <!--
   GENERATED FILE - Do not edit directly
   Edit:   Components/ directory
   Build:  bun skills/PAI/Tools/CreateDynamicCore.ts
   Built:  17 February 2026 16:31:58
 -->
----
-name: PAI
-description: Personal AI Infrastructure core. The authoritative reference for how PAI works.
----
 # Intro to PAI
 
 The PAI system is designed to magnify human capabilities. It is a general problem-solving system that uses the PAI Algorithm.
