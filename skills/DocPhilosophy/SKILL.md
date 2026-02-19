@@ -34,6 +34,8 @@ When both forces align, documentation thrives. When they diverge, it rots. Every
 
 Every placement decision satisfies all three. No exceptions.
 
+**Signal Density for AI context files:** Root-level files are always-on — permanent token cost per interaction. Directory-level files are on-demand — cost paid only during scoped work. Apply a stricter density and falsifiability bar to root content than to directory-local content.
+
 ---
 
 ## Decision Tree
@@ -101,6 +103,10 @@ Instructions shaping AI agent behavior: CLAUDE.md, AGENTS.md, skill files, syste
 These are documentation *for* agents operating within the system — not documentation *about* the system. Different audience, different density requirements.
 
 **Constraint:** Context windows are finite. Every low-value token displaces a high-value one. See `Rules/AIContextLayers.md`.
+
+**Tool-use filter:** Modern agents actively call Glob, Grep, and Read to discover file structure and contents. AI context files capture only what tool use cannot reveal — why a non-obvious structure exists, what to avoid, which conventions govern without being visible in any single file. If an agent can discover a fact in one tool call, that fact does not belong in the context file.
+
+**Multi-agent constraint:** Multiple agents work in different directories of the same codebase concurrently, with no shared context. Each AI context file must be interpretable in isolation — it cannot assume the reader has seen sibling or parent files. Design for independent consumption, not sequential reading.
 
 ### 3. Architecture Decision Records (ADRs)
 

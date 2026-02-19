@@ -1,6 +1,6 @@
 ---
 name: Prompting
-description: Meta-prompting system for dynamic prompt generation using templates, standards, and patterns. USE WHEN meta-prompting, template generation, prompt optimization, or programmatic prompt composition.
+description: Meta-prompting system for dynamic prompt generation using templates, standards, and patterns. USE WHEN meta-prompting, template generation, prompt optimization, programmatic prompt composition, OR auditing agent instruction files (skill files, CLAUDE.md, system prompts) for signal density, hedging, or voice consistency.
 ---
 
 ## Customization
