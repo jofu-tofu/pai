@@ -1,20 +1,10 @@
----
-name: CSharp
-description: C# and .NET coding guidelines for maintainable code. USE WHEN writing C# code OR reviewing C# code OR refactoring .NET code OR discussing async patterns OR null safety. Contains 18 rules across 5 priority categories for framework-agnostic C# excellence.
----
+# CSharp Workflow
 
-# CSharp
+> **Trigger:** File signals: `.cs`, `.csproj`, `.sln`, ASP.NET files, `using` statements, `namespace` declarations, `await`/`async` in C# context
 
-Framework-agnostic C# best practices combining csharpcodingguidelines.com (AV series) and dotnet-cursor-rules. **18 rules across 5 categories, prioritized by impact.**
+## Reference Material
 
-## When to Apply This Skill
-
-**Automatic triggers:**
-- Writing C# classes or methods
-- Reviewing C# code for quality
-- Refactoring .NET code
-- Implementing async patterns
-- Null safety decisions
+- `../Rules/CSharp/` — 18 individual rule files across 5 categories
 
 ## Quick Decision Tree
 
@@ -26,7 +16,7 @@ Framework-agnostic C# best practices combining csharpcodingguidelines.com (AV se
 4. **Method signature issues?** → Category 4: Member Design (HIGH)
 5. **Code readability concerns?** → Category 5: Maintainability (MEDIUM)
 
-**For detailed implementation:** Read the specific rule file from `Rules/` folder.
+**For detailed implementation:** Read the specific rule file from `../Rules/CSharp/` folder.
 
 ## Priority Hierarchy
 
@@ -97,35 +87,23 @@ public async Task<string> GetDataAsync()
 }
 ```
 
-## Reference Documentation
+## How to Use Rules
 
-**All 18 rules are sharded into individual files in `Rules/` folder for efficient loading.**
-
-### How to Use Rules
-
-**Pattern:** When applying a rule, read its specific file from Rules/ folder.
+**Pattern:** When applying a rule, read its specific file from `../Rules/CSharp/` folder.
 
 ```
 Decision tree identifies: Category 2 (Null Safety)
 Quick ref shows: EnableNullableContext rule
-Action: Read Rules/EnableNullableContext.md
+Action: Read ../Rules/CSharp/EnableNullableContext.md
 Result: Complete code examples and implementation guidance
 ```
-
-### What's in Each Rule File
-
-Each rule file (`Rules/RuleName.md`) includes:
-- Why it matters (explanation + impact level)
-- Incorrect code example with explanation
-- Correct code example with explanation
-- C# version annotations where applicable
 
 ### Rule File Naming Convention
 
 Rules use TitleCase naming for PAI compliance:
-- `enable-nullable-context` → `Rules/EnableNullableContext.md`
-- `single-responsibility` → `Rules/SingleResponsibility.md`
-- `cancellation-tokens` → `Rules/CancellationTokens.md`
+- `enable-nullable-context` → `../Rules/CSharp/EnableNullableContext.md`
+- `single-responsibility` → `../Rules/CSharp/SingleResponsibility.md`
+- `cancellation-tokens` → `../Rules/CSharp/CancellationTokens.md`
 
 ## Complete Rule Index
 

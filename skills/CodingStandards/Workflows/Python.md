@@ -1,20 +1,10 @@
----
-name: PythonCoding
-description: Python code quality and best practices. USE WHEN writing Python code OR reviewing Python code OR refactoring Python OR debugging Python issues. Contains 18 rules across 5 priority categories for framework-agnostic Python excellence.
----
+# Python Workflow
 
-# PythonCoding
+> **Trigger:** File signals: `.py`, `requirements.txt`, `pyproject.toml`, `setup.py`, `__init__.py`, `poetry.lock`, `Pipfile`
 
-Framework-agnostic Python best practices combining minimaxir's defensive patterns and Dagster's "Dignified Python" principles. **18 rules across 5 categories, prioritized by impact.**
+## Reference Material
 
-## When to Apply This Skill
-
-**Automatic triggers:**
-- Writing Python functions or classes
-- Reviewing Python code for quality
-- Refactoring Python code
-- Debugging Python issues
-- Type checking or error handling decisions
+- `../Rules/Python/` — 18 individual rule files across 5 categories
 
 ## Quick Decision Tree
 
@@ -26,7 +16,7 @@ Framework-agnostic Python best practices combining minimaxir's defensive pattern
 4. **Code organization problems?** → Category 4: Code Organization (HIGH)
 5. **Error handling gaps?** → Category 5: Error Handling (MEDIUM)
 
-**For detailed implementation:** Read the specific rule file from `Rules/` folder.
+**For detailed implementation:** Read the specific rule file from `../Rules/Python/` folder.
 
 ## Priority Hierarchy
 
@@ -93,35 +83,23 @@ def append_item(item: str, items: list[str] | None = None) -> list[str]:
     return items
 ```
 
-## Reference Documentation
+## How to Use Rules
 
-**All 18 rules are sharded into individual files in `Rules/` folder for efficient loading.**
-
-### How to Use Rules
-
-**Pattern:** When applying a rule, read its specific file from Rules/ folder.
+**Pattern:** When applying a rule, read its specific file from `../Rules/Python/` folder.
 
 ```
 Decision tree identifies: Category 1 (Defensive Programming)
 Quick ref shows: DefensiveLbyl rule
-Action: Read Rules/DefensiveLbyl.md
+Action: Read ../Rules/Python/DefensiveLbyl.md
 Result: Complete code examples and implementation guidance
 ```
-
-### What's in Each Rule File
-
-Each rule file (`Rules/RuleName.md`) includes:
-- Why it matters (explanation + impact level)
-- Incorrect code example with explanation
-- Correct code example with explanation
-- Edge cases and when rule doesn't apply
 
 ### Rule File Naming Convention
 
 Rules use TitleCase naming for PAI compliance:
-- `defensive-lbyl` → `Rules/DefensiveLbyl.md`
-- `type-hints-required` → `Rules/TypeHintsRequired.md`
-- `org-keyword-arguments` → `Rules/OrgKeywordArguments.md`
+- `defensive-lbyl` → `../Rules/Python/DefensiveLbyl.md`
+- `type-hints-required` → `../Rules/Python/TypeHintsRequired.md`
+- `org-keyword-arguments` → `../Rules/Python/OrgKeywordArguments.md`
 
 ## Complete Rule Index
 

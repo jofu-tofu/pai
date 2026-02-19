@@ -1,11 +1,10 @@
----
-name: React
-description: React and Next.js guidelines for component architecture and performance optimization. USE WHEN writing React components OR reviewing React code OR refactoring Next.js code OR designing component APIs OR optimizing performance OR eliminating waterfalls OR reducing bundle size OR working with Server Components OR building compound components OR refactoring boolean prop proliferation. Contains 65 rules across 9 categories.
----
+# React Workflow
 
-# React
+> **Trigger:** File signals: `.tsx`, `.jsx`, React imports (`import React`, `from 'react'`), Next.js config (`next.config.*`), `use client` / `use server` directives
 
-Component architecture and performance optimization for React and Next.js. **65 rules across 9 categories, organized by workflow intent.**
+## Reference Material
+
+- `../Rules/React/` — 65 individual rule files across 9 categories
 
 ## Quick Decision Tree
 
@@ -14,7 +13,7 @@ Component architecture and performance optimization for React and Next.js. **65 
 ### Building or designing components?
 → **Category 0: Component Architecture & Composition** (HIGH)
   - Compound components, state lifting, explicit variants, React 19 APIs
-  - Read: `Rules/ArchitectureAvoidBooleanProps.md`, `Rules/ArchitectureCompoundComponents.md`, `Rules/StateContextInterface.md`
+  - Read: `../Rules/React/ArchitectureAvoidBooleanProps.md`, `../Rules/React/ArchitectureCompoundComponents.md`, `../Rules/React/StateContextInterface.md`
 
 ### Optimizing existing code?
 1. **See sequential awaits?** → Category 1: Eliminating Waterfalls (CRITICAL)
@@ -26,7 +25,7 @@ Component architecture and performance optimization for React and Next.js. **65 
 7. **JavaScript bottlenecks?** → Category 7: JavaScript Performance (LOW-MEDIUM)
 8. **Edge cases or initialization?** → Category 8: Advanced Patterns (LOW)
 
-**For detailed implementation:** Read the specific rule file from `Rules/` folder (see Complete Rule Index below).
+**For detailed implementation:** Read the specific rule file from `../Rules/React/` folder (see Complete Rule Index below).
 
 ## Priority Hierarchy
 
@@ -97,40 +96,23 @@ import X from 'lucide-react/dist/esm/icons/x'
 <ClientComponent user={{ id: user.id, name: user.name, avatar: user.avatar }} />
 ```
 
-## Reference Documentation
+## How to Use Rules
 
-**All 65 rules are sharded into individual files in `Rules/` folder for efficient loading.**
-
-### How to Use Rules
-
-**Pattern:** When applying a rule, read its specific file from Rules/ folder.
+**Pattern:** When applying a rule, read its specific file from `../Rules/React/` folder.
 
 ```
 Decision tree identifies: Category 0 (Architecture)
 Quick ref shows: architecture-compound-components rule
-Action: Read Rules/ArchitectureCompoundComponents.md
+Action: Read ../Rules/React/ArchitectureCompoundComponents.md
 Result: Complete code examples and implementation guidance
 ```
-
-### What's in Each Rule File
-
-Each rule file (`Rules/RuleName.md`) includes:
-- Why it matters (explanation + impact level)
-- Incorrect code example with explanation
-- Correct code example with explanation
-- Impact metrics and benchmarks
-- Additional context and references
 
 ### Rule File Naming Convention
 
 Rules use TitleCase naming for PAI compliance:
-- `async-parallel` → `Rules/AsyncParallel.md`
-- `architecture-compound-components` → `Rules/ArchitectureCompoundComponents.md`
-- `state-context-interface` → `Rules/StateContextInterface.md`
-
-### Optional: Complete Reference
-
-`AGENTS.md` (~107KB) contains all rules in one document for comprehensive reading, but prefer loading individual rule files for efficiency.
+- `async-parallel` → `../Rules/React/AsyncParallel.md`
+- `architecture-compound-components` → `../Rules/React/ArchitectureCompoundComponents.md`
+- `state-context-interface` → `../Rules/React/StateContextInterface.md`
 
 ## Complete Rule Index
 
@@ -219,9 +201,8 @@ Rules use TitleCase naming for PAI compliance:
 
 ## Integration
 
-This skill integrates with PAI's code generation and review workflows. When writing or refactoring React/Next.js code, these patterns ensure optimal component architecture and performance.
+**Complements TypeScript:** React skill covers component architecture and performance patterns. TypeScript skill covers the type system — no duplication, full coverage.
 
 **Sources:**
 - Vercel Engineering — React Best Practices (January 2026), MIT
 - Vercel Engineering — React Composition Patterns (January 2026), MIT
-- Repository: github.com/vercel-labs/agent-skills

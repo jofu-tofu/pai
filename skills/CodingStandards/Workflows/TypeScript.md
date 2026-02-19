@@ -1,21 +1,10 @@
----
-name: TypeScript
-description: TypeScript type system, error handling, and compiler strictness guidelines. USE WHEN writing TypeScript code OR reviewing TypeScript code OR refactoring TypeScript OR type safety decisions OR error handling patterns OR configuring tsconfig OR working with generics OR discriminated unions OR Zod validation. Contains 20 rules across 10 priority categories for framework-agnostic TypeScript excellence.
----
+# TypeScript Workflow
 
-# TypeScript
+> **Trigger:** File signals: `.ts` files (non-React), `tsconfig.json`, TypeScript generics, discriminated unions, `z.infer`, `Zod` imports
 
-Framework-agnostic TypeScript best practices synthesized from Matt Pocock (Total TypeScript) and Steve Kinney's guidelines. **20 rules across 10 categories, prioritized by impact.** Focuses on the type system, error handling, and compiler strictness — complementing React skill's performance-focused rules.
+## Reference Material
 
-## When to Apply This Skill
-
-**Automatic triggers:**
-- Writing TypeScript functions, types, or interfaces
-- Reviewing TypeScript code for type safety
-- Configuring tsconfig.json
-- Error handling decisions (Result types, try/catch)
-- Runtime validation of external data
-- Refactoring toward stricter types
+- `../Rules/TypeScript/` — 19 individual rule files across 10 categories
 
 ## Quick Decision Tree
 
@@ -32,7 +21,7 @@ Framework-agnostic TypeScript best practices synthesized from Matt Pocock (Total
 9. **Import organization?** → Category 9: Import Organization (MEDIUM)
 10. **Naming or file structure?** → Category 10: Naming & Files (MEDIUM)
 
-**For detailed implementation:** Read the specific rule file from `Rules/` folder.
+**For detailed implementation:** Read the specific rule file from `../Rules/TypeScript/` folder.
 
 ## Priority Hierarchy
 
@@ -90,35 +79,23 @@ User: "Add type-safe validation to this API response"
 → Replaces `as` assertions with schema.parse()
 ```
 
-## Reference Documentation
+## How to Use Rules
 
-**All 20 rules are sharded into individual files in `Rules/` folder for efficient loading.**
-
-### How to Use Rules
-
-**Pattern:** When applying a rule, read its specific file from Rules/ folder.
+**Pattern:** When applying a rule, read its specific file from `../Rules/TypeScript/` folder.
 
 ```
 Decision tree identifies: Category 2 (Type Safety)
 Quick ref shows: NeverAny rule
-Action: Read Rules/NeverAny.md
+Action: Read ../Rules/TypeScript/NeverAny.md
 Result: Complete code examples and implementation guidance
 ```
-
-### What's in Each Rule File
-
-Each rule file (`Rules/RuleName.md`) includes:
-- Why it matters (explanation + impact level)
-- Incorrect code example with explanation
-- Correct code example with explanation
-- Edge cases and when rule doesn't apply
 
 ### Rule File Naming Convention
 
 Rules use TitleCase naming for PAI compliance:
-- `strict-mode-always` → `Rules/StrictModeAlways.md`
-- `never-any` → `Rules/NeverAny.md`
-- `result-over-try-catch` → `Rules/ResultOverTryCatch.md`
+- `strict-mode-always` → `../Rules/TypeScript/StrictModeAlways.md`
+- `never-any` → `../Rules/TypeScript/NeverAny.md`
+- `result-over-try-catch` → `../Rules/TypeScript/ResultOverTryCatch.md`
 
 ## Complete Rule Index
 
@@ -162,8 +139,6 @@ Rules use TitleCase naming for PAI compliance:
 - FileOrganization
 
 ## Integration
-
-This skill integrates with PAI's code generation and review workflows. When writing or reviewing TypeScript code, these patterns ensure type-safe, maintainable, and defensive code.
 
 **Complements React:** React skill covers component architecture and performance patterns (composition, Promise.all, data structures, caching). This skill covers the type system — no duplication, full coverage.
 
