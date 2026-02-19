@@ -4,7 +4,6 @@
 
 ## Reference Material
 
-- **Full Checklist:** `../ValidationChecklist.md`
 - **Authoritative Spec:** `../SkillSystem.md`
 - **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
@@ -77,6 +76,12 @@ Required sections ensure skills are discoverable and usable. The routing table m
 - [ ] `## Examples` section exists
 - [ ] Routing table uses correct format
 
+#### Check 4.5: SkillIntent Completeness
+
+- [ ] `SkillIntent.md` exists at skill root (WARNING if missing — do not fail, but chain to CreateSkillIntent after report)
+- [ ] `SkillIntent.md` contains `## Success Criteria` section (FAILURE if file exists but section is absent)
+- [ ] `## Success Criteria` contains at least 3 distinct binary-testable criteria (FAILURE if section exists but has fewer than 3 — one vague criterion does not satisfy SC2)
+
 #### Check 5: Workflow References Resolve
 
 Broken references cause runtime failures when users trigger workflows that point to missing files.
@@ -98,13 +103,13 @@ The standard directory structure (Tools/, Workflows/) enables consistent organiz
 
 ```bash
 # Validate specific skill
-bun run $PAI_DIR/skills/UpdateSkill/Tools/ValidateSkill.ts [SkillName]
+bun run $PAI_DIR/skills/SkillForge/Tools/ValidateSkill.ts [SkillName]
 
 # Validate all skills
-bun run $PAI_DIR/skills/UpdateSkill/Tools/ValidateSkill.ts --all
+bun run $PAI_DIR/skills/SkillForge/Tools/ValidateSkill.ts --all
 
 # List skills with status
-bun run $PAI_DIR/skills/UpdateSkill/Tools/ValidateSkill.ts --list
+bun run $PAI_DIR/skills/SkillForge/Tools/ValidateSkill.ts --list
 ```
 
 ### Step 4: Generate Report
@@ -164,6 +169,8 @@ Complete checklist from SkillSystem.md:
 - [ ] `## Examples` section with 2-3 usage patterns
 - [ ] `Tools/` directory exists (even if empty)
 - [ ] All workflow files use TitleCase
+- [ ] `SkillIntent.md` exists (WARNING if missing)
+- [ ] `SkillIntent.md` contains `## Success Criteria` (FAILURE if file present but section absent)
 ```
 
 ## Batch Validation
@@ -171,7 +178,7 @@ Complete checklist from SkillSystem.md:
 To validate all skills:
 
 ```bash
-bun run $PAI_DIR/skills/UpdateSkill/Tools/ValidateSkill.ts --all
+bun run $PAI_DIR/skills/SkillForge/Tools/ValidateSkill.ts --all
 ```
 
 ## Example Output
@@ -194,5 +201,11 @@ After completing this workflow, evaluate these chain conditions:
 | Condition | Chain To | Action |
 |---|---|---|
 | Validation passed but user reported routing issues or requested deeper assurance | StressTest | Announce: "Running stress test for deeper routing assurance..." then execute `Workflows/StressTest.md` |
+| Target SkillIntent.md is missing OR exists but lacks `## Success Criteria` | CreateSkillIntent | Announce: "SkillIntent.md incomplete — running CreateSkillIntent to resolve..." then execute `Workflows/CreateSkillIntent.md` |
+
+**Chain Decision Log (MANDATORY — SC7):**
+Log one line per chain in the table above, regardless of outcome:
+  `Chain [WorkflowName]: condition [true/false] — [fired/skipped]`
+Skipped chains MUST be logged — silence on a skipped chain violates SC7.
 
 If no conditions match, skip follow-ups.

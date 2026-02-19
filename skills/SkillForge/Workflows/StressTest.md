@@ -8,14 +8,14 @@
 
 ## Purpose
 
-Run a battery of health checks against any target skill to validate file structure, routing table integrity, trigger consistency, and live add/remove functionality. Works on any skill in the PAI system — not just UpdateSkill.
+Run a battery of health checks against any target skill to validate file structure, routing table integrity, trigger consistency, and live add/remove functionality. Works on any skill in the PAI system — not just SkillForge.
 
 ## When to Run
 
 - After modifying any skill's workflows or routing table
 - When a workflow fails to trigger correctly
 - Periodic health check after PAI system upgrades or migrations
-- As a final validation step after CreateSkill or UpdateSkill operations
+- As a final validation step after CreateSkill or SkillForge operations
 
 ---
 
@@ -148,7 +148,7 @@ Step 4 — Canary Operation:   [PASS/FAIL/N/A]
 OVERALL: [PASS / FAIL — list failing steps]
 ```
 
-If any step fails: do not auto-fix. Report failures and ask user which to remediate, then invoke the appropriate UpdateSkill workflow (ManageWorkflows, ModifyContent, etc.) for each fix.
+If any step fails: do not auto-fix. Report failures and ask user which to remediate, then invoke the appropriate SkillForge workflow (ManageWorkflows, ModifyContent, etc.) for each fix.
 
 ---
 
@@ -160,6 +160,11 @@ After completing this workflow, evaluate these chain conditions:
 |---|---|---|
 | Structural checks pass but routing issues were reported | InvocationSim | Announce: "Running invocation sim for deeper routing analysis..." then execute `Workflows/InvocationSim.md` |
 | Trigger consistency check found mismatches | PromptQualityAudit | Announce: "Running prompt quality audit on mismatched triggers..." then execute `Workflows/PromptQualityAudit.md` |
+
+**Chain Decision Log (MANDATORY — SC7):**
+Log one line per chain in the table above, regardless of outcome:
+  `Chain [WorkflowName]: condition [true/false] — [fired/skipped]`
+Skipped chains MUST be logged — silence on a skipped chain violates SC7.
 
 If no conditions match, skip follow-ups.
 

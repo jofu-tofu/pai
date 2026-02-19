@@ -1,7 +1,7 @@
 # Skill System Spec
 
 > **Authoritative source for all skill structure, naming, and validation rules.**
-> All UpdateSkill workflows reference this file instead of any external spec.
+> All SkillForge workflows reference this file instead of any external spec.
 
 ---
 
@@ -145,6 +145,9 @@ Every skill SHOULD have a `SkillIntent.md` in its root directory. This is the de
 
 > **For agents modifying this skill:** Read this before making any changes.
 
+## First Principles
+[Core philosophical principles that all decisions derive from. What enduring truths guide this skill's design?]
+
 ## Problem This Skill Solves
 [What gap exists without this skill?]
 
@@ -155,12 +158,15 @@ Every skill SHOULD have a `SkillIntent.md` in its root directory. This is the de
 ## Explicit Out-of-Scope
 [What this skill deliberately does NOT handle, and why]
 
+## Success Criteria
+[Binary-testable philosophical states describing what "this skill did its job" looks like. Minimum 3 criteria. Describe ideal states, not implementation steps.]
+
 ## Constraints
 [Non-negotiable rules that must remain true through any update]
 
-## Evolution Notes
-| Version/Date | Change | Rationale |
-|---|---|---|
+## File Roles (optional — recommended for skills with 5+ context files)
+| File | Is | Is Not |
+|------|-----|--------|
 ```
 
 Use the `CreateSkillIntent` workflow to generate this file for any skill.
@@ -271,3 +277,96 @@ Every tool in `Tools/` must:
 - [ ] Every routing table entry has a matching file on disk
 - [ ] Every `Workflows/*.md` file has a routing table entry (no ghost files)
 - [ ] Every context file in `## Reference Material` exists on disk
+
+### SkillIntent Completeness
+| Check | Requirement |
+|-------|-------------|
+| `SkillIntent.md` | Should exist at `$PAI_DIR/skills/[SkillName]/SkillIntent.md` |
+| `## Success Criteria` | `SkillIntent.md` must contain a `## Success Criteria` section with at least **3** distinct binary-testable criteria (SC2 minimum) |
+
+**Notes:**
+- Missing `SkillIntent.md` is a WARNING (not a hard failure) for skills that predate the mandate
+- Missing `## Success Criteria` within an existing `SkillIntent.md` is a FAILURE — the file exists but is incomplete
+- Any modification workflow run on the skill should resolve both issues before completing
+
+### Quick Validation
+
+```bash
+# Validate specific skill
+bun $PAI_DIR/skills/SkillForge/Tools/ValidateSkill.ts [SkillName]
+
+# Validate all skills
+bun $PAI_DIR/skills/SkillForge/Tools/ValidateSkill.ts --all
+
+# List skills with status
+bun $PAI_DIR/skills/SkillForge/Tools/ValidateSkill.ts --list
+```
+
+### Validation Report Templates
+
+#### All Checks Passed
+
+```
+VALIDATION REPORT: [SkillName]
+
+Status: PASSED
+
+Checks:
+  [x] SKILL.md exists
+  [x] Valid frontmatter
+  [x] TitleCase naming
+  [x] Required sections present
+  [x] Workflow references resolve
+  [x] Directory structure correct
+
+COMPLETED: [SkillName] validation passed - all checks OK.
+```
+
+#### Issues Found
+
+```
+VALIDATION REPORT: [SkillName]
+
+Status: FAILED
+
+Checks:
+  [x] SKILL.md exists
+  [ ] Valid frontmatter - ISSUE: Missing USE WHEN clause
+  [x] TitleCase naming
+  [ ] Required sections - ISSUE: Missing Examples section
+  [x] Workflow references resolve
+  [x] Directory structure correct
+
+Issues (2):
+1. Frontmatter description missing "USE WHEN" clause
+   Fix: Add "USE WHEN [triggers]" to description field
+
+2. Missing Examples section
+   Fix: Add "## Examples" section with 2-3 usage patterns
+
+COMPLETED: [SkillName] validation failed - 2 issues found.
+```
+
+### Common Issues & Fixes
+
+| Issue | Fix |
+|-------|-----|
+| Missing USE WHEN | Add `USE WHEN [intent triggers]` to description |
+| Non-TitleCase name | Rename directory and update YAML `name:` |
+| Missing Examples | Add `## Examples` with 2-3 usage patterns |
+| Broken workflow reference | Check file exists, verify path spelling |
+| Missing Tools/ directory | Create empty `Tools/` directory |
+| Context files in subdirectory | Move to skill root directory |
+| Missing `SkillIntent.md` | Run `CreateSkillIntent` workflow to generate |
+| `SkillIntent.md` lacks `## Success Criteria` | Run `CreateSkillIntent` workflow to add the section |
+
+### Why Each Check Matters
+
+| Check | Impact If Missing |
+|-------|-------------------|
+| SKILL.md | PAI cannot discover or invoke skill |
+| USE WHEN | Skill won't activate on user intent |
+| TitleCase | Inconsistent naming breaks automation |
+| Examples | Claude may misunderstand how skill works |
+| Workflow references | Runtime failures when workflows don't exist |
+| Directory structure | Tools and automation may fail |

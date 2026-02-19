@@ -4,7 +4,10 @@
 
 ## Reference Material
 
-- `PromptingStandards.md` — Wording and trigger phrase quality rules (Claude 4.x). Read before writing trigger phrases for new workflows.
+- `../PromptingStandards.md` — Wording and trigger phrase quality rules (Claude 4.x). Read before writing trigger phrases for new workflows.
+- `../RiskFramework.md` — Change risk classification guide. Add = Low, Rename = Medium, Remove = High. Consult before executing the operation to apply the correct approval level.
+- `[target skill]/SkillIntent.md` — Target skill's design intent (if present). Read before modifying to ensure changes don't contradict original purpose or out-of-scope decisions.
+- `../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
 - **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
@@ -38,6 +41,41 @@ Verify: $PAI_DIR/skills/[SkillName]/Workflows/ directory exists
 ```
 
 If Workflows/ directory doesn't exist for an Add operation, create it.
+
+### Step 2.5: SkillIntent Required Sections Check (MANDATORY — cannot skip)
+
+Check if the target skill has a `SkillIntent.md` and whether it contains all three required sections.
+
+```bash
+cat $PAI_DIR/skills/[SkillName]/SkillIntent.md
+```
+
+**If SkillIntent.md does NOT exist:**
+```
+⚠️ [SkillName] has no SkillIntent.md.
+This update cannot be considered complete without one.
+Options:
+  [C] Create SkillIntent now (chains to CreateSkillIntent, then resumes operation)
+  [S] Skip this update and create SkillIntent first
+```
+Do not proceed to the operation steps until SkillIntent.md exists.
+
+**If SkillIntent.md exists — check for ALL THREE required sections:**
+
+Scan for: `## Problem This Skill Solves`, `## Constraints`, `## Success Criteria`.
+
+**If ANY required section is MISSING:**
+```
+⚠️ [SkillName]/SkillIntent.md is missing required section(s): [list missing sections].
+Options:
+  [A] Add missing sections now via CreateSkillIntent, then continue with the operation
+  [S] Skip this update and complete the SkillIntent first
+```
+Do not proceed until all three sections are present. There is no defer path.
+
+**If all three sections are PRESENT:** Proceed to the operation steps below. No action needed.
+
+**Note — SkillIntent.md content modifications:** If the requested operation involves editing the *content* of a target skill's `SkillIntent.md` (not just checking it), this qualifies as a SkillIntent.md modification per `../RiskFramework.md § Unconditional Confirmation Triggers`. Obtain explicit user confirmation before making any content changes to SkillIntent.md.
 
 ---
 
@@ -172,6 +210,21 @@ Update the workflow name and file path in SKILL.md routing table.
 
 ---
 
+### Completion Gate: Prompt Quality Audit (BLOCKING — cannot skip)
+
+**After ANY Add or Rename operation completes**, PromptQualityAudit MUST run before reporting completion. This is not optional — every workflow addition introduces trigger phrases, and every rename may change routing.
+
+1. Log: `Chain PromptQualityAudit: condition true — firing (completion gate)`
+2. Execute `Workflows/PromptQualityAudit.md` on the modified skill
+3. If PromptQualityAudit finds failures: fix them before proceeding to the summary output
+4. After PromptQualityAudit passes: proceed to summary
+
+**For Remove operations only:** PromptQualityAudit is not required (no new phrases introduced), but log: `Completion Gate: remove operation — PromptQualityAudit skipped`
+
+**Why this gate exists:** Step A2.5 catches issues during creation. This gate catches issues that Step A2.5 missed or that emerged from interaction with existing phrases. Two layers: inline check + full audit.
+
+---
+
 ## Constraints
 
 - **TitleCase mandatory** - All workflow names must use TitleCase
@@ -199,5 +252,10 @@ After completing this workflow, evaluate these chain conditions:
 |---|---|---|
 | A workflow was added or removed | StressTest | Announce: "Running stress test to verify skill integrity after workflow change..." then execute `Workflows/StressTest.md` |
 | A new workflow was added | PromptQualityAudit | Announce: "Running prompt quality audit on the new workflow's trigger phrases..." then execute `Workflows/PromptQualityAudit.md` |
+
+**Chain Decision Log (MANDATORY — SC7):**
+Log one line per chain in the table above, regardless of outcome:
+  `Chain [WorkflowName]: condition [true/false] — [fired/skipped]`
+Skipped chains MUST be logged — silence on a skipped chain violates SC7.
 
 If no conditions match, skip follow-ups.

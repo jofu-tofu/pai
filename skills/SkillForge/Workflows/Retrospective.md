@@ -5,7 +5,6 @@
 ## Reference Material
 
 - **Risk Framework:** `../RiskFramework.md`
-- **Validation Checklist:** `../ValidationChecklist.md`
 - **Authoritative Spec:** `../SkillSystem.md`
 - **Target skill's SkillIntent.md** (if present) — Read before proposing improvements; recommendations must align with the skill's original purpose and must not contradict its constraints.
 - **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
@@ -227,18 +226,17 @@ Removed:
   - [Deleted content, if any]
 ```
 
-### Step 10.5: Token Optimization Check
+### Step 10.5: Organization Check
 
-After applying session-based improvements, run a quick token budget check on the updated skill:
+After applying session-based improvements, check whether content placement is still sound:
 
-- Has `SKILL.md` grown beyond 100 lines?
-- Have any workflow files exceeded 150 lines?
-- Are there context files that grew beyond 200 lines?
-- Are there context files referenced from SKILL.md directly (instead of from specific workflows)?
+- Is there content in `SKILL.md` that is only used by one specific workflow (and would be clearer living in that workflow file)?
+- Are there context files now referenced by ALL workflows (and would be clearer as universal content in `SKILL.md`)?
+- Did any workflow grow to cover two conceptually distinct jobs (a split candidate)?
 
 If **any** answer is yes:
 ```
-Token budget exceeded — consider running WorkflowDecompose to optimize structure.
+Organization signal found — consider running WorkflowDecompose for a placement analysis.
 Would you like to run WorkflowDecompose on [SkillName] now? (yes / no / later)
 ```
 
@@ -298,5 +296,11 @@ After completing this workflow, evaluate these chain conditions:
 | Condition | Chain To | Action |
 |---|---|---|
 | Improvement recommendations require content changes | ModifyContent | Announce: "Running ModifyContent to apply recommended changes..." then execute `Workflows/ModifyContent.md` |
+| Session reveals a missing workflow that should be added | ManageWorkflows | Announce: "Running ManageWorkflows to add the missing workflow..." then execute `Workflows/ManageWorkflows.md` |
+
+**Chain Decision Log (MANDATORY — SC7):**
+Log one line per chain in the table above, regardless of outcome:
+  `Chain [WorkflowName]: condition [true/false] — [fired/skipped]`
+Skipped chains MUST be logged — silence on a skipped chain violates SC7.
 
 If no conditions match, skip follow-ups.

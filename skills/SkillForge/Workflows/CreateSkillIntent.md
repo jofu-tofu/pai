@@ -5,7 +5,7 @@
 ## Reference Material
 
 - `../SkillSystem.md` — SkillIntent.md standard structure and conventions
-- `../SkillIntent.md` — UpdateSkill's own SkillIntent as a concrete example
+- `../SkillIntent.md` — SkillForge's own SkillIntent as a concrete example
 
 ## Purpose
 
@@ -70,16 +70,18 @@ Ask the user to confirm, correct, or enrich the inferences. Focus on what CANNOT
 
 **Question set (ask these as a group, not one-by-one):**
 
-1. **Problem statement:** Does this capture why the skill was built?
+1. **First principles:** What enduring truths guide this skill's design? What philosophical anchors should survive any refactor? *(Examples: "signal density over completeness", "user-workflow-first", "the WHY endures, the WHAT changes")*
+
+2. **Problem statement:** Does this capture why the skill was built?
    > "[Inferred problem statement]"
 
-2. **Key design decisions:** Why does the skill work the way it does? What alternatives were considered and rejected? *(Examples: "We chose workflow-per-operation over one big workflow because..." or "We deliberately don't auto-apply because...")*
+3. **Key design decisions:** Why does the skill work the way it does? What alternatives were considered and rejected? *(Examples: "We chose workflow-per-operation over one big workflow because..." or "We deliberately don't auto-apply because...")*
 
-3. **Explicit out-of-scope:** What should this skill NEVER do, even if users ask? Why is that boundary there?
+4. **Explicit out-of-scope:** What should this skill NEVER do, even if users ask? Why is that boundary there?
 
-4. **Non-negotiable constraints:** What rules must survive any future refactoring? *(Examples: "always read-only by default", "never delete without confirmation")*
+5. **Non-negotiable constraints:** What rules must survive any future refactoring? *(Examples: "always read-only by default", "never delete without confirmation")*
 
-5. **Evolution history:** Are there any major past changes worth documenting and their reasoning?
+6. **Success criteria:** How do you know when this skill has successfully done its job? Describe the ideal state — binary YES/NO philosophical conditions, not implementation steps. *(Examples: "every context file reference resolves bidirectionally", "design intent is consulted before any modification begins" — NOT "Step 2.5 runs the SkillIntent check")*
 
 ---
 
@@ -95,6 +97,12 @@ Using the inferred context (Step 2) and interview answers (Step 3), write `Skill
 > **For agents modifying this skill:** Read this before making any changes. It captures
 > the original design decisions, explicit out-of-scope boundaries, and constraints that
 > all updates must respect.
+
+---
+
+## First Principles
+
+[Core philosophical principles that all decisions derive from. What enduring truths guide this skill's design? Each principle should be a named concept with a brief explanation.]
 
 ---
 
@@ -118,17 +126,24 @@ Using the inferred context (Step 2) and interview answers (Step 3), write `Skill
 
 ---
 
-## Constraints
+## Success Criteria
 
-[Numbered list of non-negotiable rules that must remain true through any update or refactoring]
+What "this skill successfully executed" looks like. Each criterion must be a binary YES/NO verifiable condition describing a philosophical ideal state — not an implementation step.
+
+- [ ] [Philosophical state — e.g., "Every context file reference resolves bidirectionally"]
+- [ ] [Philosophical state — e.g., "Design intent is consulted before any modification begins"]
+
+**Quality gate — reject any criterion that:**
+- Uses vague qualifiers: "works well", "is efficient", "looks right", "is complete"
+- Requires subjective judgment with no observable artifact
+- Is compound (contains "and" — split into two criteria)
+- References specific workflow step numbers, log formats, or file paths (describe the ideal state, not how to check it)
 
 ---
 
-## Evolution Notes
+## Constraints
 
-| Version/Date | Change | Rationale |
-|---|---|---|
-| Initial | [original scope] | [why it was built] |
+[Numbered list of non-negotiable rules that must remain true through any update or refactoring]
 ```
 
 **Quality criteria:**
@@ -138,6 +153,19 @@ Using the inferred context (Step 2) and interview answers (Step 3), write `Skill
 - Constraints are verifiable — a future agent should be able to check whether a proposed change violates them
 
 ---
+
+### Step 4.5: Testability Gate — Validate Success Criteria
+
+Before confirming with the user, re-read each criterion you wrote in the `## Success Criteria` section and apply the quality gate from the template:
+
+For each criterion, answer:
+- [ ] **Is it binary?** Can it be answered YES or NO in under 5 seconds with a concrete check?
+- [ ] **Is there an observable artifact?** Does the YES answer point to something you can inspect (a file, a section, a transcript entry, a tool output)?
+- [ ] **Is it atomic?** Does it contain "and"? If yes → split into two criteria.
+- [ ] **No vague qualifiers?** Reject: "works well", "is complete", "looks right", "is appropriate", "is comprehensive".
+- [ ] **Minimum 3 criteria?** SC2 requires at least 3 criteria covering **distinct** aspects of the skill's post-update state. A single criterion or two overlapping criteria fails SC2. If fewer than 3, add criteria now — do not proceed to Step 5.
+
+**If any criterion fails the quality gate:** Rewrite it before proceeding. Do not present untestable or insufficient criteria to the user.
 
 ### Step 5: Confirm and Write
 
@@ -164,11 +192,12 @@ On confirmation, write the file.
 SUMMARY: Created SkillIntent.md for [SkillName]
 LOCATION: [path to file]
 SECTIONS:
+  First principles: [N principles]
   Problem statement: [1-sentence summary]
   Design decisions: [N decisions documented]
   Out-of-scope: [N items]
+  Success criteria: [N criteria]
   Constraints: [N constraints]
-  Evolution notes: [N entries]
-COMPLETED: SkillIntent.md written. Future UpdateSkill operations on [SkillName]
+COMPLETED: SkillIntent.md written. Future SkillForge operations on [SkillName]
            will read this file before making changes.
 ```

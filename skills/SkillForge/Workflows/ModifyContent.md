@@ -4,8 +4,10 @@
 
 ## Reference Material
 
-- `PromptingStandards.md` — Wording and trigger phrase quality rules. Read when modifying frontmatter descriptions or trigger phrases.
+- `../PromptingStandards.md` — Wording and trigger phrase quality rules. Read when modifying frontmatter descriptions or trigger phrases.
+- `../RiskFramework.md` — Change risk classification guide. Consult before Step 4 to classify the modification as Additive/Enhancement/Modification/Destructive and apply the appropriate approval level.
 - `[target skill]/SkillIntent.md` — Target skill's design intent (if present). Read before modifying to ensure changes don't contradict original purpose or out-of-scope decisions.
+- `../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
 - **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
@@ -43,6 +45,43 @@ Identify:
 - Workflow routing table
 - Examples section
 - Any additional sections
+
+### Step 2.5: SkillIntent Required Sections Check (MANDATORY — cannot skip)
+
+Check if the target skill has a `SkillIntent.md` and whether it contains all three required sections.
+
+**Check A — SkillIntent exists:**
+```bash
+cat $PAI_DIR/skills/[SkillName]/SkillIntent.md
+```
+
+**If SkillIntent.md does NOT exist:**
+```
+⚠️ [SkillName] has no SkillIntent.md.
+This update cannot be considered complete without one.
+Options:
+  [C] Create SkillIntent now (chains to CreateSkillIntent, then resumes from Step 3)
+  [S] Skip this update and create SkillIntent first
+```
+Do not proceed to Step 3 until SkillIntent.md exists.
+
+**If SkillIntent.md exists — Check B — All three required sections present:**
+
+Scan for ALL THREE sections: `## Problem This Skill Solves`, `## Constraints`, `## Success Criteria`.
+
+**If ANY required section is MISSING:**
+```
+⚠️ [SkillName]/SkillIntent.md is missing required section(s): [list missing sections].
+These sections are required before this update is considered complete.
+Options:
+  [A] Add missing sections now via CreateSkillIntent, then continue with this modification
+  [S] Skip this update and complete the SkillIntent first
+```
+Do not proceed to Step 3 until all three sections are present. There is no defer path — the sections must exist before this modification completes.
+
+**If all three sections are PRESENT:** Proceed to Step 3. No action needed.
+
+---
 
 ### Step 3: Determine Modification Type
 
@@ -98,6 +137,26 @@ Run validation checks:
 3. All workflow references in routing table resolve
 4. TitleCase naming enforced
 
+### Step 5.5: Prompt Quality Completion Gate (BLOCKING — cannot skip)
+
+**This step enforces PromptQualityAudit as a structural requirement, not an optional follow-up.**
+
+Check: Did this execution modify ANY of the following?
+- `description:` frontmatter field or `USE WHEN` clause
+- Trigger phrases in the routing table
+
+**If YES to any:** PromptQualityAudit MUST run before this workflow reports completion. Do not proceed to Step 6. Instead:
+1. Log: `Chain PromptQualityAudit: condition true — firing (completion gate)`
+2. Execute `Workflows/PromptQualityAudit.md` on the modified skill NOW
+3. If PromptQualityAudit finds failures: fix them before proceeding
+4. After PromptQualityAudit passes: proceed to Step 6
+
+**If NO (structural-only changes):** Log: `Completion Gate: no trigger phrase changes — skipped` and proceed to Step 6.
+
+**Why this gate exists:** Follow-Up chains are agent-evaluated and can be rationalized away. This inline gate makes the audit structurally mandatory — skipping it means visibly skipping a numbered step.
+
+---
+
 ### Step 6: Report Changes
 
 ```
@@ -133,5 +192,11 @@ After completing this workflow, evaluate these chain conditions:
 |---|---|---|
 | Trigger phrases or USE WHEN clause were modified | PromptQualityAudit | Announce: "Running prompt quality audit on the phrases you just changed..." then execute `Workflows/PromptQualityAudit.md` |
 | Significant structural changes made (not just description edits) | StressTest | Announce: "Running stress test to verify skill integrity..." then execute `Workflows/StressTest.md` |
+| Context Files table was modified (file added, removed, or renamed) | StressTest | Announce: "Running stress test to check for orphaned context file references..." then execute `Workflows/StressTest.md` |
+
+**Chain Decision Log (MANDATORY — SC7):**
+Log one line per chain in the table above, regardless of outcome:
+  `Chain [WorkflowName]: condition [true/false] — [fired/skipped]`
+Skipped chains MUST be logged — silence on a skipped chain violates SC7.
 
 If no conditions match, skip follow-ups.

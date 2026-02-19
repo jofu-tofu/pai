@@ -1,6 +1,6 @@
 # InvocationSim Workflow
 
-> **Trigger:** "invocation sim", "simulate invocations", "test routing", "routing audit", "usage simulation", "trigger coverage", "coverage test", "what invocations work", "does this skill route correctly"
+> **Trigger:** "invocation sim", "simulate invocations", "test skill routing", "routing audit", "usage simulation", "trigger coverage", "what invocations work", "does this skill route correctly"
 
 ## Reference Material
 
@@ -88,13 +88,13 @@ Scenarios to generate:
 These should NOT route to this skill (or this workflow) at all. If they do, the triggers are too broad.
 
 Scenarios to generate:
-17. "Create a new skill for [domain]" → should go to CreateSkill, not UpdateSkill
+17. "Create a new skill for [domain]" → should go to CreateSkill, not SkillForge
 18. "Delete the entire [skill]" → dangerous — should confirm and potentially block
 19. "Build a workflow from scratch" → CreateSkill territory
 20. "[SkillName]-specific cross-skill question" → out of scope
 
 #### Category F: Meta / Self-Referential
-21. "Update the UpdateSkill skill" (recursive case)
+21. "Update the SkillForge skill" (recursive case)
 22. "Add a workflow to the skill we're currently editing"
 23. "Validate the skill that handles skill validation"
 
@@ -134,7 +134,7 @@ AVAILABLE CONTEXT:
 
 | Question | Answer |
 |----------|--------|
-| Does the description trigger UpdateSkill at all? | YES / NO / MAYBE |
+| Does the description trigger SkillForge at all? | YES / NO / MAYBE |
 | Which routing table row best matches this prompt? | [WorkflowName] or NONE |
 | Is that the CORRECT workflow for this request? | YES / NO / AMBIGUOUS |
 | Does the agent have enough context to execute? | YES / NO / PARTIAL |
@@ -271,7 +271,7 @@ Content chains found:
 **Common chain patterns to look for:**
 - **Gate pattern** — Workflow reads a standards file before acting (e.g., PromptQualityAudit → PromptingStandards.md). Rules in the file constrain what the workflow outputs.
 - **Guard pattern** — Workflow reads an intent/constraint file before modifying (e.g., ModifyContent → SkillIntent.md). Rules in the file can *block* proposed changes.
-- **Checklist pattern** — Workflow reads a validation spec and must check every item (e.g., ValidateSkill → ValidationChecklist.md).
+- **Checklist pattern** — Workflow reads a validation spec and must check every item (e.g., ValidateSkill → SkillSystem.md § Validation Checklist).
 
 #### 3c.2: Rule Extraction from Referenced Files
 
@@ -462,6 +462,24 @@ Combined: [weighted average or qualitative assessment]
 
 ---
 
+### Step 7: Update InvocationSimLog.md
+
+After delivering the Step 6 report, overwrite `$PAI_DIR/skills/SkillForge/InvocationSimLog.md` with the last-run summary. **Replace the entire file — do not append.** This keeps the log token-efficient (last run only, no history).
+
+```markdown
+# InvocationSim Last Run
+
+**Skill:** [SkillName]
+**Date:** [YYYY-MM-DD]
+**Result:** [HEALTHY / NEEDS_WORK / CRITICAL]
+**Scores:** L1: N% | L2: N% | L3: N%
+**Top finding:** [one-line summary of most important issue, or "No issues found"]
+```
+
+This file is the persistence record for SC6 verification. A stale or absent log indicates InvocationSim has not been run since the last routing table change.
+
+---
+
 ## Follow-Up
 
 After completing this workflow, evaluate these chain conditions:
@@ -470,77 +488,10 @@ After completing this workflow, evaluate these chain conditions:
 |---|---|---|
 | Dead routes or ambiguous scenarios found | PromptQualityAudit | Announce: "Running prompt quality audit on problematic trigger phrases..." then execute `Workflows/PromptQualityAudit.md` |
 
+**Chain Decision Log (MANDATORY — SC7):**
+Log one line per chain in the table above, regardless of outcome:
+  `Chain [WorkflowName]: condition [true/false] — [fired/skipped]`
+Skipped chains MUST be logged — silence on a skipped chain violates SC7.
+
 If no conditions match, skip follow-ups.
 
----
-
-## Working Through UpdateSkill as the Example
-
-Running InvocationSim on UpdateSkill itself reveals the following scenario space:
-
-### Sample Scenarios (UpdateSkill)
-
-| # | Scenario | Expected Route | Notes |
-|---|----------|---------------|-------|
-| 1 | "Update the Browser skill description" | ModifyContent | Direct |
-| 2 | "Add a cleanup workflow to Daemon" | ManageWorkflows | Direct |
-| 3 | "Remove the deprecated workflow from Research" | ManageWorkflows | Direct |
-| 4 | "Rename the Init workflow to Setup" | ManageWorkflows | Direct |
-| 5 | "Check if the Fabric skill is valid" | ValidateSkill | Direct |
-| 6 | "Validate the Research skill" | ValidateSkill | Direct |
-| 7 | "Run a retrospective on Browser" | Retrospective | Direct |
-| 8 | "Analyze how the Council skill performed this session" | Retrospective | Direct |
-| 9 | "Refactor the Council skill structure" | RefactorSkill | Direct |
-| 10 | "Decompose the UpdateSkill into smaller pieces" | WorkflowDecompose | Direct |
-| 11 | "Token audit the Research skill" | WorkflowDecompose | Direct |
-| 12 | "Stress test UpdateSkill" | StressTest | Direct |
-| 13 | "Make the Browser skill better" | Retrospective? | AMBIGUOUS |
-| 14 | "The Browser skill isn't triggering" | ValidateSkill | Diagnostic — trigger coverage |
-| 15 | "Fix the skill" | UNROUTED | Too vague — which skill? |
-| 16 | "Improve the Research skill" | Retrospective? | AMBIGUOUS — improve = retrospective or refactor? |
-| 17 | "Create a new skill for cooking" | OUT_OF_SCOPE | → CreateSkill |
-| 18 | "Delete the Telos skill entirely" | OUT_OF_SCOPE | → skill deletion not in UpdateSkill |
-| 19 | "Update UpdateSkill" | Retrospective? | Meta — ambiguous routing |
-| 20 | "Edit the trigger phrases for Browser" | ModifyContent | Synonym hit — "edit" should trigger |
-| 21 | "The workflow descriptions are too long" | WorkflowDecompose | Symptom maps to decompose |
-| 22 | "Clean up the Research skill" | RefactorSkill? | AMBIGUOUS — clean up = refactor or modify? |
-| 23 | "Check skill" | ValidateSkill | Trigger phrase direct |
-| 24 | "Analyze skill structure" | WorkflowDecompose | Direct |
-| 25 | "Does this skill work?" | ValidateSkill? | Ambiguous — could also be StressTest |
-
-**Findings from this sample:**
-- Scenarios 13, 16, 19, 22: Ambiguous between Retrospective and RefactorSkill — trigger phrases overlap
-- Scenario 15: Unrouted — "Fix the skill" (missing target) — valid gap
-- Scenarios 17, 18: Correctly out of scope (good)
-- Dead route risk: StressTest has only 1 natural trigger ("stress test skill") — low coverage
-
-## Example Output (abbreviated)
-
-```
-INVOCATION SIM REPORT — UpdateSkill
-=====================================
-Scenarios generated: 25
-Workflows tested: 8
-
-ROUTING RESULTS:
-  CORRECT:       18 (72%)
-  WRONG_ROUTE:   0
-  UNROUTED:      2 ("fix the skill", "make it work")
-  AMBIGUOUS:     4 (improve, clean up, make better, update skill itself)
-  OUT_OF_SCOPE:  2 (correct)
-  OVER_TRIGGER:  0
-
-DEAD ROUTES: None at 25-scenario depth
-
-UNROUTED SCENARIOS:
-  "Fix the skill" → no target specified, no route
-  → Recommendation: Add AskUserQuestion gate: "Which skill? What to fix?"
-
-AMBIGUOUS SCENARIOS:
-  "Improve the Research skill" → Retrospective or RefactorSkill?
-  → Recommendation: Add disambiguation note to SKILL.md examples:
-    "improve = Retrospective (session-based) vs. refactor = RefactorSkill (structural)"
-
-OVERALL HEALTH: NEEDS_WORK
-Score: 20/23 = 87% (excluding 2 expected out-of-scope)
-```

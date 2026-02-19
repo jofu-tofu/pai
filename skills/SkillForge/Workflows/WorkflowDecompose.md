@@ -1,6 +1,6 @@
 # WorkflowDecompose Workflow
 
-> **Trigger:** "decompose skill", "usage analysis", "analyze skill structure", "how is this skill structured", "audit skill structure"
+> **Trigger:** "decompose skill", "skill usage analysis", "analyze skill structure", "how is this skill structured", "audit skill structure"
 
 ## Reference Material
 
@@ -157,5 +157,10 @@ After completing this workflow, evaluate these chain conditions:
 | Condition | Chain To | Action |
 |---|---|---|
 | Analysis reveals structural issues needing action | RefactorSkill | Announce: "Running RefactorSkill to address structural issues found..." then execute `Workflows/RefactorSkill.md` |
+
+**Chain Decision Log (MANDATORY — SC7):**
+Log one line per chain in the table above, regardless of outcome:
+  `Chain [WorkflowName]: condition [true/false] — [fired/skipped]`
+Skipped chains MUST be logged — silence on a skipped chain violates SC7.
 
 If no conditions match, skip follow-ups.

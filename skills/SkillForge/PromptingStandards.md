@@ -1,6 +1,6 @@
-# Prompting Standards (UpdateSkill Local Copy)
+# Prompting Standards (SkillForge Local Copy)
 
-> Extracted from `Prompting/Standards.md` — Claude 4.x Best Practices relevant to skill wording, trigger phrases, and description quality. This copy exists to keep UpdateSkill self-contained.
+> Extracted from `Prompting/Standards.md` — Claude 4.x Best Practices relevant to skill wording, trigger phrases, and description quality. This copy exists to keep SkillForge self-contained.
 
 ---
 

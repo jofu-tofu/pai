@@ -1,6 +1,6 @@
 # PromptQualityAudit Workflow
 
-> **Trigger:** "prompt quality audit", "audit skill wording", "check skill trigger phrases", "review skill prompts", "wording audit", "audit prompts"
+> **Trigger:** "prompt quality audit", "audit skill wording", "check skill trigger phrases", "review skill prompts", "skill wording audit", "audit skill prompts"
 
 ## Purpose
 
@@ -19,7 +19,7 @@ This is the retrospective counterpart to the Prompt Quality Gates in ModifyConte
 
 ## Reference Material
 
-- `PromptingStandards.md` — Wording and trigger phrase quality rules. Read before running audit.
+- `../PromptingStandards.md` — Wording and trigger phrase quality rules. Read before running audit.
 
 ---
 

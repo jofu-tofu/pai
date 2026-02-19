@@ -2,7 +2,7 @@
 
 Change categorization and risk assessment guide for skill modifications.
 
-Used by: `RefactorSkill.md`, `Retrospective.md`
+Used by: `RefactorSkill.md`, `Retrospective.md`, `ModifyContent.md`, `ManageWorkflows.md`, `CanonicalizeSkill.md`
 
 ---
 
@@ -43,6 +43,22 @@ Used by: `RefactorSkill.md`, `Retrospective.md`
 - Any change that could break existing usage
 
 **Approval:** Required - present detailed impact assessment
+
+---
+
+## Unconditional Confirmation Triggers
+
+These change types **always** require explicit user confirmation regardless of risk classification. Agent-classified "low risk" does NOT override this list.
+
+| Change Type | Why Unconditional |
+|-------------|------------------|
+| Routing table entry deletion | Removes a user-reachable path; cannot be undone without knowledge of old entry |
+| Routing table entry modification (changing an existing trigger phrase or file reference, not adding a new row) | Silent trigger rewrites break invocations without any deletion signal; "audit prompts" → "audit" routes differently and is as dangerous as deletion |
+| Workflow file deletion | Destroys content permanently; git history may not be accessible |
+| SkillIntent.md modification | Alters the design anchor; successive agents rely on it being authoritative |
+| WorkflowChains.md entry removal | Breaks chain propagation silently; effects cascade through downstream workflows |
+
+**How to gate:** Present the specific change and request explicit confirmation before executing. "Low risk per RiskFramework.md" is not a valid bypass for any item in this table.
 
 ---
 

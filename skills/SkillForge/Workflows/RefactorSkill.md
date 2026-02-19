@@ -4,10 +4,10 @@
 
 ## Reference Material
 
-- **Validation Checklist:** `../ValidationChecklist.md`
 - **Risk Framework:** `../RiskFramework.md`
 - **Authoritative Spec:** `../SkillSystem.md`
 - **Target skill's SkillIntent.md** (if present) — Read before restructuring; changes must not contradict the skill's stated out-of-scope decisions or constraints.
+- `../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
 - **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
@@ -49,6 +49,42 @@ Frontmatter:
 Workflows: [count]
 Tools: [count]
 ```
+
+### Step 1.5: SkillIntent Required Sections Check (MANDATORY — cannot skip)
+
+Check if the target skill has a `SkillIntent.md` and whether it contains all three required sections.
+
+```bash
+cat $PAI_DIR/skills/[SkillName]/SkillIntent.md
+```
+
+**If SkillIntent.md does NOT exist:**
+```
+⚠️ [SkillName] has no SkillIntent.md.
+Refactoring without a SkillIntent is high-risk — there is no anchor for what must not change.
+Options:
+  [C] Create SkillIntent now (chains to CreateSkillIntent, then resumes from Step 2)
+  [S] Skip this refactor and create SkillIntent first
+```
+Do not proceed to Step 2 until SkillIntent.md exists.
+
+**If SkillIntent.md exists — check for ALL THREE required sections:**
+
+Scan for: `## Problem This Skill Solves`, `## Constraints`, `## Success Criteria`.
+
+**If ANY required section is MISSING:**
+```
+⚠️ [SkillName]/SkillIntent.md is missing required section(s): [list missing sections].
+Refactoring without a complete SkillIntent risks contradicting unstated design decisions.
+Options:
+  [A] Add missing sections now via CreateSkillIntent, then continue with refactor
+  [S] Skip this refactor and complete the SkillIntent first
+```
+Do not proceed to Step 2 until all three sections are present. There is no defer path.
+
+**If all three sections are PRESENT:** Proceed to Step 2. No action needed.
+
+---
 
 ### Step 2: Identify Refactoring Goals
 
@@ -230,7 +266,7 @@ Dependencies: None
 Run full validation:
 
 ```bash
-bun run $PAI_DIR/skills/UpdateSkill/Tools/ValidateSkill.ts [SkillName]
+bun run $PAI_DIR/skills/SkillForge/Tools/ValidateSkill.ts [SkillName]
 ```
 
 Manual checks:
@@ -298,3 +334,8 @@ After completing this workflow, execute these chains:
 |---|---|---|
 | ALWAYS after restructuring | ValidateSkill | Announce: "Running validation after restructuring..." then execute `Workflows/ValidateSkill.md` |
 | ALWAYS after restructuring | StressTest | Announce: "Running stress test after restructuring..." then execute `Workflows/StressTest.md` |
+
+**Chain Decision Log (MANDATORY — SC7):**
+Log one line per chain in the table above, regardless of outcome:
+  `Chain [WorkflowName]: condition [true/false] — [fired/skipped]`
+Both chains here are Always — both log `condition true — fired` after RefactorSkill completes.
