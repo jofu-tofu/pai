@@ -135,3 +135,6 @@ Releases/
 
 # AIW Installation
 .aiwcli/
+
+# PRD working files (generated per-session)
+.prd/
