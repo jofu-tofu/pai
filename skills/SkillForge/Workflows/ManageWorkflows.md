@@ -212,16 +212,14 @@ Update the workflow name and file path in SKILL.md routing table.
 
 ### Completion Gate: Prompt Quality Audit (BLOCKING — cannot skip)
 
-**After ANY Add or Rename operation completes**, PromptQualityAudit MUST run before reporting completion. This is not optional — every workflow addition introduces trigger phrases, and every rename may change routing.
+**After ANY Add, Remove, or Rename operation completes**, PromptQualityAudit MUST run before reporting completion. This is not optional — every workflow topology change can shift trigger boundaries and routing behavior.
 
 1. Log: `Chain PromptQualityAudit: condition true — firing (completion gate)`
 2. Execute `Workflows/PromptQualityAudit.md` on the modified skill
 3. If PromptQualityAudit finds failures: fix them before proceeding to the summary output
 4. After PromptQualityAudit passes: proceed to summary
 
-**For Remove operations only:** PromptQualityAudit is not required (no new phrases introduced), but log: `Completion Gate: remove operation — PromptQualityAudit skipped`
-
-**Why this gate exists:** Step A2.5 catches issues during creation. This gate catches issues that Step A2.5 missed or that emerged from interaction with existing phrases. Two layers: inline check + full audit.
+**Why this gate exists (first principles):** Trigger reliability is a system-level property, not a per-phrase property. Adding, renaming, and removing workflows all change the routing landscape. The assumption that remove operations are "prompt-neutral" is soft and often false because ambiguity boundaries can move when options disappear. Prompt audit cost is low relative to routing failure cost, so this gate is default-on.
 
 ---
 
@@ -251,7 +249,7 @@ After completing this workflow, evaluate these chain conditions:
 | Condition | Chain To | Action |
 |---|---|---|
 | A workflow was added or removed | StressTest | Announce: "Running stress test to verify skill integrity after workflow change..." then execute `Workflows/StressTest.md` |
-| A new workflow was added | PromptQualityAudit | Announce: "Running prompt quality audit on the new workflow's trigger phrases..." then execute `Workflows/PromptQualityAudit.md` |
+| ALWAYS after workflow add, rename, or remove | PromptQualityAudit | Announce: "Running prompt quality audit after workflow topology changes..." then execute `Workflows/PromptQualityAudit.md` (if already completed in the completion gate with no additional edits, log condition true and mark as already satisfied) |
 
 **Chain Decision Log (MANDATORY — SC7):**
 Log one line per chain in the table above, regardless of outcome:

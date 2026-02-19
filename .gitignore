@@ -60,8 +60,7 @@ MEMORY/**/*
 skills/skill-index.json
 
 # Local Epic-specific skills (development only, not committed)
-skills/EpicBrowser/
-skills/EpicDesign/
+skills/epic-*/
 
 # ============================================
 # IDE & TOOL SETTINGS

@@ -109,9 +109,9 @@ Do not proceed to Step 3 until all three sections are present. There is no defer
 - Follow existing example format
 - Include User prompt and arrow-denoted steps
 
-### Step 4.5: Prompt Quality Gate (descriptions and trigger phrases only)
+### Step 4.5: Prompt Quality Gate (default-on for wording edits)
 
-**Skip this step if the modification was structural only** (adding a section, updating examples format, renaming a file path). Run this step if the modification touched any of: `description:` field, `USE WHEN` clause, trigger phrases in the routing table.
+Run this step whenever the modification touches user-facing wording. Only skip if the change is strictly non-text structural (for example: section reordering with no wording changes, or path-only renames).
 
 Read `PromptingStandards.md` (in this skill's root dir) and verify the modified wording against these criteria:
 
@@ -127,7 +127,7 @@ Read `PromptingStandards.md` (in this skill's root dir) and verify the modified 
 - [ ] Phrase is something a real user would naturally say, not internal jargon
 - [ ] New phrase doesn't create ambiguity with adjacent workflows
 
-Report any gate failures before proceeding to Step 5. If failures found: revise wording and re-check. Do not skip the gate.
+Report any gate failures before proceeding to Step 5. If failures found: revise wording and re-check. If this step is skipped, record the exact reason.
 
 ### Step 5: Validate Changes
 
@@ -141,19 +141,13 @@ Run validation checks:
 
 **This step enforces PromptQualityAudit as a structural requirement, not an optional follow-up.**
 
-Check: Did this execution modify ANY of the following?
-- `description:` frontmatter field or `USE WHEN` clause
-- Trigger phrases in the routing table
-
-**If YES to any:** PromptQualityAudit MUST run before this workflow reports completion. Do not proceed to Step 6. Instead:
+PromptQualityAudit MUST run before this workflow reports completion, regardless of modification type. Do not proceed to Step 6. Instead:
 1. Log: `Chain PromptQualityAudit: condition true — firing (completion gate)`
 2. Execute `Workflows/PromptQualityAudit.md` on the modified skill NOW
 3. If PromptQualityAudit finds failures: fix them before proceeding
 4. After PromptQualityAudit passes: proceed to Step 6
 
-**If NO (structural-only changes):** Log: `Completion Gate: no trigger phrase changes — skipped` and proceed to Step 6.
-
-**Why this gate exists:** Follow-Up chains are agent-evaluated and can be rationalized away. This inline gate makes the audit structurally mandatory — skipping it means visibly skipping a numbered step.
+**Why this gate exists (first principles):** Skill invocation is a language-routing problem with a hard constraint: user phrasing must map cleanly to workflow intent. The idea that "structural edits cannot affect prompt behavior" is a soft assumption and often false due to context interactions. Prompt audit cost is low; misrouting cost is high. A default-on gate minimizes total risk.
 
 ---
 
@@ -190,7 +184,7 @@ After completing this workflow, evaluate these chain conditions:
 
 | Condition | Chain To | Action |
 |---|---|---|
-| Trigger phrases or USE WHEN clause were modified | PromptQualityAudit | Announce: "Running prompt quality audit on the phrases you just changed..." then execute `Workflows/PromptQualityAudit.md` |
+| ALWAYS after ModifyContent completes | PromptQualityAudit | Announce: "Running prompt quality audit on the updated skill content..." then execute `Workflows/PromptQualityAudit.md` (if already completed in Step 5.5 with no additional edits, log condition true and mark as already satisfied) |
 | Significant structural changes made (not just description edits) | StressTest | Announce: "Running stress test to verify skill integrity..." then execute `Workflows/StressTest.md` |
 | Context Files table was modified (file added, removed, or renamed) | StressTest | Announce: "Running stress test to check for orphaned context file references..." then execute `Workflows/StressTest.md` |
 

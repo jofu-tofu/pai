@@ -11,11 +11,11 @@
 | CreateSkill | ValidateSkill | ALWAYS after new skill creation | Always |
 | CreateSkill | CreateSkillIntent | ALWAYS after new skill creation | Always |
 | CanonicalizeSkill | ValidateSkill | ALWAYS after canonicalization completes | Always |
-| ModifyContent | PromptQualityAudit | IF trigger phrases or USE WHEN clause were modified | Conditional |
+| ModifyContent | PromptQualityAudit | ALWAYS after ModifyContent completes (completion gate may satisfy this inline) | Always |
 | ModifyContent | StressTest | IF structural changes made (not just description edits) | Conditional |
 | ModifyContent | StressTest | IF the Context Files table was modified (detect new orphans) | Conditional |
 | ManageWorkflows | StressTest | IF a workflow was added or removed | Conditional |
-| ManageWorkflows | PromptQualityAudit | ALWAYS after add or rename operations (trigger phrases always involved) | Always |
+| ManageWorkflows | PromptQualityAudit | ALWAYS after add, rename, or remove operations (completion gate may satisfy this inline) | Always |
 | RefactorSkill | ValidateSkill | ALWAYS after restructuring | Always |
 | RefactorSkill | StressTest | ALWAYS after restructuring | Always |
 | StressTest | InvocationSim | IF structural checks pass but routing issues reported | Conditional |
