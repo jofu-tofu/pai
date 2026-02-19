@@ -15,12 +15,38 @@ Uses parallel haiku agents per subsystem to read actual file content.
 
 ## Workflow Steps
 
+### Step 0 — Detect Scope
+
+Check if the user's request specifies a directory path or named subdirectory.
+
+**Full-tree mode** (default — no scope specified):
+- Operate across the entire project tree.
+- Continue with Step 1 as written below.
+
+**Targeted mode** (scope specified — e.g., "generate context for src/auth"):
+- Resolve SCOPE_PATH relative to project root.
+- In Step 1: scan only SCOPE_PATH, not the whole tree.
+- In Step 1.5: build dependency map before dispatching agents.
+- In Steps 2–4: dispatch agents only for SCOPE_PATH; write only that dir's CLAUDE.md.
+- In Step 6: write targeted CLAUDE.md only. If root CLAUDE.md's Subsystems section
+  would need updating (new subsystem not yet listed there), surface a notice:
+  `"Note: Root CLAUDE.md Subsystems entry for [SCOPE_PATH] may need updating."`
+  Do NOT auto-update root in targeted mode unless the user explicitly asked for it.
+
+---
+
 ### Step 1 — Find Project Root and Build Tree Map
 
 1. Find the project root: look for `.git` directory walking up from the current directory
 2. Walk the directory tree (skip: `node_modules`, `.git`, `dist`, `build`, `.next`, `__pycache__`, `.cache`, `coverage`)
+   - **Targeted mode:** walk only SCOPE_PATH, not the full project tree
 3. List all existing `CLAUDE.md` files in the tree — note their paths
-4. Identify subsystems: top-level directories with 3+ files of their own
+4. Identify subsystems using the two-question placement rule:
+   **Q1:** Would an agent make at least one wrong decision in this directory without knowing its conventions, constraints, or non-obvious patterns?
+   **Q2:** Is that knowledge non-obvious from reading the files themselves?
+   → If YES to both: this directory gets its own CLAUDE.md and haiku agent.
+   → If NO to either: include key facts in the parent CLAUDE.md's Subsystems section instead.
+   *Practical guide:* Directories with code patterns, naming conventions, local constraints, or historical decisions that span files → YES. Directories that are pure write-targets, static assets, or whose content is fully self-describing → NO.
 
 ```
 Example tree map:
@@ -30,6 +56,55 @@ Example tree map:
   /project/src/db/        → 4 files → haiku agent needed
   /project/src/utils/     → 2 files → include in root agent's file list
 ```
+
+### Step 1.5 — Dependency Mapping (targeted mode only)
+
+Before dispatching agents, map the target directory's cross-boundary dependencies.
+This gives the haiku agent facts it cannot discover by reading only its own files.
+
+**1. Extract outbound imports (what SCOPE_PATH depends on):**
+
+Scan every file in SCOPE_PATH for import statements. Use language-agnostic patterns:
+- TypeScript/JS: `import ... from`, `require(`
+- Python: `import `, `from ... import`
+- Go: `import (` blocks
+- Rust: `use `, `mod `
+- General: any path-like string referencing `../` or a sibling directory
+
+Categorize each import:
+- **External package**: a package name (not a local path) — e.g., `express`, `bcrypt`, `zod`
+- **Internal dep**: a path resolving to another directory in this project — e.g., `../db/`, `@/config`
+
+**2. Extract inbound consumers (what imports SCOPE_PATH):**
+
+Grep the project (from root) for import statements that reference the target dir name:
+```
+grep -r "from.*[scope-dir-name]" --include="*.ts" .
+grep -r "require.*[scope-dir-name]" .
+grep -r "import.*[scope-dir-name]" .
+```
+List the directories of files that reference SCOPE_PATH — these are its consumers.
+
+**3. Build dependency context:**
+```
+DEPENDENCY CONTEXT for [SCOPE_PATH]:
+  External packages: [list — or "none"]
+  Internal deps:     [dir → what is imported from it — or "none"]
+  Consumed by:       [dirs that import from SCOPE_PATH — or "none / unknown"]
+```
+
+**4. Append to haiku agent prompt in Step 2:**
+```
+Additionally, this subsystem has the following cross-boundary dependencies:
+[paste DEPENDENCY CONTEXT block]
+
+If internal deps or consumers exist, include a ## Dependencies section in your output:
+  - Depends on: [dir — reason, e.g., "src/db — User model for auth queries"]
+  - Consumed by: [dir — reason, e.g., "src/api/routes — used as auth middleware"]
+Only include entries that would cause an agent to fail without knowing them.
+```
+
+---
 
 ### Step 2 — Dispatch Parallel Haiku Agents
 
@@ -84,6 +159,16 @@ From root-level agent results + cross-subsystem knowledge, synthesize root CLAUD
 
 - [hard prohibition or requirement]
 
+## Context Tree
+
+When working in a specific subsystem, read that directory's CLAUDE.md first:
+[List subdirectory CLAUDE.md files here, e.g.:]
+- `src/auth/CLAUDE.md` — auth conventions, JWT handling, session patterns
+- `src/api/CLAUDE.md` — route patterns, middleware order, error handling
+*(Omit this section if no subdirectory CLAUDE.md files exist yet.)*
+
+These files are not auto-loaded. Read the relevant one before working in that directory.
+
 ## Scope
 
 This file is the root context layer — it contains only things that apply across
@@ -135,6 +220,13 @@ For each subsystem with its own haiku agent result:
 
 - [local constraint]
 
+## Dependencies
+
+- Depends on: [other dir — what is used from it, e.g., "src/db — User model"]
+- Consumed by: [other dir — how it uses this one, e.g., "src/api/routes — auth middleware"]
+
+*(Omit this section if no internal cross-boundary dependencies exist.)*
+
 ## Scope
 
 This file covers only conventions and constraints specific to this directory.
@@ -163,6 +255,12 @@ Write root CLAUDE.md and all subdirectory CLAUDE.md files.
 **Overwrite behavior:** If a CLAUDE.md already exists at the target path, overwrite it completely. Generate creates the authoritative context from scratch — do not merge with existing content. If you want to preserve existing content, use Audit instead.
 **Auto-apply — no confirmation required.** Changes are reversible via git.
 
+**Add freshness timestamp** to the `## Context Maintenance` section of every file written:
+```
+<!-- context-layer: generated={YYYY-MM-DD} | last-audited=never | version=1 -->
+```
+This timestamp is machine-readable and used by the Drift workflow to detect staleness. Update `last-audited` to the current date whenever Audit runs against this file.
+
 Report on completion:
 ```
 ContextLayer Generate complete:
@@ -180,3 +278,4 @@ ContextLayer Generate complete:
 - `BudgetModel.md` — Token budget enforcement
 - `HaikuAgentPattern.md` — Exact prompt template, JSON schema, retry/fallback
 - `PruningInstruction.md` — Template to embed at bottom of each file
+- `DesignRationale.md` — Hypothesis verdicts (H1–H6) and past RedTeam findings; read to avoid re-implementing rejected designs

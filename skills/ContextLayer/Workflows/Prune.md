@@ -21,9 +21,27 @@ Run Prune first (cheap), then Audit if stale references are suspected.
 
 ## Workflow Steps
 
+### Step 0 — Detect Scope
+
+Check if the user's request specifies a directory path or named subdirectory.
+
+**Full-tree mode** (default — no scope specified):
+- Prune all CLAUDE.md files in the project tree.
+- Continue with Step 1 as written below.
+
+**Targeted mode** (scope specified — e.g., "prune just the api directory"):
+- Resolve SCOPE_PATH relative to project root.
+- In Step 1: find only CLAUDE.md files within SCOPE_PATH.
+- Steps 2–5 proceed as normal against the scoped set.
+- On completion:
+  `"Targeted prune of [SCOPE_PATH] complete — N files processed, M lines removed."`
+
+---
+
 ### Step 1 — Find All CLAUDE.md Files
 
 Find all CLAUDE.md files in the project tree.
+**Targeted mode:** find only CLAUDE.md files within SCOPE_PATH.
 **Do not read any other files.** Prune operates on CLAUDE.md content only.
 
 ### Step 2 — Apply Falsifiability Test to Every Entry
@@ -37,6 +55,18 @@ For each CLAUDE.md file, examine each entry individually:
 > "Even if an agent usually gets this right, would removing this cause wrong behavior 10% of the time in this specific project?"
 
 If the answer to BOTH is NO → mark for removal.
+
+### Step 2.5 — Protected Section Check
+
+Before applying any removal, identify protected sections that are exempt from Prune operations:
+
+**PROTECTED — never remove regardless of falsifiability:**
+- `## Context Maintenance` section (and its entire content block) — this section is the self-sustainability mechanism. Removing it breaks Constraint #3 in SkillIntent.md. Pattern: any section whose heading matches `## Context Maintenance` is exempt from Steps 2–4.
+- The HTML comment timestamp line `<!-- context-layer: generated=... -->` — machine-readable by Drift workflow.
+
+If a section or line is protected, skip it entirely. Do not apply the falsifiability test to it.
+
+---
 
 ### Step 3 — Apply Redundancy and Quality Checks
 
@@ -82,6 +112,12 @@ ContextLayer Prune complete:
 ```
 
 If zero changes: "CLAUDE.md files are already lean — no content to prune."
+
+---
+
+## Reference Material
+
+- `BudgetModel.md` — Token budget targets per file type (root 800–1500, subdir 200–500) used in Step 4
 
 ---
 

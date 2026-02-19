@@ -19,9 +19,27 @@ Auto-applies corrections across the full tree.
 
 ## Workflow Steps
 
+### Step 0 — Detect Scope
+
+Check if the user's request specifies a directory path or named subdirectory.
+
+**Full-tree mode** (default — no scope specified):
+- Audit all CLAUDE.md files in the project tree.
+- Continue with Step 1 as written below.
+
+**Targeted mode** (scope specified — e.g., "audit just the auth directory"):
+- Resolve SCOPE_PATH relative to project root.
+- In Step 1: find only CLAUDE.md files within SCOPE_PATH.
+- Steps 2–5 proceed as normal against the scoped set.
+- On completion, report only on scoped files:
+  `"Targeted audit of [SCOPE_PATH] complete — N files checked."`
+
+---
+
 ### Step 1 — Find All CLAUDE.md Files
 
 Find all CLAUDE.md files in the project tree (skip: `node_modules`, `.git`, `dist`, `build`).
+**Targeted mode:** find only CLAUDE.md files within SCOPE_PATH.
 Build a list: each file path + its location in the tree.
 
 ### Step 2 — Extract Claims from Each CLAUDE.md
@@ -32,6 +50,30 @@ For each CLAUDE.md file, extract all verifiable claims:
 - **Convention claims** — "files use kebab-case naming" — verifiable: sample actual files
 - **Inline cross-boundary summaries** — "Auth owns JWT logic, entry: src/auth/" — verifiable: does src/auth/ exist? does it handle JWT? *(High rot risk per Science H3 caveat — prioritize these)*
 - **Constraint claims** — "no direct DB writes from API layer" — verifiable: scan API layer imports
+
+### Step 2.5 — New Content Scan (Omission Detection)
+
+Before dispatching haiku agents, scan for directories and files that should be in this CLAUDE.md but aren't referenced yet. This catches the reference-frame trap: Audit can only verify what's already mentioned; this step finds what's missing entirely.
+
+**Walk the target directory** (same skip-list: `node_modules`, `.git`, `dist`, `build`, binary extensions):
+
+1. **Missing subsystems:** For each subdirectory with 3+ files that is NOT referenced anywhere in this CLAUDE.md → flag as `[MISSING SUBSYSTEM]`
+2. **Missing key files:** For each file matching high-signal names (`index.*`, `main.*`, `entry.*`, `routes.*`, `schema.*`, `config.*`, `SKILL.md`, `SkillIntent.md`) that is NOT mentioned → flag as `[MISSING KEY FILE]`
+3. **New top-level dirs:** If the CLAUDE.md has a `## File Structure` or `## Subsystems` section, check if any top-level directories exist that aren't listed → flag as `[MISSING STRUCTURE ENTRY]`
+
+Output a **Missing Entries Checklist** before agents run:
+```
+Missing entries detected:
+  [MISSING SUBSYSTEM] skills/NewSkill/ — 5 files, not referenced
+  [MISSING KEY FILE] hooks/lib/new-utility.ts — not mentioned
+  [MISSING STRUCTURE ENTRY] agents/ — top-level dir not in File Structure
+```
+
+Haiku agents in Step 3 receive this checklist and are instructed to populate the `missing` field for each flagged item (applying falsifiability test before adding).
+
+If no missing items found: `"New content scan: nothing missing"` — proceed directly to Step 3.
+
+---
 
 ### Step 3 — Dispatch Parallel Haiku Agents
 
@@ -71,6 +113,19 @@ For each CLAUDE.md, apply agent results:
    **Config-data directories:** If the audited directory contains only config/data files (`.json`, `.yaml`, `.toml`, `.env`, `.ini`) with no code patterns, commands, or naming conventions, the `missing` field will likely be empty or contain only data values. Data values (port numbers, timeout settings, pool sizes) fail the falsifiability test — do NOT add them. If an entire audit produces only data values in `missing`, add nothing.
 4. **Still accurate entries** → keep unchanged
 
+### Step 4.5 — Budget Check (when content was added)
+
+If Step 4 added any "missing" entries, estimate the updated token count per modified file:
+- Root CLAUDE.md target: 800–1500 tokens (hard cap)
+- Subdir CLAUDE.md target: 200–500 tokens (hard cap)
+
+If a file now exceeds its cap after additions:
+1. Re-apply the falsifiability test to newly added entries — remove the lowest-signal additions first
+2. If still over budget after removing additions, flag for Prune: `"[BUDGET WARNING] {path} is ~X tokens — run Prune to reduce"`
+3. Never add content that pushes a file over its hard cap without flagging it
+
+If no content was added in Step 4, skip this step entirely.
+
 ### Step 5 — Auto-Apply All Changes
 
 Write updated CLAUDE.md files across the full tree.
@@ -94,3 +149,4 @@ If zero changes: "All CLAUDE.md files are accurate — no changes needed."
 
 - `HaikuAgentPattern.md` — Prompt template, JSON schema, retry/fallback spec
 - `ScanProtocol.md` — Falsifiability test for evaluating "missing" entries before adding
+- `BudgetModel.md` — Token budget targets per file type; check after Step 4 when content is added

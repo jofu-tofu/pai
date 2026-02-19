@@ -126,4 +126,32 @@ Task 4: root-level agent             → reads package.json, README, top-level f
 Collect all results before synthesizing. Failed agents → orchestrator fallback.
 ```
 
-**Subsystem selection rule:** Any directory with 3+ files of its own gets a dedicated haiku agent. Directories with fewer than 3 files are included in the parent-level agent's file list.
+**Subsystem selection rule:** Use the two-question placement rule from `Generate.md` Step 1 to decide whether a directory gets a dedicated haiku agent.
+
+---
+
+## Document-Project Mode
+
+For directories where markdown files outnumber code files (`.md` count > 50% of all files), apply document-project reading order instead of the code-project defaults.
+
+**Detect:** Before dispatching, count `.md` files vs. total files in the target directory.
+- `.md` files > 50% → **document-project mode**
+- Otherwise → **code-project mode** (default, current behavior)
+
+**Document-project file priority order** (replaces code heuristics):
+1. Files named `SKILL.md`, `SkillIntent.md`, `WorkflowChains.md` — routing and intent documents
+2. Files in `Workflows/` subdirectory — relationship/structure documents
+3. Files named `DesignRationale.md`, `*Rationale.md`, `*Philosophy.md` — decision context
+4. Any remaining `.md` files up to the 6-file limit
+
+**Document-project prompt addition** (append to verbatim prompt template):
+```
+This is a document-centric directory. Focus on:
+- conventions: how documents are structured and named; what belongs where
+- key_files: which documents define routing, relationships, or intent
+- constraints: what types of content belong vs. don't belong here
+- cross_refs: which other directories this document set depends on or is consumed by
+Skip: implementation details that exist only within individual documents.
+```
+
+**Code-project mode** (unchanged): entry file → config → 1-2 representative implementation files, max 6 total.

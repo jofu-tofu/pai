@@ -5,7 +5,11 @@ description: >
   USE WHEN the request involves creating, reviewing, correcting, shrinking, or
   refreshing CLAUDE.md files — whether the user says so explicitly or describes
   symptoms like "agents are confused", "context is stale", "CLAUDE.md is too big",
-  or "just started a new project". Covers the full lifecycle of agent context files.
+  "just started a new project", "agents keep putting things in the wrong place",
+  "my skill is getting confused about its own structure", "agents don't know about
+  our workaround", "why did we implement it this way is lost", "context hasn't been
+  updated in a while", or "I just added a new module and agents don't know about it".
+  Covers the full lifecycle of agent context files.
   For README, API docs, or non-CLAUDE.md documentation, handle directly without this skill.
 ---
 
@@ -38,6 +42,11 @@ or noisy. The content may be correct, but there's too much of it. Use this when
 the user reports context files getting bloated, hitting token limits, or wanting
 to reduce context overhead without a full audit.
 
+**→ Drift** (`Workflows/Drift.md`) when the user wants to check if their context
+layer is stale without doing a full Audit. Uses git history only — no source reads,
+no haiku agents. Cheap diagnostic that tells you *which* files need Audit, not what's
+wrong with them. Run Drift before Audit to avoid auditing files that haven't changed.
+
 ## When It's Ambiguous
 
 Some requests don't clearly signal which workflow to use. Resolve by asking one question:
@@ -57,10 +66,14 @@ most common need and causes no harm if the content was already correct.
 ## Quick Reference
 
 - **Generate** → parallel haiku agents per subsystem → synthesized CLAUDE.md tree
-- **Audit** → haiku agents verify each CLAUDE.md's claims → auto-apply corrections
+- **Audit** → new-content scan + haiku agents verify claims → auto-apply corrections
 - **Prune** → content-only pass (no filesystem reads) → remove low-signal lines
+- **Drift** → git log staleness check → diagnostic report, no file changes
 - **Budget:** Root 800–1500 tokens | Subdir 200–500 tokens
 - **Auto-apply:** All workflows write changes directly — reversible via git
+- **Protected:** `## Context Maintenance` sections are never removed by Prune (see Prune Step 2.5)
+- **Scope:** All workflows support targeted mode — specify a directory to operate on just that subtree
+- **Dependency map:** Generate (targeted) maps imports + consumers → adds ## Dependencies section
 
 ## Context Files
 
@@ -88,6 +101,12 @@ most common need and causes no harm if the content was already correct.
 "Claude ignores my CLAUDE.md, it's too long"     → Prune
 "just started a new repo, agents have no clue"   → Generate
 "we refactored last week, context is now wrong"  → Audit
+
+// Scoped / targeted (operate on one directory, not the whole tree)
+"generate context for just the auth directory"   → Generate (targeted: src/auth)
+"audit only the api subdirectory's CLAUDE.md"    → Audit (targeted: src/api)
+"prune just the db context file"                 → Prune (targeted: src/db)
+"the workers module has no context yet"          → Generate (targeted: src/workers)
 
 // Redirects (handle without ContextLayer)
 "update my README"         → edit the README directly
