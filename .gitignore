@@ -62,6 +62,9 @@ skills/skill-index.json
 # Local Epic-specific skills (development only, not committed)
 skills/epic-*/
 
+# System skills (Codex-installed, not committed)
+skills/.system/
+
 # ============================================
 # IDE & TOOL SETTINGS
 # ============================================
