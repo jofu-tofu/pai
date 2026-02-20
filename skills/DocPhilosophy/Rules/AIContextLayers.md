@@ -31,6 +31,17 @@ Each layer deeper is less reliably consumed. Place critical instructions in earl
 
 ---
 
+## Writing Constraints for AI Context Files
+
+Two constraints govern what belongs in AI context files:
+
+| Constraint | Rule | Rationale |
+|------------|------|-----------|
+| **Tool-use filter** | Only document what agents cannot discover via Glob, Grep, and Read in one tool call | Modern agents actively discover file structure and contents. Context files capture *why* a non-obvious structure exists, what to avoid, and which conventions are invisible in any single file. |
+| **Multi-agent isolation** | Each context file must be interpretable in isolation — no assumed knowledge from sibling or parent files | Multiple agents work in different directories concurrently with no shared context. Design for independent consumption, not sequential reading. |
+
+---
+
 ## Layer Strategy
 
 ### Layer 1: Project Context (CLAUDE.md, AGENTS.md)
@@ -85,14 +96,14 @@ On-demand information via search, tool calls, or explicit reads. **Reliability: 
 ## The Context Budget
 
 ```
-Total context window:     200,000 tokens (typical)
-System prompt:             ~2,000 tokens
-Project context:           ~3,000 tokens  ← CLAUDE.md budget
-Conversation history:     ~50,000 tokens  ← grows during session
-Working space:           ~145,000 tokens  ← code, search results, tool output
+Total context window:   200,000–1,000,000 tokens (model-dependent)
+System prompt:                    ~2,000 tokens
+Project context:                  ~3,000 tokens  ← CLAUDE.md budget
+Conversation history:           ~50,000+ tokens  ← grows during session
+Working space:              remainder of window  ← code, search results, tool output
 ```
 
-Every token in CLAUDE.md permanently reduces working space for every interaction. Make each token earn its place.
+Larger context windows do not reduce the importance of density. Every token in CLAUDE.md permanently reduces working space for every interaction — and "lost in the middle" effects (Chroma, 2024) mean that mid-window content is retrieved less reliably regardless of total window size. Make each token earn its place.
 
 ---
 

@@ -1,8 +1,34 @@
 # CodingStandards — Skill Intent
 
-## Purpose
+> **For agents modifying this skill:** Read this document before making any changes.
 
-Provide a single, unified entry point for language-specific coding standards that previously lived in 4 separate skills (React, TypeScript, CSharp, PythonCoding). The skill is a static, indexed knowledge base — not a dynamic router.
+## First Principles
+
+1. **Static over dynamic** — Routing is deterministic table lookup, never LLM inference. File signals map to exact paths.
+2. **Language isolation** — Each language's rules, decision trees, and examples live in their own workflow and Rules/ subdirectory. No cross-language contamination.
+3. **Sharded rules** — Individual rule files in `Rules/[Language]/` load on demand. Never consolidate into monolithic files.
+4. **Parity with originals** — Each workflow must deliver the same content its predecessor skill delivered. Consolidation is structural, not reductive.
+
+## Problem This Skill Solves
+
+Four separate skills (React, TypeScript, CSharp, PythonCoding) created routing ambiguity and maintenance overhead. CodingStandards provides a single entry point that routes to isolated, self-contained language workflows — reducing skill count while preserving full content parity.
+
+## Design Decisions
+
+| Decision | Chosen Approach | Alternatives Rejected | Why |
+|---|---|---|---|
+| Routing mechanism | Static Language Lookup table with file signals | Dynamic language detection via LLM inference | Static tables are deterministic, fast, and never misroute |
+| Rule storage | Sharded individual .md files per rule per language | Single consolidated file per language | Sharded files load only what's needed; consolidation wastes context |
+| Workflow structure | Self-contained per-language workflow with decision tree | Shared decision tree with language branching | Self-contained workflows guarantee isolation and maintain parity |
+| Multi-language handling | Read both matching workflow files independently | Merged cross-language workflow | Independent reads preserve isolation principle |
+
+## Explicit Out-of-Scope
+
+1. **Dynamic language detection or LLM inference of context** — File signals in the Language Lookup table are the only routing mechanism.
+2. **Runtime routing logic or conditional loading** — No code, no conditionals, no dynamic dispatch. Static tables only.
+3. **Adding a detection layer** — This would violate the static knowledge base design.
+4. **Centralizing rule file content** — Rules stay sharded in `Rules/[Language]/` subdirectories.
+5. **Merging language content** — Each language's rules, decision trees, and examples stay isolated.
 
 ## Success Criteria
 
@@ -13,21 +39,13 @@ Provide a single, unified entry point for language-specific coding standards tha
 5. **Zero ambiguity** — Language Lookup table in SKILL.md is deterministic: explicit file signals → exact paths
 6. **Gap visibility** — LanguageIndex.md shows unsupported languages; adding new language has exactly 5 documented steps
 
-## Design Intent
+## Constraints
 
-The SKILL.md is a reference document, not a dispatcher. An invoking agent reads the Language Lookup table, identifies which language is present by file signals (not inference), and reads only the matching workflow file. No LLM reasoning is required to route.
-
-Workflow files are self-contained: each contains the decision tree, priority hierarchy, examples, and rule index from the original skill. They reference `../Rules/[Language]/` for individual rule files.
-
-## Explicit Out-of-Scope
-
-The following are explicitly **not appropriate** improvements to this skill:
-
-1. **Dynamic language detection or LLM inference of context** — The skill does not auto-detect languages. File signals in the Language Lookup table are the only routing mechanism.
-2. **Runtime routing logic or conditional loading** — No code, no conditionals, no dynamic dispatch. Static tables only.
-3. "Improving" the skill by adding a detection layer — This would violate the static knowledge base design.
-4. **Centralizing rule file content** — Rules stay sharded in `Rules/[Language]/` subdirectories. Never consolidate rules into a single file for "convenience."
-5. **Merging language content** — Each language's rules, decision trees, and examples stay isolated in their own workflow file and Rules/ subdirectory.
+1. **No dynamic routing** — All routing is via static tables. No LLM inference, no code, no conditionals.
+2. **Language isolation** — Each workflow references only its own `Rules/[Language]/` directory. Cross-language references are forbidden.
+3. **Rule sharding** — Individual rule files must remain separate. Never merge into monolithic files.
+4. **Parity preservation** — Content changes must not reduce what was available in the original per-language skills.
+5. **File signal determinism** — Every Language Lookup entry maps file signals to exactly one workflow path.
 
 ## Maintenance Lifecycle
 
@@ -36,13 +54,13 @@ To add a new language:
 2. Create `Workflows/LangName.md` with decision tree + reference to `../Rules/LangName/`
 3. Add file signal patterns to SKILL.md Language Lookup table and Workflow Routing table
 4. Add row to LanguageIndex.md supported table, remove from gaps list
-5. Run SkillForge > ValidateSkill and InvocationSim
+5. Run SkillForge > ValidateSkill
 
 To update a language's rules:
 - Edit files in `Rules/[Language]/` directly
 - Update the workflow file's rule index if rules are added/removed
-- Update count in SKILL.md Language Lookup table and LanguageIndex.md
 
 ## Version History
 
+- v1.1.0 (2026-02-19) — SkillForge audit: added First Principles, Problem, Design Decisions, Constraints sections
 - v1.0.0 (2026-02-18) — Initial creation, migrated from React, TypeScript, CSharp, PythonCoding skills

@@ -4,6 +4,12 @@
 
 **Use when:** Testing systems that include language model components — prompts, AI pipelines, RAG systems, AI agents, or any code whose correctness depends on LLM output.
 
+## Reference Material
+
+- **FIRST Principles:** `../Rules/FIRST.md`
+- **Test Pyramid:** `../Rules/TestPyramid.md`
+- **Anti-Patterns:** `../Rules/AntiPatterns.md`
+
 ---
 
 ## The Core Problem

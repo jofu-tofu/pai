@@ -4,6 +4,12 @@
 
 **Use when:** Writing or debugging tests for asynchronous operations (Promises, async/await, callbacks, event emitters, streams).
 
+## Reference Material
+
+- **FIRST Principles:** `../Rules/FIRST.md`
+- **Anti-Patterns:** `../Rules/AntiPatterns.md`
+- **Behavior Over Implementation:** `../Rules/BehaviorOverImplementation.md`
+
 ---
 
 ## The Core Problem

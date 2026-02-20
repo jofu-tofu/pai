@@ -4,6 +4,13 @@
 
 **Use when:** Evaluating whether your test suite actually catches bugs — not just whether tests pass.
 
+## Reference Material
+
+- **Mutation Testing:** `../Rules/MutationTesting.md`
+- **Property-Based Testing:** `../Rules/PropertyBasedTesting.md`
+- **FIRST Principles:** `../Rules/FIRST.md`
+- **Anti-Patterns:** `../Rules/AntiPatterns.md`
+
 ---
 
 ## The Core Problem

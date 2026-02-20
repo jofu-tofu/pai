@@ -22,33 +22,21 @@ For multi-language contexts (e.g., TypeScript + Python full-stack), read both ma
 
 ## Workflow Routing
 
-| Trigger | Workflow File |
-|---------|---------------|
-| React component, JSX, Next.js, Server Components, RSC, hydration | `Workflows/React.md` |
-| TypeScript types, tsconfig, generics, discriminated unions, Zod | `Workflows/TypeScript.md` |
-| C# class, async/await in .NET, nullable context, .csproj | `Workflows/CSharp.md` |
-| Python function, type hints, defensive programming, pyproject | `Workflows/Python.md` |
+| Workflow | Trigger | File |
+|----------|---------|------|
+| **React** | React components, JSX patterns, Next.js optimization, Server Components, hydration issues | `Workflows/React.md` |
+| **TypeScript** | TypeScript type safety, tsconfig setup, generics, discriminated unions, Zod validation | `Workflows/TypeScript.md` |
+| **CSharp** | C# class design, async/await in .NET, nullable context, .csproj configuration | `Workflows/CSharp.md` |
+| **Python** | Python type hints, defensive programming, error handling, code organization | `Workflows/Python.md` |
 
-## Design Constraint: Static Knowledge Base
+**If no language matches:** This skill only covers React, TypeScript, C#, and Python. For unsupported languages, see `LanguageIndex.md` for the gap list.
 
-This skill is a static, indexed knowledge base. It does NOT perform dynamic language detection, runtime inference, or context analysis. The Language Lookup table above is the complete dispatch mechanism — no code, no LLM inference, no "auto-detect" logic is ever appropriate here.
+## How to Use
 
-**Anti-pattern (NEVER do this):** Adding logic like "detect language from context and load appropriate rules"
-
-**Correct pattern:** Invoking workflow reads the Language Lookup table and determines which workflow file(s) to read based on explicit file signals listed in the table.
-
-## How Individual Rules Work
-
-Each workflow file references its own Rules/ subdirectory. Rule files are sharded for efficient loading — only read the rules you need.
-
-```
-1. Identify language via file signals in Language Lookup table
-2. Read matching Workflow file (e.g., Workflows/CSharp.md)
-3. Use workflow's decision tree to identify relevant category
-4. Read specific rule file(s) from Rules/[Language]/ directory
-```
-
-## Language Coverage
+1. Identify language via file signals in Language Lookup table above
+2. Read the matching Workflow file
+3. Use the workflow's decision tree to identify the relevant category
+4. Read specific rule file(s) from `Rules/[Language]/` directory
 
 See `LanguageIndex.md` for full coverage registry, gap list, and instructions for adding new languages.
 
@@ -76,4 +64,12 @@ User: "How should I handle async operations in this .NET service?"
 -> Matches C# signal (.cs, async patterns)
 -> Reads Workflows/CSharp.md
 -> Applies AsyncForIoBound, NoMixingAsyncSync, CancellationTokens rules
+```
+
+**Example 4: Python type safety**
+```
+User: "Add proper type hints to this Python module"
+-> Matches Python signal (.py, type hints)
+-> Reads Workflows/Python.md
+-> Applies TypeHintsRequired, TypeAvoidAny, TypeLiteralValues rules
 ```

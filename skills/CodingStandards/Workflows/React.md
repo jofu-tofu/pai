@@ -2,6 +2,10 @@
 
 > **Trigger:** File signals: `.tsx`, `.jsx`, React imports (`import React`, `from 'react'`), Next.js config (`next.config.*`), `use client` / `use server` directives
 
+## Purpose
+
+Apply React and Next.js coding standards covering component architecture, performance optimization, server-side patterns, and rendering best practices across 65 rules in 9 priority categories.
+
 ## Reference Material
 
 - `../Rules/React/` — 65 individual rule files across 9 categories

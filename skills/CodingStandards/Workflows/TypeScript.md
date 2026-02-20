@@ -2,6 +2,10 @@
 
 > **Trigger:** File signals: `.ts` files (non-React), `tsconfig.json`, TypeScript generics, discriminated unions, `z.infer`, `Zod` imports
 
+## Purpose
+
+Apply TypeScript coding standards covering compiler strictness, type safety, discriminated unions, generics, error handling, and runtime validation across 19 rules in 10 priority categories.
+
 ## Reference Material
 
 - `../Rules/TypeScript/` — 19 individual rule files across 10 categories

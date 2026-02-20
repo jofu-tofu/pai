@@ -1,6 +1,15 @@
 # DiagnoseTest Workflow
 
+> **Trigger:** "diagnose test", "fix test", "test breaking", "test failing after refactor"
+
 Diagnose test quality issues and provide actionable fixes. This workflow bridges TestDriven philosophy to concrete code changes.
+
+## Reference Material
+
+- **Behavior Over Implementation:** `../Rules/BehaviorOverImplementation.md`
+- **FIRST Principles:** `../Rules/FIRST.md`
+- **Test Pyramid:** `../Rules/TestPyramid.md`
+- **Characterization Tests:** `../Rules/CharacterizationTests.md`
 
 ## When to Use
 

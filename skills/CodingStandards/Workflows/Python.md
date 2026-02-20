@@ -2,6 +2,10 @@
 
 > **Trigger:** File signals: `.py`, `requirements.txt`, `pyproject.toml`, `setup.py`, `__init__.py`, `poetry.lock`, `Pipfile`
 
+## Purpose
+
+Apply Python coding standards covering defensive programming, type system usage, performance patterns, code organization, and error handling across 18 rules in 5 priority categories.
+
 ## Reference Material
 
 - `../Rules/Python/` — 18 individual rule files across 5 categories

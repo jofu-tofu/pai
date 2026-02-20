@@ -17,6 +17,8 @@ This skill provides **principles for test quality** plus **four actionable workf
 
 ## Workflow Routing
 
+When a workflow is matched, **read its file and follow the steps within it.**
+
 | Trigger | Workflow | Use When |
 |---------|----------|----------|
 | "write tests", "add tests", "test this", "how do I test" | `Workflows/WriteTests.md` | Writing tests for new or existing code |

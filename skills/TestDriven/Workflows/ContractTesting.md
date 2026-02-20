@@ -4,6 +4,12 @@
 
 **Use when:** Testing that distributed services (microservices, APIs) can communicate correctly without requiring all services to run simultaneously.
 
+## Reference Material
+
+- **Contract Testing:** `../Rules/ContractTesting.md`
+- **Test Pyramid:** `../Rules/TestPyramid.md`
+- **Test Double Taxonomy:** `../Rules/TestDoubleTaxonomy.md`
+
 ---
 
 ## The Core Problem

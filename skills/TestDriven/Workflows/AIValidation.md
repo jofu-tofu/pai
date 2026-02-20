@@ -1,6 +1,14 @@
 # AIValidation Workflow
 
+> **Trigger:** "AI refactored", "AI generated", "validate AI", "copilot", "claude refactored"
+
 Validate AI-refactored code and AI-generated tests. Ensures AI changes preserve behavior and AI tests actually catch regressions.
+
+## Reference Material
+
+- **Behavior Over Implementation:** `../Rules/BehaviorOverImplementation.md`
+- **Characterization Tests:** `../Rules/CharacterizationTests.md`
+- **FIRST Principles:** `../Rules/FIRST.md`
 
 ## When to Use
 

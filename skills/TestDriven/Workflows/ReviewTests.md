@@ -1,6 +1,15 @@
 # ReviewTests Workflow
 
+> **Trigger:** "review tests", "test quality", "PR review", "audit tests"
+
 Evaluate test quality for code review, audit, or improvement. Uses TestDriven principles to identify weak tests and suggest fixes.
+
+## Reference Material
+
+- **FIRST Principles:** `../Rules/FIRST.md`
+- **Behavior Over Implementation:** `../Rules/BehaviorOverImplementation.md`
+- **Test Pyramid:** `../Rules/TestPyramid.md`
+- **Anti-Patterns:** `../Rules/AntiPatterns.md`
 
 ## When to Use
 

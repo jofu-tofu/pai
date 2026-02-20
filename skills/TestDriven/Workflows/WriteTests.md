@@ -1,6 +1,14 @@
 # WriteTests Workflow
 
+> **Trigger:** "write tests", "add tests", "test this", "how do I test"
+
 Help developers write high-quality tests for new or existing code. Applies TestDriven principles to produce tests that survive refactoring.
+
+## Reference Material
+
+- **Behavior Over Implementation:** `../Rules/BehaviorOverImplementation.md`
+- **FIRST Principles:** `../Rules/FIRST.md`
+- **Red-Green-Refactor:** `../Rules/RedGreenRefactor.md`
 
 ## When to Use
 

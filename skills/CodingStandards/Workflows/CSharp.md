@@ -2,6 +2,10 @@
 
 > **Trigger:** File signals: `.cs`, `.csproj`, `.sln`, ASP.NET files, `using` statements, `namespace` declarations, `await`/`async` in C# context
 
+## Purpose
+
+Apply C# and .NET coding standards covering type design, null safety, async patterns, member design, and maintainability across 18 rules in 5 priority categories.
+
 ## Reference Material
 
 - `../Rules/CSharp/` — 18 individual rule files across 5 categories

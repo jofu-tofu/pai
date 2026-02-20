@@ -1,6 +1,6 @@
 ---
 name: DocPhilosophy
-description: Philosophical framework for documentation placement decisions. USE WHEN deciding where documentation belongs OR evaluating documentation strategy OR discussing context rot OR signal-to-noise in docs OR AI agent context layers OR choosing between codebase docs and knowledge base OR documentation architecture OR ADR placement OR docs-as-code philosophy. Contains 7 principles from authoritative sources for documentation that survives and serves.
+description: Philosophical framework for documentation placement decisions. USE WHEN deciding where documentation belongs OR evaluating doc placement strategy OR discussing context rot OR signal-to-noise in docs OR AI context file design OR docs going unread OR codebase vs knowledge base OR doc placement architecture OR ADR placement OR docs-as-code philosophy. Contains 7 principles from authoritative sources for documentation that survives and serves.
 ---
 
 # DocPhilosophy
@@ -32,7 +32,7 @@ When both forces align, documentation thrives. When they diverge, it rots. Every
 | **Ownership** | Every doc needs exactly one accountable owner | Ownerless docs die within months |
 | **Signal Density** | Small, dense docs outperform large, comprehensive ones | Cognitive load kills consumption |
 
-Every placement decision satisfies all three. No exceptions.
+Every placement decision satisfies all three. When tensions arise — e.g., Proximity pushes toward inline comments but Signal Density warns against bloat — resolve in favor of the law whose violation causes faster decay. Proximity violations rot in months; Signal Density violations reduce consumption immediately. Judge by the specific scenario.
 
 **Signal Density for AI context files:** Root-level files are always-on — permanent token cost per interaction. Directory-level files are on-demand — cost paid only during scoped work. Apply a stricter density and falsifiability bar to root content than to directory-local content.
 
@@ -102,11 +102,7 @@ Instructions shaping AI agent behavior: CLAUDE.md, AGENTS.md, skill files, syste
 
 These are documentation *for* agents operating within the system — not documentation *about* the system. Different audience, different density requirements.
 
-**Constraint:** Context windows are finite. Every low-value token displaces a high-value one. See `Rules/AIContextLayers.md`.
-
-**Tool-use filter:** Modern agents actively call Glob, Grep, and Read to discover file structure and contents. AI context files capture only what tool use cannot reveal — why a non-obvious structure exists, what to avoid, which conventions govern without being visible in any single file. If an agent can discover a fact in one tool call, that fact does not belong in the context file.
-
-**Multi-agent constraint:** Multiple agents work in different directories of the same codebase concurrently, with no shared context. Each AI context file must be interpretable in isolation — it cannot assume the reader has seen sibling or parent files. Design for independent consumption, not sequential reading.
+**Constraint:** Context windows are finite. Every low-value token displaces a high-value one. See `Rules/AIContextLayers.md` for the full context layer model, writing constraints (tool-use filter, multi-agent isolation), and budget guidance.
 
 ### 3. Architecture Decision Records (ADRs)
 
@@ -131,13 +127,13 @@ Onboarding material, API reference, contribution guides, deployment procedures �
 
 Human-readable insights, learning notes, cross-project patterns, personal reflections.
 
-**Rule:** If it's meant to be read by me → Obsidian. If it's meant to be read by the codebase (developers or agents) → in the codebase.
+**Rule:** Personal insights go to personal KB; codebase knowledge stays in the codebase. See `Rules/KnowledgeIsPerishable.md` for the Obsidian Principle and externalization guidance.
 
 ### 6. Living Design Docs
 
 Design documents that evolve as understanding deepens. Unlike ADRs (immutable records), these track *current* design thinking.
 
-**Warning:** Most susceptible to context rot. Require active ownership and scheduled review to survive.
+**Warning:** Most susceptible to context rot. Require active ownership and review on the cadence defined in `Rules/ContextRotIsReal.md` (fresh <3 months, aging 3-6, stale 6-12, rotten 12+) to survive.
 
 ---
 
