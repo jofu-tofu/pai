@@ -1,6 +1,6 @@
 # Retrospective Workflow
 
-> **Trigger:** "retrospective on skill", "analyze skill performance", "improve skill based on session", "review skill usage"
+> **Trigger:** "retrospective on skill", "run a retrospective on skill", "run a retrospective on the [name] skill", "run retrospective", "do a retrospective on skill", "do a retrospective on the [name] skill", "skill retrospective", "analyze skill performance", "review skill usage"
 
 ## Reference Material
 
@@ -12,6 +12,8 @@
 ## Purpose
 
 Analyze the current session to identify skills that were invoked, evaluate their performance, and suggest improvements to the skill based on observed usage patterns, gaps, or issues encountered during execution.
+
+**Not this workflow if:** User wants criteria-based improvement without session context (→ ImproveSkill), wants a structural/organizational analysis (→ WorkflowDecompose), or wants a comprehensive health check across all dimensions (→ AuditSkill).
 
 ## Context & Motivation
 
@@ -170,7 +172,7 @@ Request explicit confirmation:
 **Execute changes in order:**
 
 1. **Additive changes** (if approved)
-   - Add new workflows using ManageWorkflows workflow
+   - Add new workflows using RefactorSkill workflow (Quick Operations)
    - Add trigger phrases to SKILL.md description
    - Add examples to SKILL.md
 
@@ -236,8 +238,8 @@ After applying session-based improvements, check whether content placement is st
 
 If **any** answer is yes:
 ```
-Organization signal found — consider running WorkflowDecompose for a placement analysis.
-Would you like to run WorkflowDecompose on [SkillName] now? (yes / no / later)
+Organization signal found — consider running ExplainSkill for a placement analysis.
+Would you like to run ExplainSkill on [SkillName] now? (yes / no / later)
 ```
 
 If all answers are no: skip silently — no output needed.
@@ -295,8 +297,8 @@ After completing this workflow, evaluate these chain conditions:
 
 | Condition | Chain To | Action |
 |---|---|---|
-| Improvement recommendations require content changes | ModifyContent | Announce: "Running ModifyContent to apply recommended changes..." then execute `Workflows/ModifyContent.md` |
-| Session reveals a missing workflow that should be added | ManageWorkflows | Announce: "Running ManageWorkflows to add the missing workflow..." then execute `Workflows/ManageWorkflows.md` |
+| Improvement recommendations require content changes | ModifyContent | Announce: "Running ModifyContent to apply recommended changes..." then execute `Workflows/Author/ModifyContent.md` |
+| Session reveals a missing workflow or structural issue | RefactorSkill | Announce: "Running RefactorSkill to address workflow/structural changes..." then execute `Workflows/Author/RefactorSkill.md` |
 
 **Chain Decision Log (MANDATORY — SC7):**
 Log one line per chain in the table above, regardless of outcome:

@@ -1,11 +1,12 @@
 # RefactorSkill Workflow
 
-> **Trigger:** "refactor skill", "restructure skill", "reorganize skill", "major skill update"
+> **Trigger:** "refactor skill", "restructure skill", "reorganize skill", "major skill update", "add workflow to skill", "add workflow", "remove workflow", "rename workflow", "create workflow"
 
 ## Reference Material
 
 - **Risk Framework:** `../../Standards/RiskFramework.md`
 - **Authoritative Spec:** `../../Standards/SkillSystem.md`
+- **Prompting Standards:** `../../Standards/PromptingStandards.md` — Wording and trigger phrase quality rules. Read before writing trigger phrases for new workflows.
 - **Target skill's SkillIntent.md** (if present) — Read before restructuring; changes must not contradict the skill's stated out-of-scope decisions or constraints.
 - `../../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
 - **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
@@ -25,6 +26,163 @@ Skills accumulate technical debt over time: naming conventions drift, workflows 
 - User approval required before executing changes
 
 ## Workflow Steps
+
+### Scope Detection — Quick vs. Full Refactor
+
+Before beginning, determine the scope of the request:
+
+| User Intent | Scope | Entry Point |
+|-------------|-------|-------------|
+| "Add a workflow", "remove workflow", "rename workflow", "create workflow" | **Quick** — single workflow operation | Jump to **Quick Operations** below |
+| "Refactor skill", "restructure", "reorganize", "major update" | **Full** — multi-file restructuring | Continue to **Step 1** below |
+
+If the user's intent is ambiguous, ask:
+```
+Is this a quick workflow operation (add/remove/rename) or a broader restructuring?
+  [Q] Quick — single workflow change
+  [F] Full — structural refactoring
+```
+
+---
+
+## Quick Operations
+
+For adding, removing, or renaming individual workflows. These are lightweight operations that don't require full structural analysis.
+
+### Add Workflow
+
+#### Step Q-A1: Determine Workflow Details
+
+Gather from user:
+- Workflow name (enforce TitleCase)
+- Trigger phrase(s)
+- Purpose/description
+
+#### Step Q-A2: Create Workflow File
+
+Create `$PAI_DIR/skills/[SkillName]/Workflows/[WorkflowName].md`:
+
+```markdown
+# [WorkflowName] Workflow
+
+> **Trigger:** "[trigger phrases]"
+
+## Purpose
+
+[Description of what this workflow does]
+
+## Workflow Steps
+
+### Step 1: [First Step]
+
+[Instructions]
+
+### Step 2: [Second Step]
+
+[Instructions]
+
+## Example Output
+
+\`\`\`
+SUMMARY: [What was done]
+ACTIONS: [Steps taken]
+RESULTS: [Outcome]
+COMPLETED: [Brief completion message]
+\`\`\`
+```
+
+#### Step Q-A2.5: Trigger Phrase Quality Gate
+
+Before writing trigger phrases into the workflow file or routing table, verify them against `PromptingStandards.md` (in this skill's root dir).
+
+Check each proposed trigger phrase against:
+- [ ] **Length**: 2-6 words. Longer phrases are fragile; single words over-trigger.
+- [ ] **Natural language**: Would a real user say this unprompted? Test by imagining saying it aloud.
+- [ ] **Specificity**: Does the phrase unambiguously indicate THIS workflow and not another?
+- [ ] **Overlap check**: Compare against all existing trigger phrases in the target skill's SKILL.md routing table. No semantic duplicates.
+- [ ] **Verb clarity**: The phrase should make the intended action obvious (add, remove, rename, validate, etc.)
+
+If any phrase fails: revise before proceeding. Document the rejected phrase and reason in the summary output.
+
+#### Step Q-A3: Update Routing Table
+
+Add row to `## Workflow Routing` table in SKILL.md:
+
+```markdown
+| **[WorkflowName]** | "[trigger]" | `Workflows/[WorkflowName].md` |
+```
+
+#### Step Q-A4: Validate
+
+- Verify file was created
+- Verify routing table entry points to existing file
+- Run skill validation
+
+---
+
+### Remove Workflow
+
+#### Step Q-R1: Confirm Deletion
+
+Request user confirmation before deletion to prevent accidental loss of workflow logic.
+
+```
+WARNING: This will permanently delete:
+  - $PAI_DIR/skills/[SkillName]/Workflows/[WorkflowName].md
+
+Type "confirm" to proceed.
+```
+
+#### Step Q-R2: Remove File
+
+```bash
+rm $PAI_DIR/skills/[SkillName]/Workflows/[WorkflowName].md
+```
+
+#### Step Q-R3: Update Routing Table
+
+Remove the corresponding row from `## Workflow Routing` table in SKILL.md.
+
+#### Step Q-R4: Validate
+
+- Verify file was deleted
+- Verify no orphan references remain in SKILL.md
+
+---
+
+### Rename Workflow
+
+#### Step Q-N1: Validate New Name
+
+- Enforce TitleCase
+- Check new name doesn't conflict with existing workflow
+
+#### Step Q-N2: Rename File
+
+```bash
+mv $PAI_DIR/skills/[SkillName]/Workflows/[OldName].md \
+   $PAI_DIR/skills/[SkillName]/Workflows/[NewName].md
+```
+
+#### Step Q-N3: Update File Content
+
+Update the `# [WorkflowName] Workflow` header inside the file.
+
+#### Step Q-N4: Update Routing Table
+
+Update the workflow name and file path in SKILL.md routing table.
+
+#### Step Q-N5: Validate
+
+- Verify old file no longer exists
+- Verify new file exists
+- Verify routing table points to correct file
+
+---
+
+## Full Refactor
+
+For major restructuring that affects multiple files or the overall skill architecture.
 
 ### Step 1: Document Current State
 

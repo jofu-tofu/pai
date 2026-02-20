@@ -8,6 +8,7 @@
 
 - `../../Standards/RiskFramework.md` — Change risk classification guide. Canonicalization involves file renames (Medium risk) and potential structural changes (Medium-High). Read before Step 4 to classify planned changes and confirm user approval level.
 - `../../Standards/SkillSystem.md` — Canonical structure spec (also read in Step 1).
+- `../../Standards/PromptingStandards.md` — Wording and trigger phrase quality rules. Read when routing table or trigger phrases are modified (Step 10.5).
 - `../../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
 
 ---
@@ -126,15 +127,15 @@ mv sync_repo.md SyncRepo.md
 
 ## Step 5: Enforce Flat Folder Structure
 
-**CRITICAL: Maximum 2 levels deep - `skills/SkillName/Category/`**
+**CRITICAL: Maximum 3 levels deep from skill root - `SkillName/Category/SubFolder/file.md`**
 
 ### Check for Nested Folders
 
 Scan for folders deeper than 2 levels:
 
 ```bash
-# Find any folders 3+ levels deep (FORBIDDEN)
-find $PAI_DIR/skills/[SkillName]/ -type d -mindepth 2 -maxdepth 3
+# Find any folders 4+ levels deep (FORBIDDEN — max 3 levels from skill root)
+find $PAI_DIR/skills/[SkillName]/ -type d -mindepth 3
 ```
 
 ### Common Violations to Fix
@@ -289,6 +290,19 @@ User: "[Different request]"
 ```
 
 Place the Examples section after Workflow Routing.
+
+---
+
+## Step 10.5: Prompt Quality Gate
+
+If the canonicalization modified routing table entries or trigger phrases, verify them against `../../Standards/PromptingStandards.md`:
+
+- [ ] Each trigger phrase is 2–6 words
+- [ ] No phrase overlaps semantically with another workflow's triggers
+- [ ] Each phrase is something a real user would naturally say
+- [ ] USE WHEN clause in description contains concrete signal words
+
+If this step is skipped (no routing changes were made), record the reason.
 
 ---
 

@@ -1,6 +1,6 @@
 # ImproveSkill — SkillForge Workflow
 
-> **Trigger:** "improve skill", "make skill better", "what's wrong with this skill", "how can we improve this skill", "audit and fix skill", "fix what's wrong with skill", "comprehensive skill improvement"
+> **Trigger:** "improve skill", "make skill better", "what's wrong with this skill", "how can we improve this skill", "diagnose and fix skill", "fix what's wrong with skill", "comprehensive skill improvement"
 
 > **Purpose:** Comprehensive skill improvement driven by evaluating the target skill against its own Success Criteria AND content coherence. Unlike Retrospective (which is session-based and inductive), ImproveSkill is deductive: it starts from stated criteria, adds content coherence analysis via ContentAudit, and works backward to find gaps across both dimensions.
 
@@ -17,7 +17,7 @@
 - "Make this skill better"
 - "What's wrong with this skill?"
 - "How can we improve the X skill?"
-- "Audit and fix this skill"
+- "Diagnose and fix this skill"
 - "Fix what's wrong with this skill"
 - "Comprehensive skill improvement"
 - User wants directional improvement but doesn't know where to start
@@ -82,7 +82,7 @@ For each opportunity:
 - One-sentence description of the gap
 - Proposed fix (what would change)
 - Risk level per `../../Standards/RiskFramework.md`
-- Which workflow would apply the fix (ModifyContent, ManageWorkflows, RefactorSkill)
+- Which workflow would apply the fix (ModifyContent, RefactorSkill)
 
 ### Step 5 — Optional Deep Analysis
 
@@ -106,8 +106,7 @@ Ask user to select which improvements to apply.
 
 For each selected improvement, chain to the appropriate workflow:
 - Content changes → `ModifyContent`
-- New/removed workflows → `ManageWorkflows`
-- Structural reorganization → `RefactorSkill`
+- New/removed workflows or structural reorganization → `RefactorSkill`
 
 Execute chains sequentially. Each chained workflow runs its own Follow-Up chains (full cascade per WorkflowChains.md rules).
 
@@ -121,13 +120,11 @@ Evaluate all chains below. Log each using SC7 format before announcing execution
 |---|---|---|
 | AgentEvalOrchestrator(full) | ALWAYS after SC evaluation completes (Step 3) | Always |
 | ModifyContent | IF user selected content improvements in Step 6 | Conditional |
-| ManageWorkflows | IF user selected workflow additions/removals in Step 6 | Conditional |
-| RefactorSkill | IF user selected structural changes in Step 6 | Conditional |
+| RefactorSkill | IF user selected workflow additions/removals or structural changes in Step 6 | Conditional |
 
 **Chain Decision Log (mandatory per SC7):**
 ```
 Chain AgentEvalOrchestrator(full): condition [true] — [fired]
 Chain ModifyContent: condition [true/false] — [fired/skipped]
-Chain ManageWorkflows: condition [true/false] — [fired/skipped]
 Chain RefactorSkill: condition [true/false] — [fired/skipped]
 ```

@@ -1,6 +1,6 @@
-# ContentAudit — SkillForge Workflow
+# ContentAudit — SkillForge Internal Workflow
 
-> **Trigger:** "content audit skill", "check skill content quality", "audit skill content"
+> **Internal workflow** — used as methodology by the Content Coherence evaluation agent in `AgentEvalOrchestrator`. Not a user-facing workflow. Do not add to SKILL.md routing table.
 
 > **Purpose:** Evaluate whether a skill's content semantically delivers on its stated purpose. This is the quality dimension that structural checks (ValidateSkill, StressTest) and routing checks (InvocationSim) cannot see: does the skill's actual content make sense, cohere internally, and fulfill the SkillIntent?
 

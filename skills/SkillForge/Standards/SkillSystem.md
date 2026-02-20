@@ -139,7 +139,7 @@ SkillName/                    # TitleCase directory name
 - NEVER create `Context/`, `Docs/`, `Resources/`, or `backups/` subdirectories (blocklist)
 - Any other TitleCase sub-folder name is allowed — names should describe the folder's purpose
 - `Tools/` directory MUST always be present (create empty if no tools yet)
-- Maximum directory depth: 3 levels (`SkillName/Workflows/Author/file.md`)
+- Maximum directory depth: 3 levels from skill root (`SkillName/Category/SubFolder/file.md`) — applies to Workflows/, context sub-folders, and Orchestration/ alike
 
 ---
 

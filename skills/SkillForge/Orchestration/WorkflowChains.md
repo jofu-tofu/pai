@@ -21,17 +21,18 @@ Evaluation rubrics live in `Orchestration/Rubrics/` — one file per dimension.
 | CreateSkill | CreateSkillIntent | ALWAYS after creation | Always |
 | CanonicalizeSkill | AgentEvalOrchestrator(scoped) | ALWAYS — changes: "file structure reorganized" | Always |
 | ModifyContent | AgentEvalOrchestrator(scoped) | ALWAYS — changes: passed from ModifyContent (what was edited) | Always |
-| ManageWorkflows | AgentEvalOrchestrator(scoped) | ALWAYS — changes: "workflow added/removed/renamed" | Always |
-| RefactorSkill | AgentEvalOrchestrator(scoped) | ALWAYS — changes: "major restructure" | Always |
+| RefactorSkill | AgentEvalOrchestrator(scoped) | ALWAYS — changes: "restructure or workflow topology change" | Always |
 | AuditSkill | AgentEvalOrchestrator(full) | ALWAYS (Step 2) | Always |
 | ImproveSkill | AgentEvalOrchestrator(full) | ALWAYS after SC evaluation | Always |
+| ExplainSkill | WorkflowDecompose(internal) | ALWAYS — delegates analysis to internal engine | Always |
 | Retrospective | ModifyContent | IF improvement recommendations require content changes | Conditional |
-| Retrospective | ManageWorkflows | IF session reveals a missing workflow | Conditional |
-| WorkflowDecompose | RefactorSkill | IF analysis reveals structural issues | Conditional |
+| Retrospective | RefactorSkill | IF session reveals a missing workflow or structural issue | Conditional |
+| WorkflowDecompose | RefactorSkill | IF analysis reveals structural issues (internal chain only) | Conditional |
 | AuditSkill | ImproveSkill | IF audit found WARN or FAIL results and user wants to act | Conditional |
 | ImproveSkill | ModifyContent | IF user selected content improvements | Conditional |
-| ImproveSkill | ManageWorkflows | IF user selected workflow additions/removals | Conditional |
-| ImproveSkill | RefactorSkill | IF user selected structural changes | Conditional |
+| ImproveSkill | RefactorSkill | IF user selected workflow additions/removals or structural changes | Conditional |
+| ExplainSkill | ImproveSkill | IF user chose to address issues found | Conditional |
+| ExplainSkill | RefactorSkill | IF user chose to restructure | Conditional |
 
 ## Chaining Rules
 
@@ -53,23 +54,25 @@ CanonicalizeSkill ──→ AgentEvalOrchestrator(scoped: "file structure reorga
 
 ModifyContent ──→ AgentEvalOrchestrator(scoped: change details)
 
-ManageWorkflows ──→ AgentEvalOrchestrator(scoped: "workflow added/removed/renamed")
+RefactorSkill ──→ AgentEvalOrchestrator(scoped: "restructure or workflow topology change")
 
-RefactorSkill ──→ AgentEvalOrchestrator(scoped: "major restructure")
+ExplainSkill ──┬──→ WorkflowDecompose(internal: analysis engine)
+               ├──→ ImproveSkill (conditional) ──→ AgentEvalOrchestrator(full)
+               └──→ RefactorSkill (conditional) ──→ AgentEvalOrchestrator(scoped)
 
 Retrospective ──┬──→ ModifyContent (conditional) ──→ AgentEvalOrchestrator(scoped)
-                └──→ ManageWorkflows (conditional) ──→ AgentEvalOrchestrator(scoped)
+                └──→ RefactorSkill (conditional) ──→ AgentEvalOrchestrator(scoped)
 
-WorkflowDecompose ──→ RefactorSkill (conditional) ──→ AgentEvalOrchestrator(scoped)
+WorkflowDecompose ──→ RefactorSkill (conditional, internal chain only) ──→ AgentEvalOrchestrator(scoped)
 
 AuditSkill ──┬──→ AgentEvalOrchestrator(full) [Step 2]
              └──→ ImproveSkill (conditional) ──→ AgentEvalOrchestrator(full)
 
 ImproveSkill ──┬──→ AgentEvalOrchestrator(full) [Step 3.5]
                ├──→ ModifyContent (conditional) ──→ AgentEvalOrchestrator(scoped)
-               ├──→ ManageWorkflows (conditional) ──→ AgentEvalOrchestrator(scoped)
                └──→ RefactorSkill (conditional) ──→ AgentEvalOrchestrator(scoped)
 
+Internal workflows (not in SKILL.md routing): WorkflowDecompose
 Terminal nodes (no outgoing chains): AgentEvalOrchestrator, CreateSkillIntent
 No cycles — all paths terminate at AgentEvalOrchestrator or CreateSkillIntent.
 ```
@@ -83,11 +86,11 @@ When modifying a workflow, these downstream workflows may be affected:
 | CreateSkill | AgentEvalOrchestrator(scoped), CreateSkillIntent |
 | CanonicalizeSkill | AgentEvalOrchestrator(scoped) |
 | ModifyContent | AgentEvalOrchestrator(scoped) |
-| ManageWorkflows | AgentEvalOrchestrator(scoped) |
 | RefactorSkill | AgentEvalOrchestrator(scoped) |
-| Retrospective | ModifyContent (and its chains), ManageWorkflows (and its chains) |
-| WorkflowDecompose | RefactorSkill (and its chains) |
+| ExplainSkill | WorkflowDecompose(internal), ImproveSkill (and its chains), RefactorSkill (and its chains) |
+| Retrospective | ModifyContent (and its chains), RefactorSkill (and its chains) |
+| WorkflowDecompose | RefactorSkill (and its chains) — internal workflow, not user-facing |
 | AuditSkill | AgentEvalOrchestrator(full), ImproveSkill (and its chains) |
-| ImproveSkill | AgentEvalOrchestrator(full), ModifyContent (and its chains), ManageWorkflows (and its chains), RefactorSkill (and its chains) |
+| ImproveSkill | AgentEvalOrchestrator(full), ModifyContent (and its chains), RefactorSkill (and its chains) |
 | AgentEvalOrchestrator | (terminal — no downstream) |
 | CreateSkillIntent | (terminal — no downstream) |

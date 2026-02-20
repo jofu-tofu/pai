@@ -1,13 +1,13 @@
 ---
 name: SkillForge
-description: Create, modify, and maintain skills. USE WHEN create skill OR new skill OR update skill OR update the skill OR update the [name] skill OR edit skill OR review skill OR improve skill OR improve the [name] skill OR change skill OR change the skill OR change the [name] skill OR tweak skill OR adjust skill OR add workflow OR remove workflow OR modify skill OR refactor skill OR canonicalize skill OR fix skill structure OR optimize skill prompts OR skill maintenance OR retrospective OR run retrospective OR run a retrospective on skill OR run a retrospective on the [name] skill OR do a retrospective on skill OR do a retrospective on the [name] skill OR skill retrospective OR analyze skill performance OR analyze skill structure OR skill not triggering OR audit skill OR audit the [name] skill OR content audit skill OR comprehensive skill check OR improve skill against criteria OR what's wrong with this skill OR look at skill OR check skill OR audit and fix skill.
+description: Create, modify, and maintain skills. USE WHEN create skill OR new skill OR update skill OR update the skill OR update the [name] skill OR edit skill OR improve skill OR improve the [name] skill OR change skill OR change the skill OR change the [name] skill OR tweak skill OR adjust skill OR add workflow OR remove workflow OR modify skill OR refactor skill OR canonicalize skill OR fix skill structure OR retrospective OR run retrospective OR run a retrospective on skill OR run a retrospective on the [name] skill OR do a retrospective on skill OR do a retrospective on the [name] skill OR skill retrospective OR analyze skill performance OR analyze skill structure OR skill not triggering OR audit skill OR audit the [name] skill OR comprehensive skill check OR improve skill against criteria OR what's wrong with this skill OR diagnose and fix skill.
 ---
 
 # SkillForge
 
 Unified skill lifecycle framework: creating, modifying, validating, and canonicalizing skills in the PAI system.
 
-> **For agents modifying ANY skill (including SkillForge itself):** Modify skill triggers, descriptions, and workflow routing through SkillForge workflows (ModifyContent, ManageWorkflows, RefactorSkill) — direct Edit bypasses quality gate chains. Typo or formatting fixes may use direct Edit.
+> **For agents modifying ANY skill (including SkillForge itself):** Modify skill triggers, descriptions, and workflow routing through SkillForge workflows (ModifyContent, RefactorSkill) — direct Edit bypasses quality gate chains. Typo or formatting fixes may use direct Edit.
 
 ## Workflow Routing
 
@@ -31,8 +31,7 @@ For creating, modifying, and restructuring skills.
 | **CreateSkill** | "create a new skill", "new skill", "build a skill", "make a skill" | `Workflows/Author/CreateSkill.md` |
 | **CanonicalizeSkill** | "canonicalize skill", "fix skill structure", "convert skill format", "skill naming wrong" | `Workflows/Author/CanonicalizeSkill.md` |
 | **ModifyContent** | "update skill content", "update the skill", "update the [name] skill", "update skill to", "change the skill", "change the [name] skill", "change skill", "edit skill description", "change skill frontmatter", "tweak skill", "adjust skill" | `Workflows/Author/ModifyContent.md` |
-| **ManageWorkflows** | "add workflow to skill", "add workflow", "remove workflow", "rename workflow", "create workflow" | `Workflows/Author/ManageWorkflows.md` |
-| **RefactorSkill** | "refactor skill", "restructure skill", "reorganize skill", "major skill update" | `Workflows/Author/RefactorSkill.md` |
+| **RefactorSkill** | "refactor skill", "restructure skill", "reorganize skill", "major skill update", "add workflow", "remove workflow", "rename workflow", "create workflow" | `Workflows/Author/RefactorSkill.md` |
 
 ### Quality Workflows
 
@@ -40,11 +39,10 @@ For understanding, improving, auditing, and diagnosing skills.
 
 | Workflow | Trigger | File |
 |----------|---------|------|
-| **ImproveSkill** | "improve skill", "make skill better", "what's wrong with this skill", "how can we improve this skill", "audit and fix skill", "fix what's wrong with skill", "comprehensive skill improvement" | `Workflows/Quality/ImproveSkill.md` |
+| **ImproveSkill** | "improve skill", "make skill better", "what's wrong with this skill", "how can we improve this skill", "diagnose and fix skill", "fix what's wrong with skill", "comprehensive skill improvement" | `Workflows/Quality/ImproveSkill.md` |
 | **AuditSkill** | "audit skill", "full skill health check", "comprehensive skill check", "run all checks on skill" | `Workflows/Quality/AuditSkill.md` |
 | **Retrospective** | "retrospective on skill", "run a retrospective on skill", "run a retrospective on the [name] skill", "run retrospective", "do a retrospective on skill", "do a retrospective on the [name] skill", "skill retrospective", "analyze skill performance", "review skill usage" | `Workflows/Quality/Retrospective.md` |
-| **WorkflowDecompose** | "decompose skill", "skill usage analysis", "analyze skill structure" | `Workflows/Quality/WorkflowDecompose.md` |
-| **ContentAudit** | "content audit skill", "check skill content quality", "audit skill content" | `Workflows/Quality/ContentAudit.md` |
+| **ExplainSkill** | "explain skill", "analyze skill structure", "skill usage analysis", "how does this skill work", "decompose skill" | `Workflows/Quality/ExplainSkill.md` |
 
 ## Examples
 
@@ -73,7 +71,7 @@ User: "Improve the Browser skill"
 ```
 User: "Audit the Research skill"
 -> Invokes AuditSkill workflow
--> Runs all 6 audit phases, produces composite PASS/WARN/FAIL report
+-> Dispatches 7 evaluation agents across quality dimensions, produces composite PASS/WARN/FAIL report
 ```
 
 **Example 5: Diagnose why a skill isn't triggering**

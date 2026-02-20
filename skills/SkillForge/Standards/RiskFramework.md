@@ -2,7 +2,7 @@
 
 Change categorization and risk assessment guide for skill modifications.
 
-Used by: `RefactorSkill.md`, `Retrospective.md`, `ModifyContent.md`, `ManageWorkflows.md`, `CanonicalizeSkill.md`
+Used by: `RefactorSkill.md`, `Retrospective.md`, `ModifyContent.md`, `CanonicalizeSkill.md`
 
 ---
 

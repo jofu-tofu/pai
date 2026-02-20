@@ -1,6 +1,7 @@
 # WorkflowDecompose Workflow
 
-> **Trigger:** "decompose skill", "skill usage analysis", "analyze skill structure", "how is this skill structured", "audit skill structure"
+> **Internal workflow** — not directly user-facing. Called by ExplainSkill and other workflows.
+> Former triggers ("decompose skill", "skill usage analysis", "analyze skill structure") now route through ExplainSkill.
 
 ## Reference Material
 
@@ -9,6 +10,8 @@
 ## Purpose
 
 Analyze a skill's file structure to understand what files exist, which load in which situations, where content is misplaced, and where coverage gaps exist. Produces a concrete structure report with optional remediation.
+
+**Not this workflow if:** User wants to improve skill quality against criteria (→ ImproveSkill), wants a comprehensive multi-dimension audit (→ AuditSkill), or wants to apply specific content changes they already identified (→ ModifyContent).
 
 The goal is **organizational clarity**, not token savings. A skill should be as complete as its content requires. Content should live where it will actually be found and used — that's the standard for placement decisions.
 
@@ -156,7 +159,7 @@ After completing this workflow, evaluate these chain conditions:
 
 | Condition | Chain To | Action |
 |---|---|---|
-| Analysis reveals structural issues needing action | RefactorSkill | Announce: "Running RefactorSkill to address structural issues found..." then execute `Workflows/RefactorSkill.md` |
+| Analysis reveals structural issues needing action | RefactorSkill | Announce: "Running RefactorSkill to address structural issues found..." then execute `Workflows/Author/RefactorSkill.md` |
 
 **Chain Decision Log (MANDATORY — SC7):**
 Log one line per chain in the table above, regardless of outcome:

@@ -1,6 +1,6 @@
 # ModifyContent Workflow
 
-> **Trigger:** "update skill content", "edit skill description", "change skill frontmatter"
+> **Trigger:** "update skill content", "update the skill", "update the [name] skill", "update skill to", "change the skill", "change the [name] skill", "change skill", "edit skill description", "change skill frontmatter", "tweak skill", "adjust skill"
 
 ## Reference Material
 

@@ -75,7 +75,7 @@ Every skill exiting a SkillForge workflow satisfies these:
 
 These must remain true through any refactoring or content update:
 
-1. **Self-application required** — SkillForge applies its own workflows to itself. Changes to SkillForge's files must route through ModifyContent, ManageWorkflows, or RefactorSkill (not direct edits) so that every gate fires on the skill itself.
+1. **Self-application required** — SkillForge applies its own workflows to itself. Changes to SkillForge's files must route through ModifyContent or RefactorSkill (not direct edits) so that every gate fires on the skill itself.
 2. **User-confirmed deletion** — Removing files or routing rows requires explicit user confirmation in every case.
 3. **Atomic changes** — Multi-step changes either complete fully or roll back; no partial states.
 4. **Validation as a gate** — Any workflow that modifies skill structure must offer or run ValidateSkill after changes.
