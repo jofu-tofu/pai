@@ -35,11 +35,5 @@
 ### Function to Optimize
 Produce persuasive, accurate, audience-appropriate decks with predictable delivery quality.
 
-### Rebuilt Architecture
-1. Build a format-neutral `Presentation Brief` first.
-2. Render the brief through HTML or PPT workflow.
-3. Apply one shared quality checklist.
-4. Repurpose through content structure before style transfer.
-
 ### Key Insight
-Message structure is the durable asset; HTML and PPT are renderers.
+Message structure is the durable asset; HTML and PPT are renderers. The CreatePresentation workflow implements the full pipeline from brief through format-specific rendering.

@@ -1,6 +1,11 @@
 # RepurposePresentation Workflow
 
-> **Trigger:** "convert presentation", "html to ppt", "ppt to html"
+> **Trigger:** "convert presentation", "html to ppt", "ppt to html", "html to powerpoint", "powerpoint to html", "turn into powerpoint"
+
+## Scope
+
+**Best fit for:** Converting an existing presentation between HTML and PPT formats while preserving message hierarchy.
+**Route to:** `CreatePresentation` for building a new deck from scratch. `ReviewPresentation` for quality-checking an existing deck without format conversion. Conversion produces a fidelity risk log — for pixel-identical reproduction, inform the user that lossless round-trip conversion is outside scope.
 
 ## Reference Material
 

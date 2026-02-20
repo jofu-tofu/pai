@@ -1,6 +1,11 @@
 # CreatePresentation Workflow
 
-> **Trigger:** "create presentation", "build slide deck", "make deck"
+> **Trigger:** "create presentation", "build slide deck", "make deck", "make a slideshow", "generate slides"
+
+## Scope
+
+**Best fit for:** New presentations where content strategy, format selection, and narrative structure are all needed from scratch.
+**Route to:** `CreateHtmlPresentation` for browser-ready HTML when format is already decided. `CreatePptPresentation` for PowerPoint when format is already decided. `RepurposePresentation` for converting an existing deck between formats. `ReviewPresentation` for quality-checking an existing deck. For graphic design services, proprietary vendor templates, or deep background research, use dedicated skills instead.
 
 ## Reference Material
 

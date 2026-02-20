@@ -21,10 +21,10 @@ Running the **WorkflowName** workflow from the **PresentationForge** skill...
 
 | Workflow | Trigger | File |
 |----------|---------|------|
-| **CreatePresentation** | "create presentation", "build slide deck", "make deck" | `Workflows/CreatePresentation.md` |
-| **CreateHtmlPresentation** | "create html slides", "build web slides", "lightweight presentation" | `Workflows/CreateHtmlPresentation.md` |
-| **CreatePptPresentation** | "create ppt deck", "create powerpoint deck", "professional presentation" | `Workflows/CreatePptPresentation.md` |
-| **RepurposePresentation** | "convert presentation", "html to ppt", "ppt to html" | `Workflows/RepurposePresentation.md` |
+| **CreatePresentation** | "create presentation", "build slide deck", "make deck", "make a slideshow", "generate slides" | `Workflows/CreatePresentation.md` |
+| **CreateHtmlPresentation** | "create html slides", "build web slides", "create lightweight slides" | `Workflows/CreateHtmlPresentation.md` |
+| **CreatePptPresentation** | "create ppt deck", "create powerpoint deck", "create professional deck" | `Workflows/CreatePptPresentation.md` |
+| **RepurposePresentation** | "convert presentation", "html to ppt", "ppt to html", "html to powerpoint", "powerpoint to html", "turn into powerpoint" | `Workflows/RepurposePresentation.md` |
 | **ReviewPresentation** | "review presentation", "polish slide deck", "presentation quality check" | `Workflows/ReviewPresentation.md` |
 
 ## Context Files
@@ -42,7 +42,7 @@ Running the **WorkflowName** workflow from the **PresentationForge** skill...
 ```
 User: "Create html slides for a 7-minute product update"
 -> Invokes CreateHtmlPresentation workflow
--> Chooses Marp/Slidev/reveal.js path based on complexity
+-> Selects best-fit HTML engine for the use case
 -> Returns deck files plus a short speaker script
 ```
 

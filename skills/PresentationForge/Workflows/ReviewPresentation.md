@@ -2,6 +2,11 @@
 
 > **Trigger:** "review presentation", "polish slide deck", "presentation quality check"
 
+## Scope
+
+**Best fit for:** Quality-checking and polishing an existing presentation deck, returning a PASS/FAIL verdict with actionable fixes.
+**Route to:** `CreatePresentation` for building a new deck from scratch. `RepurposePresentation` for converting between HTML and PPT. For graphic design overhauls or full visual redesigns, use dedicated design tools instead.
+
 ## Reference Material
 
 - `../FirstPrinciples.md`
