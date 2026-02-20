@@ -1,16 +1,6 @@
 ---
 name: ContextLayer
-description: >
-  Generate and maintain slim, high-signal CLAUDE.md context files for AI agents.
-  USE WHEN the request involves creating, reviewing, correcting, shrinking, or
-  refreshing CLAUDE.md files — whether the user says so explicitly or describes
-  symptoms like "agents are confused", "context is stale", "CLAUDE.md is too big",
-  "just started a new project", "agents keep putting things in the wrong place",
-  "my skill is getting confused about its own structure", "agents don't know about
-  our workaround", "why did we implement it this way is lost", "context hasn't been
-  updated in a while", or "I just added a new module and agents don't know about it".
-  Covers the full lifecycle of agent context files.
-  For README, API docs, or non-CLAUDE.md documentation, handle directly without this skill.
+description: Generate and maintain slim, high-signal CLAUDE.md context files for AI agents. USE WHEN the request involves creating, reviewing, correcting, shrinking, or refreshing CLAUDE.md files — whether the user says so explicitly or describes symptoms like "agents are confused", "context is stale", "CLAUDE.md is too big", "just started a new project", "agents keep putting things in the wrong place", "my skill is getting confused about its own structure", "agents don't know about our workaround", "why did we implement it this way is lost", "context hasn't been updated in a while", or "I just added a new module and agents don't know about it". Covers the full lifecycle of agent context files. For README, API docs, or non-CLAUDE.md documentation, handle directly without this skill.
 ---
 
 # ContextLayer
@@ -22,30 +12,25 @@ agents to operate with bad context and produce subtly wrong behavior.
 **Context layer = tree**, not a single file. Root CLAUDE.md for global
 orientation; subdirectory CLAUDE.md files for scoped domain context.
 
-## Workflow Decision
+## Workflow Routing
 
-Choose the workflow based on what state the user's context is in:
+When a workflow is matched, **read its file and follow the steps within it.**
 
-**→ Generate** (`Workflows/Generate.md`) when no CLAUDE.md exists yet, or a full
-rebuild is needed. The project is starting fresh, or the existing context is so
-wrong it's better to regenerate than repair. Use this when the user is onboarding
-a new project, adding a new AI agent to a codebase for the first time, or explicitly
-wants to rebuild from scratch.
+| Workflow | Trigger | File |
+|----------|---------|------|
+| **Generate** | No CLAUDE.md exists, full rebuild needed, new project onboarding | `Workflows/Generate.md` |
+| **Audit** | CLAUDE.md may be wrong/outdated/incomplete, agent confusion reported | `Workflows/Audit.md` |
+| **Prune** | CLAUDE.md too large or noisy, token budget exceeded, reduce overhead | `Workflows/Prune.md` |
+| **Drift** | Check staleness without full Audit, git-based diagnostic, cheap check | `Workflows/Drift.md` |
 
-**→ Audit** (`Workflows/Audit.md`) when a CLAUDE.md exists but may be wrong,
-outdated, or incomplete. The file exists — it just might be lying. Use this when
-the user reports agent confusion, suspects stale information, wants a regular
-health check, or notices the codebase has changed since the context was written.
+### Workflow Selection Guide
 
-**→ Prune** (`Workflows/Prune.md`) when a CLAUDE.md exists and has grown too large
-or noisy. The content may be correct, but there's too much of it. Use this when
-the user reports context files getting bloated, hitting token limits, or wanting
-to reduce context overhead without a full audit.
+Choose based on what state the user's context is in:
 
-**→ Drift** (`Workflows/Drift.md`) when the user wants to check if their context
-layer is stale without doing a full Audit. Uses git history only — no source reads,
-no haiku agents. Cheap diagnostic that tells you *which* files need Audit, not what's
-wrong with them. Run Drift before Audit to avoid auditing files that haven't changed.
+- **Generate** — project starting fresh, existing context so wrong it's faster to rebuild than repair, onboarding a new AI agent to a codebase for the first time
+- **Audit** — file exists but might be lying, user reports agent confusion, suspects stale info, codebase changed since context was written
+- **Prune** — content may be correct but there's too much of it, context files bloated, hitting token limits
+- **Drift** — cheap git-only diagnostic that tells you *which* files need Audit, not what's wrong with them. Run Drift before Audit to avoid auditing files that haven't changed.
 
 ## When It's Ambiguous
 
@@ -83,7 +68,7 @@ most common need and causes no harm if the content was already correct.
 - `PruningInstruction.md` — Template embedded at bottom of every generated CLAUDE.md
 - `DesignRationale.md` — Hypothesis verdicts (H1–H6) and RedTeam findings
 
-## Invocation Examples
+## Examples
 
 ```
 // Explicit triggers

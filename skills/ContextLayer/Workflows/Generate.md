@@ -35,6 +35,57 @@ Check if the user's request specifies a directory path or named subdirectory.
 
 ---
 
+### Step 0.5 — Gather Supplementary Context
+
+Scan for context beyond the codebase that improves the generated CLAUDE.md.
+
+**1. Quick doc scan** (~5 seconds, Glob only):
+
+Scan the project for supplementary context sources:
+```
+*.prd, .prd/**, docs/design/**, docs/architecture/**,
+VISION.md, ROADMAP.md, DESIGN.md, ARCHITECTURE.md,
+docs/PRD*, docs/spec*, docs/RFC*, ADR*, docs/ADR*
+```
+If matches found → read the first 100 lines of each (max 4 files, prioritize by proximity to root, skip binary files). Extract:
+- **Project purpose** — what the project is for and who it serves
+- **Key constraints** — performance budgets, migration state, licensing restrictions, technology mandates
+- **Stability map** — which areas are settled vs. actively in-flux
+
+Collect extracted context into a `SUPPLEMENTARY_CONTEXT` block (plain text, max 500 tokens).
+
+**2. Skill scan** (~2 seconds):
+
+Check `skill-index.json` for skills with context-gathering capability (e.g., Research, FirstPrinciples). If a skill surfaces non-obvious project context the doc scan missed, present it as a suggestion:
+```
+"Found [SkillName] skill — gathers [specific context type]. Invoke? (y/n)"
+```
+Skip this sub-step if the doc scan already found rich context.
+
+**3. Ask one question** (conditional):
+
+IF the doc scan found nothing AND the request lacks clear project context:
+→ Ask the user ONE focused question:
+  *"Is there anything about this project's purpose, constraints, or direction that isn't visible in the code? (e.g., PRD, design vision, migration plans, upcoming changes). If not, I'll proceed with code-only context."*
+
+IF the doc scan found context OR the user provided scope/context in their request:
+→ Skip the question. Proceed immediately.
+
+**4. Assemble and carry forward:**
+
+Combine gathered context into a `SUPPLEMENTARY_CONTEXT` variable:
+```
+SUPPLEMENTARY_CONTEXT for [project]:
+  Purpose: [1-2 sentences, or "not specified"]
+  Key constraints: [list, or "none found"]
+  Stability: [what's in-flux, or "unknown"]
+  Source: [which docs/user input provided this]
+```
+
+If nothing gathered: set `SUPPLEMENTARY_CONTEXT` to empty and proceed.
+
+---
+
 ### Step 1 — Find Project Root and Build Tree Map
 
 1. Find the project root: look for `.git` directory walking up from the current directory
@@ -124,6 +175,15 @@ Use the exact prompt template from `HaikuAgentPattern.md`.
 - 1-2 representative implementation files
 - Maximum 6 files total per agent
 
+**Supplementary context passthrough:** If Step 0.5 produced a non-empty `SUPPLEMENTARY_CONTEXT`, append it to the root-level agent's prompt:
+```
+Additionally, the following supplementary context was gathered about this project:
+[paste SUPPLEMENTARY_CONTEXT block]
+
+Use this to inform your understanding of the project's purpose, constraints, and direction.
+Incorporate relevant facts into your output — but only if they pass the falsifiability test.
+```
+
 **Collect all JSON results before proceeding to Step 3.**
 Failed agents → apply retry protocol from `HaikuAgentPattern.md`.
 
@@ -145,42 +205,30 @@ From root-level agent results + cross-subsystem knowledge, synthesize root CLAUD
 - [project-specific convention 1]
 - [project-specific convention 2]
 
-## File Structure
+## Architecture
 
 ```
 [top-level directory tree with 1-line annotations]
 ```
 
-## Subsystems
-
+**Subsystems:**
 - **[Name]:** [what it owns] (entry: [path])
 
 ## Constraints
 
 - [hard prohibition or requirement]
 
-## Context Tree
+## Gotchas
 
-Before working in a subsystem, read its CLAUDE.md to understand conventions.
-After working in a subsystem, check its CLAUDE.md for entries your changes invalidated.
+- Read a subsystem's CLAUDE.md before working in it — it has local conventions
+- After editing files, check the nearest CLAUDE.md for entries your changes invalidated
+- Add directory-specific conventions to that directory's CLAUDE.md, not root
+- Record architectural WHY decisions in inline comments or ADRs
 
-[List subdirectory CLAUDE.md files here, e.g.:]
+**Context tree** (not auto-loaded — read the relevant one before working in that directory):
 - `src/auth/CLAUDE.md` — auth conventions, JWT handling, session patterns
 - `src/api/CLAUDE.md` — route patterns, middleware order, error handling
-*(Omit this section if no subdirectory CLAUDE.md files exist yet.)*
-
-These files are not auto-loaded. Read the relevant one before working in that directory.
-
-## Scope
-
-This file is the root context layer — it contains only things that apply across
-the entire project. Directory-specific conventions belong in that directory's
-CLAUDE.md. Architectural WHY decisions belong in inline comments or ADRs.
-Anything an agent can infer from reading the code belongs nowhere.
-
-When you modify files, check if the nearest CLAUDE.md (this file or a
-subdirectory's) still accurately describes the conventions and constraints.
-Update stale entries before finishing your task.
+*(Omit context tree if no subdirectory CLAUDE.md files exist yet.)*
 
 ---
 ## Context Maintenance
@@ -221,28 +269,25 @@ For each subsystem with its own haiku agent result:
 
 - [local convention]
 
-## Key Files
+## Architecture
+
+**Key files:**
 
 | File | Role |
 |------|------|
 | [path] | [role] |
 
+**Dependencies** *(omit if no internal cross-boundary dependencies)*:
+- Depends on: [other dir — what is used from it, e.g., "src/db — User model"]
+- Consumed by: [other dir — how it uses this one, e.g., "src/api/routes — auth middleware"]
+
 ## Constraints
 
 - [local constraint]
 
-## Dependencies
+## Gotchas
 
-- Depends on: [other dir — what is used from it, e.g., "src/db — User model"]
-- Consumed by: [other dir — how it uses this one, e.g., "src/api/routes — auth middleware"]
-
-*(Omit this section if no internal cross-boundary dependencies exist.)*
-
-## Scope
-
-This file covers only conventions and constraints specific to this directory.
-Project-wide rules belong in the root CLAUDE.md. WHY decisions belong in
-inline comments. Anything inferable from reading the code belongs nowhere.
+*(Omit this section if no directory-specific gotchas exist.)*
 
 ---
 ## Context Maintenance
@@ -283,7 +328,7 @@ ContextLayer Generate complete:
 
 ---
 
-## Reference Files
+## Reference Material
 
 - `ScanProtocol.md` — Scan order and falsifiability test rules
 - `BudgetModel.md` — Token budget enforcement

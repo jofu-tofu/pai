@@ -151,7 +151,7 @@ If zero changes: "All CLAUDE.md files are accurate — no changes needed."
 
 ---
 
-## Reference Files
+## Reference Material
 
 - `HaikuAgentPattern.md` — Prompt template, JSON schema, retry/fallback spec
 - `ScanProtocol.md` — Falsifiability test for evaluating "missing" entries before adding
