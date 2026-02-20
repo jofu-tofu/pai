@@ -5,7 +5,7 @@
 
 ## Purpose
 
-Single quality gate that fans out skill evaluation to focused agents. Each agent receives one evaluation dimension's rubric plus the target skill files, evaluates deeply, and returns structured findings. The orchestrator only coordinates and aggregates — it never evaluates deeply itself.
+Single quality gate that fans out skill evaluation to focused agents. Each agent receives one evaluation dimension's rubric plus the `ExploreSkill.ts` command to run. Agents run the script themselves as their first action, getting the complete skill snapshot (file tree, contents, routing analysis, validation results) directly in their own context. The orchestrator only coordinates and aggregates — it never evaluates deeply itself.
 
 ## Modes
 
@@ -24,15 +24,13 @@ Single quality gate that fans out skill evaluation to focused agents. Each agent
 
 ## Steps
 
-### Step 1: Load Target Skill
+### Step 1: Identify Target Skill
 
-Read all `.md` files from the target skill directory:
-- `SKILL.md` — frontmatter, routing table, examples
-- `SkillIntent.md` — design intent, constraints, success criteria
-- All `Workflows/*.md` — workflow files
-- Any other `.md` files at the skill root (context files)
+Resolve the target skill name (e.g., `Research`). Verify the skill directory exists. Do NOT run `ExploreSkill.ts` yourself — each agent will run it independently as their first action.
 
-Concatenate into a single skill context block for agent prompts.
+Record:
+- **Skill name** — directory name (e.g., `Research`)
+- **Explore command** — `bun run $PAI_DIR/skills/SkillForge/Tools/ExploreSkill.ts <SkillName>`
 
 ### Step 2: Load Rubrics
 
@@ -77,11 +75,13 @@ AGENT COUNT: [N]
 
 For each selected rubric, construct an agent prompt containing:
 
-1. **Role instruction:** "You are a focused skill quality evaluator. Evaluate the target skill against the rubric below. Return findings in the structured format specified. Do not suggest fixes — report findings only."
-2. **Rubric content:** The full rubric file (Focus, Reference Material, Rubric table)
-3. **Target skill files:** All files loaded in Step 1
+1. **Role instruction:** "You are a focused skill quality evaluator. Your FIRST action must be to run the ExploreSkill command below to get a complete skill snapshot. Then evaluate against the rubric using the snapshot as evidence. Do not suggest fixes — report findings only."
+2. **Explore command:** `bun run $PAI_DIR/skills/SkillForge/Tools/ExploreSkill.ts <SkillName>` — agent runs this via Bash as its first action
+3. **Rubric content:** The full rubric file (Focus, Reference Material, Rubric table)
 4. **Output format instructions:** See Agent Output Format section below
 5. **Time budget:** "Complete evaluation within 60 seconds."
+
+Each agent runs the script itself (~2 seconds), getting the complete skill snapshot directly in its own context — file tree, naming audit, routing table with existence checks, trigger extraction, ValidateSkill output, and all file contents. The orchestrator never needs to hold or copy the snapshot.
 
 ### Step 5: Dispatch Agents
 
@@ -199,4 +199,4 @@ The PREFIX matches the rubric file's prefix (FP, SI, RH, BR, CC, IC, PQ).
 
 ## Token Budget Assumption
 
-Skills are small by design (<5K tokens). 7 agents × ~8K prompt each = ~56K total input tokens. Well within budget for parallel dispatch. No size guard needed.
+Agent prompts are lean — each receives a rubric (~1-2K tokens) plus the `ExploreSkill.ts` command (~100 tokens). Each agent runs the script itself via Bash (~2 seconds), getting the full snapshot directly in its own context. The orchestrator prompt stays small — no need to hold or copy the snapshot. Total orchestrator prompt: 7 agents × ~3K each = ~21K tokens. Each agent independently loads ~10-30K of snapshot data via its own Bash call.
