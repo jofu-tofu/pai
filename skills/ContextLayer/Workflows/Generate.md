@@ -161,7 +161,9 @@ From root-level agent results + cross-subsystem knowledge, synthesize root CLAUD
 
 ## Context Tree
 
-When working in a specific subsystem, read that directory's CLAUDE.md first:
+Before working in a subsystem, read its CLAUDE.md to understand conventions.
+After working in a subsystem, check its CLAUDE.md for entries your changes invalidated.
+
 [List subdirectory CLAUDE.md files here, e.g.:]
 - `src/auth/CLAUDE.md` — auth conventions, JWT handling, session patterns
 - `src/api/CLAUDE.md` — route patterns, middleware order, error handling
@@ -176,19 +178,28 @@ the entire project. Directory-specific conventions belong in that directory's
 CLAUDE.md. Architectural WHY decisions belong in inline comments or ADRs.
 Anything an agent can infer from reading the code belongs nowhere.
 
+When you modify files, check if the nearest CLAUDE.md (this file or a
+subdirectory's) still accurately describes the conventions and constraints.
+Update stale entries before finishing your task.
+
 ---
 ## Context Maintenance
 
-**Remove** any entry that fails the falsifiability test: if removing a line would not
-change how an agent works in this project, remove it. If a convention here conflicts
-with the actual codebase, the codebase wins — update this file to match, do not work
-around it. Prune aggressively. This file should shrink as the codebase matures.
+**After modifying files in this project:** scan the entries above — if any claim is now
+false or incomplete, update this file before ending the task. Do not defer.
 
-**Add** an entry here only if it would cause an agent to fail without knowing it, is
-not obvious from the code, and applies project-wide (not just one directory).
+**Add** an entry only if an agent would fail without knowing it, it is not obvious from
+the code, and applies project-wide (not just one directory).
 
-**When to trigger a full Audit or Generate:** after renaming directories, after major
-refactors (>20% of files changed), or after 30+ days without touching this file.
+**Remove** any entry that fails the falsifiability test: if removing it would not change
+how an agent acts, remove it. If a convention here conflicts with the codebase, the
+codebase wins — update this file, do not work around it. Prune aggressively.
+
+**Staleness anchor:** This file assumes `[key_entry_point]` exists. If it doesn't, this file
+is stale — update or regenerate before relying on it.
+
+**Trigger Audit or Generate:** rename/move files → Audit; >20% of files changed →
+Generate; 30+ days without touching this file → Audit.
 ```
 
 **Apply falsifiability test** (from `ScanProtocol.md`) to every entry before writing.

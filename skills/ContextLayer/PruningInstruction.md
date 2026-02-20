@@ -11,35 +11,25 @@ Do not modify the `---` separators — they are part of the embedded instruction
 ---
 ## Context Maintenance
 
-**Remove** any entry that fails the falsifiability test: if removing a line would not
-change how an agent works in this project, remove it. If a convention here conflicts
-with the actual codebase, the codebase wins — update this file to match, do not work
-around it. Prune aggressively. This file should shrink as the codebase matures.
+**After modifying files in this directory:** scan the entries above — if any claim is now
+false or incomplete, update this file before ending the task. Do not defer.
 
-**Add** an entry here when you discover something in this directory that:
-- Would cause an agent to fail or produce wrong output if it didn't know this
-- Is not obvious from reading the code directly
-- Is specific enough to belong at this level (not a project-wide rule → root CLAUDE.md)
+**Add** an entry only if an agent would fail without knowing it, it is not obvious from
+the code, and it belongs at this scope (project-wide rule → root CLAUDE.md; WHY decision
+→ inline comment or ADR; inferable from code → nowhere).
 
-**Where things belong** — use this decision tree when deciding where to record something:
+**Remove** any entry that fails the falsifiability test: if removing it would not change
+how an agent acts here, remove it. If a convention here conflicts with the codebase,
+the codebase wins — update this file, do not work around it. Prune aggressively.
 
-  Does it affect agents across the whole project?
-  → Yes → root CLAUDE.md (not here)
-  → No, only this directory → this file
+**Staleness anchor:** This file assumes `[key_entry_point]` exists. If it doesn't, this file
+is stale — update or regenerate before relying on it.
 
-  Is it a WHY decision (an architectural choice or trade-off)?
-  → Yes → inline code comment or ADR in docs/decisions/
-  → No, it's a convention or constraint → this file
-
-  Can an agent infer it by reading the code?
-  → Yes → do not add it (noise)
-  → No → add it here
-
-**When to trigger a full Audit or Generate:**
-- After renaming directories or moving files: run Audit
-- After major refactors (>20% of files changed): run Generate
-- After 30+ days without touching this file: run Audit
-- If an agent makes a mistake caused by this file: fix immediately, then run Audit
+**Trigger Audit or Generate:**
+- Rename/move files or dirs → Audit
+- >20% of files changed → Generate
+- 30+ days without touching this file → Audit
+- Agent mistake caused by this file → fix immediately, then Audit
 ```
 
 ---
@@ -49,14 +39,16 @@ around it. Prune aggressively. This file should shrink as the codebase matures.
 - Place at the very bottom of each generated CLAUDE.md, after all content sections
 - The `---` separator before `## Context Maintenance` ensures the heading is clearly scoped
 - Do not add a closing `---` after the block — the file ends after the last instruction
+- **Staleness anchor:** Replace `[key_entry_point]` with the most important file path referenced in the CLAUDE.md (e.g., `src/index.ts`, `package.json`). Choose the file most likely to be renamed or deleted during a refactor — this makes the anchor a canary for staleness. If the anchor path stops existing, the agent knows the CLAUDE.md content is unreliable without reading every entry.
 
 ---
 
 ## Design Note
 
-The embedded instruction works as a **Phase 1 bridge** — it instructs the currently-active
-agent to maintain context opportunistically while reading/editing CLAUDE.md. It does not
-trigger autonomously.
+The embedded instruction works as the **primary self-maintenance mechanism** — it instructs
+the currently-active agent to check and update CLAUDE.md after modifying files in the
+directory. The post-action trigger ("After modifying files...") converts passive maintenance
+into an active obligation that fires during normal work.
 
 **Phase 2 (planned):** `PostToolUse` hook on file Write events → lightweight check:
 "Does this change affect a CLAUDE.md claim in this directory?" → trigger Audit if yes.
@@ -64,5 +56,8 @@ trigger autonomously.
 **Phase 3 (planned):** `SessionStart` hook → quick falsifiability sweep of root CLAUDE.md
 only (fast, no haiku agents, content-only pass like Prune).
 
-Phase 2+3 close the autonomous-trigger gap. Until then, the embedded instruction is the
-primary maintenance mechanism for agents actively working in the project.
+Phase 1 uses embedded instructions (not hooks) because the trigger fires within the agent's
+existing CLAUDE.md read — zero infrastructure, zero latency, works in any repo. H4 testing
+(see DesignRationale.md) confirmed agents follow embedded meta-instructions when the file
+is loaded. Phase 2+3 hooks would add autonomous triggering as a safety net for edge cases
+where the agent skips the check (context saturation, early termination).

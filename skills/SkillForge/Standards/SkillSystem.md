@@ -115,22 +115,31 @@ Every `Workflows/*.md` file MUST follow this structure:
 ```
 SkillName/                    # TitleCase directory name
 ├── SKILL.md                  # Main skill file (always uppercase)
-├── ContextFile.md            # Context files in skill ROOT (TitleCase)
 ├── SkillIntent.md            # Design intent document (see below)
-├── WorkflowChains.md         # Workflow chain map (recommended for 5+ workflows)
+├── Standards/                # Purpose-named context sub-folder (TitleCase)
+│   ├── SpecFile.md           # Canonical specs, standards, frameworks
+│   └── RulesFile.md
+├── Orchestration/            # Purpose-named context sub-folder (TitleCase)
+│   └── ChainMap.md           # Workflow chains, logs, coordination
 ├── Tools/                    # CLI tools (ALWAYS present, even if empty)
 │   └── ToolName.ts           # TypeScript CLI tool (TitleCase)
 └── Workflows/                # Execution workflows (TitleCase)
-    ├── Create.md
-    └── Update.md
+    ├── Author/               # Lifecycle-phase sub-folders allowed
+    │   └── Create.md
+    ├── Quality/
+    │   └── Audit.md
+    └── Gates/
+        └── Validate.md
 ```
 
 **Critical rules:**
-- Context files live in the **skill root**, never in subdirectories
-- NEVER create `Context/`, `Docs/`, or `Resources/` subdirectories
+- SKILL.md and SkillIntent.md live in the **skill root** — always visible
+- Context files live in **purpose-named TitleCase sub-folders** (e.g., Standards/, Orchestration/)
+- Workflows may use **lifecycle-phase sub-folders** (e.g., Author/, Quality/, Gates/)
+- NEVER create `Context/`, `Docs/`, `Resources/`, or `backups/` subdirectories (blocklist)
+- Any other TitleCase sub-folder name is allowed — names should describe the folder's purpose
 - `Tools/` directory MUST always be present (create empty if no tools yet)
-- Maximum directory depth: 2 levels (`SkillName/Category/file.md`)
-- No `backups/` directories inside skills
+- Maximum directory depth: 3 levels (`SkillName/Workflows/Author/file.md`)
 
 ---
 

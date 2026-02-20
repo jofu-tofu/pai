@@ -4,10 +4,10 @@
 
 ## Reference Material
 
-- `../PromptingStandards.md` — Wording and trigger phrase quality rules (Claude 4.x). Read before writing trigger phrases for new workflows.
-- `../RiskFramework.md` — Change risk classification guide. Add = Low, Rename = Medium, Remove = High. Consult before executing the operation to apply the correct approval level.
+- `../../Standards/PromptingStandards.md` — Wording and trigger phrase quality rules (Claude 4.x). Read before writing trigger phrases for new workflows.
+- `../../Standards/RiskFramework.md` — Change risk classification guide. Add = Low, Rename = Medium, Remove = High. Consult before executing the operation to apply the correct approval level.
 - `[target skill]/SkillIntent.md` — Target skill's design intent (if present). Read before modifying to ensure changes don't contradict original purpose or out-of-scope decisions.
-- `../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
+- `../../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
 - **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
@@ -21,7 +21,7 @@ Skills grow and change as new capabilities are needed or existing workflows beco
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Read `../SkillSystem.md` for workflow conventions
+- Read `../../Standards/SkillSystem.md` for workflow conventions
 
 ## Workflow Steps
 
@@ -75,7 +75,7 @@ Do not proceed until all three sections are present. There is no defer path.
 
 **If all three sections are PRESENT:** Proceed to the operation steps below. No action needed.
 
-**Note — SkillIntent.md content modifications:** If the requested operation involves editing the *content* of a target skill's `SkillIntent.md` (not just checking it), this qualifies as a SkillIntent.md modification per `../RiskFramework.md § Unconditional Confirmation Triggers`. Obtain explicit user confirmation before making any content changes to SkillIntent.md.
+**Note — SkillIntent.md content modifications:** If the requested operation involves editing the *content* of a target skill's `SkillIntent.md` (not just checking it), this qualifies as a SkillIntent.md modification per `../../Standards/RiskFramework.md § Unconditional Confirmation Triggers`. Obtain explicit user confirmation before making any content changes to SkillIntent.md.
 
 ---
 
@@ -210,17 +210,6 @@ Update the workflow name and file path in SKILL.md routing table.
 
 ---
 
-### Completion Gate: Prompt Quality Audit (BLOCKING — cannot skip)
-
-**After ANY Add, Remove, or Rename operation completes**, PromptQualityAudit MUST run before reporting completion. This is not optional — every workflow topology change can shift trigger boundaries and routing behavior.
-
-1. Log: `Chain PromptQualityAudit: condition true — firing (completion gate)`
-2. Execute `Workflows/PromptQualityAudit.md` on the modified skill
-3. If PromptQualityAudit finds failures: fix them before proceeding to the summary output
-4. After PromptQualityAudit passes: proceed to summary
-
-**Why this gate exists (first principles):** Trigger reliability is a system-level property, not a per-phrase property. Adding, renaming, and removing workflows all change the routing landscape. The assumption that remove operations are "prompt-neutral" is soft and often false because ambiguity boundaries can move when options disappear. Prompt audit cost is low relative to routing failure cost, so this gate is default-on.
-
 ---
 
 ## Constraints
@@ -248,12 +237,11 @@ After completing this workflow, evaluate these chain conditions:
 
 | Condition | Chain To | Action |
 |---|---|---|
-| A workflow was added or removed | StressTest | Announce: "Running stress test to verify skill integrity after workflow change..." then execute `Workflows/StressTest.md` |
-| ALWAYS after workflow add, rename, or remove | PromptQualityAudit | Announce: "Running prompt quality audit after workflow topology changes..." then execute `Workflows/PromptQualityAudit.md` (if already completed in the completion gate with no additional edits, log condition true and mark as already satisfied) |
+| ALWAYS after workflow add, rename, or remove | AgentEvalOrchestrator(scoped) | Announce: "Running scoped evaluation after workflow topology change..." then invoke `Orchestration/AgentEvalOrchestrator.md` with mode=scoped, changes="workflow added/removed/renamed" |
+
+This chain is Always — run it unconditionally after every ManageWorkflows execution. The orchestrator selects relevant evaluation dimensions based on the change context.
 
 **Chain Decision Log (MANDATORY — SC7):**
 Log one line per chain in the table above, regardless of outcome:
   `Chain [WorkflowName]: condition [true/false] — [fired/skipped]`
-Skipped chains MUST be logged — silence on a skipped chain violates SC7.
-
-If no conditions match, skip follow-ups.
+Always chains: log `condition true — fired`. Silence on any chain entry violates SC7.

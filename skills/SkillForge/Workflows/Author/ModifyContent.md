@@ -4,10 +4,10 @@
 
 ## Reference Material
 
-- `../PromptingStandards.md` — Wording and trigger phrase quality rules. Read when modifying frontmatter descriptions or trigger phrases.
-- `../RiskFramework.md` — Change risk classification guide. Consult before Step 4 to classify the modification as Additive/Enhancement/Modification/Destructive and apply the appropriate approval level.
+- `../../Standards/PromptingStandards.md` — Wording and trigger phrase quality rules. Read when modifying frontmatter descriptions or trigger phrases.
+- `../../Standards/RiskFramework.md` — Change risk classification guide. Consult before Step 4 to classify the modification as Additive/Enhancement/Modification/Destructive and apply the appropriate approval level.
 - `[target skill]/SkillIntent.md` — Target skill's design intent (if present). Read before modifying to ensure changes don't contradict original purpose or out-of-scope decisions.
-- `../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
+- `../../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
 - **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
@@ -21,7 +21,7 @@ Skills evolve as usage patterns emerge. When frontmatter becomes stale, routing 
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Read `../SkillSystem.md` for structure requirements
+- Read `../../Standards/SkillSystem.md` for structure requirements
 
 ## Workflow Steps
 
@@ -137,18 +137,6 @@ Run validation checks:
 3. All workflow references in routing table resolve
 4. TitleCase naming enforced
 
-### Step 5.5: Prompt Quality Completion Gate (BLOCKING — cannot skip)
-
-**This step enforces PromptQualityAudit as a structural requirement, not an optional follow-up.**
-
-PromptQualityAudit MUST run before this workflow reports completion, regardless of modification type. Do not proceed to Step 6. Instead:
-1. Log: `Chain PromptQualityAudit: condition true — firing (completion gate)`
-2. Execute `Workflows/PromptQualityAudit.md` on the modified skill NOW
-3. If PromptQualityAudit finds failures: fix them before proceeding
-4. After PromptQualityAudit passes: proceed to Step 6
-
-**Why this gate exists (first principles):** Skill invocation is a language-routing problem with a hard constraint: user phrasing must map cleanly to workflow intent. The idea that "structural edits cannot affect prompt behavior" is a soft assumption and often false due to context interactions. Prompt audit cost is low; misrouting cost is high. A default-on gate minimizes total risk.
-
 ---
 
 ### Step 6: Report Changes
@@ -184,13 +172,11 @@ After completing this workflow, evaluate these chain conditions:
 
 | Condition | Chain To | Action |
 |---|---|---|
-| ALWAYS after ModifyContent completes | PromptQualityAudit | Announce: "Running prompt quality audit on the updated skill content..." then execute `Workflows/PromptQualityAudit.md` (if already completed in Step 5.5 with no additional edits, log condition true and mark as already satisfied) |
-| Significant structural changes made (not just description edits) | StressTest | Announce: "Running stress test to verify skill integrity..." then execute `Workflows/StressTest.md` |
-| Context Files table was modified (file added, removed, or renamed) | StressTest | Announce: "Running stress test to check for orphaned context file references..." then execute `Workflows/StressTest.md` |
+| ALWAYS after ModifyContent completes | AgentEvalOrchestrator(scoped) | Announce: "Running scoped evaluation on modified content..." then invoke `Orchestration/AgentEvalOrchestrator.md` with mode=scoped, changes="{description of what was edited — e.g., 'description frontmatter updated', 'routing table modified', 'examples rewritten'}" |
+
+This chain is Always — run it unconditionally after every ModifyContent execution. The orchestrator selects relevant evaluation dimensions based on the change context.
 
 **Chain Decision Log (MANDATORY — SC7):**
 Log one line per chain in the table above, regardless of outcome:
   `Chain [WorkflowName]: condition [true/false] — [fired/skipped]`
-Skipped chains MUST be logged — silence on a skipped chain violates SC7.
-
-If no conditions match, skip follow-ups.
+Always chains: log `condition true — fired`. Silence on any chain entry violates SC7.

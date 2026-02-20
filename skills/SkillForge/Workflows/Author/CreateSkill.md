@@ -6,15 +6,15 @@ Create a new skill following the canonical structure with proper TitleCase namin
 
 ## Reference Material
 
-- `../SkillSystem.md` — Canonical skill structure spec (TitleCase naming, required sections, directory layout)
-- `../PromptingStandards.md` — Wording and trigger phrase quality rules for new skill descriptions
-- `../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured)
+- `../../Standards/SkillSystem.md` — Canonical skill structure spec (TitleCase naming, required sections, directory layout)
+- `../../Standards/PromptingStandards.md` — Wording and trigger phrase quality rules for new skill descriptions
+- `../../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured)
 
 ## Step 1: Read the Authoritative Sources
 
 **REQUIRED FIRST:**
 
-1. Read the skill system documentation: `$PAI_DIR/skills/SkillForge/SkillSystem.md`
+1. Read the skill system documentation: `$PAI_DIR/skills/SkillForge/Standards/SkillSystem.md`
 
 ## Step 2: Understand the Request
 
@@ -238,8 +238,8 @@ After completing this workflow, evaluate these chain conditions:
 
 | Condition | Chain To | Action |
 |---|---|---|
-| New skill was created | ValidateSkill | Announce: "Validating newly created skill..." then execute `Workflows/ValidateSkill.md` |
-| New skill was created | CreateSkillIntent | Announce: "Generating SkillIntent for new skill..." then execute `Workflows/CreateSkillIntent.md` |
+| New skill was created | AgentEvalOrchestrator(scoped) | Announce: "Running scoped evaluation on newly created skill..." then invoke `Orchestration/AgentEvalOrchestrator.md` with mode=scoped, changes="new skill created, all files new" |
+| New skill was created | CreateSkillIntent | Announce: "Generating SkillIntent for new skill..." then execute `Workflows/Gates/CreateSkillIntent.md` |
 
 Both chains are Always — run them unconditionally after every CreateSkill execution.
 

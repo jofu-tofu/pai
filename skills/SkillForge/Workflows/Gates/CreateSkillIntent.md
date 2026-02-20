@@ -4,8 +4,8 @@
 
 ## Reference Material
 
-- `../SkillSystem.md` — SkillIntent.md standard structure and conventions
-- `../SkillIntent.md` — SkillForge's own SkillIntent as a concrete example
+- `../../Standards/SkillSystem.md` — SkillIntent.md standard structure and conventions
+- `../../SkillIntent.md` — SkillForge's own SkillIntent as a concrete example
 
 ## Purpose
 

@@ -152,6 +152,24 @@ async function validateSkill(skillPath: string): Promise<ValidationResult> {
     message: hasToolsDir ? undefined : 'Missing Tools/ directory'
   });
 
+  // Check 10b: No blocklisted sub-folder names
+  const BLOCKLISTED_DIRS = ['Context', 'Docs', 'Resources', 'backups'];
+  try {
+    const entries = await readdir(skillPath, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        const isBlocklisted = BLOCKLISTED_DIRS.includes(entry.name);
+        if (isBlocklisted) {
+          checks.push({
+            name: `Blocklisted directory: ${entry.name}`,
+            passed: false,
+            message: `"${entry.name}/" is a blocklisted directory name — use purpose-named TitleCase sub-folders instead`
+          });
+        }
+      }
+    }
+  } catch {}
+
   // Check 11: Workflow references resolve
   const workflowRefs = extractWorkflowRefs(content);
   if (workflowRefs.length > 0) {
@@ -175,13 +193,13 @@ async function validateSkill(skillPath: string): Promise<ValidationResult> {
           message: refExists ? undefined : `Referenced workflow "${ref}" not found`
         });
 
-        // Check workflow filename is TitleCase
-        const workflowName = ref.replace('.md', '');
-        if (refExists && !isTitleCase(workflowName)) {
+        // Check workflow filename is TitleCase (use basename for sub-folder paths)
+        const workflowBasename = basename(ref).replace('.md', '');
+        if (refExists && !isTitleCase(workflowBasename)) {
           checks.push({
             name: `Workflow TitleCase: ${ref}`,
             passed: false,
-            message: `Workflow "${workflowName}" should be TitleCase`
+            message: `Workflow "${workflowBasename}" should be TitleCase`
           });
         }
       }

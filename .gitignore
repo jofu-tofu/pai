@@ -136,8 +136,8 @@ _output/
 # Release builds
 Releases/
 
-# AIW Installation
-.aiwcli/
-
 # PRD working files (generated per-session)
 .prd/
+
+# AIW Installation
+.aiwcli/

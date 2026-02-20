@@ -4,10 +4,10 @@
 
 ## Reference Material
 
-- **Risk Framework:** `../RiskFramework.md`
-- **Authoritative Spec:** `../SkillSystem.md`
+- **Risk Framework:** `../../Standards/RiskFramework.md`
+- **Authoritative Spec:** `../../Standards/SkillSystem.md`
 - **Target skill's SkillIntent.md** (if present) — Read before restructuring; changes must not contradict the skill's stated out-of-scope decisions or constraints.
-- `../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
+- `../../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
 - **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
 ## Purpose
@@ -21,7 +21,7 @@ Skills accumulate technical debt over time: naming conventions drift, workflows 
 ## Prerequisites
 
 - Target skill must exist in `$PAI_DIR/skills/`
-- Read `../SkillSystem.md` for structure requirements
+- Read `../../Standards/SkillSystem.md` for structure requirements
 - User approval required before executing changes
 
 ## Workflow Steps
@@ -332,10 +332,11 @@ After completing this workflow, execute these chains:
 
 | Condition | Chain To | Action |
 |---|---|---|
-| ALWAYS after restructuring | ValidateSkill | Announce: "Running validation after restructuring..." then execute `Workflows/ValidateSkill.md` |
-| ALWAYS after restructuring | StressTest | Announce: "Running stress test after restructuring..." then execute `Workflows/StressTest.md` |
+| ALWAYS after restructuring | AgentEvalOrchestrator(scoped) | Announce: "Running scoped evaluation after major restructure..." then invoke `Orchestration/AgentEvalOrchestrator.md` with mode=scoped, changes="major restructure" |
+
+This chain is Always — run it unconditionally after every RefactorSkill execution. For major restructures, the orchestrator may escalate scoped mode to full if changes are broad enough.
 
 **Chain Decision Log (MANDATORY — SC7):**
 Log one line per chain in the table above, regardless of outcome:
   `Chain [WorkflowName]: condition [true/false] — [fired/skipped]`
-Both chains here are Always — both log `condition true — fired` after RefactorSkill completes.
+Always chains: log `condition true — fired`. Silence on any chain entry violates SC7.

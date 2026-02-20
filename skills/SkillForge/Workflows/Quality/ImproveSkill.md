@@ -1,13 +1,13 @@
 # ImproveSkill — SkillForge Workflow
 
-> **Trigger:** "improve skill", "make skill better", "what's wrong with this skill", "how can we improve this skill"
+> **Trigger:** "improve skill", "make skill better", "what's wrong with this skill", "how can we improve this skill", "audit and fix skill", "fix what's wrong with skill", "comprehensive skill improvement"
 
-> **Purpose:** Goal-directed skill improvement driven by evaluating the target skill against its own Success Criteria. Unlike Retrospective (which is session-based and inductive), ImproveSkill is deductive: it starts from stated criteria and works backward to find gaps.
+> **Purpose:** Comprehensive skill improvement driven by evaluating the target skill against its own Success Criteria AND content coherence. Unlike Retrospective (which is session-based and inductive), ImproveSkill is deductive: it starts from stated criteria, adds content coherence analysis via ContentAudit, and works backward to find gaps across both dimensions.
 
 ## Reference Material
 
-- `../RiskFramework.md` — Risk classification for proposed improvements (referenced in Step 4)
-- `../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
+- `../../Standards/RiskFramework.md` — Risk classification for proposed improvements (referenced in Step 4)
+- `../../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
 
 ---
 
@@ -17,6 +17,9 @@
 - "Make this skill better"
 - "What's wrong with this skill?"
 - "How can we improve the X skill?"
+- "Audit and fix this skill"
+- "Fix what's wrong with this skill"
+- "Comprehensive skill improvement"
 - User wants directional improvement but doesn't know where to start
 
 **Not this workflow if:** User has session-specific observations (→ Retrospective), wants structural reorganization (→ RefactorSkill), or wants to change specific content they already identified (→ ModifyContent).
@@ -59,17 +62,26 @@ Evidence: {specific file + line or section reference}
 Gap: {if WEAK or FAIL, what's missing}
 ```
 
+### Step 3.5 — Agent Evaluation
+
+Invoke `AgentEvalOrchestrator` with mode=full on the target skill (read `../../Orchestration/AgentEvalOrchestrator.md`). This dispatches 7 parallel agents across all evaluation dimensions — structural integrity, routing health, content coherence, prompt quality, first principles, behavioral resilience, and invocation coverage.
+
+Capture agent evaluation findings and integrate them into Step 4's improvement opportunities:
+- PASS findings → no action needed
+- WARN findings → add as Priority 2 improvements
+- FAIL findings → add as Priority 1 improvements (alongside SC FAILs)
+
 ### Step 4 — Identify Improvement Opportunities
 
-From Step 3 findings, produce a ranked list of improvement opportunities:
-- **Priority 1 (FAIL):** Success Criteria that are not met at all
-- **Priority 2 (WEAK):** Success Criteria that are fragile or partially met
+From Step 3 (SC evaluation) AND Step 3.5 (ContentAudit) findings, produce a ranked list of improvement opportunities:
+- **Priority 1 (FAIL):** SC not met OR ContentAudit FAIL findings
+- **Priority 2 (WEAK):** SC fragile OR ContentAudit WARN findings
 - **Priority 3 (Enhancement):** Opportunities beyond stated criteria (new capabilities, better UX, missing edge cases)
 
 For each opportunity:
 - One-sentence description of the gap
 - Proposed fix (what would change)
-- Risk level per `../RiskFramework.md`
+- Risk level per `../../Standards/RiskFramework.md`
 - Which workflow would apply the fix (ModifyContent, ManageWorkflows, RefactorSkill)
 
 ### Step 5 — Optional Deep Analysis
@@ -107,12 +119,14 @@ Evaluate all chains below. Log each using SC7 format before announcing execution
 
 | Chains To | Condition | Tier |
 |---|---|---|
+| AgentEvalOrchestrator(full) | ALWAYS after SC evaluation completes (Step 3) | Always |
 | ModifyContent | IF user selected content improvements in Step 6 | Conditional |
 | ManageWorkflows | IF user selected workflow additions/removals in Step 6 | Conditional |
 | RefactorSkill | IF user selected structural changes in Step 6 | Conditional |
 
 **Chain Decision Log (mandatory per SC7):**
 ```
+Chain AgentEvalOrchestrator(full): condition [true] — [fired]
 Chain ModifyContent: condition [true/false] — [fired/skipped]
 Chain ManageWorkflows: condition [true/false] — [fired/skipped]
 Chain RefactorSkill: condition [true/false] — [fired/skipped]

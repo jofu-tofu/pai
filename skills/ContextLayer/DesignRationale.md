@@ -62,3 +62,62 @@ Five scenarios run against the PAI codebase using real parallel haiku agent disp
 | Auto-apply (Phase 1) | Explicit user requirement: friction reduction. Changes are reversible via git. Phase 2 adds diff-display. |
 | No DocPhilosophy runtime dependency | It's a thinking tool; baking its concepts into static files saves tokens on every invocation |
 | Context layer = tree, not single file | Hierarchical context: root for global orientation, subdirs for scoped domain context |
+
+---
+
+## Self-Sufficiency Analysis (2026-02-19)
+
+First-principles analysis of ContextLayer's self-maintenance mechanisms. Full analysis in session notes; key findings preserved here for future maintainers.
+
+**Method:** FirstPrinciples Deconstruct → Challenge → Reconstruct on the five self-sufficiency components (embedded template, post-action trigger, falsifiability test, trigger escalation, failure-feedback loop) under skill-only constraint.
+
+### Hidden Assumptions Identified
+
+| # | Assumption | Status | Evidence |
+|---|-----------|--------|----------|
+| SA-1 | "Auto-loaded = attended to" — root CLAUDE.md being in context means agents follow its instructions | **FALSE** | Being in context window ≠ attended to, especially for instructions competing with primary task |
+| SA-2 | "H4 validates the post-action trigger" — H4 proves agents maintain CLAUDE.md after editing | **PARTIAL** | H4 tested during-file compliance only. Post-action recall after primary task completion is untested |
+| SA-3 | "Self-maintenance is achievable through embedded instructions alone" | **OVERCLAIMED** | Embedded instructions achieve partial maintenance. Honest term: "degradation-resistant," not "self-sustaining" |
+| SA-4 | "Trigger escalation is useful outside PAI" | **MOSTLY FALSE** | Audit/Generate skill references are inert in repos without PAI skill system |
+| SA-5 | "Bottom-of-file is the right position for maintenance instructions" | **UNVALIDATED** | Chosen for aesthetics ("after all content"), not compliance optimization |
+| SA-6 | "Root placement is the single highest-impact change" | **LIKELY TRUE, OVERSTATED** | Highest-impact single change (~40-60% compliance vs. 15-25% current), but moderate improvement, not transformative |
+
+### Reliability Gradient (Validated)
+
+The self-sufficiency reliability gradient was confirmed through analysis:
+
+| Level | Mechanism | Reliability | Rationale |
+|-------|-----------|-------------|-----------|
+| 1 | Root CLAUDE.md (auto-loaded) | MODERATE-HIGH | Auto-loaded but competes with primary task for attention. Not HIGH in absolute terms. |
+| 2 | Subdir CLAUDE.md (on-demand) | MEDIUM | Only read when agent works in that directory |
+| 3 | Post-action trigger | LOW-MEDIUM | 6-step causal chain; each step is probabilistic; overall compliance is product of individual probabilities |
+| 4 | Cross-session | ZERO | No mechanism exists without hooks |
+
+### Key Structural Finding: The 6-Step Causal Chain
+
+The post-action trigger ("After modifying files...") requires 6 sequential steps, each probabilistic:
+1. Agent loaded this CLAUDE.md earlier
+2. Agent remembers the instruction after primary task
+3. Agent prioritizes maintenance over finishing faster
+4. Agent re-reads or recalls CLAUDE.md content
+5. Agent compares old content against new state
+6. Agent edits CLAUDE.md
+
+Failure at any step breaks the chain. Real compliance = product of individual step probabilities, not any single step's probability. H4 tested steps 1+3 in isolation; the full chain is untested.
+
+### Fundamental Truths (Hard Constraints)
+
+1. Text in a file has no agency — instructions are passive, processed only when an LLM reads them
+2. Language models have finite attention budgets — every instruction competes with every other instruction and the primary task
+3. Primary tasks always win the attention competition — maintenance instructions always lose to user intent
+4. Auto-loaded ≠ attended to ≠ complied with — three distinct failure points
+5. Compliance probability = f(relevance × specificity × position × task-alignment)
+
+### Reconstruction Verdict
+
+Within the skill-only constraint, the highest-impact improvements are:
+1. **Root CLAUDE.md as maintenance anchor** — moves from level-2 to level-1 visibility (moderate impact)
+2. **Task-aligned maintenance** — make maintenance a byproduct of primary task, not a competing obligation (structurally sound)
+3. **Measurement infrastructure** — Audit self-sufficiency score to validate whether improvements work (necessary but measures structure, not behavior)
+
+**Honest framing:** Embedded instructions achieve partial self-maintenance, not self-sufficiency. The term "self-sustaining" in SC #2 should be understood as "degradation-resistant with maintenance prompts" — not "autonomously self-correcting."

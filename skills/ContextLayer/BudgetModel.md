@@ -38,7 +38,7 @@ Target: signal ratio > 0.8 in every generated CLAUDE.md.
 | File structure | 100–200 | Indented tree, 1-line annotations |
 | Cross-boundary summaries | 100–400 | Inline: `name: owns (entry: path)` |
 | Prohibitions | 50–150 | Bullet list |
-| Pruning instruction | 50–100 | Embedded template from PruningInstruction.md |
+| Pruning instruction | 50–120 | Embedded template from PruningInstruction.md |
 | **Total** | **550–1,550** | ~450 token headroom within budget |
 
 ### Subdirectory CLAUDE.md (200–500 tokens)
@@ -49,7 +49,7 @@ Target: signal ratio > 0.8 in every generated CLAUDE.md.
 | Local conventions | 75–200 | Bullet list |
 | Key files | 75–150 | Table: `path → role` |
 | Local constraints | 50–100 | Bullet list |
-| Pruning instruction | 50–100 | Embedded template |
+| Pruning instruction | 50–120 | Embedded template |
 | **Total** | **300–650** | Trim to fit 500 token ceiling |
 
 ---

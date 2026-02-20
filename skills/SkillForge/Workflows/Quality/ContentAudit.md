@@ -6,8 +6,8 @@
 
 ## Reference Material
 
-- `../PromptingStandards.md` — Wording quality rules (used when evaluating trigger phrase coherence)
-- `../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
+- `../../Standards/PromptingStandards.md` — Wording quality rules (used when evaluating trigger phrase coherence)
+- `../../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
 
 ---
 
@@ -19,7 +19,7 @@
 - "Audit this skill's content"
 - "Review skill content quality"
 
-**Not this workflow if:** User wants structural compliance (→ ValidateSkill), routing correctness (→ InvocationSim), trigger phrase quality (→ PromptQualityAudit), or a full audit across all dimensions (→ AuditSkill).
+**Not this workflow if:** User wants structural compliance (→ ValidateSkill), routing correctness (→ InvocationSim), trigger phrase quality (→ PromptQualityAudit), a full audit across all dimensions (→ AuditSkill), or comprehensive improvement (→ ImproveSkill, which includes content audit automatically).
 
 ---
 
@@ -124,10 +124,8 @@ Evaluate all chains below. Log each using SC7 format:
 | Chains To | Condition | Tier |
 |---|---|---|
 | ModifyContent | IF content gaps or contradictions found that need targeted fixes | Conditional |
-| ImproveSkill | IF findings suggest broader improvement beyond content edits | Conditional |
 
 **Chain Decision Log (mandatory per SC7):**
 ```
 Chain ModifyContent: condition [true/false] — [fired/skipped]
-Chain ImproveSkill: condition [true/false] — [fired/skipped]
 ```

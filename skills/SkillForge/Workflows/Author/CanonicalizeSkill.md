@@ -6,9 +6,9 @@
 
 ## Reference Material
 
-- `../RiskFramework.md` — Change risk classification guide. Canonicalization involves file renames (Medium risk) and potential structural changes (Medium-High). Read before Step 4 to classify planned changes and confirm user approval level.
-- `../SkillSystem.md` — Canonical structure spec (also read in Step 1).
-- `../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
+- `../../Standards/RiskFramework.md` — Change risk classification guide. Canonicalization involves file renames (Medium risk) and potential structural changes (Medium-High). Read before Step 4 to classify planned changes and confirm user approval level.
+- `../../Standards/SkillSystem.md` — Canonical structure spec (also read in Step 1).
+- `../../SkillIntent.md` — SkillForge's own design philosophy (First Principles guide how skills should be structured and maintained)
 
 ---
 
@@ -17,7 +17,7 @@
 **REQUIRED FIRST:** Read the canonical structure:
 
 ```
-$PAI_DIR/skills/SkillForge/SkillSystem.md
+$PAI_DIR/skills/SkillForge/Standards/SkillSystem.md
 ```
 
 This is the authoritative local copy. All SkillForge workflows use this file — no external PAI/SYSTEM dependency.
@@ -314,7 +314,7 @@ After completing this workflow, evaluate these chain conditions:
 
 | Condition | Chain To | Action |
 |---|---|---|
-| Canonicalization completed | ValidateSkill | Announce: "Validating canonicalized skill..." then execute `Workflows/ValidateSkill.md` |
+| Canonicalization completed | AgentEvalOrchestrator(scoped) | Announce: "Running scoped evaluation after canonicalization..." then invoke `Orchestration/AgentEvalOrchestrator.md` with mode=scoped, changes="file structure reorganized" |
 
 This chain is Always — run it unconditionally after every CanonicalizeSkill execution.
 

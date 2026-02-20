@@ -4,8 +4,8 @@
 
 ## Reference Material
 
-- **Risk Framework:** `../RiskFramework.md`
-- **Authoritative Spec:** `../SkillSystem.md`
+- **Risk Framework:** `../../Standards/RiskFramework.md`
+- **Authoritative Spec:** `../../Standards/SkillSystem.md`
 - **Target skill's SkillIntent.md** (if present) — Read before proposing improvements; recommendations must align with the skill's original purpose and must not contradict its constraints.
 - **Workflow Chains:** `../WorkflowChains.md` — Check Follow-Up section after completing this workflow
 
@@ -21,7 +21,7 @@ Skills improve through real-world usage feedback. When a skill requires multiple
 
 - A completed session where at least one skill was invoked
 - Target skill exists in `$PAI_DIR/skills/`
-- Read `../SkillSystem.md` for structure requirements
+- Read `../../Standards/SkillSystem.md` for structure requirements
 
 ## Workflow Steps
 
