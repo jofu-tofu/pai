@@ -313,9 +313,15 @@ Write root CLAUDE.md and all subdirectory CLAUDE.md files.
 
 **Add freshness timestamp** to the `## Context Maintenance` section of every file written:
 ```
-<!-- context-layer: generated={YYYY-MM-DD} | last-audited=never | version=1 -->
+<!-- context-layer: generated={YYYY-MM-DD} | last-audited=never | version=1 | dir-commits-at-audit={N} | tree-sig={sig} -->
 ```
-This timestamp is machine-readable and used by the Drift workflow to detect staleness. Update `last-audited` to the current date whenever Audit runs against this file.
+
+**Computing new fields at generation time:**
+- `dir-commits-at-audit`: Run `git rev-list --count HEAD -- {directory}/` for the covered directory. Store the result.
+- `tree-sig`: Count subdirectories, files, and file extensions in the covered directory. Format: `dirs:{N},files:{N},exts:{ext}:{N},{ext}:{N},...` (extensions sorted alphabetically, skip `node_modules`/`.git`/`dist`/`build`).
+- `version`: Start at `1` for new files. Increment by 1 each time Generate or Audit modifies the file.
+
+This timestamp is machine-readable and used by the Drift workflow to detect staleness. On Audit: update `last-audited` to current date, recompute `dir-commits-at-audit` and `tree-sig`, increment `version`.
 
 Report on completion:
 ```

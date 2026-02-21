@@ -35,31 +35,63 @@ For each directory with 3+ files of its own that has NO CLAUDE.md:
 
 These are gaps in the coverage, not staleness — but surface them alongside staleness results.
 
-### Step 3 — Check Git Activity Since Last Update
+### Step 3 — Compute Drift Signals
 
-For each CLAUDE.md found in Step 1, check what changed in its covered directory since the CLAUDE.md was last updated:
+For each CLAUDE.md found in Step 1, compute two drift signals:
 
+**Signal A — Commit Delta (primary):**
+
+Count total commits in the covered directory:
+```
+git rev-list --count HEAD -- {directory}/
+```
+
+If the CLAUDE.md contains `dir-commits-at-audit={N}` in its freshness timestamp:
+- Compute delta: `current_count - N`
+- **0:** No activity since last audit → mark `FRESH`
+- **1–5:** Low activity → mark `LOW DRIFT`
+- **6–20:** Moderate activity → mark `MODERATE DRIFT` (consider Audit)
+- **21+:** High activity → mark `HIGH DRIFT` (run Audit)
+
+If `dir-commits-at-audit` field is missing (legacy format): fall back to time-based `--since` method:
 ```
 git log --oneline --since="{CLAUDE.md last modified date}" -- {directory}/
 ```
+Apply same thresholds. Flag as `[LEGACY FORMAT]` in report.
 
-- **0 commits:** No activity since last update → mark `FRESH`
-- **1–5 commits:** Low activity → mark `LOW DRIFT` (probably fine)
-- **6–20 commits:** Moderate activity → mark `MODERATE DRIFT` (consider Audit)
-- **21+ commits:** High activity → mark `HIGH DRIFT` (run Audit)
+**Signal B — Structural Fingerprint (secondary):**
 
-Also check for structural changes (new directories added since last CLAUDE.md update):
+Compute current tree signature for the covered directory:
+```
+dirs={count of subdirectories},files={count of files},exts:{ext}:{count},...
+```
+Example: `dirs:5,files:23,exts:ts:12,md:4`
+
+If the CLAUDE.md contains `tree-sig={stored_sig}`:
+- Compare stored vs. current. Any mismatch → mark `STRUCTURAL CHANGE` regardless of commit delta.
+- Structural changes (new dirs, deleted files, new file types) are highest-priority drift signals.
+
+If `tree-sig` field is missing (legacy format): fall back to git-based structural detection:
 ```
 git log --oneline --diff-filter=A --since="{date}" --name-only -- {directory}/
 ```
-If new subdirectories appear: mark `STRUCTURAL CHANGE` regardless of commit count.
 
-### Step 4 — Check Freshness Timestamps (if present)
+**Staleness priority:** `STRUCTURAL CHANGE > HIGH DRIFT > MODERATE DRIFT > LOW DRIFT > FRESH`
+
+### Step 4 — Parse Freshness Timestamps
 
 If a CLAUDE.md contains a line matching `<!-- context-layer: generated=... -->`:
-- Parse the `last-audited` field
+
+**Parse all fields:** `generated`, `last-audited`, `version`, `dir-commits-at-audit`, `tree-sig`
+
+**Time-based flags (tiebreaker — used when commit delta and tree-sig both show FRESH):**
 - If `last-audited=never` and file is >30 days old: add `NEVER AUDITED` flag
-- If `last-audited` date is >60 days ago: add `AUDIT OVERDUE` flag
+- If `last-audited` date is >90 days ago: add `STALE (CALENDAR)` flag
+
+**Missing fields (backward compatibility):**
+- No `dir-commits-at-audit` → Step 3 already fell back to time-based; flag `[LEGACY FORMAT]`
+- No `tree-sig` → Step 3 already fell back to git-based structural detection; flag `[LEGACY FORMAT]`
+- `[LEGACY FORMAT]` files should be prioritized for next Generate/Audit to populate new fields
 
 ### Step 5 — Report
 
@@ -68,28 +100,34 @@ Output a staleness report:
 ```
 ContextLayer Drift Report — {date}
 
-FRESH (no action needed):
-  ✓ {path} — last updated {date}, {N} commits since = 0
-
-LOW DRIFT (monitor):
-  ~ {path} — last updated {date}, {N} commits since update
-
-MODERATE DRIFT (consider Audit):
-  ⚠ {path} — last updated {date}, {N} commits since update
-  ⚠ {path} — AUDIT OVERDUE (last audited {date})
+STRUCTURAL CHANGE (highest priority — run Audit):
+  ✗ {path} — tree-sig mismatch: stored={old_sig} current={new_sig}
 
 HIGH DRIFT (run Audit):
-  ✗ {path} — last updated {date}, {N} commits since update
-  ✗ {path} — STRUCTURAL CHANGE: new directories added since last update
+  ✗ {path} — {N} commits since audit (delta: {current} - {baseline})
   ✗ {path} — NEVER AUDITED ({N} days since generation)
+
+MODERATE DRIFT (consider Audit):
+  ⚠ {path} — {N} commits since audit
+  ⚠ {path} — STALE (CALENDAR) — last audited {date}, >90 days ago
+
+LOW DRIFT (monitor):
+  ~ {path} — {N} commits since audit
+
+FRESH (no action needed):
+  ✓ {path} — 0 commits since audit, tree-sig unchanged
+
+LEGACY FORMAT (upgrade on next Audit/Generate):
+  ⚙ {path} — missing dir-commits-at-audit and/or tree-sig fields
 
 MISSING COVERAGE:
   ✗ {dir} — no CLAUDE.md, {N} files
 
 Recommended actions:
-  Run Audit on: [{list of HIGH DRIFT and STRUCTURAL CHANGE paths}]
-  Consider Audit on: [{list of MODERATE DRIFT paths}]
-  Consider Generate for: [{list of MISSING COVERAGE dirs}]
+  Run Audit on: [{STRUCTURAL CHANGE and HIGH DRIFT paths}]
+  Consider Audit on: [{MODERATE DRIFT paths}]
+  Upgrade format on: [{LEGACY FORMAT paths}]
+  Consider Generate for: [{MISSING COVERAGE dirs}]
 ```
 
 **No files are modified by Drift.** It is read-only. All changes happen in Audit or Generate.

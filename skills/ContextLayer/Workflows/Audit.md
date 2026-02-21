@@ -118,6 +118,12 @@ For each CLAUDE.md, apply agent results:
    with the current template from PruningInstruction.md (preserving the freshness timestamp
    comment if present)
 5. **Still accurate entries** → keep unchanged
+6. **Update freshness timestamp** → In the `<!-- context-layer: ... -->` comment:
+   - Set `last-audited` to today's date
+   - Increment `version` by 1
+   - Recompute `dir-commits-at-audit`: run `git rev-list --count HEAD -- {directory}/`
+   - Recompute `tree-sig`: count subdirs, files, extensions in covered directory (format: `dirs:{N},files:{N},exts:{ext}:{N},...`)
+   - If `dir-commits-at-audit` or `tree-sig` fields are missing (legacy format), add them now
 
 ### Step 4.5 — Budget Check (when content was added)
 

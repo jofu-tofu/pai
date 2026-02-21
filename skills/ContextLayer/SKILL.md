@@ -21,7 +21,7 @@ When a workflow is matched, **read its file and follow the steps within it.**
 | **Generate** | No CLAUDE.md exists, full rebuild needed, new project onboarding | `Workflows/Generate.md` |
 | **Audit** | CLAUDE.md may be wrong/outdated/incomplete, agent confusion reported | `Workflows/Audit.md` |
 | **Prune** | CLAUDE.md too large or noisy, token budget exceeded, reduce overhead | `Workflows/Prune.md` |
-| **Drift** | Check staleness without full Audit, git-based diagnostic, cheap check | `Workflows/Drift.md` |
+| **Drift** | Check staleness via commit-delta + structural fingerprint, cheap diagnostic | `Workflows/Drift.md` |
 
 ### Workflow Selection Guide
 
@@ -53,7 +53,7 @@ most common need and causes no harm if the content was already correct.
 - **Generate** → parallel haiku agents per subsystem → synthesized CLAUDE.md tree
 - **Audit** → new-content scan + haiku agents verify claims → auto-apply corrections
 - **Prune** → content-only pass (no filesystem reads) → remove low-signal lines
-- **Drift** → git log staleness check → diagnostic report, no file changes
+- **Drift** → commit-delta + tree-sig fingerprint → diagnostic report, no file changes
 - **Budget:** Root 800–1500 tokens | Subdir 200–500 tokens
 - **Auto-apply:** All workflows write changes directly — reversible via git
 - **Protected:** `## Context Maintenance` sections are never removed by Prune (see Prune Step 2.5)
