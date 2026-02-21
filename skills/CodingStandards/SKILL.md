@@ -1,17 +1,19 @@
 ---
 name: CodingStandards
-description: "Language-specific coding standards and best practices knowledge base. USE WHEN writing React components OR applying React best practices OR refactoring Next.js code OR designing component APIs OR optimizing performance OR eliminating waterfalls OR reducing bundle size OR working with Server Components OR building compound components OR refactoring boolean prop proliferation OR writing TypeScript code OR applying TypeScript standards OR refactoring TypeScript OR type safety decisions OR error handling patterns OR configuring tsconfig OR working with generics OR discriminated unions OR Zod validation OR writing C# code OR applying C# coding standards OR refactoring .NET code OR discussing async patterns OR null safety OR writing Python code OR applying Python best practices OR refactoring Python OR debugging Python issues. Contains 120 rules across 4 languages (React: 65, TypeScript: 19, C#: 18, Python: 18)."
+description: "Language-specific coding standards and best practices knowledge base. USE WHEN writing React components OR applying React best practices OR refactoring Next.js code OR designing component APIs OR optimizing performance OR eliminating waterfalls OR reducing bundle size OR working with Server Components OR building compound components OR refactoring boolean prop proliferation OR writing TypeScript code OR applying TypeScript standards OR refactoring TypeScript OR type safety decisions OR error handling patterns OR configuring tsconfig OR working with generics OR discriminated unions OR Zod validation OR writing C# code OR applying C# coding standards OR refactoring .NET code OR discussing async patterns OR null safety OR writing Python code OR applying Python best practices OR refactoring Python OR debugging Python issues OR writing Svelte components OR applying Svelte 5 best practices OR working with SvelteKit OR using runes OR $state OR $derived OR $effect OR $props OR Svelte reactivity OR SvelteKit routing OR SvelteKit form actions OR writing Tailwind CSS OR applying Tailwind best practices OR utility class ordering OR Tailwind responsive design OR dark mode with Tailwind OR @apply usage OR Tailwind configuration OR Tailwind accessibility. Contains 188 rules across 6 languages (React: 65, Svelte: 36, Tailwind: 32, TypeScript: 19, C#: 18, Python: 18)."
 ---
 
 # CodingStandards
 
-A static, indexed knowledge base of coding standards for React/Next.js, TypeScript, C#, and Python. **120 rules across 4 languages.** Use the Language Lookup table below to navigate directly to the right workflow and rules.
+A static, indexed knowledge base of coding standards for React/Next.js, Svelte/SvelteKit, Tailwind CSS, TypeScript, C#, and Python. **188 rules across 6 languages.** Use the Language Lookup table below to navigate directly to the right workflow and rules.
 
 ## Language Lookup
 
 | Language | File Signals | Workflow | Rules Directory | Count |
 |----------|-------------|---------|-----------------|-------|
 | React / Next.js | `.tsx`, `.jsx`, React imports (`from 'react'`), `next.config.*`, `use client`, `use server` | `Workflows/React.md` | `Rules/React/` | 65 |
+| Svelte / SvelteKit | `.svelte`, `.svelte.ts`, `svelte.config.*`, `+page.svelte`, `+layout.svelte`, `+page.server.ts` | `Workflows/Svelte.md` | `Rules/Svelte/` | 36 |
+| Tailwind CSS | `tailwind.config.*`, `@tailwind`, `@apply`, `@theme`, `@import "tailwindcss"`, utility class patterns in HTML/JSX | `Workflows/Tailwind.md` | `Rules/Tailwind/` | 32 |
 | TypeScript | `.ts` (non-React), `tsconfig.json`, generics, `z.infer`, Zod imports | `Workflows/TypeScript.md` | `Rules/TypeScript/` | 19 |
 | C# / .NET | `.cs`, `.csproj`, `.sln`, `using` statements, `namespace` declarations | `Workflows/CSharp.md` | `Rules/CSharp/` | 18 |
 | Python | `.py`, `requirements.txt`, `pyproject.toml`, `setup.py`, `__init__.py` | `Workflows/Python.md` | `Rules/Python/` | 18 |
@@ -25,11 +27,13 @@ For multi-language contexts (e.g., TypeScript + Python full-stack), read both ma
 | Workflow | Trigger | File |
 |----------|---------|------|
 | **React** | React components, JSX patterns, Next.js optimization, Server Components, hydration issues | `Workflows/React.md` |
+| **Svelte** | Svelte 5 runes, SvelteKit routing, form actions, reactivity patterns, $state/$derived/$effect | `Workflows/Svelte.md` |
+| **Tailwind** | Tailwind utility classes, class ordering, @apply usage, responsive utilities, dark mode variants, Tailwind config | `Workflows/Tailwind.md` |
 | **TypeScript** | TypeScript type safety, tsconfig setup, generics, discriminated unions, Zod validation | `Workflows/TypeScript.md` |
 | **CSharp** | C# class design, async/await in .NET, nullable context, .csproj configuration | `Workflows/CSharp.md` |
 | **Python** | Python type hints, defensive programming, error handling, code organization | `Workflows/Python.md` |
 
-**If no language matches:** This skill only covers React, TypeScript, C#, and Python. For unsupported languages, see `LanguageIndex.md` for the gap list.
+**If no language matches:** This skill only covers React, Svelte, Tailwind CSS, TypeScript, C#, and Python. For unsupported languages, see `LanguageIndex.md` for the gap list.
 
 ## How to Use
 
@@ -72,4 +76,12 @@ User: "Add proper type hints to this Python module"
 -> Matches Python signal (.py, type hints)
 -> Reads Workflows/Python.md
 -> Applies TypeHintsRequired, TypeAvoidAny, TypeLiteralValues rules
+```
+
+**Example 5: Svelte 5 reactivity**
+```
+User: "I need to fix reactivity issues in my Svelte 5 component"
+-> Matches Svelte signal (.svelte, reactivity concern)
+-> Reads Workflows/Svelte.md
+-> Applies DerivedOverEffect, NoStateInEffect, NarrowReactiveDeps rules
 ```

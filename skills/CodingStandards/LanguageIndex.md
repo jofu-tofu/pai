@@ -2,11 +2,13 @@
 
 Authoritative registry of supported languages and known gaps in CodingStandards.
 
-## Supported (4)
+## Supported (6)
 
 | Language | Workflow | Rules Directory | Count | Sources |
 |----------|---------|-----------------|-------|---------|
 | React / Next.js | `Workflows/React.md` | `Rules/React/` | 65 | Vercel Engineering (Jan 2026) |
+| Svelte 5 / SvelteKit | `Workflows/Svelte.md` | `Rules/Svelte/` | 36 | Svelte docs, Joy of Code, Captain Codeman, Mainmatter |
+| Tailwind CSS | `Workflows/Tailwind.md` | `Rules/Tailwind/` | 32 | Tailwind official docs (v3/v4), prettier-plugin-tailwindcss, eslint-plugin-tailwindcss, Adam Wathan, Evil Martians, Atomic Object |
 | TypeScript | `Workflows/TypeScript.md` | `Rules/TypeScript/` | 19 | Matt Pocock, Steve Kinney |
 | C# / .NET | `Workflows/CSharp.md` | `Rules/CSharp/` | 18 | csharpcodingguidelines.com, dotnet-cursor-rules |
 | Python | `Workflows/Python.md` | `Rules/Python/` | 18 | minimaxir, Dagster "Dignified Python" |
