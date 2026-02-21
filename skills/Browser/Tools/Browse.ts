@@ -126,6 +126,15 @@ function truncate(str: string, maxLen: number): string {
   return str.slice(0, maxLen - 3) + '...'
 }
 
+const A11Y_MAX_LINES = 200
+
+function formatAccessibilityTree(tree: string): string {
+  const lines = tree.split('\n')
+  if (lines.length <= A11Y_MAX_LINES) return tree
+  return lines.slice(0, A11Y_MAX_LINES).join('\n') +
+    `\n[truncated — showing first ${A11Y_MAX_LINES} of ${lines.length} lines]`
+}
+
 // ============================================
 // SESSION MANAGEMENT
 // ============================================
@@ -346,11 +355,20 @@ async function debugUrl(url: string): Promise<void> {
   const screenshotPath = join(tmpdir(), `browse-${timestamp}.png`)
   await sessionCommand('screenshot', { path: screenshotPath })
 
-  // Get diagnostics
-  const diag = await sessionCommand('diagnostics', {}, 'GET') as Diagnostics
+  // Get diagnostics and accessibility tree in parallel
+  const [diag, a11yData] = await Promise.all([
+    sessionCommand('diagnostics', {}, 'GET') as Promise<Diagnostics>,
+    sessionCommand('accessibility', {}, 'GET').catch(() => null) as Promise<{ tree: string } | null>
+  ])
 
-  // Output
+  // Output diagnostics
   console.log(formatDiagnostics(diag, screenshotPath))
+
+  // Output accessibility tree
+  if (a11yData?.tree) {
+    console.log('\nAccessibility Tree:')
+    console.log(formatAccessibilityTree(a11yData.tree))
+  }
 }
 
 async function showErrors(): Promise<void> {
@@ -454,24 +472,55 @@ async function takeScreenshot(path?: string): Promise<void> {
   console.log(`Screenshot: ${screenshotPath}`)
 }
 
+async function getA11yTree(): Promise<string | null> {
+  try {
+    const data = await sessionCommand('accessibility', {}, 'GET') as { tree: string }
+    return data?.tree || null
+  } catch {
+    return null
+  }
+}
+
+async function printA11yTree(): Promise<void> {
+  const tree = await getA11yTree()
+  if (tree) {
+    console.log('\nAccessibility Tree:')
+    console.log(formatAccessibilityTree(tree))
+  }
+}
+
+async function showAccessibilityTree(): Promise<void> {
+  const tree = await getA11yTree()
+  if (tree) {
+    console.log('Accessibility Tree:')
+    console.log(formatAccessibilityTree(tree))
+  } else {
+    console.log('No accessibility tree available (navigate to a page first)')
+  }
+}
+
 async function navigate(url: string): Promise<void> {
   const result = await sessionCommand('navigate', { url })
   console.log(`Navigated to: ${result.url}`)
+  await printA11yTree()
 }
 
 async function click(selector: string): Promise<void> {
   await sessionCommand('click', { selector })
   console.log(`Clicked: ${selector}`)
+  await printA11yTree()
 }
 
 async function fill(selector: string, value: string): Promise<void> {
   await sessionCommand('fill', { selector, value })
   console.log(`Filled: ${selector}`)
+  await printA11yTree()
 }
 
 async function type(selector: string, text: string): Promise<void> {
   await sessionCommand('type', { selector, text })
   console.log(`Typed in: ${selector}`)
+  await printA11yTree()
 }
 
 async function evaluate(script: string): Promise<void> {
@@ -625,6 +674,7 @@ Usage:
   bun run Browse.ts <url>                    Navigate with full diagnostics
   bun run Browse.ts <url> --headless         Navigate in headless mode (faster, no window)
   bun run Browse.ts detect                   Scan for local dev servers on common ports
+  bun run Browse.ts a11y                     Show accessibility tree of current page
   bun run Browse.ts errors                   Show console errors
   bun run Browse.ts warnings                 Show console warnings
   bun run Browse.ts console                  Show all console output
@@ -679,6 +729,12 @@ async function main(): Promise<void> {
 
     // Named commands
     switch (command) {
+      case 'a11y':
+      case 'accessibility':
+      case 'tree':
+        await showAccessibilityTree()
+        break
+
       case 'errors':
         await showErrors()
         break
@@ -793,9 +849,62 @@ async function main(): Promise<void> {
         process.exit(1)
     }
   } catch (err: any) {
-    console.error(`Error: ${err.message}`)
+    handleError(err)
     process.exit(1)
   }
+}
+
+function handleError(err: any): void {
+  const msg = err.message || String(err)
+
+  // Playwright not installed
+  if (msg.includes('Cannot find module') && msg.includes('playwright') ||
+      msg.includes('browserType.launch') ||
+      msg.includes('Executable doesn\'t exist') ||
+      msg.includes('executable doesn\'t exist')) {
+    console.error('Error: Playwright is not installed or browsers are missing.\n')
+    console.error('To fix, run:')
+    console.error('  npx playwright install chromium\n')
+    console.error('If Playwright itself is not installed:')
+    console.error('  npm install playwright')
+    console.error('  npx playwright install chromium')
+    return
+  }
+
+  // Port in use
+  if (msg.includes('EADDRINUSE') || msg.includes('address already in use')) {
+    console.error(`Error: Port ${DEFAULT_PORT} is already in use.\n`)
+    console.error('This may be another browser session or a different process.')
+    console.error('To fix:')
+    console.error(`  1. Stop the existing session: bun run Browse.ts stop`)
+    console.error(`  2. Or kill the process: lsof -ti:${DEFAULT_PORT} | xargs kill`)
+    console.error(`  3. Or restart: bun run Browse.ts restart`)
+    return
+  }
+
+  // Session start timeout
+  if (msg.includes('Failed to start browser session')) {
+    console.error('Error: Browser session failed to start within timeout.\n')
+    console.error('Common causes:')
+    console.error('  1. Playwright browsers not installed → npx playwright install chromium')
+    console.error('  2. Another session is stuck → bun run Browse.ts restart')
+    console.error('  3. System resources exhausted → close other browser instances')
+    if (!isWindows) {
+      console.error(`  4. Check for orphan processes: ps aux | grep BrowserSession`)
+    }
+    return
+  }
+
+  // Connection refused (server died)
+  if (msg.includes('ECONNREFUSED') || msg.includes('fetch failed')) {
+    console.error('Error: Cannot connect to browser session.\n')
+    console.error('The session may have crashed. Try:')
+    console.error('  bun run Browse.ts restart')
+    return
+  }
+
+  // Generic fallback
+  console.error(`Error: ${msg}`)
 }
 
 main()

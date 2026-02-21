@@ -21,6 +21,7 @@ export interface LaunchOptions {
   headless?: boolean
   viewport?: { width: number; height: number }
   userAgent?: string
+  executablePath?: string
 }
 
 export interface NavigateOptions {
@@ -98,7 +99,8 @@ export class PlaywrightBrowser {
     const launcher = browserType === 'firefox' ? firefox : browserType === 'webkit' ? webkit : chromium
 
     this.browser = await launcher.launch({
-      headless: options?.headless ?? false
+      headless: options?.headless ?? false,
+      ...(options?.executablePath ? { executablePath: options.executablePath } : {})
     })
 
     this.context = await this.browser.newContext({

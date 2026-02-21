@@ -11,6 +11,24 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'http'
 // Runtime detection
 export const isBun = typeof globalThis.Bun !== 'undefined'
 export const isWindows = process.platform === 'win32'
+export const isWSL = !isWindows && process.platform === 'linux'
+  && (process.env.WSL_DISTRO_NAME !== undefined || process.env.WSLENV !== undefined)
+
+/**
+ * Find Windows Chrome executable from WSL via /mnt/c/ paths.
+ * Returns the path if found, undefined otherwise.
+ */
+export async function findWindowsChrome(): Promise<string | undefined> {
+  if (!isWSL) return undefined
+  const candidates = [
+    '/mnt/c/Program Files/Google/Chrome/Application/chrome.exe',
+    '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+  ]
+  for (const path of candidates) {
+    if (await fileExists(path)) return path
+  }
+  return undefined
+}
 
 // ============================================
 // FILE I/O

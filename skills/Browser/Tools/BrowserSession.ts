@@ -32,7 +32,7 @@
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { PlaywrightBrowser } from '../index.ts'
-import { writeFileCompat, fileExists, removeFile, serve } from './compat.ts'
+import { writeFileCompat, fileExists, removeFile, serve, isWSL, findWindowsChrome } from './compat.ts'
 
 const CONFIG = {
   port: parseInt(process.env.BROWSER_PORT || '9222'),
@@ -127,15 +127,24 @@ function error(message: string, status = 500): Response {
 // LAUNCH BROWSER
 // ============================================
 
+// Resolve executable path: env override > Playwright default
+// NOTE: On WSL2, Windows Chrome is NOT usable via Playwright due to WSL2 NAT networking.
+// Chrome binds DevTools to Windows 127.0.0.1 which is unreachable from WSL2.
+// To fix: add `networkingMode=mirrored` to %USERPROFILE%\.wslconfig and restart WSL.
+const executablePath = process.env.BROWSER_EXECUTABLE || undefined
+
 console.log('Starting browser session...')
 console.log(`  Port: ${CONFIG.port}`)
 console.log(`  Headless: ${CONFIG.headless}`)
 console.log(`  Viewport: ${CONFIG.viewport.width}x${CONFIG.viewport.height}`)
 console.log(`  Idle timeout: ${CONFIG.idleTimeout / 60000} minutes`)
+if (executablePath) console.log(`  Executable: ${executablePath}`)
+if (isWSL) console.log(`  WSL detected: using Linux Chromium (Windows Chrome requires mirrored networking)`)
 
 await browser.launch({
   headless: CONFIG.headless,
-  viewport: CONFIG.viewport
+  viewport: CONFIG.viewport,
+  ...(executablePath ? { executablePath } : {})
 })
 
 // ============================================
@@ -194,6 +203,12 @@ const server = serve({
           pageTitle: await browser.getTitle(),
           pageUrl: browser.getUrl()
         })
+      }
+
+      // Accessibility tree snapshot
+      if (url.pathname === '/accessibility' && method === 'GET') {
+        const tree = await browser.getAccessibilityTree()
+        return success({ tree })
       }
 
       // Console logs

@@ -35,7 +35,7 @@ This file is maintained manually or by future automation. If it doesn't exist, p
 
 Debugging shouldn't be opt-in. Like good logging frameworks - you don't turn on logging when you have a problem, you have it enabled from the start so the data exists when problems occur.
 
-**Visible by default.** All automation runs with browser window VISIBLE for debugging. This is intentional - you can see exactly what's happening.
+**Headed (visible) by default.** All automation runs with the browser window VISIBLE — this is the default and intentional. You can see exactly what's happening. Use `--headless` flag only when you explicitly need faster, invisible execution.
 
 **v2.0.0 Changes:**
 - Session auto-starts on first use (no explicit `session start`)
@@ -82,12 +82,15 @@ Navigates to URL, takes screenshot, and reports:
 ### Query Commands
 
 ```bash
+bun run Browse.ts a11y        # Accessibility tree (text representation of page)
 bun run Browse.ts errors      # Console errors only
 bun run Browse.ts warnings    # Console warnings only
 bun run Browse.ts console     # All console output
 bun run Browse.ts network     # All network activity
 bun run Browse.ts failed      # Failed requests only (4xx, 5xx)
 ```
+
+> **Token-saving tip:** The accessibility tree provides a structured text representation of the page. Use `a11y` instead of `screenshot` when you need to understand page structure without the token cost of an image. Navigation and interaction commands (click, fill, type, navigate) automatically output the accessibility tree after execution.
 
 ### Interaction Commands
 
@@ -203,7 +206,8 @@ Session auto-closes after 30 minutes of inactivity:
 
 | Command | Description |
 |---------|-------------|
-| `<url>` | Navigate with full diagnostics |
+| `<url>` | Navigate with full diagnostics + accessibility tree |
+| `a11y` | Show accessibility tree of current page |
 | `errors` | Show console errors |
 | `warnings` | Show console warnings |
 | `console` | Show all console output |
@@ -227,6 +231,7 @@ Session auto-closes after 30 minutes of inactivity:
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/diagnostics` | GET | Full diagnostic summary |
+| `/accessibility` | GET | Accessibility tree snapshot |
 | `/console` | GET | Console logs |
 | `/network` | GET | Network logs |
 | `/health` | GET | Health check |
