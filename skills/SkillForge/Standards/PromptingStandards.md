@@ -88,6 +88,23 @@ Use "Do X", not "You should do X" or "It is recommended to do X."
 
 ---
 
+## Why-Statement Hardening (Trigger Reliability)
+
+When a skill undertriggers despite having correct USE WHEN phrases, the problem is often that the model decides to do the work directly instead of invoking the skill. Adding a **consequence-driven why-statement** before the USE WHEN clause tells the model what it loses by skipping the skill.
+
+**Pattern:** `[Opening sentence]. [Why-statement explaining what breaks if skipped]. USE WHEN [triggers]`
+
+**Example:**
+```
+description: Create, modify, and maintain skills. MANDATORY for ALL skill modifications — direct Edit bypasses quality gates, workflow chains, and evaluation rubrics. USE WHEN create skill OR ...
+```
+
+**When to use:** When a skill has quality gates, workflow chains, or evaluation pipelines that direct tool calls would bypass. The why-statement reframes the model's cost-benefit from "can I do this myself?" to "I must invoke this or I'll break the pipeline."
+
+**Tension with soft language:** PromptingStandards recommend soft trigger language to avoid overtriggering. Why-statements are an exception — they address undertriggering by explaining consequences, not by commanding action. Use only when undertriggering is the documented problem.
+
+---
+
 ## Anti-Patterns to Avoid
 
 ❌ **Verbose explanations** — Don't explain reasoning behind every instruction. Be direct.

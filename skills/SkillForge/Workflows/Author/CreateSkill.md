@@ -80,6 +80,16 @@ mkdir -p $PAI_DIR/skills/Daemon/Workflows
 mkdir -p $PAI_DIR/skills/Daemon/Tools
 ```
 
+## Step 4.5: Authoring Context Load
+
+Read the prompting standards before writing any skill content:
+
+```
+$PAI_DIR/skills/SkillForge/Standards/PromptingStandards.md
+```
+
+This is a context load, not a gate. Use these standards while writing the description, USE WHEN clause, and trigger phrases in Steps 5-6. The post-completion AgentEvalOrchestrator will verify — this step ensures you write correctly the first time.
+
 ## Step 5: Create SKILL.md
 
 Follow this exact structure:

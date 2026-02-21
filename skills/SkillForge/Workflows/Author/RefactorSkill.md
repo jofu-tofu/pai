@@ -58,6 +58,16 @@ Gather from user:
 - Trigger phrase(s)
 - Purpose/description
 
+#### Step Q-A1.5: Authoring Context Load
+
+Read the prompting standards before writing any content:
+
+```
+$PAI_DIR/skills/SkillForge/Standards/PromptingStandards.md
+```
+
+This is a context load, not a gate. Use these standards when formulating trigger phrases and workflow descriptions in Q-A2 and Q-A3. Step Q-A2.5 will verify trigger phrase quality — this step ensures you propose correctly-formed phrases the first time.
+
 #### Step Q-A2: Create Workflow File
 
 Create `$PAI_DIR/skills/[SkillName]/Workflows/[WorkflowName].md`:
@@ -409,6 +419,16 @@ Dependencies: None
 ```
 
 **Result:** Clear, concise documentation for a simple 1-file refactor. For complex refactors, expand each section accordingly.
+
+### Step 4.5: Authoring Context Load
+
+Read the prompting standards before executing changes:
+
+```
+$PAI_DIR/skills/SkillForge/Standards/PromptingStandards.md
+```
+
+This is a context load, not a gate. Use these standards while executing changes in Step 5. The post-completion AgentEvalOrchestrator will verify — this step ensures you write correctly the first time.
 
 ### Step 5: Execute Changes
 

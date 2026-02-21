@@ -93,6 +93,22 @@ Do not proceed to Step 3 until all three sections are present. There is no defer
 | Update examples | `## Examples` section |
 | Add new section | Markdown body |
 
+### Step 3.5: Authoring Context Load
+
+If this modification touches user-facing wording (description, USE WHEN clause, trigger phrases, examples), read the prompting standards before writing:
+
+```
+$PAI_DIR/skills/SkillForge/Standards/PromptingStandards.md
+```
+
+This is a context load, not a gate. Use these standards while making changes in Step 4. Step 4.5 will verify the output — this step ensures you write correctly the first time.
+
+**When in doubt, load.** The cost of reading 139 lines is negligible; the cost of skipping when wording is involved creates a rewrite loop. Only skip for changes that are unambiguously structural:
+- **Skip examples:** section reordering with no wording edits, path-only renames, adding a missing `Tools/` directory
+- **Load examples:** editing description text, changing USE WHEN clause, modifying trigger phrases, rewriting examples, renaming a trigger phrase for clarity
+
+Record reason if skipped. Uses the same scope as Step 4.5.
+
 ### Step 4: Apply Changes
 
 **For frontmatter changes:**
