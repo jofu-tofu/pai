@@ -1,12 +1,12 @@
 ---
 name: PresentationForge
-description: Format-aware presentation authoring for HTML and PowerPoint deliverables. USE WHEN user wants to create a presentation, choose between lightweight HTML slides and professional PPT decks, convert between HTML and PPT, or polish a deck for delivery.
+description: Format-aware document and presentation authoring for HTML documents and PowerPoint deliverables. USE WHEN user wants to create a presentation, create an HTML document, choose between HTML documents and professional PPT decks, convert between formats, run readability checks, polish a deck for delivery, visualize architecture, diagram the codebase, create architecture diagram, show type flow, diagram how modules connect, or create a visual explanation of code.
 ---
 
 # PresentationForge
 
-Create and refine presentation decks with a format-first strategy:
-- HTML for lightweight, link-friendly, low-overhead decks
+Create and refine documents and presentations with a content-first, format-aware strategy:
+- HTML for scrollable, link-friendly, readable documents
 - PPT/PPTX for enterprise and formal stakeholder settings
 
 ## Workflow Routing
@@ -22,42 +22,45 @@ Running the **WorkflowName** workflow from the **PresentationForge** skill...
 | Workflow | Trigger | File |
 |----------|---------|------|
 | **CreatePresentation** | "create presentation", "build slide deck", "make deck", "make a slideshow", "generate slides" | `Workflows/CreatePresentation.md` |
-| **CreateHtmlPresentation** | "create html slides", "build web slides", "create lightweight slides" | `Workflows/CreateHtmlPresentation.md` |
+| **CreateHtmlDocument** | "create html document", "build web document", "create html report", "create scrollable report" | `Workflows/CreateHtmlDocument.md` |
 | **CreatePptPresentation** | "create ppt deck", "create powerpoint deck", "create professional deck" | `Workflows/CreatePptPresentation.md` |
 | **RepurposePresentation** | "convert presentation", "html to ppt", "ppt to html", "html to powerpoint", "powerpoint to html", "turn into powerpoint" | `Workflows/RepurposePresentation.md` |
 | **ReviewPresentation** | "review presentation", "polish slide deck", "presentation quality check" | `Workflows/ReviewPresentation.md` |
+| **ReadabilityGate** | "readability check", "check readability", "run readability gate" | `Workflows/ReadabilityGate.md` |
 
 ## Context Files
 
 | File | Purpose |
 |------|---------|
 | `FirstPrinciples.md` | Fundamental model, constraint classification, and architecture rationale |
-| `FormatSelection.md` | Decision matrix for choosing HTML vs PPT |
+| `FormatSelection.md` | Decision matrix for choosing HTML Document vs PPT |
 | `ToolingLandscape.md` | Verified external tooling and community references with trade-offs |
-| `QualityChecklist.md` | Cross-format quality bar for content and visual execution |
+| `Standards/ReadabilityStandards.md` | Research-backed readability rules for all content types (35 rules) |
+| `Standards/CodebaseAnalysisStandards.md` | Content-specific rules for codebase analysis documents (~28 rules) |
 
 ## Examples
 
-**Example 1: Lightweight HTML deck**
+**Example 1: Codebase analysis document**
 ```
-User: "Create html slides for a 7-minute product update"
--> Invokes CreateHtmlPresentation workflow
--> Selects best-fit HTML engine for the use case
--> Returns deck files plus a short speaker script
+User: "Create an html document analyzing this codebase's architecture"
+-> Invokes CreatePresentation workflow
+-> Detects content type: codebase-analysis
+-> Routes to CreateHtmlDocument for scrollable HTML output
+-> Auto-chains ReadabilityGate with general + codebase-analysis standards
 ```
 
 **Example 2: Professional board deck**
 ```
 User: "Create a powerpoint deck for executive review"
 -> Invokes CreatePptPresentation workflow
--> Uses template-safe PPT path and applies presentation quality checklist
+-> Uses template-safe PPT path and applies readability standards
 -> Returns a professional PPTX-ready structure with notes
 ```
 
-**Example 3: Convert and polish**
+**Example 3: Readability check**
 ```
-User: "Convert this markdown deck from html to ppt and polish it"
--> Invokes RepurposePresentation workflow
--> Converts while preserving message hierarchy and identifies fidelity risks
--> Chains to ReviewPresentation checks and returns fix list
+User: "Run a readability check on this document"
+-> Invokes ReadabilityGate workflow
+-> Scores against ReadabilityStandards (+ content-type-specific standards if applicable)
+-> Returns advisory PASS/FAIL verdict with severity-ranked findings
 ```

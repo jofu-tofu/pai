@@ -5,13 +5,13 @@
 ## Scope
 
 **Best fit for:** Building PowerPoint/PPTX presentations when the output format is already decided as PPT.
-**Route to:** `CreatePresentation` when format choice is still open and a full content-strategy pass is needed. `CreateHtmlPresentation` when the user needs browser-native HTML slides. `RepurposePresentation` for converting an existing deck. For graphic design services, proprietary vendor templates the user has not provided, or lossless round-trip conversion guarantees, use dedicated tools instead.
+**Route to:** `CreatePresentation` when format choice is still open and a full content-strategy pass is needed. `CreateHtmlDocument` when the user needs a scrollable HTML document. `RepurposePresentation` for converting an existing deck. For graphic design services, proprietary vendor templates the user has not provided, or lossless round-trip conversion guarantees, use dedicated tools instead.
 
 ## Reference Material
 
 - `../FirstPrinciples.md`
 - `../ToolingLandscape.md`
-- `../QualityChecklist.md`
+- `../Standards/ReadabilityStandards.md`
 
 ## Purpose
 
@@ -78,14 +78,14 @@ python build_deck.py
 
 ### Step 4: Professional Quality Pass
 
-Apply PPT section of `../QualityChecklist.md`:
+Apply `../Standards/ReadabilityStandards.md` for PPT format:
 - Open in target PowerPoint environment
 - Verify templates, fonts, and notes
 - Check file weight and distribution constraints
 
 ### Step 5: Handle Build Issues
 
-If the selected build tool is unavailable or fails, try the next approach in priority order (Marp CLI → PptxGenJS → python-pptx). Report which path was used and why the preferred tool was skipped. If `QualityChecklist.md` or `ToolingLandscape.md` are unavailable, apply inline quality checks and note the missing reference in the output.
+If the selected build tool is unavailable or fails, try the next approach in priority order (Marp CLI → PptxGenJS → python-pptx). Report which path was used and why the preferred tool was skipped. If `ReadabilityStandards.md` or `ToolingLandscape.md` are unavailable, apply inline quality checks and note the missing reference in the output.
 
 ### Step 6: Return Artifacts
 
