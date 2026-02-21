@@ -22,6 +22,10 @@ the code, and it belongs at this scope (project-wide rule → root CLAUDE.md; WH
 how an agent acts here, remove it. If a convention here conflicts with the codebase,
 the codebase wins — update this file, do not work around it. Prune aggressively.
 
+**Track follow-up work:** After modifying files, evaluate whether changes create incomplete
+work, shift a phase status, or break an assumption tracked elsewhere. If so, create a task
+or update the relevant tracking document before ending the session. Do not leave implicit TODOs.
+
 **Staleness anchor:** This file assumes `[key_entry_point]` exists. If it doesn't, this file
 is stale — update or regenerate before relying on it.
 

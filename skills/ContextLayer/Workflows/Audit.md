@@ -62,6 +62,7 @@ Before dispatching haiku agents, scan for directories and files that should be i
 3. **New top-level dirs:** If the CLAUDE.md has a `## File Structure` or `## Subsystems` section, check if any top-level directories exist that aren't listed → flag as `[MISSING STRUCTURE ENTRY]`
 4. **Missing maintenance trigger:** If this CLAUDE.md has a `## Context Maintenance` section but does NOT contain text matching "After modifying files" → flag as `[MISSING MAINTENANCE TRIGGER]`
 5. **Broken staleness anchor:** If the `## Context Maintenance` section contains a "Staleness anchor" line referencing a file path, check if that path exists on disk. If it does NOT exist → flag as `[BROKEN STALENESS ANCHOR]` — this is a strong signal the entire file needs regeneration, not just patching.
+6. **Missing task tracking rule:** If this CLAUDE.md has a `## Context Maintenance` section but does NOT contain text matching "follow-up work" or "create a task" → flag as `[MISSING TASK TRACKING RULE]`
 
 Output a **Missing Entries Checklist** before agents run:
 ```
@@ -70,6 +71,7 @@ Missing entries detected:
   [MISSING KEY FILE] hooks/lib/new-utility.ts — not mentioned
   [MISSING STRUCTURE ENTRY] agents/ — top-level dir not in File Structure
   [MISSING MAINTENANCE TRIGGER] CLAUDE.md — Context Maintenance lacks post-action trigger
+  [MISSING TASK TRACKING RULE] CLAUDE.md — Context Maintenance lacks follow-up work rule
 ```
 
 Haiku agents in Step 3 receive this checklist and are instructed to populate the `missing` field for each flagged item (applying falsifiability test before adding).
@@ -117,8 +119,11 @@ For each CLAUDE.md, apply agent results:
 4. **Missing maintenance trigger** → replace the entire `## Context Maintenance` section
    with the current template from PruningInstruction.md (preserving the freshness timestamp
    comment if present)
-5. **Still accurate entries** → keep unchanged
-6. **Update freshness timestamp** → In the `<!-- context-layer: ... -->` comment:
+5. **Missing task tracking rule** → insert the "Track follow-up work" rule from
+   PruningInstruction.md into the existing `## Context Maintenance` section (between
+   the "Remove" rule and the "Staleness anchor" line)
+6. **Still accurate entries** → keep unchanged
+7. **Update freshness timestamp** → In the `<!-- context-layer: ... -->` comment:
    - Set `last-audited` to today's date
    - Increment `version` by 1
    - Recompute `dir-commits-at-audit`: run `git rev-list --count HEAD -- {directory}/`
