@@ -1,54 +1,64 @@
 # DelegateAgents Workflow
 
-Read the context layer from GatherContext, identify which PAI skills are relevant, determine how many agents to spawn, then launch them in parallel.
+Read the context layer from GatherContext, construct review dimensions from the full context, then spawn one agent per dimension in parallel.
 
 ## Purpose
 
-The key insight: comprehensiveness is achieved through **specialization**, not through one agent trying to review everything. Each agent is given a specific lens and only the relevant portion of the diff. This makes reviews both deeper (each agent goes far in its domain) and faster (all agents run in parallel).
+Comprehensiveness comes from **specialization** — each agent reviews through a specific lens rather than one agent going shallow across everything. The dimensions aren't predetermined; they emerge from the context. What changed, what the user asked for, what the intent reveals, and what the architecture demands all combine to determine how many dimensions we need and what each one focuses on.
 
 ## Step 1: Read Context Layer
 
-Load `_output/contexts/[context-slug]/notes/CodeReview-Context.md`
+Load `$REVIEW_DIR/context.md` (the review directory created by GatherContext)
 
-Extract:
-- Change fingerprint (languages, domains, risk areas)
-- Size tier (Small / Medium / Large)
-- Intent summary
+Extract ALL context signals:
+- **Change fingerprint** — languages, domains, risk areas, size tier
+- **Intent** — what the change is trying to accomplish, why it matters
+- **Requested lenses** — any skill names the user passed as arguments
+- **Architectural scope** — how many modules, how they connect, what changed structurally
 
-## Step 2: Select Relevant Skills
+## Step 2: Construct Review Dimensions
 
-Scan the available skills against the change fingerprint. Match skills to what was changed:
+Review dimensions are **lenses** — each one defines what an agent focuses on and what knowledge it brings. Dimensions emerge from the context, not from a fixed mapping.
 
-| Change Type | Consider These Skills |
-|-------------|----------------------|
-| TypeScript changes | TypeScript skill |
-| React / TSX components | React skill |
-| Python code | PythonCoding skill |
-| C# / .NET | CSharp skill |
-| UI / CSS / accessibility | WebDesign skill |
-| Tests added/modified | TestDriven skill |
-| Architecture changes | Design skill |
-| Documentation changes | DocPhilosophy skill |
-| Any code (general correctness) | Always include a General agent |
-| Security-sensitive areas | Consider RedTeam agent |
+**Context signals that produce dimensions:**
 
-**Philosophical dimension:** If the intent context reveals the *why* of the change is more important than the mechanics (e.g., a major architectural decision, a design philosophy shift), add a philosophical/architectural agent using the Design or DocPhilosophy skill.
+| Signal | How It Creates Dimensions |
+|--------|--------------------------|
+| **Change fingerprint** (languages) | Each language in the diff may warrant its own dimension (TypeScript correctness, React patterns, Python idioms) |
+| **Change fingerprint** (domains) | Each affected domain (API, UI, data model, auth) may warrant a dimension |
+| **Change fingerprint** (risk areas) | Security-sensitive changes, auth code, data handling add security/safety dimensions |
+| **Requested lenses** (skill arguments) | Each requested skill is read and its relevant categories become dimensions. Multi-category skills (like CodingStandards) are decomposed — match their sub-categories to the fingerprint and only load what's relevant. |
+| **Intent context** | If the *why* matters more than the *how* (architecture decision, design philosophy shift), add an architectural/philosophical dimension |
+| **Test changes** | If tests were added or modified, add a test quality dimension |
+
+**The process:**
+1. List all context signals from the context layer
+2. For each signal, identify what review dimension(s) it implies
+3. Merge dimensions that would overlap (e.g., "TypeScript correctness" from the fingerprint and "TypeScript standards" from a CodingStandards argument become one combined "TypeScript" dimension with both general and standards-specific rules)
+4. For each dimension, identify which PAI skill(s) provide relevant knowledge. Read those skills and extract the specific rules/principles the agent should apply — don't just name the skill.
+
+**Output:** A list of review dimensions, each with:
+- A lens name (e.g., "TypeScript + CodingStandards", "React patterns", "Test quality", "General correctness")
+- The specific knowledge/rules to inject into the agent prompt
+- Which files from the diff are relevant to this dimension
 
 **Always include at minimum:**
-- 1 General agent (overall correctness, logic, patterns)
-- 1 language-specific agent (TypeScript, Python, etc.)
+- 1 General correctness dimension (logic, patterns, bugs — applied to the full diff)
+- At least 1 domain-specific dimension
+
+**Constraint:** Every context signal must map to at least one dimension. No signal — especially a user-requested lens — should be silently dropped.
 
 ## Step 3: Determine Agent Count
 
-Scale with size tier:
+Each dimension becomes one agent. Scale the number of dimensions with change size:
 
-| Size Tier | Lines Changed | Agent Count | Strategy |
-|-----------|--------------|-------------|----------|
-| Small | 1-50 lines | 2 agents | General + 1 domain |
-| Medium | 50-300 lines | 3-4 agents | General + 2-3 domains |
-| Large | 300+ lines | 5-8 agents | General + full domain coverage |
+| Size Tier | Lines Changed | Typical Dimensions | Strategy |
+|-----------|--------------|-------------------|----------|
+| Small | 1-50 lines | 2-3 | General + 1-2 focused |
+| Medium | 50-300 lines | 3-5 | General + language + domain-specific |
+| Large | 300+ lines | 5-8 | General + full dimensional coverage |
 
-Cap at 8 agents regardless of size — diminishing returns past that, and synthesis complexity increases.
+Cap at 8 agents — diminishing returns past that, and synthesis complexity increases.
 
 ## Step 4: Construct Agent Prompts
 
@@ -87,7 +97,12 @@ For each issue found:
 - Recommendation: [what to do about it]
 ```
 
-## Step 5: Launch Agents in Parallel
+## Step 5: Announce and Launch Agents in Parallel
+
+**MANDATORY announcement before spawning (makes proportionality visible):**
+```
+Change size: [TIER] ([N] lines) → spawning [N] agents: [domain1], [domain2], ...
+```
 
 Spawn all agents simultaneously using `run_in_background: true`.
 
@@ -118,7 +133,7 @@ All agents running in parallel. Collecting results...
 
 Wait for all agents to complete. Collect their structured findings.
 
-Write raw outputs to: `_output/contexts/[context-slug]/notes/CodeReview-AgentOutputs.md`
+Write raw outputs to: `$REVIEW_DIR/agent-outputs.md`
 
 ## Follow-Up
 

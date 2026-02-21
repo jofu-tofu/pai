@@ -6,41 +6,96 @@ Aggregate outputs from all parallel agents into a unified, deduplicated, priorit
 
 Multiple agents reviewing the same diff will overlap. The TypeScript agent and the General agent may both flag the same null check. This workflow collapses duplicates, resolves conflicts, and produces a single coherent findings list ordered by severity and significance.
 
-## TODO
-
-- [ ] Define deduplication strategy — how to recognize when two agents flagged the same issue (same file + line range vs. semantic similarity)
-- [ ] Define conflict resolution — when agents disagree (one says CRITICAL, another says LOW for same line), who wins? Or do we surface both with a note?
-- [ ] Define grouping strategy — should findings be grouped by file, by severity, by agent, or by domain?
-- [ ] Define architectural map generation — if multiple files in the same module changed, how do we produce a coherent "here's what changed architecturally" summary
-- [ ] Define the output schema for findings that VerifyClaims can operate on
-- [ ] Handle the case where an agent returned no findings (is that a pass or a failure to review?)
-
 ## Inputs
 
-- Raw agent outputs from `_output/contexts/[context-slug]/notes/CodeReview-AgentOutputs.md`
-- Context layer from `_output/contexts/[context-slug]/notes/CodeReview-Context.md`
+- Raw agent outputs from `$REVIEW_DIR/agent-outputs.md`
+- Context layer from `$REVIEW_DIR/context.md`
 
-## Expected Output
+## Step 1: Collect All Findings
 
-A unified findings document at `_output/contexts/[context-slug]/notes/CodeReview-Findings.md`:
+Read all agent outputs. For each finding, extract:
+- File + line range
+- Severity (CRITICAL / HIGH / MEDIUM / LOW / SUGGESTION)
+- Domain (which agent found it)
+- Issue description
+- Recommendation
+
+## Step 2: Deduplicate
+
+Two findings are duplicates when they reference the **same file AND overlapping line ranges** (within 5 lines of each other) AND describe the same category of issue.
+
+**Dedup rules:**
+- Same file + same line range + same issue category → merge into one finding
+- Same file + overlapping lines + different issue categories → keep both (different concerns)
+- Different files + similar issue pattern → keep both but note the pattern
+
+**When merging duplicates:**
+- Keep the higher severity rating
+- Combine recommendations from both agents
+- Note which agents independently flagged it (multi-agent agreement = higher confidence)
+
+## Step 3: Resolve Severity Conflicts
+
+When two agents flag the same issue with different severities:
+- If one says CRITICAL and another says LOW → use CRITICAL, but note the disagreement
+- General rule: take the higher severity and add a confidence note
+- Exception: if the lower-severity agent provides specific reasoning for downgrading, include that reasoning as context
+
+## Step 4: Build Architectural Map
+
+Using the context layer's change fingerprint and the findings:
+- Group changed files by module/component
+- Identify which modules have findings and which are clean
+- Produce a 3-5 sentence structural summary: "This change touches [modules]. The [X] module has the most findings ([N]). The [Y] module passed clean across all agents."
+
+## Step 5: Identify Clean Domains
+
+For each agent domain that found NO issues, record it:
+- "TypeScript types: No issues found (TypeScript agent reviewed 8 files)"
+- "Security: No vulnerabilities detected (Security agent reviewed auth-related changes)"
+
+This is the "What Looks Good" section — it builds credibility by proving agents actually reviewed, not just that they didn't flag.
+
+## Step 6: Produce Unified Findings
+
+Write to `$REVIEW_DIR/findings.md`:
 
 ```markdown
 ## Synthesized Findings
 
-**Total issues:** N
+**Total issues:** N (after dedup: M unique)
 **By severity:** CRITICAL: X | HIGH: Y | MEDIUM: Z | LOW: W | SUGGESTIONS: V
+**Agent agreement:** N findings flagged by 2+ agents
 
 ### CRITICAL
-[...]
+[Finding card format — see below]
 
 ### HIGH
 [...]
 
+### MEDIUM
+[...]
+
+### LOW
+[...]
+
+### SUGGESTIONS
+[...]
+
 ### Architectural Map
-[Which modules/components changed and how they relate]
+[3-5 sentence structural summary]
 
 ### What Agents Found Nothing Wrong With
-[Domains that passed clean — builds credibility]
+[Clean domains with evidence of review]
+```
+
+**Finding card format:**
+```
+**[SHORT_TITLE]** — `[filename]:[line]`
+Severity: [CRITICAL/HIGH/MEDIUM/LOW/SUGGESTION]
+Flagged by: [Agent1, Agent2] (confidence: [single/multi-agent])
+Issue: [1-2 sentences]
+Recommendation: [What to do]
 ```
 
 ## Follow-Up

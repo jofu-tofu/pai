@@ -18,9 +18,21 @@ These criteria orient every workflow decision:
 5. **Proportional** — Agent count and skill selection scale with the size and nature of the changes
 6. **Verified claims** — Issues discovered are cross-checked against the correct diff before reporting
 
+## Pipeline Discipline (MANDATORY)
+
+**This skill operates as a 5-stage pipeline. Do NOT ad-hoc a review.**
+
+When triggered, you MUST:
+1. Read `Workflows/Review.md` FIRST — before reading any source code or diffs
+2. Follow Review.md's steps sequentially — each step references an internal workflow file
+3. Read each internal workflow file (`GatherContext.md`, `DelegateAgents.md`, etc.) when Review.md tells you to
+4. Execute every stage — do not combine, skip, or improvise stages
+
+**Why this matters:** A single-agent review that reads all files into context produces shallow, unverified findings. The pipeline exists to compress context, parallelize depth, and verify claims. Skipping it defeats the skill's purpose.
+
 ## Workflow Routing
 
-**When executing a workflow, output this notification:**
+**When executing a workflow, output this notification IMMEDIATELY upon reading Review.md — before any other actions:**
 
 ```
 Running the **Review** workflow from the **CodeReview** skill...
@@ -30,7 +42,7 @@ Running the **Review** workflow from the **CodeReview** skill...
 |----------|---------|------|
 | **Review** | "code review", "review my PR", "review this branch", "review my changes", "review my commits", "review last N commits", "check my code", "audit my changes", "what did I change", "do a code review", "run a review" | `Workflows/Review.md` |
 
-> **Pipeline stages** (GatherContext, DelegateAgents, SynthesizeFindings, VerifyClaims, GenerateReport) are internal — invoked by Review.md, not user-facing.
+> **Pipeline stages** (GatherContext, DelegateAgents, SynthesizeFindings, VerifyClaims, GenerateReport) are internal — invoked by Review.md, not user-facing. Each has its own workflow file with concrete instructions.
 
 ## Examples
 
@@ -53,6 +65,22 @@ User: "Review my PR"
 User: "Review just the auth changes"
 -> Invokes Review workflow
 -> Scopes diff to auth-related files only
+```
+
+**Example 4: Review with additional lenses**
+```
+User: "/CodeReview /CodingStandards"
+-> Invokes Review workflow
+-> CodingStandards is a context signal alongside the change fingerprint
+-> DelegateAgents constructs dimensions from ALL context: fingerprint languages + CodingStandards categories
+-> TypeScript dimension gets both general correctness AND CodingStandards TypeScript rules
+```
+
+**Example 5: Review with multiple lenses**
+```
+User: "/CodeReview /CodingStandards /TestDriven"
+-> Both skills feed into dimension construction alongside the change fingerprint
+-> Dimensions emerge from the combined context, not from separate paths
 ```
 
 ## Architecture Notes

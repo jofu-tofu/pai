@@ -1,118 +1,142 @@
 # GatherContext Workflow
 
-Gather everything needed to do a comprehensive review — the changes themselves, and the bigger picture of why they exist — then compress it into a slim context layer that agents can consume without token waste.
+Gather everything a fresh orchestrator needs to intelligently partition code review into focused, disjoint review agents — not just the changes, but the full landscape of standards, rules, and context that determine what "good" looks like for these specific changes.
 
-## Purpose
+## First Principles
 
-Two layers of context are required:
-1. **Change context** — What actually changed: the diff, files touched, commit messages, line numbers
-2. **Intent context** — Why it changed: PR description, linked ticket, stated goals, architectural decisions
+This workflow exists because **code review is a delegation problem**. The orchestrator receiving this context is a fresh session. It has never seen the codebase, the changes, or the project's conventions. It must:
 
-Without both layers, agents make surface-level observations. With both, they can evaluate whether the *approach* is correct, not just whether the *code* is correct.
+1. **Understand what changed** — the diff, the scope, the intent
+2. **Understand what "correct" means for these changes** — which standards, rules, skills, and conventions apply
+3. **Partition review intelligently** — split into disjoint dimensions where each agent goes deep with the right rules
 
-## Step 1: Determine Commit Range
+Without comprehensive context, the orchestrator either delegates blindly (agents review without knowing the rules) or doesn't delegate at all (single shallow pass). The context layer is the difference between a review that catches "this violates your TypeScript conventions" and one that only catches "this variable is unused."
 
-Ask the user (or infer from context):
-- Branch name? (vs main/master)
-- Specific commit SHA range? (e.g., `abc123..HEAD`)
-- PR URL or number?
-- "Last N commits"?
+**Why comprehensiveness matters more than brevity here:** Every piece of context that the orchestrator doesn't have is a review dimension it can't construct. A missed coding standard is a class of issues that won't be caught. A missed user argument is a lens the user asked for that gets silently dropped. The context layer should be dense signal — not bloated, but complete.
+
+## Step 1: Gather Change Context
+
+Establish the commit range, then capture everything about what changed and why.
+
+**Commit range** (ask or infer):
+- Branch name (vs main/master)
+- Specific commit SHA range
+- PR URL or number
+- "Last N commits"
 
 ```bash
-# Get the diff for a branch
+# Get the full picture
 git diff main...HEAD --stat
-git diff main...HEAD
-
-# Get commit messages in range
-git log main...HEAD --oneline
-
-# Get changed files only
+git diff main...HEAD -U5
+git log main...HEAD --format="%H %s%n%b"
 git diff main...HEAD --name-only
 ```
 
-**Critical:** Establish the exact commit range before proceeding. All issues found in later steps must be traceable to lines within this range. This is what makes claims credible.
-
-## Step 2: Gather the Raw Diff
-
-```bash
-# Full diff with context lines
-git diff main...HEAD -U5
-
-# Stats summary
-git diff main...HEAD --stat
-
-# Commit messages for intent signals
-git log main...HEAD --format="%H %s%n%b"
-```
-
-Capture:
-- Files changed (categorized by type: `.ts`, `.tsx`, `.md`, config, etc.)
+**Capture:**
+- Files changed (categorized by type: `.ts`, `.tsx`, `.md`, config, test, etc.)
 - Total lines added/removed
 - New files vs modifications vs deletions
-- Key commit messages (often reveal intent)
+- Commit messages (these reveal intent)
 
-## Step 3: Gather Intent Context
+**Intent signals** (attempt in priority order):
+1. PR description — `gh pr view [number] --json title,body,labels`
+2. Linked tickets — look for references in commit messages (JIRA-123, #456)
+3. Recent conversation — has the user explained what they're building?
+4. Commit messages — extract stated reasons from `git log`
 
-Attempt to gather in priority order:
+If no intent available: note "Intent: unavailable — review will focus on technical correctness"
 
-1. **PR description** — If PR URL provided: `gh pr view [number] --json title,body,labels`
-2. **Linked ticket** — Look for ticket references in commit messages (JIRA-123, #456, etc.)
-3. **CLAUDE.md** — Check for project-level context about patterns and decisions
-4. **Recent conversation** — Has the user explained what they're building in this session?
-5. **Commit messages** — Extract stated reasons from `git log`
-
-If none available: note "Intent context: not available — review will focus on technical correctness only"
-
-## Step 4: Fingerprint the Changes
-
-Analyze the diff to produce a **change fingerprint** — a structured summary of what kind of changes were made. This drives agent selection in DelegateAgents.
-
+**Change fingerprint:**
 ```
-Change Fingerprint:
 - Languages: [TypeScript, React/TSX, CSS, ...]
 - Domains: [API endpoints, UI components, data models, config, tests, ...]
 - Patterns: [New feature, refactor, bug fix, dependency update, ...]
 - Risk areas: [Auth-related, DB queries, external API calls, user data, ...]
-- Size tier: [Small / Medium / Large] based on line count
+- Size tier: [Small (1-50 lines) / Medium (50-300) / Large (300+)]
 ```
 
-## Step 5: Produce Context Layer
+## Step 2: Gather Review Context
 
-Compress everything into a **slim, structured context layer** — designed to be injected into agent prompts without token waste. Target: under 500 tokens for small changes, under 1200 for large.
+This is the step most review systems skip. Beyond the diff, gather everything that tells the orchestrator what rules and standards apply to these changes. Context sources are open-ended — scan for whatever is available.
+
+**Context source categories:**
+
+| Category | What to look for | Examples |
+|----------|-----------------|----------|
+| **Coding standards** | Language-specific rules, style guides, best practices | CodingStandards skill (TypeScript, React, Python, C# rules), `.eslintrc`, `biome.json`, project style guides |
+| **Testing philosophy** | How this project approaches tests, what coverage expectations exist | TestDriven skill (10 core principles), test config files, existing test patterns |
+| **Project conventions** | Architecture decisions, patterns, constraints documented in the project | `CLAUDE.md`, `DEVELOPMENT.md`, ADRs (`docs/adr/`), `CONTRIBUTING.md` |
+| **Domain-specific rules** | Security policies, accessibility standards, performance budgets | WebDesign skill (WCAG rules), security policies, performance configs |
+| **User-specified lenses** | Skills or focus areas the user explicitly requested | Any `/SkillName` arguments passed alongside `/CodeReview` |
+| **Architectural decisions** | Past decisions that constrain what "correct" looks like | ADR files, decision logs, `DECISIONS.md`, git blame for contested areas |
+| **Revision history** | Past reviews, known tech debt, deferred decisions | Previous review reports, TODO comments in changed files, linked ticket history |
+
+**How to gather:**
+1. Check what the user passed as arguments — these are mandatory lenses
+2. Read `CLAUDE.md` and any project convention files in the repo root
+3. For each language/domain in the change fingerprint, check if a relevant PAI skill exists (scan `skill-index.json` or match against known skills)
+4. For matched skills, read their key rules/principles — extract the SUBSET relevant to the changed files, not the entire skill
+5. Check for config files that encode standards (`.eslintrc`, `tsconfig.json`, `biome.json`, etc.)
+6. Look for ADRs or decision documents if the changes touch architectural boundaries
+
+**The goal is not to load everything** — it's to identify which rules and standards the review agents need to know about so they can evaluate the changes against the right criteria. Extract the relevant subset, not the full content.
+
+## Step 3: Produce Context Layer
+
+Compress everything into a structured context layer — designed to be injected into the orchestrator's working memory. This document must enable the orchestrator to construct review dimensions without re-scanning.
 
 ```markdown
 ## CodeReview Context Layer
 
+### Changes
 **Commit range:** [SHA..SHA or branch..HEAD]
-**Changed files:** [N files — list with type]
-**Size:** [+X / -Y lines]
+**Changed files:** [N files — list with type categorization]
+**Size:** [+X / -Y lines | Size tier]
 
-**Intent:**
-[1-3 sentences: what this change is trying to accomplish, based on PR description / ticket / commits]
+### Intent
+[1-3 sentences: what this change is trying to accomplish, from PR/ticket/commits]
 
-**Key changes summary:**
-- [File/component]: [What changed in 1 line]
-- [File/component]: [What changed in 1 line]
-...
-
-**Change fingerprint:**
+### Change Fingerprint
 - Languages: [list]
 - Domains: [list]
+- Patterns: [list]
 - Risk areas: [list]
-- Size tier: [Small / Medium / Large]
 
-**Full diff:** [attached below or reference path]
+### Review Context Sources
+[For each context source discovered, summarize what rules/standards it contributes:]
+
+**[Category]: [Source name]**
+- [Key rules/principles relevant to these changes, extracted — not full content]
+- [Number of rules extracted, e.g., "12 TypeScript rules from CodingStandards"]
+
+**[Category]: [Source name]**
+- [Key rules/principles relevant to these changes]
+
+### Requested Lenses
+[Skill names passed as arguments, or "none — dimensions constructed from fingerprint + discovered context only"]
+
+### Dimension Signals
+[Based on the change fingerprint + review context sources, list the natural dimension partitions:]
+- [Dimension 1]: [What it covers] — [Which context sources feed it]
+- [Dimension 2]: [What it covers] — [Which context sources feed it]
+- [Dimension N]: ...
+
+[These are suggestions, not prescriptions — the orchestrator decides final partitioning]
+
+### Full Diff
+[Attached below or referenced by path]
 ```
 
-Write this to: `_output/contexts/[context-slug]/notes/CodeReview-Context.md`
+Create a timestamped review directory and write the context layer there:
 
-## Step 6: Confirm Before Proceeding
+```
+REVIEW_DIR=_output/contexts/[context-slug]/reviews/codereview/[YYYYMMDD-HHMMSS]
+```
 
-Output the context layer to the user and confirm:
-- "Here is the context layer I've built. Does this accurately capture what you're reviewing? Anything missing from the intent section?"
-- If user confirms → proceed to DelegateAgents
-- If corrections needed → update context layer and confirm again
+Write context layer to: `$REVIEW_DIR/context.md`
+
+All downstream workflows write their outputs to this same directory (`findings.md`, `agent-outputs.md`, `report.md`).
 
 ## Follow-Up
 
-Always chains to → **DelegateAgents** (unless user says to stop)
+Always chains to → **DelegateAgents** (pass the context layer path)

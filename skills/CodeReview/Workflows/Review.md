@@ -2,19 +2,28 @@
 
 The single user-facing entry point for code review. Orchestrates all pipeline stages in sequence.
 
+**FIRST ACTION — Output the workflow notification immediately:**
+```
+Running the **Review** workflow from the **CodeReview** skill...
+```
+Do this BEFORE reading any source code, diffs, or other files. The notification signals to the user that the pipeline is starting.
+
 ## Reference Material
 
 - `../SkillIntent.md` — Design decisions, success criteria, explicit out-of-scope
 
 ## Step 1: Establish Scope
 
-Determine what to review. Ask if not clear from context:
+Determine what to review. Scope includes the commit range AND any additional review lenses the user requested.
 
+**Commit range** — ask if not clear from context:
 - **Branch:** "Which branch or commit range? (default: current branch vs main)"
 - **PR:** "PR number or URL?"
 - **Scoped:** "Any specific files or areas to focus on, or full diff?"
 
 If the user said "last N commits" → compute range: `git log --oneline -N` to find the SHA.
+
+**Additional lenses** — check if the user passed skill names as arguments (e.g., `/CodeReview /CodingStandards /TestDriven`). These are context signals that influence which review dimensions get constructed in DelegateAgents. Pass them to GatherContext alongside the commit range.
 
 ```bash
 # Confirm what's in scope before proceeding
@@ -22,13 +31,13 @@ git log main...HEAD --oneline
 git diff main...HEAD --stat
 ```
 
-Show the user a one-line summary: "I'll review N commits touching X files (+Y/-Z lines). Proceeding..."
+Show the user a one-line summary: "I'll review N commits touching X files (+Y/-Z lines). [Additional lenses: SkillName1, SkillName2.] Proceeding..."
 
 ## Step 2: Gather Context (internal — GatherContext.md)
 
 Read and execute: `Workflows/GatherContext.md`
 
-Produces: `_output/contexts/[slug]/notes/CodeReview-Context.md`
+Produces: `$REVIEW_DIR/context.md` (in `_output/contexts/[context-slug]/reviews/codereview/[timestamp]/`)
 
 Confirm the context layer with the user before proceeding:
 > "Here's what I understand about this change: [intent summary]. Does this look right?"
@@ -73,8 +82,7 @@ Produces the final structured report:
 
 ## Step 7: Deliver
 
-Output the report directly in the conversation. Also write to:
-`_output/contexts/[slug]/notes/CodeReview-Report.md`
+Output the report directly in the conversation. Also write to `$REVIEW_DIR/report.md`
 
 ---
 
@@ -86,6 +94,7 @@ Output the report directly in the conversation. Also write to:
 | "focus on [area]" | Scope diff to matching files |
 | "post to PR" | After report, run `gh pr comment` with summary |
 | "no agents" / "just you" | Single-agent review, skip DelegateAgents parallelism |
+| `/SkillName` as argument | Additional context signal for dimension construction (see Step 1) |
 
 ## TODO
 
