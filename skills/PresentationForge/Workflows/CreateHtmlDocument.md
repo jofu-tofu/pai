@@ -80,11 +80,20 @@ Before delivery, check the document against loaded standards:
 
 Fix any violations found during validation.
 
-### Step 6: Return Artifacts and Auto-Chain ReadabilityGate
+### Step 6: Open in Browser
+
+After generating the HTML file, **always** open it in the user's default browser:
+
+```bash
+bun /home/fujos/.claude/skills/PresentationForge/Tools/open-in-browser.ts "<path-to-generated-file>"
+```
+
+This is automatic — do not ask the user if they want to open it. The script handles WSL (opens in Windows browser), macOS, and Linux.
+
+### Step 7: Return Artifacts and Auto-Chain ReadabilityGate
 
 Return:
-- HTML document file
-- View instructions (open in browser)
+- HTML document file (already opened in browser)
 - Content type and format metadata
 
 **Auto-chain ReadabilityGate** with:

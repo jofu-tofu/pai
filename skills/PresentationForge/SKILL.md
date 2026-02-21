@@ -28,6 +28,12 @@ Running the **WorkflowName** workflow from the **PresentationForge** skill...
 | **ReviewPresentation** | "review presentation", "polish slide deck", "presentation quality check" | `Workflows/ReviewPresentation.md` |
 | **ReadabilityGate** | "readability check", "check readability", "run readability gate" | `Workflows/ReadabilityGate.md` |
 
+## Tools
+
+| Tool | Purpose | Usage |
+|------|---------|-------|
+| `Tools/open-in-browser.ts` | Opens a file in the user's default browser (WSL/macOS/Linux) | `bun Tools/open-in-browser.ts <file-path>` |
+
 ## Context Files
 
 | File | Purpose |
