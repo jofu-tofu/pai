@@ -1,4 +1,4 @@
-### 7.1 Never Construct Class Names with String Interpolation
+### TW5.6 Never Construct Class Names with String Interpolation
 
 **Impact: CRITICAL (dynamically constructed classes are silently purged in production)**
 

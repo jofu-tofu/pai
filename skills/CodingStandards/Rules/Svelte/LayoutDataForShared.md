@@ -1,4 +1,4 @@
-### 6.2 Use Layout Load for Shared Data
+### SV2.7 Use Layout Load for Shared Data
 
 **Impact: HIGH (eliminates duplicated data fetching across routes)**
 

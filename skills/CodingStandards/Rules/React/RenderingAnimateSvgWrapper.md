@@ -1,4 +1,4 @@
-### 6.1 Animate SVG Wrapper Instead of SVG Element
+### R4.13 Animate SVG Wrapper Instead of SVG Element
 
 **Impact: LOW (enables hardware acceleration)**
 

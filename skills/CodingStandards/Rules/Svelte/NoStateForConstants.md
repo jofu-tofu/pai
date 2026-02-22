@@ -1,4 +1,4 @@
-### 1.6 Don't Wrap Constants in $state
+### SV1.6 Don't Wrap Constants in $state
 
 **Impact: MEDIUM (reduces unnecessary reactive overhead)**
 

@@ -210,3 +210,22 @@ Rules use TitleCase naming for PAI compliance:
 **Sources:**
 - Vercel Engineering — React Best Practices (January 2026), MIT
 - Vercel Engineering — React Composition Patterns (January 2026), MIT
+
+## Dimensional Loading
+
+For agents that need focused subsets rather than the full rule set, read `../Dimensions/React/INDEX.md` for a routing table.
+
+| Dimension | File | Rule Count | Load When |
+|-----------|------|------------|-----------|
+| Architecture | Architecture.md | 8 | Component design, API design, composition patterns |
+| Data Fetching | DataFetching.md | 16 | Async patterns, waterfalls, caching, Suspense, SWR |
+| Server Components | ServerComponents.md | 7 | RSC patterns, server cache, auth actions, serialization |
+| Rendering &amp; Performance | RenderingPerf.md | 21 | Re-render optimization, hydration, transitions |
+| Bundle Size | BundleSize.md | 5 | Import optimization, dynamic loading, preloading |
+| JavaScript Performance | JavaScriptPerf.md | 15 | Loops, data structures, DOM batching, caching |
+
+**Default:** Load Architecture for any React task.
+
+**Use the full workflow (this file) when:** comprehensive standards review for a complete component or module.
+
+**Use a dimension when:** focused context for a specific concern, multi-agent review, or constrained-context scenarios.

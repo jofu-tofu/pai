@@ -1,4 +1,4 @@
-### 8.1 Initialize App Once, Not Per Mount
+### R6.14 Initialize App Once, Not Per Mount
 
 **Impact: LOW-MEDIUM (avoids duplicate init in development)**
 

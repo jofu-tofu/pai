@@ -1,4 +1,4 @@
-### 2.4 Dynamic Imports for Heavy Components
+### R5.2 Dynamic Imports for Heavy Components
 
 **Impact: CRITICAL (directly affects TTI and LCP)**
 

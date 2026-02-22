@@ -1,4 +1,4 @@
-### 3.3 Cross-Request LRU Caching
+### R3.3 Cross-Request LRU Caching
 
 **Impact: HIGH (caches across requests)**
 

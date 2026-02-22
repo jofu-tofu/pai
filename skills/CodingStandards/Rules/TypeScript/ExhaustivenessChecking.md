@@ -1,4 +1,4 @@
-### 3.2 Exhaustiveness Checking
+### TS2.2 Exhaustiveness Checking
 
 **Impact: HIGH (Compiler catches unhandled union cases — adding a new variant immediately shows every switch/if that needs updating)**
 

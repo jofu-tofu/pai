@@ -182,3 +182,21 @@ v4 migration tasks (CSS-first config setup, PostCSS plugin changes) are excluded
 This skill integrates with PAI's code generation and review workflows. When writing or reviewing Tailwind CSS code, these patterns ensure consistent, accessible, and performant utility-first styling.
 
 **Sources:** Tailwind official docs (v3/v4), prettier-plugin-tailwindcss, eslint-plugin-tailwindcss, Adam Wathan, Evil Martians, Atomic Object, Steve Kinney, CVA docs, WCAG 2.5.8
+
+## Dimensional Loading
+
+For agents that need focused subsets rather than the full rule set, read `../Dimensions/Tailwind/INDEX.md` for a routing table.
+
+| Dimension | File | Rule Count | Load When |
+|-----------|------|------------|-----------|
+| Philosophy | Philosophy.md | 6 | Utility-first approach, component extraction, @apply decisions |
+| Class Organization | ClassOrganization.md | 9 | Class ordering, conflicts, state modifiers, layout |
+| Responsive Design | ResponsiveDesign.md | 4 | Breakpoints, mobile-first, container queries, spacing |
+| Theming | Theming.md | 4 | Dark mode, semantic tokens, custom properties |
+| Accessibility | Accessibility.md | 9 | Screen readers, focus, motion, touch targets, build safety |
+
+**Default:** Load Philosophy for any Tailwind task.
+
+**Use the full workflow (this file) when:** comprehensive standards review for a complete styling pass.
+
+**Use a dimension when:** focused context for a specific concern, multi-agent review, or constrained-context scenarios.

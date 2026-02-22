@@ -1,4 +1,4 @@
-### 6.5 Verify WCAG AA Contrast Ratios for Text Colors
+### TW5.5 Verify WCAG AA Contrast Ratios for Text Colors
 
 **Impact: CRITICAL (Tailwind defaults do NOT guarantee contrast compliance)**
 

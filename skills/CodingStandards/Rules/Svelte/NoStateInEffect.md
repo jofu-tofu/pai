@@ -1,4 +1,4 @@
-### 1.5 Don't Set $state in $effect When $derived Works
+### SV1.5 Don't Set $state in $effect When $derived Works
 
 **Impact: HIGH (eliminates unnecessary reactive overhead)**
 

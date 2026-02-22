@@ -1,4 +1,4 @@
-### 5.5 Extract to Memoized Components
+### R4.2 Extract to Memoized Components
 
 **Impact: MEDIUM (enables early returns)**
 

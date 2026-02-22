@@ -1,4 +1,4 @@
-### 2.3 Defer Non-Critical Third-Party Libraries
+### R5.3 Defer Non-Critical Third-Party Libraries
 
 **Impact: MEDIUM (loads after hydration)**
 

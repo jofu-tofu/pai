@@ -5,7 +5,7 @@ impactDescription: cleaner component definitions and context usage
 tags: react19, refs, context, hooks
 ---
 
-## React 19 API Changes
+### R1.8 React 19 API Changes
 
 > **React 19+ only.** Skip this if you're on React 18 or earlier.
 

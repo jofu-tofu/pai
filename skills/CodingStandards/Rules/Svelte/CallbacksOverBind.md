@@ -1,4 +1,4 @@
-### 2.5 Prefer Callbacks Over Excessive $bindable
+### SV2.5 Prefer Callbacks Over Excessive $bindable
 
 **Impact: MEDIUM (makes data flow explicit and traceable)**
 

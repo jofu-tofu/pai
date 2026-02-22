@@ -1,4 +1,4 @@
-### 6.9 Use useTransition Over Manual Loading States
+### R4.21 Use useTransition Over Manual Loading States
 
 **Impact: LOW (reduces re-renders and improves code clarity)**
 

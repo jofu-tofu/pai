@@ -1,4 +1,4 @@
-### 6.2 CSS content-visibility for Long Lists
+### R4.14 CSS content-visibility for Long Lists
 
 **Impact: HIGH (faster initial render)**
 

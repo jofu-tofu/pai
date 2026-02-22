@@ -1,4 +1,4 @@
-### 8.1 Use error() for Expected Errors
+### SV5.4 Use error() for Expected Errors
 
 **Impact: HIGH (provides proper HTTP status codes and error page rendering)**
 

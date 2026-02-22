@@ -1,4 +1,4 @@
-### 6.1 Use Route Groups for Layout Organization
+### SV2.6 Use Route Groups for Layout Organization
 
 **Impact: MEDIUM (organizes routes that share layouts without affecting URLs)**
 

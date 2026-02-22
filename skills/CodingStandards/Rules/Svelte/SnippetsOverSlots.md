@@ -1,4 +1,4 @@
-### 2.1 Use Snippets Instead of Slots
+### SV2.1 Use Snippets Instead of Slots
 
 **Impact: HIGH (more readable, type-safe, and composable than slots)**
 

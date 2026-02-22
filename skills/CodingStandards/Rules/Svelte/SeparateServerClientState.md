@@ -1,4 +1,4 @@
-### 5.6 Separate Server Data from Client State
+### SV4.6 Separate Server Data from Client State
 
 **Impact: CRITICAL (prevents hydration mismatches and state desync)**
 

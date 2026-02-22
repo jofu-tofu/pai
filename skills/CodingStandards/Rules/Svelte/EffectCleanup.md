@@ -1,4 +1,4 @@
-### 1.2 Return Cleanup Functions from $effect
+### SV1.2 Return Cleanup Functions from $effect
 
 **Impact: CRITICAL (prevents memory leaks from subscriptions, timers, event listeners)**
 

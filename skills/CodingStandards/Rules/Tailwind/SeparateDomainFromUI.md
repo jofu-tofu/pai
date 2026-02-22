@@ -1,4 +1,4 @@
-### 3.3 Use Tailwind Only in UI Components, Not Domain Components
+### TW1.6 Use Tailwind Only in UI Components, Not Domain Components
 
 **Impact: HIGH (prevents duplication and enforces design system consistency)**
 

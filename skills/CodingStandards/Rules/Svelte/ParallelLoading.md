@@ -1,4 +1,4 @@
-### 5.2 Fetch Data in Parallel with Promise.all
+### SV4.2 Fetch Data in Parallel with Promise.all
 
 **Impact: HIGH (reduces page load latency by eliminating waterfalls)**
 

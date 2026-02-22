@@ -1,4 +1,4 @@
-### 5.3 Do not wrap a simple expression with a primitive result type in useMemo
+### R4.9 Do not wrap a simple expression with a primitive result type in useMemo
 
 **Impact: LOW-MEDIUM (wasted computation on every render)**
 

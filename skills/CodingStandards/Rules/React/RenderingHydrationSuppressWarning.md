@@ -1,4 +1,4 @@
-### 6.6 Suppress Expected Hydration Mismatches
+### R4.18 Suppress Expected Hydration Mismatches
 
 **Impact: LOW-MEDIUM (avoids noisy hydration warnings for known differences)**
 

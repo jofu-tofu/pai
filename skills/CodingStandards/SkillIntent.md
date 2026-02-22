@@ -21,6 +21,9 @@ Four separate skills (React, TypeScript, CSharp, PythonCoding) created routing a
 | Rule storage | Sharded individual .md files per rule per language | Single consolidated file per language | Sharded files load only what's needed; consolidation wastes context |
 | Workflow structure | Self-contained per-language workflow with decision tree | Shared decision tree with language branching | Self-contained workflows guarantee isolation and maintain parity |
 | Multi-language handling | Read both matching workflow files independently | Merged cross-language workflow | Independent reads preserve isolation principle |
+| Dimension layer structure | Language-First with standardized dimension names under `Dimensions/[Language]/` | Cross-cutting Concern-First grouping (e.g., `Dimensions/Architecture/` across all languages) | Preserves language isolation first principle; each dimension only references its own language's rules |
+| Dimension content model | Synthesis layer referencing rules by link; rules stay in `Rules/` | Move rules into dimensions; duplicate content | Dimensions are a read layer, not a storage layer; avoids content drift between copies |
+| Dimension consumer format | Consumer Guide with When Reviewing / When Designing / When Implementing sections | Flat rule lists without role-based guidance | Different agents need different views of the same rules; consumer guide enables focused loading |
 
 ## Explicit Out-of-Scope
 
@@ -59,6 +62,23 @@ To add a new language:
 To update a language's rules:
 - Edit files in `Rules/[Language]/` directly
 - Update the workflow file's rule index if rules are added/removed
+
+## Dimension Layer
+
+Dimensions are a synthesis layer on top of `Rules/`. They group rules into concern-based dimensions with Consumer Guides (When Reviewing / When Designing / When Implementing) so different agents load only what they need.
+
+**Structure:** `Dimensions/[Language]/INDEX.md` routes to dimension documents. Each dimension doc links to rules via `../../Rules/[Language]/RuleName.md` — rules are never copied or moved.
+
+**Language-First approach:** Each language has its own dimension directory. No cross-language dimensions exist. This preserves the skill's language isolation first principle.
+
+**Cross-references:** A rule can appear in multiple dimensions' rule tables when it genuinely spans concerns. Each rule has a "primary" dimension (where it's listed first), but secondary dimensions can cross-reference it.
+
+To add dimensions for a new language:
+1. Create `Dimensions/LangName/INDEX.md` with routing table
+2. Create dimension documents following the Consumer Guide format
+3. Link rules via `../../Rules/LangName/RuleName.md`
+4. Append "Dimensional Loading" section to `Workflows/LangName.md`
+5. Add language column to Dimension Routing table in `SKILL.md`
 
 ## Version History
 

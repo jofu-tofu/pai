@@ -1,4 +1,4 @@
-### 6.3 Use hooks.server.ts for Cross-Cutting Concerns
+### SV2.8 Use hooks.server.ts for Cross-Cutting Concerns
 
 **Impact: HIGH (centralizes auth, logging, and request processing)**
 

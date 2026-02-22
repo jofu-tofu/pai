@@ -1,4 +1,4 @@
-### 3.2 Never Mix Async and Sync
+### CS3.2 Never Mix Async and Sync
 
 **Impact: HIGH (Task.Wait causes deadlocks in sync contexts)**
 

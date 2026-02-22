@@ -1,4 +1,4 @@
-### 5.2 No Magic Numbers
+### CS4.5 No Magic Numbers
 
 **Impact: MEDIUM (Named constants explain intent)**
 

@@ -5,7 +5,7 @@ impactDescription: enables swapping state implementations without changing UI
 tags: composition, state, architecture
 ---
 
-## Decouple State Management from UI
+### R1.3 Decouple State Management from UI
 
 The provider component should be the only place that knows how state is managed.
 UI components consume the context interface—they don't know if state comes from

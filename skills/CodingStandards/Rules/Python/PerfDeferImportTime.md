@@ -1,4 +1,4 @@
-### 3.2 Defer Import-Time Computation
+### PY3.2 Defer Import-Time Computation
 
 **Impact: HIGH (Prevents startup delays, circular imports)**
 

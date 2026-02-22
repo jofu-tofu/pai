@@ -1,4 +1,4 @@
-### 7.2 Use Svelte 5 Event Attribute Syntax
+### SV5.2 Use Svelte 5 Event Attribute Syntax
 
 **Impact: MEDIUM (Svelte 5 standard — on:event directive is deprecated)**
 

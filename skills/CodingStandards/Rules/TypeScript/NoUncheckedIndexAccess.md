@@ -1,4 +1,4 @@
-### 1.2 No Unchecked Index Access
+### TS1.2 No Unchecked Index Access
 
 **Impact: CRITICAL (Prevents undefined-at-runtime from array/object indexing that TypeScript normally assumes safe)**
 

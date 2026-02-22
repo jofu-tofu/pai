@@ -5,7 +5,7 @@ impactDescription: enables dependency-injectable state across use-cases
 tags: composition, context, state, typescript, dependency-injection
 ---
 
-## Define Generic Context Interfaces for Dependency Injection
+### R1.4 Define Generic Context Interfaces for Dependency Injection
 
 Define a **generic interface** for your component context with three parts:
 `state`, `actions`, and `meta`. This interface is a contract that any provider

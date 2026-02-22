@@ -1,4 +1,4 @@
-### 7.3 Cache Property Access in Loops
+### R6.3 Cache Property Access in Loops
 
 **Impact: LOW-MEDIUM (reduces lookups)**
 

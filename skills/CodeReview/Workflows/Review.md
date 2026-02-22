@@ -12,18 +12,26 @@ Do this BEFORE reading any source code, diffs, or other files. The notification 
 
 - `../SkillIntent.md` — Design decisions, success criteria, explicit out-of-scope
 
-## Step 1: Establish Scope
+## Step 1: Establish Scope and Review Mode
 
-Determine what to review. Scope includes the commit range AND any additional review lenses the user requested.
+Determine what to review and which **review mode** applies.
 
-**Commit range** — ask if not clear from context:
+**Mode detection** — determine from the user's request:
+
+| User Intent | Review Mode | Next Action |
+|-------------|-------------|-------------|
+| "review my PR", "review commits", "review this branch", "what did I change" | **diff** | Establish commit range below |
+| "audit this module", "review this directory", "audit the auth code", "review src/components" | **audit** | Establish target path below |
+| Ambiguous (e.g., "review the codebase") | Ask | "Are you reviewing recent changes (diff) or auditing existing code (audit)?" |
+
+### Diff Mode — Establish Commit Range
+
+Ask if not clear from context:
 - **Branch:** "Which branch or commit range? (default: current branch vs main)"
 - **PR:** "PR number or URL?"
 - **Scoped:** "Any specific files or areas to focus on, or full diff?"
 
 If the user said "last N commits" → compute range: `git log --oneline -N` to find the SHA.
-
-**Additional lenses** — check if the user passed skill names as arguments (e.g., `/CodeReview /CodingStandards /TestDriven`). These are context signals that influence which review dimensions get constructed in DelegateAgents. Pass them to GatherContext alongside the commit range.
 
 ```bash
 # Confirm what's in scope before proceeding
@@ -32,6 +40,24 @@ git diff main...HEAD --stat
 ```
 
 Show the user a one-line summary: "I'll review N commits touching X files (+Y/-Z lines). [Additional lenses: SkillName1, SkillName2.] Proceeding..."
+
+### Audit Mode — Establish Target Path
+
+Ask if not clear from context:
+- **Target:** "Which directory, module, or file set?" (e.g., `src/auth/`, `lib/`, specific file list)
+- **Focus:** "Any specific concerns? (architecture, simplification, security, general health)"
+
+```bash
+# Understand the target
+find [target-path] -type f | head -100
+find [target-path] -type f | wc -l
+```
+
+Show the user a one-line summary: "I'll audit [target path] — N files across M directories. [Additional lenses: SkillName1, SkillName2.] Proceeding..."
+
+### Additional Lenses (both modes)
+
+Check if the user passed skill names as arguments (e.g., `/CodeReview /CodingStandards /TestDriven`). These are context signals that influence which review dimensions get constructed in DelegateAgents. Pass them to GatherContext alongside the commit range (diff) or target path (audit).
 
 ## Step 2: Gather Context (internal — GatherContext.md)
 

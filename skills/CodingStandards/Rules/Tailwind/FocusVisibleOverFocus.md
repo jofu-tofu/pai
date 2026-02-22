@@ -1,4 +1,4 @@
-### 6.2 Use focus-visible: Instead of focus: for Keyboard Focus Rings
+### TW5.2 Use focus-visible: Instead of focus: for Keyboard Focus Rings
 
 **Impact: CRITICAL (focus: shows rings on mouse clicks too, annoying users)**
 

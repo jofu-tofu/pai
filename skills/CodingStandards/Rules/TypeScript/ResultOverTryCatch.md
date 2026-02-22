@@ -1,4 +1,4 @@
-### 7.1 Result Types Over Try/Catch
+### TS3.1 Result Types Over Try/Catch
 
 **Impact: CRITICAL (Try/catch hides error cases from function signatures — callers don't know a function can fail until it does)**
 

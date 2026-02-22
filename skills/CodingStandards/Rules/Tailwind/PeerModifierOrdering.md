@@ -1,4 +1,4 @@
-### 8.3 Peer Element Must Come Before Styled Siblings in DOM
+### TW2.7 Peer Element Must Come Before Styled Siblings in DOM
 
 **Impact: HIGH (peer modifiers silently fail if DOM order is wrong)**
 

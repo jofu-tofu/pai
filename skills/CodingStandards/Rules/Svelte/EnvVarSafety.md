@@ -1,4 +1,4 @@
-### 6.4 Use Correct $env Module for Server vs Client
+### SV2.9 Use Correct $env Module for Server vs Client
 
 **Impact: HIGH (prevents secret leakage through incorrect env imports)**
 

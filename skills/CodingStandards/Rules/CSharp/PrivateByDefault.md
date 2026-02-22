@@ -1,4 +1,4 @@
-### 5.3 Private by Default
+### CS4.6 Private by Default
 
 **Impact: MEDIUM (Start restrictive, open up as needed)**
 

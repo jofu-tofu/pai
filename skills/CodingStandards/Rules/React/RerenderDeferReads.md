@@ -1,4 +1,4 @@
-### 5.2 Defer State Reads to Usage Point
+### R4.1 Defer State Reads to Usage Point
 
 **Impact: MEDIUM (avoids unnecessary subscriptions)**
 

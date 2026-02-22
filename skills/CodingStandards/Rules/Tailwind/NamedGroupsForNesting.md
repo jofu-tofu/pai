@@ -1,4 +1,4 @@
-### 8.2 Use Named Groups When Nesting Multiple Group Contexts
+### TW2.6 Use Named Groups When Nesting Multiple Group Contexts
 
 **Impact: HIGH (unnamed nested groups cause ambiguous targeting)**
 

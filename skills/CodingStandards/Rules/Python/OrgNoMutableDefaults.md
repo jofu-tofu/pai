@@ -1,4 +1,4 @@
-### 3.3 No Mutable Default Arguments
+### PY3.3 No Mutable Default Arguments
 
 **Impact: HIGH (Shared mutable default causes data leaks)**
 

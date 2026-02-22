@@ -26,6 +26,9 @@ The report is the product. Everything before this was machinery. A technically c
 
 ## Step 1: Write Report Header
 
+Adapt header based on review mode from context layer:
+
+**Diff mode:**
 ```markdown
 # Code Review Report
 **Branch/Range:** [commit range from context layer]
@@ -35,12 +38,30 @@ The report is the product. Everything before this was machinery. A technically c
 **Verified:** [N]/[M] findings confirmed against changed commits
 ```
 
+**Audit mode:**
+```markdown
+# Codebase Audit Report
+**Target:** [target path from context layer]
+**Scope:** [N files across M directories]
+**Review date:** [today's date]
+**Agents used:** [N agents — list dimensions covered]
+**Findings:** CRITICAL: X | HIGH: Y | MEDIUM: Z | LOW: W | SUGGESTIONS: V
+**Verified:** [N]/[M] findings confirmed against actual code
+```
+
 ## Step 2: Write Verdict
 
-2-3 sentences. Answer:
+2-3 sentences. Answer depends on mode:
+
+**Diff mode:**
 - Is this change safe to merge?
 - What's the most important thing to know?
 - What's the overall quality assessment?
+
+**Audit mode:**
+- What is the overall health of this codebase section?
+- What's the most important issue to address?
+- What's the quality trajectory — improving or accumulating debt?
 
 ```markdown
 ## Verdict
@@ -90,7 +111,8 @@ For each severity level that has findings, write a section. Each finding is a **
 **Card rules:**
 - "Why it matters" is ONE sentence. Not a paragraph.
 - "What to do" is a concrete action, not "consider fixing this"
-- Include the commit SHA so the user can trace to the exact change
+- Diff mode: include the commit SHA so the user can trace to the exact change
+- Audit mode: omit "Introduced in" line (no commit context); include dimension/heuristic that triggered the finding
 - Verification status on every finding
 
 ## Step 5: Write "What Looks Good"

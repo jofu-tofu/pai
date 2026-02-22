@@ -1,4 +1,4 @@
-### 9.1 Import Type for Type-Only Imports
+### TS4.1 Import Type for Type-Only Imports
 
 **Impact: MEDIUM (Type-only imports are erased at compile time — prevents importing runtime modules just for their types, reducing bundle size)**
 

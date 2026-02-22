@@ -1,4 +1,4 @@
-### 8.5 Prefer gap-* Over space-x-*/space-y-* for Flex and Grid Spacing
+### TW2.9 Prefer gap-* Over space-x-*/space-y-* for Flex and Grid Spacing
 
 **Impact: MEDIUM (space-* breaks with wrapping and conditionally rendered children)**
 

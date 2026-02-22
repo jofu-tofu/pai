@@ -1,4 +1,4 @@
-### 4.2 Use Standard Breakpoints, Not Arbitrary min-[...] Values
+### TW3.2 Use Standard Breakpoints, Not Arbitrary min-[...] Values
 
 **Impact: HIGH (ad-hoc breakpoints create visual inconsistency)**
 

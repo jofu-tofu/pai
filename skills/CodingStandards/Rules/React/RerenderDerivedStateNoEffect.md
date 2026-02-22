@@ -1,4 +1,4 @@
-### 5.1 Calculate Derived State During Rendering
+### R4.6 Calculate Derived State During Rendering
 
 **Impact: MEDIUM (avoids redundant renders and state drift)**
 

@@ -1,4 +1,4 @@
-### 6.4 Interactive Elements Must Meet Minimum 44x44px Touch Target
+### TW5.4 Interactive Elements Must Meet Minimum 44x44px Touch Target
 
 **Impact: CRITICAL (small touch targets cause mis-taps on mobile devices)**
 

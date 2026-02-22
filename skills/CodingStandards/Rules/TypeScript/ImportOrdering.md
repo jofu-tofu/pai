@@ -1,4 +1,4 @@
-### 9.2 Import Ordering
+### TS4.2 Import Ordering
 
 **Impact: MEDIUM (Consistent import order reduces merge conflicts and makes dependency relationships immediately visible)**
 

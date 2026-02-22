@@ -1,4 +1,4 @@
-### 5.1 Use +page.server.ts for Secrets and Databases
+### SV4.1 Use +page.server.ts for Secrets and Databases
 
 **Impact: HIGH (prevents secrets from leaking to client bundle)**
 

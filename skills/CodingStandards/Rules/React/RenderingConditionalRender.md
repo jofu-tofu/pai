@@ -1,4 +1,4 @@
-### 6.8 Use Explicit Conditional Rendering
+### R4.20 Use Explicit Conditional Rendering
 
 **Impact: LOW (prevents rendering 0 or NaN)**
 

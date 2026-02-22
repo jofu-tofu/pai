@@ -1,4 +1,4 @@
-### 4.1 Deduplicate Global Event Listeners
+### R2.7 Deduplicate Global Event Listeners
 
 **Impact: LOW (single listener for N components)**
 

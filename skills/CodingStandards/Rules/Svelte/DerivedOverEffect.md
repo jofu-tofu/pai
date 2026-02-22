@@ -1,4 +1,4 @@
-### 1.1 Use $derived Over $effect for Computations
+### SV1.1 Use $derived Over $effect for Computations
 
 **Impact: CRITICAL (prevents unnecessary subscriptions and potential infinite loops)**
 

@@ -1,4 +1,4 @@
-### 5.6 Narrow Effect Dependencies
+### R4.4 Narrow Effect Dependencies
 
 **Impact: LOW (minimizes effect re-runs)**
 

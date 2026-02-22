@@ -1,4 +1,4 @@
-### 10.2 File Organization
+### TS4.4 File Organization
 
 **Impact: MEDIUM (Co-locating types with implementation reduces navigation and keeps related code together)**
 

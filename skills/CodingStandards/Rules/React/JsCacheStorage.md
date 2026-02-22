@@ -1,4 +1,4 @@
-### 7.5 Cache Storage API Calls
+### R6.5 Cache Storage API Calls
 
 **Impact: LOW-MEDIUM (reduces expensive I/O)**
 

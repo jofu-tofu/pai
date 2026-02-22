@@ -1,4 +1,4 @@
-### 2.2 Type Props with $props() and Interface
+### SV2.2 Type Props with $props() and Interface
 
 **Impact: HIGH (replaces export let with type-safe prop destructuring)**
 

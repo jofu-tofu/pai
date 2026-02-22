@@ -1,4 +1,4 @@
-### 3.4 Use Arrow Functions for Class Methods in $state
+### SV3.4 Use Arrow Functions for Class Methods in $state
 
 **Impact: MEDIUM (prevents this-binding bugs when passing methods as callbacks)**
 

@@ -1,4 +1,4 @@
-### 3.2 Use a Type-Safe Variant System for Component Variants
+### TW1.5 Use a Type-Safe Variant System for Component Variants
 
 **Impact: HIGH (eliminates error-prone string concatenation for variants)**
 

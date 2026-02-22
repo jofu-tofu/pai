@@ -1,4 +1,4 @@
-### 3.4 ConfigureAwait Correctly
+### CS3.4 ConfigureAwait Correctly
 
 **Impact: HIGH (Library code shouldn't capture sync context)**
 

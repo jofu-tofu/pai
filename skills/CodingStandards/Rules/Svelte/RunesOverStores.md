@@ -1,4 +1,4 @@
-### 4.4 Prefer Runes Over Stores for New Code
+### SV1.11 Prefer Runes Over Stores for New Code
 
 **Impact: MEDIUM (simplifies reactive patterns and reduces boilerplate)**
 

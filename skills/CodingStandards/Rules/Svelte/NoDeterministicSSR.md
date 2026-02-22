@@ -1,4 +1,4 @@
-### 8.2 Avoid Non-Deterministic Values During SSR
+### SV5.5 Avoid Non-Deterministic Values During SSR
 
 **Impact: HIGH (prevents hydration mismatch between server and client)**
 

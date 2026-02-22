@@ -1,4 +1,4 @@
-### 8.3 useEffectEvent for Stable Callback Refs
+### R6.15 useEffectEvent for Stable Callback Refs
 
 **Impact: LOW (prevents effect re-runs)**
 

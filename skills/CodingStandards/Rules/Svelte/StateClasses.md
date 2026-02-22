@@ -1,4 +1,4 @@
-### 4.3 Use Classes for Complex State Models
+### SV1.10 Use Classes for Complex State Models
 
 **Impact: HIGH (encapsulates state, methods, and computed properties together)**
 

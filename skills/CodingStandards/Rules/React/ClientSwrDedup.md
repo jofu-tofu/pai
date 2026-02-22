@@ -1,4 +1,4 @@
-### 4.3 Use SWR for Automatic Deduplication
+### R2.6 Use SWR for Automatic Deduplication
 
 **Impact: MEDIUM-HIGH (automatic deduplication)**
 

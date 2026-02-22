@@ -1,4 +1,4 @@
-### 6.5 Prevent Hydration Mismatch Without Flickering
+### R4.17 Prevent Hydration Mismatch Without Flickering
 
 **Impact: MEDIUM (avoids visual flicker and hydration errors)**
 

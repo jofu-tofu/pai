@@ -1,4 +1,4 @@
-### 3.5 Parallel Data Fetching with Component Composition
+### R2.10 Parallel Data Fetching with Component Composition
 
 **Impact: CRITICAL (eliminates server-side waterfalls)**
 

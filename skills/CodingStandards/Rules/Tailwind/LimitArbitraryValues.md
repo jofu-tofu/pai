@@ -1,4 +1,4 @@
-### 7.3 Extract Repeated Arbitrary Values into Theme Tokens
+### TW5.8 Extract Repeated Arbitrary Values into Theme Tokens
 
 **Impact: HIGH (arbitrary values bypass the design system and increase CSS output)**
 

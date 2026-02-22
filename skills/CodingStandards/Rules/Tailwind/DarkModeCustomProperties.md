@@ -1,4 +1,4 @@
-### 5.3 Use CSS Custom Properties to Reduce dark: Repetition
+### TW4.3 Use CSS Custom Properties to Reduce dark: Repetition
 
 **Impact: HIGH (reduces dark: variants from every element to a single definition)**
 

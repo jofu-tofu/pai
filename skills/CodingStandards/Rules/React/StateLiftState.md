@@ -5,7 +5,7 @@ impactDescription: enables state sharing outside component boundaries
 tags: composition, state, context, providers
 ---
 
-## Lift State into Provider Components
+### R1.5 Lift State into Provider Components
 
 Move state management into dedicated provider components. This allows sibling
 components outside the main UI to access and modify state without prop drilling

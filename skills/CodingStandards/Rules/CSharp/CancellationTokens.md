@@ -1,4 +1,4 @@
-### 3.3 Honor Cancellation Tokens
+### CS3.3 Honor Cancellation Tokens
 
 **Impact: HIGH (Long operations need graceful cancellation)**
 

@@ -1,4 +1,4 @@
-### 2.2 Conditional Module Loading
+### R5.4 Conditional Module Loading
 
 **Impact: HIGH (loads large data only when needed)**
 

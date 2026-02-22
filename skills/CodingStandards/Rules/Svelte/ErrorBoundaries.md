@@ -1,4 +1,4 @@
-### 8.3 Use svelte:boundary for Error Recovery
+### SV5.6 Use svelte:boundary for Error Recovery
 
 **Impact: MEDIUM (prevents child errors from crashing entire page)**
 

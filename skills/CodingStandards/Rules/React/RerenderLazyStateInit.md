@@ -1,4 +1,4 @@
-### 5.10 Use Lazy State Initialization
+### R4.8 Use Lazy State Initialization
 
 **Impact: MEDIUM (wasted computation on every render)**
 

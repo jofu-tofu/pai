@@ -1,4 +1,4 @@
-### 2.3 Avoid Any Type
+### PY2.3 Avoid Any Type
 
 **Impact: CRITICAL (Any defeats the purpose of type checking)**
 

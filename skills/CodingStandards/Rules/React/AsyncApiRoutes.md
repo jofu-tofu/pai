@@ -1,4 +1,4 @@
-### 1.3 Prevent Waterfall Chains in API Routes
+### R2.4 Prevent Waterfall Chains in API Routes
 
 **Impact: CRITICAL (2-10× improvement)**
 

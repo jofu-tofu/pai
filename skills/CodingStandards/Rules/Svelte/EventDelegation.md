@@ -1,4 +1,4 @@
-### 7.3 Use Event Delegation for Large Lists
+### SV5.3 Use Event Delegation for Large Lists
 
 **Impact: HIGH (reduces memory usage from N listeners to 1)**
 

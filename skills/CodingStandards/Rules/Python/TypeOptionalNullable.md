@@ -1,4 +1,4 @@
-### 2.4 Optional for Nullable
+### PY2.4 Optional for Nullable
 
 **Impact: CRITICAL (Explicit null handling prevents surprises)**
 

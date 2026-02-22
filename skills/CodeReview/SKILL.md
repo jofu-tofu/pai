@@ -1,11 +1,11 @@
 ---
 name: CodeReview
-description: Comprehensive multi-agent code review system. USE WHEN code review OR review PR OR review pull request OR review changes OR review commits OR review diff OR check my code OR audit code changes OR review this branch OR what did I change OR look over my code OR inspect my changes OR critique this PR OR give feedback on my changes.
+description: Comprehensive multi-agent code review and codebase audit system. USE WHEN code review OR review PR OR review pull request OR review changes OR review commits OR review diff OR check my code OR audit code changes OR review this branch OR what did I change OR look over my code OR inspect my changes OR critique this PR OR give feedback on my changes OR audit this module OR audit this directory OR review this codebase OR audit code quality OR review code health OR audit architecture.
 ---
 
 # CodeReview
 
-Multi-agent code review system that is comprehensive but fits in a single session. Achieves depth through parallelism — agents review different dimensions simultaneously while a slim context layer prevents token waste. Claims are verified against actual changed commits before surfacing to the user.
+Multi-agent code review and codebase audit system that is comprehensive but fits in a single session. Operates in two modes: **diff mode** (review changes against a commit range) and **audit mode** (evaluate existing code in a directory/module). Both modes achieve depth through parallelism — agents review different dimensions simultaneously while a slim context layer prevents token waste. Diff mode verifies claims against changed commits; audit mode verifies claims against actual file contents.
 
 ## Success Criteria
 
@@ -40,7 +40,7 @@ Running the **Review** workflow from the **CodeReview** skill...
 
 | Workflow | Trigger | File |
 |----------|---------|------|
-| **Review** | "code review", "review my PR", "review this branch", "review my changes", "review my commits", "review last N commits", "check my code", "audit my changes", "what did I change", "do a code review", "run a review" | `Workflows/Review.md` |
+| **Review** | "code review", "review my PR", "review this branch", "review my changes", "review my commits", "review last N commits", "check my code", "audit my changes", "what did I change", "do a code review", "run a review", "audit this module", "audit this directory", "review this codebase", "audit code quality", "review code health", "audit architecture" | `Workflows/Review.md` |
 
 > **Pipeline stages** (GatherContext, DelegateAgents, SynthesizeFindings, VerifyClaims, GenerateReport) are internal — invoked by Review.md, not user-facing. Each has its own workflow file with concrete instructions.
 
@@ -83,6 +83,23 @@ User: "/CodeReview /CodingStandards /TestDriven"
 -> Dimensions emerge from the combined context, not from separate paths
 ```
 
+**Example 6: Codebase audit**
+```
+User: "Audit the src/auth/ module"
+-> Invokes Review workflow in audit mode
+-> Gathers target context (file inventory, module structure, languages)
+-> Activates structured dimensions based on target size and complexity
+-> Agents review full file set, not a diff
+```
+
+**Example 7: Architecture audit**
+```
+User: "Audit the architecture of lib/core/"
+-> Invokes Review workflow in audit mode
+-> Architecture dimensions (A1-A5) activate based on target structure
+-> Agents use audit-specific prompts with full file list
+```
+
 ## Architecture Notes
 
 The skill uses a **layered compression strategy**:
@@ -92,7 +109,14 @@ The skill uses a **layered compression strategy**:
 - Synthesis → Verification (claim-checked against commit range)
 - Verified findings → Report (human-readable, severity-ordered)
 
-Agent count scales with change size (dynamic caps):
-- Small (1-50 lines changed): up to 4 agents
+Agent count scales with **review target size and complexity**:
+
+**Diff mode** (lines changed):
+- Small (1-50 lines): up to 4 agents
 - Medium (50-300 lines): up to 8 agents
 - Large (300+ lines): up to 12 agents
+
+**Audit mode** (target file count and structural complexity):
+- Small (1-10 files, single module): up to 4 agents
+- Medium (10-50 files, 2-4 modules): up to 8 agents
+- Large (50+ files, 5+ modules): up to 12 agents

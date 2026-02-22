@@ -1,4 +1,4 @@
-### 7.1 Lazy-Load Heavy Components with Dynamic Imports
+### SV5.1 Lazy-Load Heavy Components with Dynamic Imports
 
 **Impact: HIGH (reduces initial bundle size for rarely-shown UI)**
 

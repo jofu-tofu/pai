@@ -1,4 +1,4 @@
-### 7.4 Cache Repeated Function Calls
+### R6.4 Cache Repeated Function Calls
 
 **Impact: MEDIUM (avoid redundant computation)**
 

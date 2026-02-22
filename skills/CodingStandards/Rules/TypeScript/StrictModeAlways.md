@@ -1,4 +1,4 @@
-### 1.1 Strict Mode Always
+### TS1.1 Strict Mode Always
 
 **Impact: CRITICAL (Catches entire classes of bugs — null errors, implicit any, unsafe binds — at compile time instead of production)**
 

@@ -1,4 +1,4 @@
-### 7.2 Only Safelist Classes That Are Genuinely Dynamic from External Sources
+### TW5.7 Only Safelist Classes That Are Genuinely Dynamic from External Sources
 
 **Impact: HIGH (over-safelisting bloats CSS bundle and defeats tree-shaking)**
 

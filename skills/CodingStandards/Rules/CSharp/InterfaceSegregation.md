@@ -1,4 +1,4 @@
-### 1.2 Interface Segregation
+### CS1.2 Interface Segregation
 
 **Impact: CRITICAL (Small interfaces enable testing and flexibility)**
 

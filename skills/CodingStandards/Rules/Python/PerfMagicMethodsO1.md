@@ -1,4 +1,4 @@
-### 3.1 Magic Methods Must Be O(1)
+### PY3.1 Magic Methods Must Be O(1)
 
 **Impact: HIGH (Called implicitly/frequently, O(n) becomes O(n²))**
 

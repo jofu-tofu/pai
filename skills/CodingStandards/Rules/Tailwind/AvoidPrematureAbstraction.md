@@ -1,4 +1,4 @@
-### 3.1 Build with Utilities First, Extract Only When Duplicated
+### TW1.4 Build with Utilities First, Extract Only When Duplicated
 
 **Impact: HIGH (premature abstraction creates rigid, hard-to-change code)**
 

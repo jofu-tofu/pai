@@ -1,4 +1,4 @@
-### 2.1 Avoid Barrel File Imports
+### R5.1 Avoid Barrel File Imports
 
 **Impact: CRITICAL (200-800ms import cost, slow builds)**
 

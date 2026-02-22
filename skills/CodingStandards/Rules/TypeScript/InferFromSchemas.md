@@ -1,4 +1,4 @@
-### 8.2 Infer Types From Schemas
+### TS3.4 Infer Types From Schemas
 
 **Impact: HIGH (Manually maintaining both a Zod schema and a TypeScript interface creates drift — derive the type from the schema)**
 

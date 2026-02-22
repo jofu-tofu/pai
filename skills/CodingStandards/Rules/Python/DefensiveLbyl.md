@@ -1,4 +1,4 @@
-### 1.1 LBYL over EAFP
+### PY1.1 LBYL over EAFP
 
 **Impact: CRITICAL (Makes intent explicit, reader sees conditions immediately)**
 

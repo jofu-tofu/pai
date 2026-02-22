@@ -1,4 +1,4 @@
-### 4.4 Pick One Spacing Direction Convention or Use Gap
+### TW3.4 Pick One Spacing Direction Convention or Use Gap
 
 **Impact: MEDIUM (mixing margin directions causes unpredictable spacing)**
 

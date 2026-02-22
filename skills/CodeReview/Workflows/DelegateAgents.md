@@ -12,11 +12,16 @@ Comprehensiveness comes from **specialization** — each agent reviews through a
 
 Load `$REVIEW_DIR/context.md` (the review directory created by GatherContext)
 
+Determine the **review mode** from the context layer header:
+- `mode: diff` — traditional diff-based review (commit range exists)
+- `mode: audit` — codebase audit (target path exists, no commit range)
+
 Extract ALL context signals:
-- **Change fingerprint** — languages, domains, risk areas, size tier
-- **Intent** — what the change is trying to accomplish, why it matters
+- **Change fingerprint** (diff mode) — languages, domains, risk areas, size tier based on lines changed
+- **Target fingerprint** (audit mode) — languages, domains, risk areas, size tier based on file count and complexity
+- **Intent** — what the change is trying to accomplish (diff) or what the user wants evaluated (audit)
 - **Requested lenses** — any skill names the user passed as arguments
-- **Architectural scope** — how many modules, how they connect, what changed structurally
+- **Architectural scope** — how many modules, how they connect, what changed (diff) or what exists (audit)
 
 ## Step 1.5: Load Review Dimensions
 
@@ -50,12 +55,12 @@ Combine structured dimensions (from Step 1.5) with context-emergent dimensions t
 
 | Signal | How It Creates Dimensions |
 |--------|--------------------------|
-| **Change fingerprint** (languages) | Each language in the diff may warrant its own dimension (TypeScript correctness, React patterns, Python idioms) |
-| **Change fingerprint** (domains) | Each affected domain (API, UI, data model, auth) may warrant a dimension |
-| **Change fingerprint** (risk areas) | Security-sensitive changes, auth code, data handling add security/safety dimensions |
+| **Fingerprint** (languages) | Each language in the target may warrant its own dimension (TypeScript correctness, React patterns, Python idioms) |
+| **Fingerprint** (domains) | Each affected domain (API, UI, data model, auth) may warrant a dimension |
+| **Fingerprint** (risk areas) | Security-sensitive code, auth modules, data handling add security/safety dimensions |
 | **Requested lenses** (skill arguments) | Each requested skill is read and its relevant categories become dimensions. Multi-category skills (like CodingStandards) are decomposed — match their sub-categories to the fingerprint and only load what's relevant. |
 | **Intent context** | If the *why* matters more than the *how* (architecture decision, design philosophy shift), add an architectural/philosophical dimension |
-| **Test changes** | If tests were added or modified, add a test quality dimension |
+| **Test presence** (diff: test changes; audit: test coverage) | If tests were changed (diff) or test files exist in the target (audit), add a test quality dimension |
 
 **The process:**
 1. Start with the activated structured dimensions from Step 1.5
@@ -77,13 +82,28 @@ Combine structured dimensions (from Step 1.5) with context-emergent dimensions t
 
 ## Step 3: Determine Agent Count
 
-Each dimension becomes one agent. Scale with change size using dynamic caps:
+Each dimension becomes one agent. Scale with **review target size and complexity** — the metric depends on review mode:
+
+**Diff mode** — size measured by lines changed:
 
 | Size Tier | Lines Changed | Max Agents | Strategy |
 |-----------|--------------|------------|----------|
 | Small | 1-50 lines | 4 | General + baselines (A5, S4) + 1 focused |
 | Medium | 50-300 lines | 8 | General + baselines + language + domain-specific |
 | Large | 300+ lines | 12 | General + full dimensional coverage across all activated categories |
+
+**Audit mode** — size measured by target file count and structural complexity:
+
+| Size Tier | Target Scope | Max Agents | Strategy |
+|-----------|-------------|------------|----------|
+| Small | 1-10 files, single module | 4 | General + baselines (A5, S4) + 1 focused |
+| Medium | 10-50 files, 2-4 modules | 8 | General + baselines + per-language + per-domain |
+| Large | 50+ files, 5+ modules or deep nesting | 12 | General + full dimensional coverage across all activated categories |
+
+**Complexity modifiers (audit mode):** Upgrade size tier by one level when:
+- Target contains 3+ languages
+- Target has deep dependency chains (imports spanning 4+ directories)
+- Target includes generated code, config files, AND application code together
 
 When activated dimensions exceed the agent cap for the size tier, prioritize:
 1. General correctness (always)
@@ -178,6 +198,80 @@ For each issue found:
 - File: [filename]
 - Line: [line number or range]
 - Commit: [which commit introduced this line — verify with git blame]
+- Issue: [1-2 sentence description]
+- Recommendation: [what to do about it]
+```
+
+### Audit Mode Agent Prompt (for codebase audits without a diff)
+
+Used when `mode: audit` — agents review the full file set of the target, not a filtered diff.
+
+**Structured Dimension Audit Agent:**
+```
+You are a code auditor specializing in [DIMENSION_NAME].
+
+CONTEXT:
+[Context layer — target path, scope summary, intent]
+
+YOUR AUDIT LENS:
+You are auditing specifically for [DIMENSION_NAME] concerns across the target codebase.
+
+MANDATORY: Read this file FIRST before reviewing any code:
+  skills/CodeReview/Dimensions/[CATEGORY]/[DIMENSION].md
+
+This file contains:
+- Your mental model for this audit dimension
+- Specific detection heuristics ordered by severity
+- Severity calibration specific to this dimension
+- Language-specific notes for the languages in this target
+- Good vs. bad examples
+
+Work through EVERY heuristic in the document systematically.
+For each heuristic, check every file in the target. Do not skip heuristics.
+Do not use generic phrasing — cite the specific heuristic that triggered each finding.
+
+TARGET FILES:
+[Full file list — all files in the audit target]
+
+SCOPE CONSTRAINTS:
+- Do NOT flag linter-catchable issues (assume linters run in CI)
+- Do NOT suggest test generation (note missing coverage, but don't write tests)
+- Minimize style nitpicks — only surface if they create bugs or maintainability problems
+
+OUTPUT FORMAT:
+For each issue found:
+- Severity: [from the dimension document's calibration]
+- File: [filename]
+- Line: [line number or range]
+- Heuristic: [which specific heuristic from the dimension document was triggered]
+- Issue: [1-2 sentence description]
+- Recommendation: [specific fix, not vague]
+```
+
+**Context-Emergent Audit Agent:**
+```
+You are a [DOMAIN] code auditor.
+
+CONTEXT:
+[Context layer — target path, scope summary, intent]
+
+YOUR LENS:
+You are auditing specifically for [DOMAIN] concerns: [specific focus areas from skill].
+Do NOT audit general correctness — a separate agent handles that.
+
+TARGET FILES:
+[Full file list — only files relevant to this agent's domain]
+
+SCOPE CONSTRAINTS:
+- Do NOT flag linter-catchable issues (assume linters run in CI)
+- Do NOT suggest test generation (note missing coverage, but don't write tests)
+- Minimize style nitpicks — only surface if they create bugs or maintainability problems
+
+OUTPUT FORMAT:
+For each issue found:
+- Severity: [CRITICAL / HIGH / MEDIUM / LOW / SUGGESTION]
+- File: [filename]
+- Line: [line number or range]
 - Issue: [1-2 sentence description]
 - Recommendation: [what to do about it]
 ```

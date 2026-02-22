@@ -1,4 +1,4 @@
-### 1.4 Promise.all() for Independent Operations
+### R2.2 Promise.all() for Independent Operations
 
 **Impact: CRITICAL (2-10× improvement)**
 

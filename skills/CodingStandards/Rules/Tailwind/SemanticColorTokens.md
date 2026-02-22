@@ -1,4 +1,4 @@
-### 5.2 Use Semantic Color Names Instead of Raw Palette Colors
+### TW4.2 Use Semantic Color Names Instead of Raw Palette Colors
 
 **Impact: HIGH (raw palette colors allow inconsistent usage across a codebase)**
 

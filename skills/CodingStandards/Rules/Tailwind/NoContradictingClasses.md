@@ -1,4 +1,4 @@
-### 2.2 Never Apply Conflicting Utility Classes
+### TW2.2 Never Apply Conflicting Utility Classes
 
 **Impact: HIGH (contradicting classes produce unpredictable results)**
 

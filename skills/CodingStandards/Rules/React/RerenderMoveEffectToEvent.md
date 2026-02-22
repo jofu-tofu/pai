@@ -1,4 +1,4 @@
-### 5.7 Put Interaction Logic in Event Handlers
+### R4.10 Put Interaction Logic in Event Handlers
 
 **Impact: MEDIUM (avoids effect re-runs and duplicate side effects)**
 

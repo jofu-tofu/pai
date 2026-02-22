@@ -1,4 +1,4 @@
-### 4.1 Return Immutable Collections
+### CS4.1 Return Immutable Collections
 
 **Impact: HIGH (Prevents callers from mutating internal state)**
 

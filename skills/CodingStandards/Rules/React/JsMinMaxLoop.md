@@ -1,4 +1,4 @@
-### 7.10 Use Loop for Min/Max Instead of Sort
+### R6.10 Use Loop for Min/Max Instead of Sort
 
 **Impact: LOW (O(n) instead of O(n log n))**
 

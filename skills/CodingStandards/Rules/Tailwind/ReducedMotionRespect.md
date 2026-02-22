@@ -1,4 +1,4 @@
-### 6.3 Provide motion-reduce: Alternatives for All Animations
+### TW5.3 Provide motion-reduce: Alternatives for All Animations
 
 **Impact: HIGH (users with vestibular disorders experience discomfort from animations)**
 

@@ -1,4 +1,4 @@
-### 1.3 Prefer Composition Over Inheritance
+### CS1.3 Prefer Composition Over Inheritance
 
 **Impact: CRITICAL (Inheritance creates fragile hierarchies)**
 

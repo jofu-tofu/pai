@@ -1,4 +1,4 @@
-### 4.1 Use Runes in .svelte.ts for Shared State
+### SV1.8 Use Runes in .svelte.ts for Shared State
 
 **Impact: CRITICAL (replaces writable stores with fine-grained reactivity)**
 

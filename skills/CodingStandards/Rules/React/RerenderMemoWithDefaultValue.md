@@ -1,4 +1,4 @@
-### 5.4 Extract Default Non-primitive Parameter Value from Memoized Component to Constant
+### R4.3 Extract Default Non-primitive Parameter Value from Memoized Component to Constant
 
 **Impact: MEDIUM (restores memoization by using a constant for default value)**
 

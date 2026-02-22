@@ -1,4 +1,4 @@
-### 4.1 Constrain Generics
+### TS2.3 Constrain Generics
 
 **Impact: HIGH (Unconstrained generics accept anything — constraints make generic functions actually useful by limiting input to valid types)**
 

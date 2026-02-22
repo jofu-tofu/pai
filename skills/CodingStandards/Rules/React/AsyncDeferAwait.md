@@ -1,4 +1,4 @@
-### 1.1 Defer Await Until Needed
+### R2.1 Defer Await Until Needed
 
 **Impact: HIGH (avoids blocking unused code paths)**
 

@@ -1,4 +1,4 @@
-### 5.9 Use Functional setState Updates
+### R4.7 Use Functional setState Updates
 
 **Impact: MEDIUM (prevents stale closures and unnecessary callback recreations)**
 

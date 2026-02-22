@@ -1,4 +1,4 @@
-### 1.2 Dependency-Based Parallelization
+### R2.3 Dependency-Based Parallelization
 
 **Impact: CRITICAL (2-10× improvement)**
 

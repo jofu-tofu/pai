@@ -1,4 +1,4 @@
-### 6.1 Branded Types for Validated Data
+### TS1.5 Branded Types for Validated Data
 
 **Impact: MEDIUM (Prevents mixing semantically different values that share the same primitive type — UserId vs OrderId are both strings but not interchangeable)**
 

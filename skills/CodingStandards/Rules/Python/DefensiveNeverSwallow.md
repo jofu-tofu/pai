@@ -1,4 +1,4 @@
-### 1.2 Never Swallow Exceptions
+### PY1.2 Never Swallow Exceptions
 
 **Impact: CRITICAL (Silent failures cause data corruption)**
 

@@ -152,3 +152,20 @@ This skill includes modern C# features with version annotations:
 This skill integrates with PAI's code generation and review workflows. When writing or reviewing C# code, these patterns ensure maintainable, null-safe, and properly async code.
 
 **Sources:** csharpcodingguidelines.com (AV series), dotnet-cursor-rules
+
+## Dimensional Loading
+
+For agents that need focused subsets rather than the full rule set, read `../Dimensions/CSharp/INDEX.md` for a routing table.
+
+| Dimension | File | Rule Count | Load When |
+|-----------|------|------------|-----------|
+| Architecture | Architecture.md | 4 | Type design, class responsibilities, composition |
+| Null Safety | NullSafety.md | 4 | Nullable context, null guards, required properties |
+| Async Patterns | AsyncPatterns.md | 4 | async/await, cancellation tokens, sync/async mixing |
+| Member Design | MemberDesign.md | 6 | Method signatures, immutable returns, visibility |
+
+**Default:** Load Architecture for any C# task.
+
+**Use the full workflow (this file) when:** comprehensive standards review for a complete class or module.
+
+**Use a dimension when:** focused context for a specific concern, multi-agent review, or constrained-context scenarios.

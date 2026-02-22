@@ -1,4 +1,4 @@
-### 6.1 Always Pair Icon-Only Buttons with Screen Reader Text
+### TW5.1 Always Pair Icon-Only Buttons with Screen Reader Text
 
 **Impact: CRITICAL (icon-only buttons without labels are invisible to screen readers)**
 

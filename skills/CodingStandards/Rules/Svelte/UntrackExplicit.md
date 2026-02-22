@@ -1,4 +1,4 @@
-### 1.4 Use untrack() to Exclude Dependencies
+### SV1.4 Use untrack() to Exclude Dependencies
 
 **Impact: HIGH (prevents infinite loops from accidental dependency tracking)**
 

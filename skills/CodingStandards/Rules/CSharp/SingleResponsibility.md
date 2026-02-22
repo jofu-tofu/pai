@@ -1,4 +1,4 @@
-### 1.1 Single Responsibility Principle
+### CS1.1 Single Responsibility Principle
 
 **Impact: CRITICAL (Classes with multiple responsibilities break unpredictably)**
 

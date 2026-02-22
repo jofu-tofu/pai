@@ -1,4 +1,4 @@
-### 5.1 Prefer Built-in Utility Types
+### TS2.5 Prefer Built-in Utility Types
 
 **Impact: MEDIUM (Reduces type duplication — built-in utilities are well-tested, well-documented, and universally understood)**
 

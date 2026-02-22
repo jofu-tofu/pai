@@ -1,4 +1,4 @@
-### 2.3 Use Null-Conditional Operators
+### CS2.3 Use Null-Conditional Operators
 
 **Impact: CRITICAL (Cleaner than nested null checks)**
 

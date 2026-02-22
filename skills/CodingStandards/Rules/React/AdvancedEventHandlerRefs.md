@@ -1,4 +1,4 @@
-### 8.2 Store Event Handlers in Refs
+### R6.13 Store Event Handlers in Refs
 
 **Impact: LOW (stable subscriptions)**
 

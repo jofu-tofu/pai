@@ -147,3 +147,20 @@ Rules use TitleCase naming for PAI compliance:
 **Complements React:** React skill covers component architecture and performance patterns (composition, Promise.all, data structures, caching). This skill covers the type system — no duplication, full coverage.
 
 **Sources:** Matt Pocock (Total TypeScript), Steve Kinney (Frontend Masters), TypeScript community consensus
+
+## Dimensional Loading
+
+For agents that need focused subsets rather than the full rule set, read `../Dimensions/TypeScript/INDEX.md` for a routing table.
+
+| Dimension | File | Rule Count | Load When |
+|-----------|------|------------|-----------|
+| Type Safety | TypeSafety.md | 5 | Compiler config, strict mode, any usage, narrowing |
+| Type Modeling | TypeModeling.md | 6 | Discriminated unions, generics, utility types |
+| Error Handling | ErrorHandling.md | 4 | Result types, custom errors, Zod validation |
+| Conventions | Conventions.md | 4 | Import organization, naming, file structure |
+
+**Default:** Load Type Safety for any TypeScript task.
+
+**Use the full workflow (this file) when:** comprehensive standards review for a complete module.
+
+**Use a dimension when:** focused context for a specific concern, multi-agent review, or constrained-context scenarios.

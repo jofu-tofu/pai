@@ -140,3 +140,20 @@ Rules use TitleCase naming for PAI compliance:
 This skill integrates with PAI's code generation and review workflows. When writing or reviewing Python code, these patterns ensure maintainable, type-safe, and defensive code.
 
 **Sources:** minimaxir's Python CLAUDE.md, Dagster's "Dignified Python"
+
+## Dimensional Loading
+
+For agents that need focused subsets rather than the full rule set, read `../Dimensions/Python/INDEX.md` for a routing table.
+
+| Dimension | File | Rule Count | Load When |
+|-----------|------|------------|-----------|
+| Defensive Programming | DefensiveProgramming.md | 4 | Input validation, LBYL patterns, path checking |
+| Type System | TypeSystem.md | 4 | Type hints, Literal types, avoiding Any |
+| Performance | Performance.md | 3 | Magic methods, import deferral, mutable defaults |
+| Code Organization | CodeOrganization.md | 7 | Keyword args, declaration scope, error handling |
+
+**Default:** Load Defensive Programming for any Python task.
+
+**Use the full workflow (this file) when:** comprehensive standards review for a complete module.
+
+**Use a dimension when:** focused context for a specific concern, multi-agent review, or constrained-context scenarios.

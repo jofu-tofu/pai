@@ -1,4 +1,4 @@
-### 7.11 Use Set/Map for O(1) Lookups
+### R6.11 Use Set/Map for O(1) Lookups
 
 **Impact: LOW-MEDIUM (O(n) to O(1))**
 

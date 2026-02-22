@@ -1,4 +1,4 @@
-### 4.3 Use Container Queries for Component-Level Responsive Design [v4]
+### TW3.3 Use Container Queries for Component-Level Responsive Design [v4]
 
 **Impact: HIGH (makes components truly portable across layout contexts)**
 

@@ -1,4 +1,4 @@
-### 2.4 Required Properties
+### CS2.4 Required Properties
 
 **Impact: CRITICAL (Prevents incomplete object construction) - C# 11+**
 

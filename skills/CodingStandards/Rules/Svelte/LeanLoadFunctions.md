@@ -1,4 +1,4 @@
-### 5.5 Return Only Above-the-Fold Data from Load
+### SV4.5 Return Only Above-the-Fold Data from Load
 
 **Impact: HIGH (reduces serialization cost and improves time-to-interactive)**
 

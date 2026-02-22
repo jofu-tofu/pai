@@ -1,4 +1,4 @@
-### 3.3 Destructure $props() with Named Interface
+### SV3.3 Destructure $props() with Named Interface
 
 **Impact: MEDIUM (provides clear prop contracts and reusable types)**
 

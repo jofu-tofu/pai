@@ -1,4 +1,4 @@
-### 4.2 Use Passive Event Listeners for Scrolling Performance
+### R2.8 Use Passive Event Listeners for Scrolling Performance
 
 **Impact: MEDIUM (eliminates scroll delay caused by event listeners)**
 

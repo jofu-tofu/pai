@@ -5,7 +5,7 @@ impactDescription: prevents unmaintainable component variants
 tags: composition, props, architecture
 ---
 
-## Avoid Boolean Prop Proliferation
+### R1.1 Avoid Boolean Prop Proliferation
 
 Don't add boolean props like `isThread`, `isEditing`, `isDMThread` to customize
 component behavior. Each boolean doubles possible states and creates

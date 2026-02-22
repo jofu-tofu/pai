@@ -1,4 +1,4 @@
-### 5.2 Mapped Types for Custom Transformations
+### TS2.6 Mapped Types for Custom Transformations
 
 **Impact: MEDIUM (When built-in utilities don't fit, mapped types transform types programmatically — DRY at the type level)**
 

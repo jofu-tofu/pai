@@ -1,4 +1,4 @@
-### 4.2 Declare Variables Close to Use
+### PY4.2 Declare Variables Close to Use
 
 **Impact: HIGH (Reduces cognitive load, clarifies data flow)**
 

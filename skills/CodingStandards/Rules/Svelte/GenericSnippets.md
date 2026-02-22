@@ -1,4 +1,4 @@
-### 3.1 Use Generics for Type-Safe Reusable Components
+### SV3.1 Use Generics for Type-Safe Reusable Components
 
 **Impact: HIGH (enables full type inference for consumers)**
 

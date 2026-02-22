@@ -1,4 +1,4 @@
-### 8.1 Use group/group-hover: for Styling Children Based on Parent State
+### TW2.5 Use group/group-hover: for Styling Children Based on Parent State
 
 **Impact: HIGH (eliminates JavaScript class toggling for parent-child interactions)**
 

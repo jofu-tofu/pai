@@ -1,4 +1,4 @@
-### 5.1 Choose Media vs Selector Dark Mode Strategy Deliberately
+### TW4.1 Choose Media vs Selector Dark Mode Strategy Deliberately
 
 **Impact: CRITICAL (wrong strategy prevents user-togglable dark mode)**
 

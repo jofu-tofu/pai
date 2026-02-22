@@ -1,4 +1,4 @@
-### 5.3 Use Form Actions Over fetch for Mutations
+### SV4.3 Use Form Actions Over fetch for Mutations
 
 **Impact: HIGH (enables progressive enhancement — works without JavaScript)**
 

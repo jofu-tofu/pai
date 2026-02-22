@@ -1,4 +1,4 @@
-### 7.7 Early Length Check for Array Comparisons
+### R6.7 Early Length Check for Array Comparisons
 
 **Impact: MEDIUM-HIGH (avoids expensive operations when lengths differ)**
 

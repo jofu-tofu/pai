@@ -1,4 +1,4 @@
-### 2.4 Never Mutate Prop Objects Directly
+### SV2.4 Never Mutate Prop Objects Directly
 
 **Impact: HIGH (prevents unexpected parent state mutations)**
 

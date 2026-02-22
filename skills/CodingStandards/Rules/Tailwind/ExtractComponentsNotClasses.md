@@ -1,4 +1,4 @@
-### 1.3 Extract Framework Components, Not CSS Classes
+### TW1.3 Extract Framework Components, Not CSS Classes
 
 **Impact: CRITICAL (components encapsulate structure + style; CSS classes only encapsulate style)**
 

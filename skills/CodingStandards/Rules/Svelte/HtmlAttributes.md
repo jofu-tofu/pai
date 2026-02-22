@@ -1,4 +1,4 @@
-### 3.2 Extend HTMLAttributes for Wrapper Components
+### SV3.2 Extend HTMLAttributes for Wrapper Components
 
 **Impact: HIGH (inherits all native element attributes automatically)**
 

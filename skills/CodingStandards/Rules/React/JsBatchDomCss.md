@@ -1,4 +1,4 @@
-### 7.1 Avoid Layout Thrashing
+### R6.1 Avoid Layout Thrashing
 
 **Impact: MEDIUM (prevents forced synchronous layouts and reduces performance bottlenecks)**
 

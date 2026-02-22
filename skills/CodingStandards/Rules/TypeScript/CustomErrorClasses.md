@@ -1,4 +1,4 @@
-### 7.2 Custom Error Classes
+### TS3.2 Custom Error Classes
 
 **Impact: HIGH (Generic Error messages force string parsing — custom Error subclasses enable typed catch blocks and discriminated error handling)**
 

@@ -5,7 +5,7 @@ impactDescription: enables flexible composition without prop drilling
 tags: composition, compound-components, architecture
 ---
 
-## Use Compound Components
+### R1.2 Use Compound Components
 
 Structure complex components as compound components with a shared context. Each
 subcomponent accesses shared state via context, not props. Consumers compose the

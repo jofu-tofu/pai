@@ -1,4 +1,4 @@
-### 2.2 Narrow Before Use
+### TS1.4 Narrow Before Use
 
 **Impact: CRITICAL (Type assertions lie to the compiler — type guards prove correctness)**
 

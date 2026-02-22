@@ -1,4 +1,4 @@
-### 2.2 Never Return Null Collections
+### CS2.2 Never Return Null Collections
 
 **Impact: CRITICAL (Eliminates null checks at every call site)**
 

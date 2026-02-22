@@ -1,4 +1,4 @@
-### 3.6 Per-Request Deduplication with React.cache()
+### R3.2 Per-Request Deduplication with React.cache()
 
 **Impact: MEDIUM (deduplicates within request)**
 

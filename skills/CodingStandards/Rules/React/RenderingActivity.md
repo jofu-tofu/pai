@@ -1,4 +1,4 @@
-### 6.7 Use Activity Component for Show/Hide
+### R4.19 Use Activity Component for Show/Hide
 
 **Impact: MEDIUM (preserves state/DOM)**
 

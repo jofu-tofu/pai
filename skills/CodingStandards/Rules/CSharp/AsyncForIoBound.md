@@ -1,4 +1,4 @@
-### 3.1 Async for I/O-Bound Operations Only
+### CS3.1 Async for I/O-Bound Operations Only
 
 **Impact: HIGH (Async releases threads during waits, not CPU work)**
 

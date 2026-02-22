@@ -1,4 +1,4 @@
-### 1.4 Encapsulate State
+### CS1.4 Encapsulate State
 
 **Impact: CRITICAL (Exposed internals invite misuse)**
 

@@ -1,4 +1,4 @@
-### 7.12 Use toSorted() Instead of sort() for Immutability
+### R6.12 Use toSorted() Instead of sort() for Immutability
 
 **Impact: MEDIUM-HIGH (prevents mutation bugs in React state)**
 

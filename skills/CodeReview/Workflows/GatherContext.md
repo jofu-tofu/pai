@@ -16,7 +16,11 @@ Without comprehensive context, the orchestrator either delegates blindly (agents
 
 **Why comprehensiveness matters more than brevity here:** Every piece of context that the orchestrator doesn't have is a review dimension it can't construct. A missed coding standard is a class of issues that won't be caught. A missed user argument is a lens the user asked for that gets silently dropped. The context layer should be dense signal — not bloated, but complete.
 
-## Step 1: Gather Change Context
+## Step 1: Gather Review Target Context
+
+This step operates differently depending on review mode. Both produce a fingerprint for dimension construction.
+
+### Diff Mode — Gather Change Context
 
 Establish the commit range, then capture everything about what changed and why.
 
@@ -57,6 +61,44 @@ If no intent available: note "Intent: unavailable — review will focus on techn
 - Size tier: [Small (1-50 lines) / Medium (50-300) / Large (300+)]
 ```
 
+### Audit Mode — Gather Target Context
+
+Establish the target path, then capture everything about the codebase section being audited.
+
+**Target path** (from Review.md Step 1):
+- Directory path, module path, or explicit file list
+
+```bash
+# Understand the target
+find [target-path] -type f -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.py' -o -name '*.svelte' | head -200
+find [target-path] -type f | wc -l
+find [target-path] -type d | head -50
+wc -l [target-path]/**/* 2>/dev/null | tail -1
+```
+
+**Capture:**
+- Files in target (categorized by type: `.ts`, `.tsx`, `.md`, config, test, etc.)
+- Total line count of the target
+- Directory structure and nesting depth
+- Module boundaries (directories with their own index/barrel files)
+
+**Intent signals** (attempt in priority order):
+1. User's stated concern — "audit for architecture issues", "check simplification opportunities"
+2. Recent conversation — has the user explained what they're looking for?
+3. Target README or CLAUDE.md — extract stated purpose of this module
+
+If no intent available: note "Intent: general health audit — all dimensions activated"
+
+**Target fingerprint:**
+```
+- Languages: [TypeScript, React/TSX, CSS, ...]
+- Domains: [API endpoints, UI components, data models, config, tests, ...]
+- Structure: [Flat / Nested / Deep hierarchy]
+- Risk areas: [Auth-related, DB queries, external API calls, user data, ...]
+- Size tier: [Small (1-10 files) / Medium (10-50 files) / Large (50+ files)]
+- Complexity signals: [Multi-language, deep imports, generated code present]
+```
+
 ## Step 2: Gather Review Context
 
 This is the step most review systems skip. Beyond the diff, gather everything that tells the orchestrator what rules and standards apply to these changes. Context sources are open-ended — scan for whatever is available.
@@ -90,18 +132,27 @@ Compress everything into a structured context layer — designed to be injected 
 ```markdown
 ## CodeReview Context Layer
 
-### Changes
+**Mode:** [diff | audit]
+
+### Review Target
+<!-- Diff mode -->
 **Commit range:** [SHA..SHA or branch..HEAD]
 **Changed files:** [N files — list with type categorization]
 **Size:** [+X / -Y lines | Size tier]
 
-### Intent
-[1-3 sentences: what this change is trying to accomplish, from PR/ticket/commits]
+<!-- Audit mode -->
+**Target path:** [directory or file list]
+**Target files:** [N files — list with type categorization]
+**Size:** [N files, M total lines | Size tier]
+**Structure:** [Flat / Nested / Deep hierarchy | N modules]
 
-### Change Fingerprint
+### Intent
+[1-3 sentences: what this change is trying to accomplish (diff) or what the user wants evaluated (audit)]
+
+### Fingerprint
 - Languages: [list]
 - Domains: [list]
-- Patterns: [list]
+- Patterns: [list] (diff: New feature, refactor, etc. | audit: Module health, architecture review, etc.)
 - Risk areas: [list]
 
 ### Review Context Sources

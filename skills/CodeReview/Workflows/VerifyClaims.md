@@ -15,9 +15,40 @@ This workflow runs `git blame` and `git log` probes against every flagged line t
 ## Inputs
 
 - Findings from `$REVIEW_DIR/findings.md`
-- Commit range from the context layer
+- Context layer from `$REVIEW_DIR/context.md` (includes review mode)
 
-## Step 1: Verify Each Finding
+## Mode Selection
+
+Read the context layer's `Mode:` field:
+
+- **`diff`** → Proceed to Step 1 (git blame verification against commit range)
+- **`audit`** → Skip to Step 1A (file-presence verification — no commit range exists)
+
+## Step 1A: Verify Audit Findings (audit mode only)
+
+In audit mode, there is no commit range. Findings are verified by confirming the cited code actually exists.
+
+For EVERY finding in the findings list:
+
+```bash
+# Does the file exist?
+test -f [filename] && echo "EXISTS" || echo "MISSING"
+
+# Does the cited line range exist and match the described issue?
+sed -n '[start],[end]p' [filename]
+```
+
+**Decision tree (audit mode):**
+
+| Condition | Result | Action |
+|---|---|---|
+| File exists AND cited lines contain the described pattern | VERIFIED | Keep finding in report |
+| File exists BUT cited lines don't match the description | MISLOCATED | Agent to re-check, or mark "⚠ Location uncertain" |
+| File does not exist | INVALID | Discard finding |
+
+After verification, skip to Step 3 (tally) — Steps 1 and 2 are diff-mode only.
+
+## Step 1: Verify Each Finding (diff mode)
 
 For EVERY finding in the findings list, run:
 

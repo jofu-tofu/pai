@@ -1,4 +1,4 @@
-### 2.1 Never Use Any
+### TS1.3 Never Use Any
 
 **Impact: CRITICAL (Any disables type checking and spreads virally — one `any` infects every value it touches)**
 

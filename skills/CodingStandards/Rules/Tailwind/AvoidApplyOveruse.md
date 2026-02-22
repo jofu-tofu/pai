@@ -1,4 +1,4 @@
-### 1.2 Limit @apply to Third-Party Style Overrides Only
+### TW1.2 Limit @apply to Third-Party Style Overrides Only
 
 **Impact: CRITICAL (breaks utility-first paradigm and increases CSS bundle size)**
 

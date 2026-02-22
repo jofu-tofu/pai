@@ -1,4 +1,4 @@
-### 4.2 Infer Over Explicit Type Arguments
+### TS2.4 Infer Over Explicit Type Arguments
 
 **Impact: HIGH (Let TypeScript infer generic arguments from usage — explicit type arguments add noise and can lie)**
 

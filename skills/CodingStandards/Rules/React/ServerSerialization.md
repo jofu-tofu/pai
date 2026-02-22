@@ -1,4 +1,4 @@
-### 3.4 Minimize Serialization at RSC Boundaries
+### R3.5 Minimize Serialization at RSC Boundaries
 
 **Impact: HIGH (reduces data transfer size)**
 

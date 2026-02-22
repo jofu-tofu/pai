@@ -1,4 +1,4 @@
-### 4.2 Never Export Raw $state Variables
+### SV1.9 Never Export Raw $state Variables
 
 **Impact: CRITICAL (Svelte enforces reference stability — raw export won't compile)**
 

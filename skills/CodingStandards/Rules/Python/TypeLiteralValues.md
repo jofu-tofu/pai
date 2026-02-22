@@ -1,4 +1,4 @@
-### 2.2 Use Literal Types
+### PY2.2 Use Literal Types
 
 **Impact: CRITICAL (Catches typos at type-check time)**
 

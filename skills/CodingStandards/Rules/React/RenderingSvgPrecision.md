@@ -1,4 +1,4 @@
-### 6.4 Optimize SVG Precision
+### R4.16 Optimize SVG Precision
 
 **Impact: LOW (reduces file size)**
 

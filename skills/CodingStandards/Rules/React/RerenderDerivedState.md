@@ -1,4 +1,4 @@
-### 5.8 Subscribe to Derived State
+### R4.5 Subscribe to Derived State
 
 **Impact: MEDIUM (reduces re-render frequency)**
 

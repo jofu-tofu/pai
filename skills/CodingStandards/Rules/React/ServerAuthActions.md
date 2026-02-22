@@ -1,4 +1,4 @@
-### 3.1 Authenticate Server Actions Like API Routes
+### R3.1 Authenticate Server Actions Like API Routes
 
 **Impact: CRITICAL (prevents unauthorized access to server mutations)**
 

@@ -1,4 +1,4 @@
-### 3.1 Unions Over Enums
+### TS2.1 Unions Over Enums
 
 **Impact: HIGH (Enums generate runtime code, can't be tree-shaken, and have surprising numeric behavior)**
 

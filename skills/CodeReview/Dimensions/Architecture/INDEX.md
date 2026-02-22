@@ -6,11 +6,11 @@ Structured review lenses for architectural quality. Each dimension is a single-a
 
 | ID | Dimension | File | Triggers When |
 |----|-----------|------|---------------|
-| A1 | Modularity & Boundaries | Modularity.md | `affected_directories` spans 3+ modules OR `diff_line_count` > 100 |
-| A2 | Modifiability & Extensibility | Modifiability.md | New interfaces/abstract classes in diff OR `commit_messages` contains "refactor" |
-| A3 | Consistency & Conventions | Consistency.md | `affected_directories` spans 2+ modules (cross-module consistency check) |
-| A4 | Dependency Health | DependencyHealth.md | Import statements changed OR `affected_directories` spans 3+ modules |
-| A5 | Design Intent Clarity | DesignIntent.md | ALWAYS (baseline — activates for every review) |
+| A1 | Modularity & Boundaries | Modularity.md | Diff: `affected_directories` spans 3+ modules OR `diff_line_count` > 100. Audit: `target_directory_count` >= 3 OR `target_file_count` > 20 |
+| A2 | Modifiability & Extensibility | Modifiability.md | Diff: new interfaces/abstract classes in diff OR `commit_messages` contains "refactor". Audit: target contains interfaces, abstract classes, or extension points |
+| A3 | Consistency & Conventions | Consistency.md | Diff: `affected_directories` spans 2+ modules. Audit: `target_directory_count` >= 2 (cross-module consistency check) |
+| A4 | Dependency Health | DependencyHealth.md | Diff: import statements changed OR `affected_directories` spans 3+ modules. Audit: `target_file_count` > 10 (import graph analysis) |
+| A5 | Design Intent Clarity | DesignIntent.md | ALWAYS (baseline — activates for every review in both modes) |
 
 ## Default Activation
 

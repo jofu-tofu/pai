@@ -5,7 +5,7 @@ impactDescription: self-documenting code, no hidden conditionals
 tags: composition, variants, architecture
 ---
 
-## Create Explicit Component Variants
+### R1.6 Create Explicit Component Variants
 
 Instead of one component with many boolean props, create explicit variant
 components. Each variant composes the pieces it needs. The code documents

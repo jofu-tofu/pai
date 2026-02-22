@@ -1,4 +1,4 @@
-### 1.5 Strategic Suspense Boundaries
+### R2.5 Strategic Suspense Boundaries
 
 **Impact: HIGH (faster initial paint)**
 

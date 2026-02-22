@@ -6,11 +6,11 @@ Structured review lenses for code simplification opportunities. Each dimension i
 
 | ID | Dimension | File | Triggers When |
 |----|-----------|------|---------------|
-| S1 | Bloat Detection | BloatDetection.md | `diff_line_count` > 50 OR new files created |
-| S2 | Coupling Analysis | CouplingAnalysis.md | `affected_directories` spans 2+ modules OR import statements changed |
-| S3 | Dispensability Scan | DispensabilityScan.md | `diff_line_count` > 100 OR `commit_messages` contains "refactor" or "cleanup" |
-| S4 | Complexity Reduction | ComplexityReduction.md | ALWAYS (baseline — activates for every review) |
-| S5 | Change Resistance | ChangeResistance.md | `affected_directories` spans 3+ modules OR `diff_line_count` > 200 |
+| S1 | Bloat Detection | BloatDetection.md | Diff: `diff_line_count` > 50 OR new files created. Audit: `target_file_count` > 10 OR total target lines > 1000 |
+| S2 | Coupling Analysis | CouplingAnalysis.md | Diff: `affected_directories` spans 2+ modules OR import statements changed. Audit: `target_directory_count` >= 2 (cross-module coupling check) |
+| S3 | Dispensability Scan | DispensabilityScan.md | Diff: `diff_line_count` > 100 OR `commit_messages` contains "refactor"/"cleanup". Audit: `target_file_count` > 15 (dead code and unused export scan) |
+| S4 | Complexity Reduction | ComplexityReduction.md | ALWAYS (baseline — activates for every review in both modes) |
+| S5 | Change Resistance | ChangeResistance.md | Diff: `affected_directories` spans 3+ modules OR `diff_line_count` > 200. Audit: `target_directory_count` >= 3 OR `target_file_count` > 30 |
 
 ## Default Activation
 

@@ -1,4 +1,4 @@
-### 4.3 Accept Specific Parameters
+### CS4.3 Accept Specific Parameters
 
 **Impact: HIGH (Accept only needed data, not entire objects)**
 

@@ -1,4 +1,4 @@
-### 7.6 Combine Multiple Array Iterations
+### R6.6 Combine Multiple Array Iterations
 
 **Impact: LOW-MEDIUM (reduces iterations)**
 

@@ -1,4 +1,4 @@
-### 4.2 Use Methods for Expensive Operations
+### CS4.2 Use Methods for Expensive Operations
 
 **Impact: HIGH (Properties imply cheap access)**
 

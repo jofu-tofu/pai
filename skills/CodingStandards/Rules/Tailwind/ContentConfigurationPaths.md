@@ -1,4 +1,4 @@
-### 7.4 Include All File Types That Reference Tailwind Classes in Content Config
+### TW5.9 Include All File Types That Reference Tailwind Classes in Content Config
 
 **Impact: CRITICAL (missing paths cause used classes to be stripped in production)**
 

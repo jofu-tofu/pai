@@ -1,4 +1,4 @@
-### 7.9 Hoist RegExp Creation
+### R6.9 Hoist RegExp Creation
 
 **Impact: LOW-MEDIUM (avoids recreation)**
 

@@ -1,4 +1,4 @@
-### 1.7 Narrow Reactive Dependencies with $derived
+### SV1.7 Narrow Reactive Dependencies with $derived
 
 **Impact: HIGH (minimizes unnecessary re-renders)**
 

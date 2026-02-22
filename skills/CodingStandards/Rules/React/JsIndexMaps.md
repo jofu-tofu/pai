@@ -1,4 +1,4 @@
-### 7.2 Build Index Maps for Repeated Lookups
+### R6.2 Build Index Maps for Repeated Lookups
 
 **Impact: LOW-MEDIUM (1M ops to 2K ops)**
 

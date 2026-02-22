@@ -1,4 +1,4 @@
-### 10.1 Naming Conventions
+### TS4.3 Naming Conventions
 
 **Impact: MEDIUM (Consistent naming communicates intent — readers know what something is before reading its definition)**
 

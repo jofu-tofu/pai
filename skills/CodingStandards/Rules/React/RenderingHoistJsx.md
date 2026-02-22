@@ -1,4 +1,4 @@
-### 6.3 Hoist Static JSX Elements
+### R4.15 Hoist Static JSX Elements
 
 **Impact: LOW (avoids re-creation)**
 

@@ -1,4 +1,4 @@
-### 5.2 Catch Specific Exceptions
+### PY4.6 Catch Specific Exceptions
 
 **Impact: MEDIUM (Bare except hides bugs)**
 

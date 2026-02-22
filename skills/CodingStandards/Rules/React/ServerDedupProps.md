@@ -1,4 +1,4 @@
-### 3.2 Avoid Duplicate Serialization in RSC Props
+### R3.4 Avoid Duplicate Serialization in RSC Props
 
 **Impact: LOW (reduces network payload by avoiding duplicate serialization)**
 

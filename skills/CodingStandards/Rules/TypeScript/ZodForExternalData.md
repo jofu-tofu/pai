@@ -1,4 +1,4 @@
-### 8.1 Zod for External Data Validation
+### TS3.3 Zod for External Data Validation
 
 **Impact: HIGH (Type assertions on external data are lies — Zod validates at runtime and infers types, closing the compile-time/runtime gap)**
 

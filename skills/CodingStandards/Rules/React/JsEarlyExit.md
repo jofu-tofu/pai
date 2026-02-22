@@ -1,4 +1,4 @@
-### 7.8 Early Return from Functions
+### R6.8 Early Return from Functions
 
 **Impact: LOW-MEDIUM (avoids unnecessary computation)**
 
