@@ -1,6 +1,6 @@
 ---
 name: CodeReview
-description: Comprehensive multi-agent code review system. USE WHEN code review OR review PR OR review pull request OR review changes OR review commits OR review diff OR check my code OR audit code changes OR review this branch OR what did I change.
+description: Comprehensive multi-agent code review system. USE WHEN code review OR review PR OR review pull request OR review changes OR review commits OR review diff OR check my code OR audit code changes OR review this branch OR what did I change OR look over my code OR inspect my changes OR critique this PR OR give feedback on my changes.
 ---
 
 # CodeReview
@@ -92,7 +92,7 @@ The skill uses a **layered compression strategy**:
 - Synthesis → Verification (claim-checked against commit range)
 - Verified findings → Report (human-readable, severity-ordered)
 
-Agent count scales with change size:
-- Small (1-50 lines changed): 2 agents
-- Medium (50-300 lines): 3-4 agents
-- Large (300+ lines): 5-8 agents
+Agent count scales with change size (dynamic caps):
+- Small (1-50 lines changed): up to 4 agents
+- Medium (50-300 lines): up to 8 agents
+- Large (300+ lines): up to 12 agents

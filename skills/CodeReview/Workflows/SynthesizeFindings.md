@@ -1,5 +1,7 @@
 # SynthesizeFindings Workflow
 
+> Internal workflow — invoked by Review.md, not user-facing.
+
 Aggregate outputs from all parallel agents into a unified, deduplicated, prioritized findings list.
 
 ## Purpose

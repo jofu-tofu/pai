@@ -50,7 +50,7 @@ Read and execute: `Workflows/DelegateAgents.md`
 
 Uses the context layer's change fingerprint to:
 - Select relevant skills
-- Determine agent count (Small: 2, Medium: 3-4, Large: 5-8)
+- Determine agent count (Small: up to 4, Medium: up to 8, Large: up to 12)
 - Spawn agents in parallel
 
 Announce to user: "Launching N agents in parallel: [domain list]. This may take a moment..."

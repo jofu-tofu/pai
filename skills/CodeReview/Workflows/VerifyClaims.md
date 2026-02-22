@@ -1,5 +1,7 @@
 # VerifyClaims Workflow
 
+> Internal workflow — invoked by Review.md, not user-facing.
+
 **The credibility gate.** Every flagged issue must be verified to exist in lines introduced by the specified commit range before it reaches the user. This is what separates a trustworthy review from an embarrassing one.
 
 ## Purpose

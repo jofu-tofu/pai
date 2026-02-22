@@ -1,10 +1,12 @@
 # DelegateAgents Workflow
 
-Read the context layer from GatherContext, construct review dimensions from the full context, then spawn one agent per dimension in parallel.
+> Internal workflow — invoked by Review.md, not user-facing.
+
+Read the context layer from GatherContext, load structured review dimensions, construct review dimensions from the full context, then spawn one agent per dimension in parallel.
 
 ## Purpose
 
-Comprehensiveness comes from **specialization** — each agent reviews through a specific lens rather than one agent going shallow across everything. The dimensions aren't predetermined; they emerge from the context. What changed, what the user asked for, what the intent reveals, and what the architecture demands all combine to determine how many dimensions we need and what each one focuses on.
+Comprehensiveness comes from **specialization** — each agent reviews through a specific lens rather than one agent going shallow across everything. Dimensions come from two sources: (1) structured dimension documents in `Dimensions/` that provide concrete heuristics, and (2) context-emergent dimensions from change fingerprint, requested lenses, and intent. The structured dimensions ensure agents receive specific, auditable rule files — not generic phrasing.
 
 ## Step 1: Read Context Layer
 
@@ -16,11 +18,35 @@ Extract ALL context signals:
 - **Requested lenses** — any skill names the user passed as arguments
 - **Architectural scope** — how many modules, how they connect, what changed structurally
 
+## Step 1.5: Load Review Dimensions
+
+Discover all dimension categories by reading every INDEX.md file found under `../Dimensions/*/INDEX.md` (glob pattern).
+
+This discovers dimension categories dynamically — adding a new category (e.g., `Dimensions/Security/INDEX.md`) requires zero changes to this workflow file. Just create the directory with an INDEX.md and dimension documents.
+
+Each INDEX.md lists dimensions with:
+- **ID** — unique identifier (e.g., A1, S4)
+- **Dimension name** — what the lens evaluates
+- **File path** — the Tier 3 dimension document the agent will read
+- **Triggers When** — context signals from GatherContext that activate this dimension
+
+Parse the "Triggers When" column against the context signals from Step 1 to determine which dimensions activate.
+
+**Activation rules:**
+1. Match each dimension's trigger condition against context signals
+2. Dimensions marked `ALWAYS` activate for every review
+3. Dimensions with conditional triggers activate only when their conditions match
+4. The INDEX.md `Triggers When` column is the **authoritative routing logic** — this workflow does not maintain a separate signal table
+
 ## Step 2: Construct Review Dimensions
 
-Review dimensions are **lenses** — each one defines what an agent focuses on and what knowledge it brings. Dimensions emerge from the context, not from a fixed mapping.
+Combine structured dimensions (from Step 1.5) with context-emergent dimensions to build the full review dimension list.
 
-**Context signals that produce dimensions:**
+**Structured dimensions** (from `Dimensions/` INDEX files):
+- Already determined in Step 1.5 based on trigger matching
+- Each comes with a concrete dimension document file path
+
+**Context-emergent dimensions** (from context signals):
 
 | Signal | How It Creates Dimensions |
 |--------|--------------------------|
@@ -32,44 +58,98 @@ Review dimensions are **lenses** — each one defines what an agent focuses on a
 | **Test changes** | If tests were added or modified, add a test quality dimension |
 
 **The process:**
-1. List all context signals from the context layer
-2. For each signal, identify what review dimension(s) it implies
-3. Merge dimensions that would overlap (e.g., "TypeScript correctness" from the fingerprint and "TypeScript standards" from a CodingStandards argument become one combined "TypeScript" dimension with both general and standards-specific rules)
-4. For each dimension, identify which PAI skill(s) provide relevant knowledge. Read those skills and extract the specific rules/principles the agent should apply — don't just name the skill.
+1. Start with the activated structured dimensions from Step 1.5
+2. Add context-emergent dimensions from the signals above
+3. Merge dimensions that would overlap (e.g., if both A3 Consistency and a CodingStandards dimension cover naming conventions, merge them — the structured dimension document takes precedence as the agent's instruction set)
+4. For context-emergent dimensions without a structured document, identify which PAI skill(s) provide relevant knowledge and extract specific rules
 
 **Output:** A list of review dimensions, each with:
-- A lens name (e.g., "TypeScript + CodingStandards", "React patterns", "Test quality", "General correctness")
-- The specific knowledge/rules to inject into the agent prompt
+- A lens name (e.g., "Complexity Reduction [S4]", "TypeScript + CodingStandards", "General correctness")
+- For structured dimensions: the file path to the dimension document (repo-root-relative)
+- For context-emergent dimensions: the specific knowledge/rules to inject into the agent prompt
 - Which files from the diff are relevant to this dimension
 
 **Always include at minimum:**
 - 1 General correctness dimension (logic, patterns, bugs — applied to the full diff)
-- At least 1 domain-specific dimension
+- Baseline structured dimensions: A5 (Design Intent Clarity) and S4 (Complexity Reduction)
 
 **Constraint:** Every context signal must map to at least one dimension. No signal — especially a user-requested lens — should be silently dropped.
 
 ## Step 3: Determine Agent Count
 
-Each dimension becomes one agent. Scale the number of dimensions with change size:
+Each dimension becomes one agent. Scale with change size using dynamic caps:
 
-| Size Tier | Lines Changed | Typical Dimensions | Strategy |
-|-----------|--------------|-------------------|----------|
-| Small | 1-50 lines | 2-3 | General + 1-2 focused |
-| Medium | 50-300 lines | 3-5 | General + language + domain-specific |
-| Large | 300+ lines | 5-8 | General + full dimensional coverage |
+| Size Tier | Lines Changed | Max Agents | Strategy |
+|-----------|--------------|------------|----------|
+| Small | 1-50 lines | 4 | General + baselines (A5, S4) + 1 focused |
+| Medium | 50-300 lines | 8 | General + baselines + language + domain-specific |
+| Large | 300+ lines | 12 | General + full dimensional coverage across all activated categories |
 
-Cap at 8 agents — diminishing returns past that, and synthesis complexity increases.
+When activated dimensions exceed the agent cap for the size tier, prioritize:
+1. General correctness (always)
+2. Baseline dimensions: A5, S4 (always)
+3. Dimensions whose trigger conditions matched most strongly
+4. User-requested lenses (never drop these)
 
 ## Step 4: Construct Agent Prompts
 
-Each agent receives:
-1. The context layer (intent + summary — NOT the full diff unless needed)
-2. The diff sections relevant to their domain only
-3. Their specific review lens/skill
-4. The commit range to scope their claims to
-5. Output format requirements
+Each agent receives a prompt tailored to whether it has a structured dimension document or is context-emergent.
 
-**Agent prompt template:**
+### Structured Dimension Agent Prompt (for agents with a Tier 3 dimension document)
+
+```
+You are a code reviewer specializing in [DIMENSION_NAME].
+
+CONTEXT:
+[Context layer — intent, summary, commit range]
+
+YOUR REVIEW LENS:
+You are reviewing specifically for [DIMENSION_NAME] concerns.
+
+MANDATORY: Read this file FIRST before reviewing any code:
+  skills/CodeReview/Dimensions/[CATEGORY]/[DIMENSION].md
+
+This file contains:
+- Your mental model for this review dimension
+- Specific detection heuristics ordered by severity
+- Severity calibration specific to this dimension
+- Language-specific notes for the languages in this diff
+- Good vs. bad examples
+
+Work through EVERY heuristic in the document systematically.
+For each heuristic, check every file in the diff. Do not skip heuristics.
+Do not use generic phrasing — cite the specific heuristic that triggered each finding.
+
+DIFF (your domain only):
+[Filtered diff]
+
+COMMIT RANGE: [SHA..SHA]
+IMPORTANT: Only flag issues that exist in lines introduced in this commit range.
+Do not flag pre-existing issues in surrounding context lines.
+
+SCOPE CONSTRAINTS (from SkillIntent — enforce these):
+- Do NOT flag linter-catchable issues (assume linters run in CI)
+- Do NOT suggest test generation (note missing coverage, but don't write tests)
+- Minimize style nitpicks — only surface if they create bugs or maintainability problems
+
+OUTPUT FORMAT:
+For each issue found:
+- Severity: [from the dimension document's calibration]
+- File: [filename]
+- Line: [line number or range]
+- Heuristic: [which specific heuristic from the dimension document was triggered]
+- Issue: [1-2 sentence description]
+- Recommendation: [specific fix, not vague]
+```
+
+**Architecture agents (A1, A4) receive additional context:**
+- `file_list`: all files in affected modules (not just changed files) from GatherContext
+- `module_map`: directory tree showing the module structure from GatherContext
+
+This enables evaluating dependency direction, boundary violations, and import patterns across the module — not just within changed lines.
+
+### Context-Emergent Agent Prompt (for agents without a dimension document)
+
 ```
 You are a [DOMAIN] code reviewer.
 
@@ -87,6 +167,11 @@ COMMIT RANGE: [SHA..SHA]
 IMPORTANT: Only flag issues that exist in lines introduced in this commit range.
 Do not flag pre-existing issues in surrounding context lines.
 
+SCOPE CONSTRAINTS (from SkillIntent — enforce these):
+- Do NOT flag linter-catchable issues (assume linters run in CI)
+- Do NOT suggest test generation (note missing coverage, but don't write tests)
+- Minimize style nitpicks — only surface if they create bugs or maintainability problems
+
 OUTPUT FORMAT:
 For each issue found:
 - Severity: [CRITICAL / HIGH / MEDIUM / LOW / SUGGESTION]
@@ -102,20 +187,23 @@ For each issue found:
 **MANDATORY announcement before spawning (makes proportionality visible):**
 ```
 Change size: [TIER] ([N] lines) → spawning [N] agents: [domain1], [domain2], ...
+Structured dimensions: [list dimension IDs, e.g., A5, S4, A1]
+Context-emergent: [list context dimensions, e.g., TypeScript, General correctness]
 ```
 
 Spawn all agents simultaneously using `run_in_background: true`.
 
 Each agent:
-- Reads the context layer
-- Applies its skill's knowledge to the relevant diff sections
-- Returns structured findings
+- Structured dimension agents: Read their dimension document first, then apply heuristics to the diff
+- Context-emergent agents: Apply their injected knowledge to the relevant diff sections
+- All agents: Return structured findings
 
 ```
 # Launch in parallel — do not wait for one before starting the next
 Agent 1: General correctness → background
-Agent 2: TypeScript → background
-Agent 3: React → background
+Agent 2: S4 Complexity Reduction → background
+Agent 3: A5 Design Intent Clarity → background
+Agent 4: TypeScript → background
 ...
 ```
 
@@ -123,8 +211,9 @@ Output a status message so the user knows what's running:
 ```
 Launching [N] review agents:
 ✓ General correctness agent — started
+✓ S4 Complexity Reduction agent — started (reading ComplexityReduction.md)
+✓ A5 Design Intent Clarity agent — started (reading DesignIntent.md)
 ✓ TypeScript agent — started
-✓ React agent — started
 [...]
 All agents running in parallel. Collecting results...
 ```

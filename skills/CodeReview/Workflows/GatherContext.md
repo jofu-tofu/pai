@@ -1,5 +1,7 @@
 # GatherContext Workflow
 
+> Internal workflow — invoked by Review.md, not user-facing.
+
 Gather everything a fresh orchestrator needs to intelligently partition code review into focused, disjoint review agents — not just the changes, but the full landscape of standards, rules, and context that determine what "good" looks like for these specific changes.
 
 ## First Principles

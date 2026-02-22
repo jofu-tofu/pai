@@ -1,5 +1,7 @@
 # GenerateReport Workflow
 
+> Internal workflow — invoked by Review.md, not user-facing.
+
 Transform verified findings into a report the user will actually read — clear, concise, severity-ordered, with an architectural map of what changed and why it matters.
 
 ## Purpose
