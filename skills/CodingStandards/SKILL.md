@@ -5,7 +5,7 @@ description: "Coding standards and implementation best-practice knowledge base. 
 
 # CodingStandards
 
-A static, indexed knowledge base of coding standards for React/Next.js, Rust, Svelte/SvelteKit, Tailwind CSS, TypeScript, C#, and Python. **261 rules across 7 languages.** Use the Language Lookup table below to navigate directly to the right workflow and rules.
+A static, indexed knowledge base of coding standards for React/Next.js, Rust, Svelte/SvelteKit, Tailwind CSS, TypeScript, C#, Python, and MUMPS. **283 rules across 8 languages.** Use the Language Lookup table below to navigate directly to the right workflow and rules.
 
 ## Language Lookup
 
@@ -18,6 +18,7 @@ A static, indexed knowledge base of coding standards for React/Next.js, Rust, Sv
 | TypeScript | `.ts` (non-React), `tsconfig.json`, generics, `z.infer`, Zod imports | `Workflows/TypeScript.md` | `Rules/TypeScript/` | 19 |
 | C# / .NET | `.cs`, `.csproj`, `.sln`, `using` statements, `namespace` declarations | `Workflows/CSharp.md` | `Rules/CSharp/` | 18 |
 | Python | `.py`, `requirements.txt`, `pyproject.toml`, `setup.py`, `__init__.py` | `Workflows/Python.md` | `Rules/Python/` | 18 |
+| MUMPS / M / Caché / IRIS | `.m`, `.mac`, `.int`, M commands (`set`, `kill`, `do`, `quit`), globals (`^`), special vars (`$H`, `$J`) | `Workflows/MUMPS.md` | `Rules/MUMPS/` | 22 |
 
 **When a workflow is matched, read its file and follow the steps within it.**
 
@@ -34,25 +35,26 @@ For multi-language contexts (e.g., TypeScript + Python full-stack), read both ma
 | **TypeScript** | TypeScript type safety, tsconfig setup, generics, discriminated unions, Zod validation | `Workflows/TypeScript.md` |
 | **CSharp** | C# class design, async/await in .NET, nullable context, .csproj configuration | `Workflows/CSharp.md` |
 | **Python** | Python type hints, defensive programming, error handling, code organization | `Workflows/Python.md` |
+| **MUMPS** | M/Chronicles coding, ANSI portability, globals, tag structure, lock/error patterns | `Workflows/MUMPS.md` |
 
-**If no language matches:** This skill only covers React, Rust, Svelte, Tailwind CSS, TypeScript, C#, and Python. For unsupported languages, see `LanguageIndex.md` for the gap list.
+**If no language matches:** This skill only covers React, Rust, Svelte, Tailwind CSS, TypeScript, C#, Python, and MUMPS. For unsupported languages, see `LanguageIndex.md` for the gap list.
 
 ## Dimension Routing
 
 For focused tasks (code review, design, planning), load a specific **dimension** instead of the full workflow. Each language's rules are grouped into concern-based dimensions with Consumer Guides tailored for different agent roles.
 
-| Task Type | React | Rust | Svelte | TypeScript | Tailwind | C# | Python |
-|-----------|-------|------|--------|------------|----------|----|--------|
-| **Component/Type Design** | `Dimensions/React/Architecture.md` | `Dimensions/Rust/TypeSystem.md` | `Dimensions/Svelte/Architecture.md` | `Dimensions/TypeScript/TypeModeling.md` | `Dimensions/Tailwind/Philosophy.md` | `Dimensions/CSharp/Architecture.md` | `Dimensions/Python/CodeOrganization.md` |
-| **Performance Review** | `Dimensions/React/RenderingPerf.md` | `Dimensions/Rust/Performance.md` | `Dimensions/Svelte/PerformanceSSR.md` | — | `Dimensions/Tailwind/Accessibility.md` | — | `Dimensions/Python/Performance.md` |
-| **Data/Async Patterns** | `Dimensions/React/DataFetching.md` | `Dimensions/Rust/Concurrency.md` | `Dimensions/Svelte/DataForms.md` | `Dimensions/TypeScript/ErrorHandling.md` | — | `Dimensions/CSharp/AsyncPatterns.md` | `Dimensions/Python/DefensiveProgramming.md` |
-| **Type Safety** | — | `Dimensions/Rust/Ownership.md` | `Dimensions/Svelte/TypeSystem.md` | `Dimensions/TypeScript/TypeSafety.md` | — | `Dimensions/CSharp/NullSafety.md` | `Dimensions/Python/TypeSystem.md` |
-| **Styling/Layout** | — | — | — | — | `Dimensions/Tailwind/ClassOrganization.md` | — | — |
-| **Theming/Responsive** | — | — | — | — | `Dimensions/Tailwind/Theming.md`, `Dimensions/Tailwind/ResponsiveDesign.md` | — | — |
-| **Unsafe/FFI** | — | `Dimensions/Rust/UnsafeCode.md` | — | — | — | — | — |
-| **API Design** | — | `Dimensions/Rust/APIDesign.md` | — | — | — | — | — |
-| **Testing** | — | `Dimensions/Rust/Testing.md` | — | — | — | — | — |
-| **Project Structure** | — | `Dimensions/Rust/ProjectStructure.md` | — | — | — | — | — |
+| Task Type | React | Rust | Svelte | TypeScript | Tailwind | C# | Python | MUMPS |
+|-----------|-------|------|--------|------------|----------|----|--------|-------|
+| **Component/Type Design** | `Dimensions/React/Architecture.md` | `Dimensions/Rust/TypeSystem.md` | `Dimensions/Svelte/Architecture.md` | `Dimensions/TypeScript/TypeModeling.md` | `Dimensions/Tailwind/Philosophy.md` | `Dimensions/CSharp/Architecture.md` | `Dimensions/Python/CodeOrganization.md` | `Dimensions/MUMPS/NamingAndDocumentation.md` |
+| **Performance Review** | `Dimensions/React/RenderingPerf.md` | `Dimensions/Rust/Performance.md` | `Dimensions/Svelte/PerformanceSSR.md` | — | `Dimensions/Tailwind/Accessibility.md` | — | `Dimensions/Python/Performance.md` | `Dimensions/MUMPS/DataGlobals.md` |
+| **Data/Async Patterns** | `Dimensions/React/DataFetching.md` | `Dimensions/Rust/Concurrency.md` | `Dimensions/Svelte/DataForms.md` | `Dimensions/TypeScript/ErrorHandling.md` | — | `Dimensions/CSharp/AsyncPatterns.md` | `Dimensions/Python/DefensiveProgramming.md` | `Dimensions/MUMPS/ConcurrencyAndErrors.md` |
+| **Type Safety** | — | `Dimensions/Rust/Ownership.md` | `Dimensions/Svelte/TypeSystem.md` | `Dimensions/TypeScript/TypeSafety.md` | — | `Dimensions/CSharp/NullSafety.md` | `Dimensions/Python/TypeSystem.md` | — |
+| **Styling/Layout** | — | — | — | — | `Dimensions/Tailwind/ClassOrganization.md` | — | — | — |
+| **Theming/Responsive** | — | — | — | — | `Dimensions/Tailwind/Theming.md`, `Dimensions/Tailwind/ResponsiveDesign.md` | — | — | — |
+| **Unsafe/FFI** | — | `Dimensions/Rust/UnsafeCode.md` | — | — | — | — | — | `Dimensions/MUMPS/Portability.md` |
+| **API Design** | — | `Dimensions/Rust/APIDesign.md` | — | — | — | — | — | `Dimensions/MUMPS/DataGlobals.md` |
+| **Testing** | — | `Dimensions/Rust/Testing.md` | — | — | — | — | — | `Dimensions/MUMPS/ConcurrencyAndErrors.md` |
+| **Project Structure** | — | `Dimensions/Rust/ProjectStructure.md` | — | — | — | — | — | `Dimensions/MUMPS/NamingAndDocumentation.md` |
 
 **How to use dimensions:** Read `Dimensions/[Language]/INDEX.md` for the full routing table with "Load When" triggers. Each dimension doc includes a Consumer Guide with sections for reviewing, designing, and implementing.
 
@@ -109,4 +111,12 @@ User: "I need to fix reactivity issues in my Svelte 5 component"
 -> Matches Svelte signal (.svelte, reactivity concern)
 -> Reads Workflows/Svelte.md
 -> Applies DerivedOverEffect, NoStateInEffect, NarrowReactiveDeps rules
+```
+
+**Example 6: MUMPS portability and globals**
+```
+User: "Review this Chronicles M routine for portability and locking issues"
+-> Matches MUMPS signal (.m, globals, set/kill/do/quit patterns)
+-> Reads Workflows/MUMPS.md
+-> Applies PreferAnsiMCore, PreferChroniclesApisOverDirectGlobals, UseChroniclesLockWrappers rules
 ```

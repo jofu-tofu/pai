@@ -2,7 +2,7 @@
 
 Authoritative registry of supported languages and known gaps in CodingStandards.
 
-## Supported (7)
+## Supported (8)
 
 | Language | Workflow | Rules Directory | Count | Sources |
 |----------|---------|-----------------|-------|---------|
@@ -13,6 +13,7 @@ Authoritative registry of supported languages and known gaps in CodingStandards.
 | TypeScript | `Workflows/TypeScript.md` | `Rules/TypeScript/` | 19 | Matt Pocock, Steve Kinney |
 | C# / .NET | `Workflows/CSharp.md` | `Rules/CSharp/` | 18 | csharpcodingguidelines.com, dotnet-cursor-rules |
 | Python | `Workflows/Python.md` | `Rules/Python/` | 18 | minimaxir, Dagster "Dignified Python" |
+| MUMPS / M / Caché / IRIS | `Workflows/MUMPS.md` | `Rules/MUMPS/` | 22 | Epic Chronicles programmer guidelines, Epic coding standards wiki (Cache/Cache Functions), GT.M ANSI guidance, InterSystems docs, YottaDB docs |
 
 ## Not Yet Covered (gaps)
 

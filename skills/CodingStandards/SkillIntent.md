@@ -11,7 +11,7 @@
 
 ## Problem This Skill Solves
 
-Four separate skills (React, TypeScript, CSharp, PythonCoding) created routing ambiguity and maintenance overhead. CodingStandards provides a single entry point that routes to isolated, self-contained language workflows — reducing skill count while preserving full content parity.
+Language-specific standards spread across multiple skills create routing ambiguity and maintenance overhead. CodingStandards provides one deterministic entry point that routes to isolated, self-contained language workflows while preserving parity and reducing context collisions.
 
 ## Design Decisions
 
@@ -35,10 +35,10 @@ Four separate skills (React, TypeScript, CSharp, PythonCoding) created routing a
 
 ## Success Criteria
 
-1. **Single entry point** — One skill triggers for all 4 language contexts with no collision between languages
+1. **Single entry point** — One skill triggers for all supported language contexts with no collision between languages
 2. **Isolation guarantee** — C# invocation loads ONLY `Workflows/CSharp.md` + `Rules/CSharp/`; no other language rules enter context
 3. **Parity** — Context loaded for C# work is functionally identical to what the old CSharp skill loaded
-4. **Multi-language** — Full-stack context (TS + Python) → both workflows readable independently; React/CSharp workflows untouched
+4. **Multi-language** — Full-stack context (TS + Python) and cross-stack contexts (for example C# + MUMPS) load both workflows independently without contamination
 5. **Zero ambiguity** — Language Lookup table in SKILL.md is deterministic: explicit file signals → exact paths
 6. **Gap visibility** — LanguageIndex.md shows unsupported languages; adding new language has exactly 5 documented steps
 
