@@ -70,16 +70,20 @@ Confirm the context layer with the user before proceeding:
 
 If corrections → update context layer, then continue.
 
-## Step 3: Delegate Agents (internal — DelegateAgents.md)
+## Step 3: Delegate to Subagents (internal — DelegateAgents.md)
 
 Read and execute: `Workflows/DelegateAgents.md`
 
-Uses the context layer's change fingerprint to:
-- Select relevant skills
-- Determine agent count (Small: up to 4, Medium: up to 8, Large: up to 12)
-- Spawn agents in parallel
+**You are the orchestrator, not the reviewer.** Your role in this step is to construct prompts and launch subagents — not to read the diff and write findings yourself. The subagents read the dimension rule files and produce findings. You collect their outputs in Step 4.
 
-Announce to user: "Launching N agents in parallel: [domain list]. This may take a moment..."
+Uses the context layer's change fingerprint to:
+- Select relevant dimensions and skills
+- Determine subagent count (Small: up to 4, Medium: up to 8, Large: up to 12)
+- Launch subagents in parallel with `run_in_background: true`
+
+**Self-check before proceeding to Step 4:** Did you actually launch subagents? If you wrote review findings without launching subagents, stop — go back and follow DelegateAgents.md. The findings come from subagents, not from you.
+
+Announce to user: "Launching N subagents in parallel: [domain list]. This may take a moment..."
 
 ## Step 4: Synthesize Findings (internal — SynthesizeFindings.md)
 

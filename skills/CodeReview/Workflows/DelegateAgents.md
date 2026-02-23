@@ -2,7 +2,7 @@
 
 > Internal workflow — invoked by Review.md, not user-facing.
 
-Read the context layer from GatherContext, load structured review dimensions, construct review dimensions from the full context, then spawn one agent per dimension in parallel.
+Read the context layer from GatherContext, load structured review dimensions, construct review dimensions from the full context, then launch one subagent per dimension in parallel.
 
 ## Purpose
 
@@ -25,7 +25,9 @@ Extract ALL context signals:
 
 ## Step 1.5: Load Review Dimensions
 
-Discover all dimension categories by reading every INDEX.md file found under `../Dimensions/*/INDEX.md` (glob pattern).
+Discover all dimension categories by reading every INDEX.md file found under `skills/CodeReview/Dimensions/*/INDEX.md` (glob pattern from repo root).
+
+Use the Glob tool: `skills/CodeReview/Dimensions/*/INDEX.md`
 
 This discovers dimension categories dynamically — adding a new category (e.g., `Dimensions/Security/INDEX.md`) requires zero changes to this workflow file. Just create the directory with an INDEX.md and dimension documents.
 
@@ -117,49 +119,49 @@ Each agent receives a prompt tailored to whether it has a structured dimension d
 
 ### Structured Dimension Agent Prompt (for agents with a Tier 3 dimension document)
 
-```
-You are a code reviewer specializing in [DIMENSION_NAME].
+```markdown
+# [DIMENSION_NAME] Review
 
-CONTEXT:
+## Context
 [Context layer — intent, summary, commit range]
 
-YOUR REVIEW LENS:
-You are reviewing specifically for [DIMENSION_NAME] concerns.
+## Your Lens
+Review specifically for [DIMENSION_NAME] concerns.
 
-MANDATORY: Read this file FIRST before reviewing any code:
-  skills/CodeReview/Dimensions/[CATEGORY]/[DIMENSION].md
+## Dimension Rules
+First, read this file — it contains your detection heuristics, severity calibration, and examples:
+  [REPO_ROOT]/skills/CodeReview/Dimensions/[CATEGORY]/[DIMENSION].md
 
-This file contains:
-- Your mental model for this review dimension
-- Specific detection heuristics ordered by severity
-- Severity calibration specific to this dimension
-- Language-specific notes for the languages in this diff
-- Good vs. bad examples
+Work through every heuristic in the document systematically. For each heuristic, check every file in the diff. Cite the specific heuristic that triggered each finding — generic phrasing is not useful.
 
-Work through EVERY heuristic in the document systematically.
-For each heuristic, check every file in the diff. Do not skip heuristics.
-Do not use generic phrasing — cite the specific heuristic that triggered each finding.
+[IF CODINGSTANDARDS LENS REQUESTED — append this block:]
+## Additional Standards
+Read the relevant CodingStandards rules for this language:
+  [REPO_ROOT]/skills/CodingStandards/Dimensions/[LANGUAGE]/INDEX.md
+Then read the dimension files listed in that INDEX that are relevant to your review.
+Available languages: React, TypeScript, Svelte, Tailwind, Python, CSharp, Rust
 
-DIFF (your domain only):
-[Filtered diff]
+## Diff
+[Filtered diff — your domain only]
 
-COMMIT RANGE: [SHA..SHA]
-IMPORTANT: Only flag issues that exist in lines introduced in this commit range.
-Do not flag pre-existing issues in surrounding context lines.
+## Commit Range
+[SHA..SHA]
+Flag only issues in lines introduced within this commit range. Pre-existing issues erode review credibility — skip them silently.
 
-SCOPE CONSTRAINTS (from SkillIntent — enforce these):
-- Do NOT flag linter-catchable issues (assume linters run in CI)
-- Do NOT suggest test generation (note missing coverage, but don't write tests)
-- Minimize style nitpicks — only surface if they create bugs or maintainability problems
+## Scope
+- Focus on issues that affect correctness, security, or maintainability
+- Assume linters run in CI — skip lint-catchable issues
+- Note missing test coverage as a finding, but leave test generation to the developer
+- Surface style concerns only when they create bugs or maintainability problems
 
-OUTPUT FORMAT:
+## Output Format
 For each issue found:
 - Severity: [from the dimension document's calibration]
 - File: [filename]
 - Line: [line number or range]
 - Heuristic: [which specific heuristic from the dimension document was triggered]
 - Issue: [1-2 sentence description]
-- Recommendation: [specific fix, not vague]
+- Recommendation: [specific fix]
 ```
 
 **Architecture agents (A1, A4) receive additional context:**
@@ -170,31 +172,49 @@ This enables evaluating dependency direction, boundary violations, and import pa
 
 ### Context-Emergent Agent Prompt (for agents without a dimension document)
 
-```
-You are a [DOMAIN] code reviewer.
+For language-specific agents where CodingStandards rules exist, inject the relevant filepath:
 
-CONTEXT:
+```markdown
+# [DOMAIN] Review
+
+## Context
 [Context layer — intent, summary, commit range]
 
-YOUR LENS:
-You are reviewing specifically for [DOMAIN] concerns: [specific focus areas from skill].
-Do NOT review general correctness — a separate agent handles that.
+## Your Lens
+Review specifically for [DOMAIN] concerns: [specific focus areas from skill].
+A separate subagent handles general correctness — stay focused on your domain.
 
-DIFF (your domain only):
+[IF THIS IS A LANGUAGE-SPECIFIC AGENT WITH CODINGSTANDARDS COVERAGE — append:]
+## Coding Standards
+First, read the relevant coding standards for this language:
+  [REPO_ROOT]/skills/CodingStandards/Dimensions/[LANGUAGE]/INDEX.md
+Then read each dimension file listed in the INDEX that is relevant to your review.
+
+Available CodingStandards languages and their INDEX paths:
+  - React:      skills/CodingStandards/Dimensions/React/INDEX.md
+  - TypeScript:  skills/CodingStandards/Dimensions/TypeScript/INDEX.md
+  - Svelte:      skills/CodingStandards/Dimensions/Svelte/INDEX.md
+  - Tailwind:    skills/CodingStandards/Dimensions/Tailwind/INDEX.md
+  - Python:      skills/CodingStandards/Dimensions/Python/INDEX.md
+  - CSharp:      skills/CodingStandards/Dimensions/CSharp/INDEX.md
+  - Rust:        skills/CodingStandards/Rules/Rust/ (individual rule files)
+
+## Diff
 [Filtered diff — only files relevant to this agent's domain]
 
-COMMIT RANGE: [SHA..SHA]
-IMPORTANT: Only flag issues that exist in lines introduced in this commit range.
-Do not flag pre-existing issues in surrounding context lines.
+## Commit Range
+[SHA..SHA]
+Flag only issues in lines introduced within this commit range. Pre-existing issues erode review credibility — skip them silently.
 
-SCOPE CONSTRAINTS (from SkillIntent — enforce these):
-- Do NOT flag linter-catchable issues (assume linters run in CI)
-- Do NOT suggest test generation (note missing coverage, but don't write tests)
-- Minimize style nitpicks — only surface if they create bugs or maintainability problems
+## Scope
+- Focus on issues that affect correctness, security, or maintainability
+- Assume linters run in CI — skip lint-catchable issues
+- Note missing test coverage as a finding, but leave test generation to the developer
+- Surface style concerns only when they create bugs or maintainability problems
 
-OUTPUT FORMAT:
+## Output Format
 For each issue found:
-- Severity: [CRITICAL / HIGH / MEDIUM / LOW / SUGGESTION]
+- Severity: CRITICAL / HIGH / MEDIUM / LOW / SUGGESTION
 - File: [filename]
 - Line: [line number or range]
 - Commit: [which commit introduced this line — verify with git blame]
@@ -207,69 +227,69 @@ For each issue found:
 Used when `mode: audit` — agents review the full file set of the target, not a filtered diff.
 
 **Structured Dimension Audit Agent:**
-```
-You are a code auditor specializing in [DIMENSION_NAME].
+```markdown
+# [DIMENSION_NAME] Audit
 
-CONTEXT:
+## Context
 [Context layer — target path, scope summary, intent]
 
-YOUR AUDIT LENS:
-You are auditing specifically for [DIMENSION_NAME] concerns across the target codebase.
+## Your Lens
+Audit specifically for [DIMENSION_NAME] concerns across the target codebase.
 
-MANDATORY: Read this file FIRST before reviewing any code:
-  skills/CodeReview/Dimensions/[CATEGORY]/[DIMENSION].md
+## Dimension Rules
+First, read this file — it contains your detection heuristics, severity calibration, and examples:
+  [REPO_ROOT]/skills/CodeReview/Dimensions/[CATEGORY]/[DIMENSION].md
 
-This file contains:
-- Your mental model for this audit dimension
-- Specific detection heuristics ordered by severity
-- Severity calibration specific to this dimension
-- Language-specific notes for the languages in this target
-- Good vs. bad examples
+Work through every heuristic systematically. Cite the specific heuristic that triggered each finding.
 
-Work through EVERY heuristic in the document systematically.
-For each heuristic, check every file in the target. Do not skip heuristics.
-Do not use generic phrasing — cite the specific heuristic that triggered each finding.
+[IF CODINGSTANDARDS LENS REQUESTED — append this block:]
+## Additional Standards
+Read the relevant CodingStandards rules for this language:
+  [REPO_ROOT]/skills/CodingStandards/Dimensions/[LANGUAGE]/INDEX.md
+Then read the dimension files listed in that INDEX that are relevant to your audit.
 
-TARGET FILES:
+## Target Files
 [Full file list — all files in the audit target]
 
-SCOPE CONSTRAINTS:
-- Do NOT flag linter-catchable issues (assume linters run in CI)
-- Do NOT suggest test generation (note missing coverage, but don't write tests)
-- Minimize style nitpicks — only surface if they create bugs or maintainability problems
+## Scope
+- Focus on issues that affect correctness, security, or maintainability
+- Assume linters run in CI — skip lint-catchable issues
+- Note missing test coverage as a finding, but leave test generation to the developer
+- Surface style concerns only when they create bugs or maintainability problems
 
-OUTPUT FORMAT:
+## Output Format
 For each issue found:
 - Severity: [from the dimension document's calibration]
 - File: [filename]
 - Line: [line number or range]
 - Heuristic: [which specific heuristic from the dimension document was triggered]
 - Issue: [1-2 sentence description]
-- Recommendation: [specific fix, not vague]
+- Recommendation: [specific fix]
 ```
 
 **Context-Emergent Audit Agent:**
-```
-You are a [DOMAIN] code auditor.
+```markdown
+# [DOMAIN] Audit
 
-CONTEXT:
+## Context
 [Context layer — target path, scope summary, intent]
 
-YOUR LENS:
-You are auditing specifically for [DOMAIN] concerns: [specific focus areas from skill].
-Do NOT audit general correctness — a separate agent handles that.
+## Your Lens
+Audit specifically for [DOMAIN] concerns: [specific focus areas from skill].
+A separate subagent handles general correctness — stay focused on your domain.
 
-TARGET FILES:
+## Target Files
 [Full file list — only files relevant to this agent's domain]
 
-SCOPE CONSTRAINTS:
-- Do NOT flag linter-catchable issues (assume linters run in CI)
-- Do NOT suggest test generation (note missing coverage, but don't write tests)
-- Minimize style nitpicks — only surface if they create bugs or maintainability problems
+## Scope
+- Focus on issues that affect correctness, security, or maintainability
+- Assume linters run in CI — skip lint-catchable issues
+- Note missing test coverage as a finding, but leave test generation to the developer
+- Surface style concerns only when they create bugs or maintainability problems
 
-OUTPUT FORMAT:
+## Output Format
 For each issue found:
-- Severity: [CRITICAL / HIGH / MEDIUM / LOW / SUGGESTION]
+- Severity: CRITICAL / HIGH / MEDIUM / LOW / SUGGESTION
 - File: [filename]
 - Line: [line number or range]
 - Issue: [1-2 sentence description]
@@ -278,36 +298,118 @@ For each issue found:
 
 ## Step 5: Announce and Launch Agents in Parallel
 
-**MANDATORY announcement before spawning (makes proportionality visible):**
+**Announce before spawning (makes proportionality visible to the user):**
 ```
 Change size: [TIER] ([N] lines) → spawning [N] agents: [domain1], [domain2], ...
 Structured dimensions: [list dimension IDs, e.g., A5, S4, A1]
 Context-emergent: [list context dimensions, e.g., TypeScript, General correctness]
 ```
 
-Spawn all agents simultaneously using `run_in_background: true`.
+**Spawning subagents:**
 
-Each agent:
-- Structured dimension agents: Read their dimension document first, then apply heuristics to the diff
-- Context-emergent agents: Apply their injected knowledge to the relevant diff sections
-- All agents: Return structured findings
+Each review dimension becomes one subagent. Spawn all subagents in parallel (not sequential) with `run_in_background: true`. Each receives the constructed prompt from Step 4.
+
+**`[REPO_ROOT]` resolution:** Before constructing prompts, resolve the repo root path via `git rev-parse --show-toplevel` or the current working directory. Replace all `[REPO_ROOT]` placeholders with this absolute path.
+
+**Concrete example — 4 subagents for a medium TypeScript diff review:**
 
 ```
-# Launch in parallel — do not wait for one before starting the next
-Agent 1: General correctness → background
-Agent 2: S4 Complexity Reduction → background
-Agent 3: A5 Design Intent Clarity → background
-Agent 4: TypeScript → background
-...
+Subagent 1: General correctness (context-emergent)
+  description: "General correctness review"
+  background: true
+  prompt: [see General Correctness prompt template below]
+
+Subagent 2: S4 Complexity Reduction (structured dimension)
+  description: "S4 Complexity Reduction review"
+  background: true
+  prompt: [see Structured Dimension prompt — reads ComplexityReduction.md]
+
+Subagent 3: A5 Design Intent Clarity (structured dimension)
+  description: "A5 Design Intent review"
+  background: true
+  prompt: [see Structured Dimension prompt — reads DesignIntent.md]
+
+Subagent 4: TypeScript + CodingStandards (context-emergent with lens)
+  description: "TypeScript standards review"
+  background: true
+  prompt: [see Context-Emergent prompt — reads CodingStandards/TypeScript/INDEX.md]
 ```
+
+**Example General Correctness subagent prompt (fully populated):**
+
+```markdown
+# General Correctness Review
+
+## Context
+[paste context layer summary here]
+
+## Your Lens
+Review for logic errors, incorrect assumptions, missing edge cases, and bugs.
+
+## Diff
+[paste filtered diff here]
+
+## Commit Range
+abc1234..def5678
+Flag only issues in lines introduced within this commit range. Pre-existing issues erode review credibility — skip them silently.
+
+## Output Format
+For each issue found:
+- Severity: CRITICAL / HIGH / MEDIUM / LOW / SUGGESTION
+- File: [filename]
+- Line: [line number or range]
+- Issue: [1-2 sentence description]
+- Recommendation: [specific fix]
+```
+
+**Example Structured Dimension subagent prompt (fully populated):**
+
+```markdown
+# Complexity Reduction Review [S4]
+
+## Context
+[paste context layer summary here]
+
+## Your Lens
+Review specifically for Complexity Reduction concerns.
+
+## Dimension Rules
+First, read this file — it contains your detection heuristics, severity calibration, and examples:
+  [REPO_ROOT]/skills/CodeReview/Dimensions/Simplification/ComplexityReduction.md
+
+Work through every heuristic systematically. Cite the specific heuristic that triggered each finding.
+
+## Diff
+[paste filtered diff here]
+
+## Commit Range
+abc1234..def5678
+Flag only issues in lines introduced within this commit range.
+
+## Output Format
+For each issue found:
+- Severity: [from the dimension document's calibration]
+- File: [filename]
+- Line: [line number or range]
+- Heuristic: [which specific heuristic was triggered]
+- Issue: [1-2 sentence description]
+- Recommendation: [specific fix]
+```
+
+**Key rules for subagent spawning:**
+1. **All subagents launch in parallel** — one message, multiple spawns, not sequential
+2. **All subagents run in background** — non-blocking parallel execution
+3. **Every structured dimension prompt includes the absolute path** to its dimension document
+4. **Every language-specific prompt includes the CodingStandards path** when that lens was requested
+5. **Collect outputs** from each subagent's result when all complete
 
 Output a status message so the user knows what's running:
 ```
 Launching [N] review agents:
 ✓ General correctness agent — started
-✓ S4 Complexity Reduction agent — started (reading ComplexityReduction.md)
-✓ A5 Design Intent Clarity agent — started (reading DesignIntent.md)
-✓ TypeScript agent — started
+✓ S4 Complexity Reduction agent — started (will read ComplexityReduction.md)
+✓ A5 Design Intent Clarity agent — started (will read DesignIntent.md)
+✓ TypeScript agent — started (will read CodingStandards/TypeScript/INDEX.md)
 [...]
 All agents running in parallel. Collecting results...
 ```

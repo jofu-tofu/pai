@@ -30,6 +30,8 @@ When triggered, you MUST:
 
 **Why this matters:** A single-agent review that reads all files into context produces shallow, unverified findings. The pipeline exists to compress context, parallelize depth, and verify claims. Skipping it defeats the skill's purpose.
 
+**The most common failure mode:** The main session reads the diff and starts writing findings directly — without launching subagents. This produces a shallow, single-perspective review with no dimension documents read and no heuristic-driven analysis. The whole point of this skill is that *subagents* do the reviewing, each reading their own dimension rules. The main session orchestrates — it does not review code itself. If you find yourself writing review findings without having launched subagents first, stop and go back to DelegateAgents.md.
+
 ## Workflow Routing
 
 **When executing a workflow, output this notification IMMEDIATELY upon reading Review.md — before any other actions:**

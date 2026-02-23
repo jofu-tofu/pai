@@ -107,7 +107,7 @@ This is the step most review systems skip. Beyond the diff, gather everything th
 
 | Category | What to look for | Examples |
 |----------|-----------------|----------|
-| **Coding standards** | Language-specific rules, style guides, best practices | CodingStandards skill (TypeScript, React, Python, C# rules), `.eslintrc`, `biome.json`, project style guides |
+| **Coding standards** | Language-specific rules, style guides, best practices | CodingStandards skill — read `skills/CodingStandards/Dimensions/[LANGUAGE]/INDEX.md` for each language in the fingerprint. Available: `React/INDEX.md`, `TypeScript/INDEX.md`, `Svelte/INDEX.md`, `Tailwind/INDEX.md`, `Python/INDEX.md`, `CSharp/INDEX.md`. Rust rules: `skills/CodingStandards/Rules/Rust/`. Also: `.eslintrc`, `biome.json`, project style guides |
 | **Testing philosophy** | How this project approaches tests, what coverage expectations exist | TestDriven skill (10 core principles), test config files, existing test patterns |
 | **Project conventions** | Architecture decisions, patterns, constraints documented in the project | `CLAUDE.md`, `DEVELOPMENT.md`, ADRs (`docs/adr/`), `CONTRIBUTING.md` |
 | **Domain-specific rules** | Security policies, accessibility standards, performance budgets | WebDesign skill (WCAG rules), security policies, performance configs |
@@ -118,8 +118,18 @@ This is the step most review systems skip. Beyond the diff, gather everything th
 **How to gather:**
 1. Check what the user passed as arguments — these are mandatory lenses
 2. Read `CLAUDE.md` and any project convention files in the repo root
-3. For each language/domain in the change fingerprint, check if a relevant PAI skill exists (scan `skill-index.json` or match against known skills)
-4. For matched skills, read their key rules/principles — extract the SUBSET relevant to the changed files, not the entire skill
+3. For each language in the change fingerprint, use the Read tool to check for matching CodingStandards dimensions:
+   - Use Glob: `skills/CodingStandards/Dimensions/*/INDEX.md` to discover available languages
+   - For each matching language, read its INDEX.md to get the list of dimension files and rule counts
+   - Available languages and paths:
+     - **React**: `skills/CodingStandards/Dimensions/React/INDEX.md` (65 rules across Architecture, DataFetching, ServerComponents, RenderingPerf, BundleSize, JavaScriptPerf)
+     - **TypeScript**: `skills/CodingStandards/Dimensions/TypeScript/INDEX.md` (19 rules across TypeSafety, TypeModeling, ErrorHandling, Conventions)
+     - **Svelte**: `skills/CodingStandards/Dimensions/Svelte/INDEX.md` (36 rules across Reactivity, Architecture, TypeSystem, DataForms, PerformanceSSR)
+     - **Tailwind**: `skills/CodingStandards/Dimensions/Tailwind/INDEX.md` (32 rules across ClassOrganization, ResponsiveDesign, Theming, Accessibility, Philosophy)
+     - **Python**: `skills/CodingStandards/Dimensions/Python/INDEX.md` (18 rules across DefensiveProgramming, TypeSystem, Performance, CodeOrganization)
+     - **C#**: `skills/CodingStandards/Dimensions/CSharp/INDEX.md` (18 rules across AsyncPatterns, MemberDesign, NullSafety, Architecture)
+     - **Rust**: `skills/CodingStandards/Rules/Rust/` directory (73 individual rule files)
+4. For other matched PAI skills (TestDriven, WebDesign, etc.), read their key rules/principles — extract the SUBSET relevant to the changed files, not the entire skill
 5. Check for config files that encode standards (`.eslintrc`, `tsconfig.json`, `biome.json`, etc.)
 6. Look for ADRs or decision documents if the changes touch architectural boundaries
 
