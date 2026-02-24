@@ -18,9 +18,9 @@
 
 6. **Philosophical criteria, operational verification** — Success criteria describe the IDEAL STATE at a philosophical level. How you verify that state is a separate concern that lives in validation tooling, not in the criteria themselves.
 
-7. **Implementation history belongs in version control** — Evolution Notes that track WHAT changed (step rewrites, path fixes, gate additions) are a changelog — and git is the changelog. SkillIntent captures WHY decisions were made (in Design Decisions, Constraints, First Principles), not WHAT was changed. If a future agent needs to know what changed, `git log` on the file provides that. If they need to know WHY, Design Decisions and Constraints tell them. The absence of Evolution Notes is a design choice, not an oversight.
+7. **Implementation history belongs in version control** — Evolution Notes that track WHAT changed (step rewrites, path fixes, gate additions) are a changelog — and git is the changelog. SkillIntent captures WHY decisions were made (in Design Decisions, Constraints, First Principles), not WHAT was changed.
 
-8. **Progressive disclosure correctness** — A skill is a layered information architecture. Each layer has a purpose and a load condition. Content at the wrong layer either wastes always-on context (too high) or becomes invisible when needed (too low). The layers: SKILL.md (Layer 0, always loaded — routing only), workflow files (Layer 1, loaded on trigger — procedures only), context files (Layer 2, loaded by Reference Material — reference only), SkillIntent.md (Layer 3, loaded before modifications — design anchor only). Architectural correctness means every piece of content lives at exactly the layer where it's needed — no duplication across layers, no reference material in procedures, no procedures in routing.
+8. **Anti-pattern: Over-engineering agent instruction systems** — Complex multi-agent orchestration and elaborate workflow chaining structures are not reliably followed by agents. The cost of complexity is not offset by gains in agent reliability. Prefer simple, direct instructions over elaborate procedural frameworks.
 
 ---
 
@@ -40,10 +40,12 @@ SkillForge provides a safe, auditable path for skill lifecycle management — fr
 | Read-only default | Analysis and report before any change; user confirms | Auto-apply on trigger | Skill updates are high-stakes; visibility required before action |
 | Routing by trigger phrase | Agent reads SKILL.md routing table and matches to workflow | Structured command syntax | Natural language invocation; no user training required |
 | Context files as reference material | Supporting documents loaded only by specific workflows | Embed all context in SKILL.md | Keeps the always-loaded surface minimal; context loads only when needed |
-| Validation as a separate workflow | ValidateSkill is a standalone workflow, not a phase | Auto-validate after every change | Validation is expensive; should be explicit, not silent overhead |
+| Validation as a separate tool | ValidateSkill.ts runs after changes, referenced by each workflow | Auto-validate after every change silently | Validation is explicit and visible; each workflow instructs "run ValidateSkill.ts after completion" |
 | Platform-agnostic file structure | SKILL.md + Workflows/ + context files in plain markdown | Proprietary format or config files | Portable across any agent tool that can read markdown and follow instructions |
-| No evolution changelog in SkillIntent | Design anchor captures WHY via principles, decisions, constraints | Evolution Notes tracking WHAT changed | Implementation history is git's job; WHY content belongs in Design Decisions and Constraints; changelogs degrade signal density |
-| Workflow chaining made explicit | Centralized WorkflowChains.md + per-workflow Follow-Up sections | Disjoint workflows with no cascading | Natural follow-ups (e.g., ModifyContent → PromptQualityAudit) were invisible; explicit chains prevent missed cascades |
+| No evolution changelog in SkillIntent | Design anchor captures WHY via principles, decisions, constraints | Evolution Notes tracking WHAT changed | Implementation history is git's job; WHY content belongs in Design Decisions and Constraints |
+| Eliminated 7-agent orchestrator | Single-agent ReviewSkill + ValidateSkill.ts | 7 parallel evaluation agents with per-dimension rubrics | Dispatching 7 agents to evaluate markdown files is disproportionate. ValidateSkill.ts handles structural checks programmatically. Agent judgment handles subjective quality. Token cost of orchestration far exceeded quality improvement. |
+| Eliminated workflow chaining | Simple "run ValidateSkill.ts after changes" per workflow | 12-entry chain table with Always/Conditional tiers, mandatory chain decision logs | Agents did not reliably follow cascading chain logic. A single validation instruction achieves the same outcome with dramatically less complexity. |
+| Universal PromptingStandards loading | SKILL.md universal instruction + per-workflow Reference Material (belt-and-suspenders) | Per-workflow Step 1 only | Every workflow needs prompting standards. Universal instruction covers the happy path; Reference Material covers direct workflow entry. |
 
 ---
 
@@ -59,15 +61,12 @@ SkillForge provides a safe, auditable path for skill lifecycle management — fr
 
 Every skill exiting a SkillForge workflow satisfies these:
 
-1. **SkillIntent exists with Problem, Constraints, and Success Criteria sections** — Target skill has a `SkillIntent.md` containing at minimum these three required sections. Existence alone is insufficient.
+1. **SkillIntent exists with Problem, Constraints, and Success Criteria sections** — Target skill has a `SkillIntent.md` containing at minimum these three required sections.
 2. **Success Criteria contain 3+ distinct binary-testable philosophical states** — Target skill's `SkillIntent.md` has a `## Success Criteria` section with at least 3 criteria that describe ideal states, not implementation steps.
 3. **Every context file reference resolves bidirectionally** — Two checks: (a) every file listed in reference sections physically exists on disk; (b) every non-internal file in the skill's root directory is referenced in a workflow or routing table.
-4. **Every workflow is reachable from both routing table and chain map** — Every workflow file in `Workflows/` has entries in BOTH `WorkflowChains.md` AND the skill's `SKILL.md` routing table or is explicitly marked as an internal gate.
-5. **Design intent is consulted before any skill modification begins** — Modification workflows structurally require reading `SkillIntent.md` before the first file edit, ensuring design decisions and constraints inform every change.
-6. **Routing correctness is proactively verified after any routing change** — Routing verification happens through InvocationSim runs triggered by routing table changes, not by post-hoc checking.
-7. **Every chain evaluation decision is auditable in session output** — Chain evaluations produce explicit inline log entries showing which chains fired and which were skipped, with condition evaluation visible.
-8. **No medium or high-impact change is applied without explicit user confirmation** — Risk categorization gates prevent high-impact changes from being auto-applied. Unconditional confirmation types are defined in RiskFramework.md.
-9. **Trigger phrase quality is verified after any routing-related modification** — When trigger phrases, USE WHEN clauses, or routing table entries change, prompt quality audit runs as a structural gate before the workflow reports completion.
+4. **Design intent is consulted before any skill modification begins** — Modification workflows structurally require reading `SkillIntent.md` before the first file edit.
+5. **No medium or high-impact change is applied without explicit user confirmation** — Risk categorization gates prevent high-impact changes from being auto-applied.
+6. **Trigger phrase quality is verified after any routing-related modification** — When trigger phrases, USE WHEN clauses, or routing table entries change, prompt quality is verified against PromptingStandards.md.
 
 ---
 
@@ -91,7 +90,8 @@ These must remain true through any refactoring or content update:
 |------|-----|--------|
 | SKILL.md | Agent entry point. User-facing workflow routing + examples. | A comprehensive reference. Not for internal gates or implementation details. |
 | SkillIntent.md | Design anchor. WHY decisions were made. Philosophical success criteria. | An implementation guide. Not for step numbers or log formats. |
-| SkillSystem.md | Structural spec and validation checklist. HOW skills must be formatted and verified. | A skill philosophy document. Not for WHY decisions. |
-| WorkflowChains.md | Chain relationships. WHEN workflows cascade. | A workflow reference. Not for what workflows DO. |
-| RiskFramework.md | Risk categorization. HOW TO ASSESS change impact. | A workflow file. Not for step-by-step procedures. |
+| SkillSystem.md | Structural spec, validation checklist, and risk classification. HOW skills must be formatted and verified. | A skill philosophy document. Not for WHY decisions. |
 | PromptingStandards.md | Wording rules. HOW TO WRITE trigger phrases and descriptions. | A validation tool. Not for checking — for writing. |
+| ValidateSkill.ts | Programmatic structural validation. Checks naming, references, required sections. | A quality judgment tool. Not for subjective assessment. |
+| ExploreSkill.ts | Skill snapshot and discovery. Reads and summarizes skill structure. | A modification tool. Read-only. |
+| Workflow files | Step-by-step procedures for specific operations. | Reference material or design anchors. |

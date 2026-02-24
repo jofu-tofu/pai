@@ -119,27 +119,22 @@ SkillName/                    # TitleCase directory name
 ├── Standards/                # Purpose-named context sub-folder (TitleCase)
 │   ├── SpecFile.md           # Canonical specs, standards, frameworks
 │   └── RulesFile.md
-├── Orchestration/            # Purpose-named context sub-folder (TitleCase)
-│   └── ChainMap.md           # Workflow chains, logs, coordination
 ├── Tools/                    # CLI tools (ALWAYS present, even if empty)
 │   └── ToolName.ts           # TypeScript CLI tool (TitleCase)
 └── Workflows/                # Execution workflows (TitleCase)
-    ├── Author/               # Lifecycle-phase sub-folders allowed
-    │   └── Create.md
-    ├── Quality/
-    │   └── Audit.md
-    └── Gates/
-        └── Validate.md
+    ├── Create.md
+    ├── Modify.md
+    └── Review.md
 ```
 
 **Critical rules:**
 - SKILL.md and SkillIntent.md live in the **skill root** — always visible
-- Context files live in **purpose-named TitleCase sub-folders** (e.g., Standards/, Orchestration/)
-- Workflows may use **lifecycle-phase sub-folders** (e.g., Author/, Quality/, Gates/)
+- Context files live in **purpose-named TitleCase sub-folders** (e.g., Standards/)
+- Prefer flat Workflows/ directory. Sub-folders allowed only when genuinely needed for clarity.
 - NEVER create `Context/`, `Docs/`, `Resources/`, or `backups/` subdirectories (blocklist)
 - Any other TitleCase sub-folder name is allowed — names should describe the folder's purpose
 - `Tools/` directory MUST always be present (create empty if no tools yet)
-- Maximum directory depth: 3 levels from skill root (`SkillName/Category/SubFolder/file.md`) — applies to Workflows/, context sub-folders, and Orchestration/ alike
+- Maximum directory depth: 3 levels from skill root (`SkillName/Category/SubFolder/file.md`)
 
 ---
 
@@ -182,39 +177,25 @@ Use the `CreateSkillIntent` workflow to generate this file for any skill.
 
 ---
 
-## Workflow Chaining Convention
+## Change Risk Classification
 
-Skills with 5+ workflows often have natural follow-up relationships between workflows. For example, modifying content may require a prompt quality audit, or restructuring a skill should always trigger validation. The **Workflow Chaining** convention captures these relationships explicitly.
+Change categorization for skill modifications. Workflows should assess risk before applying changes.
 
-**When to use:** Recommended for skills with 5+ workflows where workflows have natural follow-up relationships. Not required for simpler skills with 1-3 workflows.
+| Category | Description | Risk Level | User Approval |
+|----------|-------------|------------|---------------|
+| **Additive** | New workflows, trigger phrases, examples | Low | Optional |
+| **Enhancement** | Clarify steps, add validation, improve docs | Low | Optional |
+| **Modification** | Change existing workflow logic or steps | Medium | Required |
+| **Destructive** | Remove workflows, change structure, delete content | High | Required |
 
-**Two components:**
+**Why this classification matters:** Additive changes are Low because they extend capabilities without affecting existing behavior — the worst case is a new workflow that goes unused. Destructive changes are High because they remove user-reachable paths or content that may be relied upon — the worst case is breaking existing workflows silently.
 
-1. **`WorkflowChains.md`** — A centralized chain map file in the skill root. This is the **authoritative source** for all chain definitions. Contains:
-   - **Chain Table** — every workflow-to-workflow chain with its condition and tier (Always/Conditional)
-   - **Chaining Rules** — cascade behavior, tier definitions, condition context evaluation
-   - **Chain Graph** — ASCII DAG showing the full chain topology
-   - **Impact Map** — reverse lookup for downstream impact analysis
+**Unconditional confirmation triggers** — these ALWAYS require explicit user confirmation regardless of risk classification:
+- Routing table entry deletion or modification (removes/changes user-reachable paths)
+- Workflow file deletion (destroys content permanently)
+- SkillIntent.md modification (alters the design anchor successive agents rely on)
 
-2. **`## Follow-Up` sections** — Added as the LAST section in each workflow file that has outgoing chains. These are **execution copies** derived from WorkflowChains.md — they provide in-context chain instructions so the agent sees them at workflow completion. Format:
-
-   ```markdown
-   ## Follow-Up
-
-   After completing this workflow, evaluate these chain conditions:
-
-   | Condition | Chain To | Action |
-   |---|---|---|
-   | [condition from chain table] | [target workflow] | Announce: "[message]..." then execute `Workflows/[Target].md` |
-
-   If no conditions match, skip follow-ups.
-   ```
-
-**Chaining rules:**
-- **Two tiers only:** Always (auto-run after primary completes) and Conditional (evaluate IF condition, run if true)
-- **Full cascade:** Chained workflows execute their own Follow-Up sections. Depth naturally limited by terminal nodes.
-- **Condition context:** Conditions evaluate against what THIS workflow just did, not the upstream caller's context
-- **Source of truth:** WorkflowChains.md is canonical. Update it first when chains change, then sync Follow-Up sections.
+"Low risk per classification" is not a valid bypass for any item in this list.
 
 ---
 
@@ -275,12 +256,6 @@ Every tool in `Tools/` must:
 - [ ] Context files live in skill root, not in subdirectories
 - [ ] Each workflow file has `## Reference Material` section
 - [ ] `SkillIntent.md` present (recommended; required for skills with active update history)
-- [ ] `WorkflowChains.md` present (recommended for skills with 5+ workflows)
-
-### Workflow chaining
-- [ ] `WorkflowChains.md` present (recommended for skills with 5+ workflows)
-- [ ] Each workflow with outgoing chains has a `## Follow-Up` section
-- [ ] Follow-Up sections match entries in `WorkflowChains.md` (WorkflowChains.md is authoritative)
 
 ### Bidirectional integrity
 - [ ] Every routing table entry has a matching file on disk

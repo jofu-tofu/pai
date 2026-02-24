@@ -70,24 +70,6 @@ The `description:` frontmatter field's USE WHEN clause is what routes the entire
 
 ---
 
-## Writing Style Guidelines
-
-**Clarity over completeness:**
-✅ "Validate user input before processing."
-❌ "You should always make sure to validate the user's input before you process it because invalid input could cause problems."
-
-**Be direct and specific:**
-✅ "Use the `calculate_tax` tool with amount and jurisdiction parameters."
-❌ "You might want to consider using the calculate_tax tool if you need to determine tax amounts."
-
-**Imperative voice in instructions:**
-Use "Do X", not "You should do X" or "It is recommended to do X."
-
-**Add motivation when it prevents misunderstanding:**
-✅ "This output is read aloud by TTS, so never use ellipses or fragments."
-
----
-
 ## Why-Statement Hardening (Trigger Reliability)
 
 When a skill undertriggers despite having correct USE WHEN phrases, the problem is often that the model decides to do the work directly instead of invoking the skill. Adding a **consequence-driven why-statement** before the USE WHEN clause tells the model what it loses by skipping the skill.
