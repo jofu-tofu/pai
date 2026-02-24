@@ -10,6 +10,8 @@
 2. **Structure before opinion** - Enumerate objective topology and contracts before subjective critique.
 3. **Visualize what is structural** - If relationships are graph-like, render them as diagrams.
 4. **Scope must be explicit** - Every review declares inclusion and exclusion boundaries.
+5. **Critique against context, not a universal template** - Whether something belongs in a design depends on its stakeholders, type, and self-claims. Dimensions ground their expectations in gathered context, not blind checklists.
+6. **Identify gaps, don't request features** - Findings describe mismatches between what the design claims or what its stakeholders need vs. what's present. Never demand additions generically.
 
 ---
 
@@ -29,6 +31,7 @@ Skill reviews often become long prose with unclear scope and no stable structure
 | Weighted rubric | 8 dimensions with fixed weights totaling 100 | Unweighted checklist | Enables prioritization and clearer tradeoff decisions |
 | Mermaid-first visuals | Require execution and structure diagrams | Prose-only reports | Faster comprehension for topology and pipeline flow |
 | Template output | Standardized report template | Free-form narrative | Improves digestibility and cross-review comparability |
+| Context-driven dimensions | GatherContext builds a design checklist assessed against stakeholders and type; all dimensions consume this | Dimensions apply universal checklists independently | Prevents blind "add this section" recommendations; grounds expectations in who the design serves |
 
 ---
 

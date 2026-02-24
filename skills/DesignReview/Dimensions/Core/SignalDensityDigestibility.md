@@ -10,14 +10,20 @@ weight: 14
 
 ## Purpose
 
-Assess whether the design communicates the most important information with minimal noise.
+Assess whether the existing design content communicates the most important information with minimal noise.
+
+## Context Dependencies
+
+From `context.md`, read:
+- **C1 (Stakeholders)** — What level of detail do they need? A maintainer needs more depth than a user.
+- **Self-Claims** — If the design claims to be concise or visual-first, check whether it follows through.
 
 ## Review Heuristics
 
-1. High-value decisions are easy to find first.
+1. High-value decisions are easy to find first. Assess what IS present, not what's absent.
 2. Long prose is compressed into lists, tables, or visuals when appropriate.
 3. Redundant or repetitive content is minimized.
-4. Recommendations are concrete and prioritized.
+4. Detail level is appropriate for the identified stakeholders — don't flag depth that serves a technical audience.
 
 ## Scoring Rubric
 

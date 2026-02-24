@@ -12,10 +12,17 @@ weight: 14
 
 Verify that what is in scope, out of scope, and conditionally scoped is explicit and actionable.
 
+## Context Dependencies
+
+From `context.md`, read:
+- **C4 (Explicit scope)**, **C5 (Non-goals)**, **C6 (Boundary with adjacent systems)** — Check whether these are present and adequate.
+- **Self-Claims** — If the design states its scope, verify the content actually stays within it.
+- **Checklist Summary** — If scope items are marked Missing, assess whether they're genuinely needed given stakeholders (C1) and design type (C2).
+
 ## Review Heuristics
 
-1. Scope includes concrete inclusions and exclusions.
-2. Boundaries between core design content and external metadata are clear.
+1. If scope is stated, verify the content stays within it. Flag content that exceeds or contradicts stated scope.
+2. If scope is expected given the stakeholders and design type but absent, note it as a gap — grounding the expectation in context, not a universal rule.
 3. Non-goals are explicit, not implied.
 4. Scope statements are testable and not vague.
 

@@ -12,12 +12,18 @@ weight: 12
 
 Ensure the workflow model is explicit: who does what, in what order, and with which artifacts.
 
+## Context Dependencies
+
+From `context.md`, read:
+- **C10 (Entry points)**, **C11 (Internal stages)**, **C12 (Artifact contracts)** — Check whether these are present and adequate.
+- **Self-Claims** — If the design claims a specific architecture (e.g., "thin orchestrator", "parallel agents"), verify the workflow structure matches.
+
 ## Review Heuristics
 
-1. User-facing and internal workflows are clearly separated.
-2. Stage responsibilities are explicit and non-overlapping.
-3. Inputs/outputs between stages are documented.
-4. Ownership for recommendations is explicit in the report.
+1. If the design claims a workflow architecture, verify the content matches (e.g., stated "thin orchestrator" but orchestrator inlines stage logic).
+2. User-facing and internal workflows are clearly separated.
+3. Stage responsibilities are explicit and non-overlapping.
+4. Inputs/outputs between stages are documented where the design type warrants it (per C2).
 
 ## Scoring Rubric
 

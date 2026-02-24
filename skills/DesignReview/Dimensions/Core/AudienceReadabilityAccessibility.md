@@ -12,12 +12,19 @@ weight: 16
 
 Evaluate whether the design language matches its audience and stays readable and inclusive.
 
+## Context Dependencies
+
+From `context.md`, read:
+- **C1 (Stakeholders)** — Who consumes this design? Calibrate readability expectations to them.
+- **C2 (Design type)** — Technical depth expectations vary by type.
+- **Self-Claims** — Any stated audience or accessibility commitments the design makes about itself.
+
 ## Review Heuristics
 
-1. Audience is explicit and consistent across sections.
-2. Wording is clear, concrete, and avoids unnecessary jargon.
+1. Language and depth match the stakeholders identified in context (C1). Don't flag technical language if the audience is technical.
+2. Wording is clear, concrete, and avoids unnecessary jargon for the identified audience.
 3. Structure is easy to scan with meaningful headers and concise blocks.
-4. Readability supports broad users (clear terms, no ambiguous references).
+4. If the design claims a specific audience, content consistently addresses that audience without drifting.
 
 ## Scoring Rubric
 

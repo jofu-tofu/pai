@@ -10,14 +10,21 @@ weight: 10
 
 ## Purpose
 
-Ensure structure and flow are visualized when diagrams communicate better than prose.
+Assess whether existing structural content would be better communicated visually.
+
+## Context Dependencies
+
+From `context.md`, read:
+- **C11 (Internal stages)** — If multiple stages exist, a flow diagram likely communicates better than prose.
+- **Self-Claims** — If the design claims a visual-first or mermaid-first policy, verify it follows through.
+- **Structural Inventory** — Check existing diagram coverage.
 
 ## Review Heuristics
 
-1. Execution flow is diagrammed when multiple stages exist.
-2. Structure map is diagrammed for multi-file or multi-module designs.
-3. Diagram labels are stable and clear.
-4. Every diagram has a brief interpretation paragraph.
+1. If the design claims a visual-first policy, verify diagrams exist for structural sections. A self-claim violation is a stronger finding.
+2. Sections with 3+ paragraphs describing structure or flow could benefit from a diagram — frame as observation, not requirement.
+3. Existing diagram labels are stable and clear.
+4. Existing diagrams have brief interpretation paragraphs.
 
 ## Scoring Rubric
 

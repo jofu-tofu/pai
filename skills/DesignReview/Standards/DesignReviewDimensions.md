@@ -2,6 +2,17 @@
 
 Research-backed dimensions for evaluating skill and workflow design quality.
 
+## Review Philosophy
+
+Dimension agents review designs using the enriched context layer produced by GatherContext. This context includes a **design checklist assessment** (C1–C16) that tells each dimension what the design contains, what it claims about itself, and who its stakeholders are.
+
+**Core principles:**
+
+1. **Critique against context, not a universal template.** Whether something "should" be present depends on the design's stakeholders, type, and self-claims — not a one-size-fits-all checklist. The context layer provides this grounding.
+2. **Don't request additions — identify gaps.** Findings should describe mismatches between what the design claims or what its stakeholders need vs. what's actually present. Never say "add X" generically; say "given stakeholders are Y, X is expected but missing/incomplete."
+3. **Self-claims are the baseline.** If the design declares a policy (e.g., "mermaid-first", "thin orchestrator"), check whether the content follows through. A violation of a self-claim is a stronger finding than a missing best practice.
+4. **Craft observations are about what IS present.** For intrinsic quality (readability, signal density, visual clarity), assess the existing content. Don't say "this section should exist" — say "this existing section has low signal density because..."
+
 ## Scoring Scale
 
 - `0` = Missing or unclear

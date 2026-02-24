@@ -10,13 +10,19 @@ weight: 10
 
 ## Purpose
 
-Check whether claims are verifiable and supported by explicit evidence and checks.
+Check whether claims made in the design are verifiable and supported by explicit evidence and checks.
+
+## Context Dependencies
+
+From `context.md`, read:
+- **C13 (Success criteria)**, **C14 (Evidence for claims)** — Check whether these are present and adequate.
+- **Self-Claims** — Identify specific claims the design makes that can be verified against actual artifacts.
 
 ## Review Heuristics
 
-1. Findings include artifact locations and evidence statements.
-2. Validation/verification steps exist for critical claims.
-3. Unverified claims are explicitly labeled.
+1. Claims in the design (especially self-claims from SkillIntent) are backed by verifiable artifacts.
+2. Validation/verification steps exist for critical process claims.
+3. Unverified claims are explicitly labeled rather than stated as fact.
 4. External references are checked when they support findings.
 
 ## Scoring Rubric

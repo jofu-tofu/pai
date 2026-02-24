@@ -12,11 +12,18 @@ weight: 10
 
 Verify that critical design context is preserved in-doc while volatile or operational detail is linked as metadata.
 
+## Context Dependencies
+
+From `context.md`, read:
+- **C15 (External links)**, **C16 (In-doc summaries)** — Check whether external dependencies are handled properly.
+- **Self-Claims** — If the design declares a metadata boundary policy, verify the content follows it.
+- **Checklist Summary** — Use the Metadata Signals section to understand what links exist and whether summaries are present.
+
 ## Review Heuristics
 
 1. Critical decisions are understandable without opening external links.
 2. External artifacts are linked with explicit purpose labels.
-3. Linked critical artifacts include in-doc summaries.
+3. If the design has external dependencies, linked critical artifacts include in-doc summaries.
 4. Volatile detail is referenced, not embedded, unless required for decisions.
 
 ## Scoring Rubric
