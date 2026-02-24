@@ -1,10 +1,17 @@
+---
+id: B1
+name: Boundary & Edge Case Errors
+category: Behavioral
+baseline: true
+---
+
 # Boundary & Edge Case Error Review
 
 > Evaluate whether the code handles boundary values correctly — the inputs at the edges of valid ranges where off-by-one, empty-collection, and limit-condition bugs hide.
 
 ## Mental Model
 
-Developers mentally test the "middle" case and assume boundaries follow. The code works for N=10 but fails for N=0, N=1, or N=MAX. Boundary errors are the most common correctness bugs found by both human reviewers and automated tools because they live in the gap between the developer's mental model ("this loop processes all items") and the actual behavior at the edges ("this loop skips the last item" or "this loop crashes on empty input"). The reviewer's job is to mentally substitute boundary values — zero, one, last, max, empty — into every arithmetic expression, loop bound, and collection access.
+Developers mentally test the "middle" case and assume boundaries follow — the code works for N=10 but fails for N=0, N=1, or N=MAX. The reviewer's job is to mentally substitute boundary values — zero, one, last, max, empty — into every arithmetic expression, loop bound, and collection access.
 
 ## Detection Heuristics (ordered by severity)
 

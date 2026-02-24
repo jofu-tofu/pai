@@ -5,7 +5,7 @@ description: Comprehensive multi-agent code review and codebase audit system. US
 
 # CodeReview
 
-Multi-agent code review and codebase audit system that is comprehensive but fits in a single session. Operates in two modes: **diff mode** (review changes against a commit range) and **audit mode** (evaluate existing code in a directory/module). Both modes achieve depth through parallelism — agents review different dimensions simultaneously while a slim context layer prevents token waste. Diff mode verifies claims against changed commits; audit mode verifies claims against actual file contents.
+Multi-agent code review and codebase audit system with **process-boundary enforcement**. Operates in two modes: **diff mode** (review changes against a commit range) and **audit mode** (evaluate existing code in a directory/module). Both modes achieve depth through parallelism — agents review different dimensions simultaneously while a slim context layer prevents token waste. Diff mode verifies claims against changed commits; audit mode verifies claims against actual file contents.
 
 ## Success Criteria
 
@@ -15,22 +15,42 @@ These criteria orient every workflow decision:
 2. **Single-session** — Entire review fits in one context window, achieved via agents + context compression
 3. **Credible** — Every flagged issue traces to an actual changed line in the specified commit range; no false positives from pre-existing code
 4. **Believable output** — Report is clear and concise enough that the user reads every word, not skims. No wall-of-text syndrome.
-5. **Proportional** — Agent count and skill selection scale with the size and nature of the changes
+5. **Proportional** — Agent count and dimension selection scale with the size and nature of the changes
 6. **Verified claims** — Issues discovered are cross-checked against the correct diff before reporting
 
-## Pipeline Discipline (MANDATORY)
+## Orchestrator Architecture (MANDATORY)
 
-**This skill operates as a 5-stage pipeline. Do NOT ad-hoc a review.**
+**This skill uses a thin orchestrator that spawns separate agents for each pipeline step.**
+
+### Core Invariant
+
+**The orchestrator (Review.md) NEVER reads workflow step files.** It only:
+- Passes file paths to agents (agent prompts include the path to the workflow file the agent should read)
+- Checks that artifacts exist between steps (e.g., `context.md` exists after GatherContext)
+- Reads `dimensions.json` to know which review agents to spawn
+
+Each pipeline step runs as a **separate agent invocation** (separate LLM session), creating real process boundaries that prevent bypass.
+
+### Why Process Boundaries Matter
+
+Previous architecture had all workflow files read in a single LLM session. The LLM would read the enforcement text and bypass it — rationalizing that the full pipeline was "overkill" and doing an ad-hoc review instead. Two rounds of text-based enforcement failed. Process boundaries solve this: the orchestrator can't skip what it never reads.
+
+### Pipeline Steps
+
+| Step | Agent | Input | Output | Artifact Check |
+|------|-------|-------|--------|---------------|
+| 1 | Setup | User request | `$REVIEW_DIR` created | Directory exists |
+| 2 | GatherContext | Commit range or target path | `context.md` | File exists, non-empty |
+| 3 | SelectDimensions | `context.md` + `Dimensions/` | `dimensions.json` | Valid JSON with dimension array |
+| 4 | Review Agents (parallel) | Dimension file + `context.md` + file list | `dimension-[id].md` per agent | All agent output files exist |
+| 5 | VerifyClaims | Agent output file paths + `context.md` | `verified-findings.md` | File exists |
+| 6 | GenerateReport | `verified-findings.md` + `context.md` | `report.md` (synthesis + report) | File exists, output to user |
 
 When triggered, you MUST:
 1. Read `Workflows/Review.md` FIRST — before reading any source code or diffs
-2. Follow Review.md's steps sequentially — each step references an internal workflow file
-3. Read each internal workflow file (`GatherContext.md`, `DelegateAgents.md`, etc.) when Review.md tells you to
-4. Execute every stage — do not combine, skip, or improvise stages
-
-**Why this matters:** A single-agent review that reads all files into context produces shallow, unverified findings. The pipeline exists to compress context, parallelize depth, and verify claims. Skipping it defeats the skill's purpose.
-
-**The most common failure mode:** The main session reads the diff and starts writing findings directly — without launching subagents. This produces a shallow, single-perspective review with no dimension documents read and no heuristic-driven analysis. The whole point of this skill is that *subagents* do the reviewing, each reading their own dimension rules. The main session orchestrates — it does not review code itself. If you find yourself writing review findings without having launched subagents first, stop and go back to DelegateAgents.md.
+2. Follow Review.md's orchestrator steps — each step spawns an agent with a workflow file path
+3. Check artifacts between steps as specified
+4. Do NOT read workflow files (GatherContext.md, SelectDimensions.md, etc.) yourself — agents read their own instructions
 
 ## Workflow Routing
 
@@ -44,7 +64,20 @@ Running the **Review** workflow from the **CodeReview** skill...
 |----------|---------|------|
 | **Review** | "code review", "review my PR", "review this branch", "review my changes", "review my commits", "review last N commits", "check my code", "audit my changes", "what did I change", "do a code review", "run a review", "audit this module", "audit this directory", "review this codebase", "audit code quality", "review code health", "audit architecture" | `Workflows/Review.md` |
 
-> **Pipeline stages** (GatherContext, DelegateAgents, SynthesizeFindings, VerifyClaims, GenerateReport) are internal — invoked by Review.md, not user-facing. Each has its own workflow file with concrete instructions.
+> **Pipeline stages** (GatherContext, SelectDimensions, VerifyClaims, GenerateReport) are internal — each runs as a separate agent. Review.md is the orchestrator.
+
+## Dimension System
+
+13 review dimensions organized into 4 categories. Each dimension file is self-contained with detection heuristics, severity calibration, language-specific notes, examples, and output format.
+
+| Category | Dimensions | Baseline |
+|----------|-----------|----------|
+| **Architecture** | A1 ArchitectureQuality, A2 Modifiability, A5 DesignIntent | A5 |
+| **Behavioral** | B1 BoundaryErrors, B2 LogicErrors, B3 CaseCompleteness, B4 DataTransformation, B5 Testability | B1, B2 |
+| **Simplification** | S1 DeadCodeBloat, S2 CouplingRigidity, S4 ComplexityReduction | S4 |
+| **Strategic** | D1 ArchitecturalDirection, D3 AssumptionAudit | D3 |
+
+**Baseline dimensions** are always included unless the review has <10 changed lines. Non-baseline dimensions are selected by the SelectDimensions agent based on context.
 
 ## Examples
 
@@ -52,7 +85,7 @@ Running the **Review** workflow from the **CodeReview** skill...
 ```
 User: "Do a code review of my last 3 commits"
 -> Invokes Review workflow
--> Internally: gathers context → delegates agents → synthesizes → verifies → reports
+-> Orchestrator spawns agents: GatherContext → SelectDimensions → N Review Agents → Synthesize → Verify → Report
 ```
 
 **Example 2: PR review**
@@ -69,56 +102,27 @@ User: "Review just the auth changes"
 -> Scopes diff to auth-related files only
 ```
 
-**Example 4: Review with additional lenses**
-```
-User: "/CodeReview /CodingStandards"
--> Invokes Review workflow
--> CodingStandards is a context signal alongside the change fingerprint
--> DelegateAgents constructs dimensions from ALL context: fingerprint languages + CodingStandards categories
--> TypeScript dimension gets both general correctness AND CodingStandards TypeScript rules
-```
-
-**Example 5: Review with multiple lenses**
-```
-User: "/CodeReview /CodingStandards /TestDriven"
--> Both skills feed into dimension construction alongside the change fingerprint
--> Dimensions emerge from the combined context, not from separate paths
-```
-
-**Example 6: Codebase audit**
+**Example 4: Codebase audit**
 ```
 User: "Audit the src/auth/ module"
 -> Invokes Review workflow in audit mode
--> Gathers target context (file inventory, module structure, languages)
--> Activates structured dimensions based on target size and complexity
 -> Agents review full file set, not a diff
-```
-
-**Example 7: Architecture audit**
-```
-User: "Audit the architecture of lib/core/"
--> Invokes Review workflow in audit mode
--> Architecture dimensions (A1-A5) activate based on target structure
--> Agents use audit-specific prompts with full file list
 ```
 
 ## Architecture Notes
 
 The skill uses a **layered compression strategy**:
 - Raw diff → Context Layer (slim, structured, agent-ready)
-- Context Layer → Agent prompts (each agent only sees what it needs)
-- Agent outputs → Synthesis (deduplicated, prioritized)
-- Synthesis → Verification (claim-checked against commit range)
-- Verified findings → Report (human-readable, severity-ordered)
+- Context Layer → Dimension Selection (which dimensions are relevant)
+- Dimension Selection → Agent prompts (each agent gets one dimension file + context)
+- Agent outputs → Per-dimension files (each agent writes its own, returns path only)
+- Per-dimension files → Verification (claim-checked against commit range)
+- Verified findings → Report (synthesis + dedup + human-readable, severity-ordered)
 
 Agent count scales with **review target size and complexity**:
 
-**Diff mode** (lines changed):
-- Small (1-50 lines): up to 4 agents
-- Medium (50-300 lines): up to 8 agents
-- Large (300+ lines): up to 12 agents
-
-**Audit mode** (target file count and structural complexity):
-- Small (1-10 files, single module): up to 4 agents
-- Medium (10-50 files, 2-4 modules): up to 8 agents
-- Large (50+ files, 5+ modules): up to 12 agents
+| Tier | Diff Lines | Audit Files | Agent Cap |
+|------|-----------|-------------|-----------|
+| Small | 1-50 | 1-10 | 5 |
+| Medium | 50-300 | 10-50 | 8 |
+| Large | 300+ | 50+ | 13 |

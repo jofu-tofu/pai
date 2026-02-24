@@ -45,7 +45,7 @@ This skill provides a structured, prioritized reference that agents consult when
 
 ## Explicit Out-of-Scope
 
-- **Component architecture and React patterns** — Covered by CodingStandards skill (React section). WebDesign covers design quality and accessibility, not component composition or state management.
+- **Component architecture and React patterns** — Covered by StandardsReview skill (React section). WebDesign covers design quality and accessibility, not component composition or state management.
 - **CSS framework selection** — This skill provides patterns, not opinions on Tailwind vs. CSS Modules vs. styled-components.
 - **Visual design aesthetics** — No color palette recommendations, spacing systems, or brand guidelines. This skill covers accessibility and usability, not visual identity.
 - **Backend accessibility** — API response formats, server-rendered HTML structure beyond what affects client-side accessibility.
@@ -73,4 +73,4 @@ This skill provides a structured, prioritized reference that agents consult when
 4. **WCAG 2.2 AA is the standard** — all rules must reference specific WCAG success criteria where applicable
 5. **No framework lock-in** — rule files must show framework-agnostic HTML examples alongside any framework-specific examples
 6. **AntiPatterns.md must reference rule files** — every anti-pattern entry must link to its corresponding rule for deeper guidance
-7. **No duplication with CodingStandards** — if a pattern belongs to component architecture or language-specific best practices, it belongs in CodingStandards, not here
+7. **No duplication with StandardsReview** — if a pattern belongs to component architecture or language-specific best practices, it belongs in StandardsReview, not here

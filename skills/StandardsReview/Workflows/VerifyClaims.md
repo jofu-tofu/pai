@@ -12,7 +12,7 @@
 - Writes verified findings to `$REVIEW_DIR/verified-findings.md`
 - Returns the absolute path to `verified-findings.md`
 
-**The credibility gate.** Every flagged issue must be verified to exist in lines introduced by the specified commit range before it reaches the user. This is what separates a trustworthy review from an embarrassing one.
+**The credibility gate.** Every flagged issue must be verified to exist in lines introduced by the specified commit range before it reaches the user.
 
 ## Purpose
 
@@ -24,19 +24,16 @@ This workflow runs `git blame` and `git log` probes against every flagged line t
 
 ## Step 0: Collect Findings from Agent Outputs
 
-Each review agent wrote its findings to a separate file. Collect them into a unified list before verification — verification needs every finding in one place to check against the commit range.
+Read each agent output file from the list provided by the orchestrator. For each file, extract all findings (RULE_ID, severity, file, line, description, recommendation). Tag each finding with the dimension that produced it.
 
-1. Read each agent output file from the paths provided by the orchestrator
-2. Extract all findings from each file: severity, file, line, heuristic, description, recommendation
-3. Tag each finding with the dimension that produced it (infer from the filename: `dimension-[id].md`)
-4. Combine into a single findings list ordered by file path, then line number
+Build a unified findings list for verification.
 
 ## Mode Selection
 
 Read the context layer's `Mode:` field:
 
-- **`diff`** → Proceed to Step 1 (git blame verification against commit range)
-- **`audit`** → Skip to Step 1A (file-presence verification — no commit range exists)
+- **`diff`** -> Proceed to Step 1 (git blame verification against commit range)
+- **`audit`** -> Skip to Step 1A (file-presence verification — no commit range exists)
 
 ## Step 1A: Verify Audit Findings (audit mode only)
 
@@ -57,10 +54,10 @@ sed -n '[start],[end]p' [filename]
 | Condition | Result | Action |
 |---|---|---|
 | File exists AND cited lines contain the described pattern | VERIFIED | Keep finding in report |
-| File exists BUT cited lines don't match the description | MISLOCATED | Agent to re-check, or mark "⚠ Location uncertain" |
+| File exists BUT cited lines don't match the description | MISLOCATED | Mark "Warning: Location uncertain" |
 | File does not exist | INVALID | Discard finding |
 
-After verification, skip to Step 3 (tally) — Steps 1 and 2 are diff-mode only.
+After verification, skip to Step 3 (tally).
 
 ## Step 1: Verify Each Finding (diff mode)
 
@@ -85,7 +82,7 @@ git log [base]..HEAD --oneline --format="%H" | grep [commit-sha-prefix]
 | Commit SHA IS in the review range | VERIFIED | Keep finding in report |
 | Commit SHA is NOT in the review range | PRE-EXISTING | Move to appendix "Pre-existing Issues" |
 | Commit IS in range but a LATER commit in range changed the same line | SELF-CORRECTED | Discard — issue was fixed within the PR |
-| Cannot determine (binary file, generated code, blame unavailable) | UNVERIFIED | Keep but mark as "⚠ Unverified — manual review recommended" |
+| Cannot determine (binary file, generated code, blame unavailable) | UNVERIFIED | Keep but mark as "Warning: Unverified — manual review recommended" |
 
 **Self-correction check (for VERIFIED findings):**
 ```bash
@@ -100,7 +97,7 @@ If a later commit modified the same file, re-blame the line to check if it was c
 ```bash
 git log --diff-filter=A --format="%H" -- [filename]
 ```
-If the file was added in the review range → all lines auto-verified. Skip blame.
+If the file was added in the review range -> all lines auto-verified. Skip blame.
 
 **Deleted code:**
 The deletion itself is the finding. Verify the deletion commit is in range:
@@ -130,18 +127,18 @@ Verification: [N]/[total] findings confirmed against changed commits
 ([M] pre-existing discarded, [P] unverified, [Q] self-corrected)
 ```
 
-## Step 4: Update Findings Document
+## Step 4: Write Verified Findings
 
-Write verification results back to `$REVIEW_DIR/findings.md`:
+Write to `$REVIEW_DIR/verified-findings.md`:
 
-For each finding, append verification status:
+For each finding, include verification status:
 ```
-Verification: ✓ VERIFIED (commit abc1234 in range)
-Verification: ✗ DISCARDED (commit def5678 predates review range — pre-existing)
-Verification: ⚠ UNVERIFIED (blame data unavailable — generated file)
+Verification: VERIFIED (commit abc1234 in range)
+Verification: DISCARDED (commit def5678 predates review range — pre-existing)
+Verification: UNVERIFIED (blame data unavailable — generated file)
 ```
 
-Remove DISCARDED findings from the main findings sections. Move them to a new appendix section:
+Remove DISCARDED findings from the main findings sections. Move them to an appendix section:
 
 ```markdown
 ### Pre-existing Issues (not introduced by this change)

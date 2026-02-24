@@ -1,10 +1,17 @@
+---
+id: B2
+name: Logic & Boolean Errors
+category: Behavioral
+baseline: true
+---
+
 # Logic & Boolean Error Review
 
 > Evaluate whether boolean expressions, conditionals, and logical control flow produce the intended truth values for all input combinations — not just the common case.
 
 ## Mental Model
 
-Boolean logic errors are invisible in testing because they produce the correct result for the common case. A wrong negation passes every happy-path test. The expression `!a || !b` behaves identically to `!(a && b)` for most inputs — but the developer may have meant `!(a || b)`. The reviewer must evaluate the expression for the false case, the boundary case, and the negated case. The danger is not that the code crashes — it silently computes the wrong answer for a subset of inputs that tests don't cover.
+Boolean logic errors are invisible in testing because they produce the correct result for the common case — a wrong negation passes every happy-path test. The reviewer must evaluate each expression for the false case, the boundary case, and the negated case, because the danger is silent wrong answers for input subsets that tests don't cover.
 
 ## Detection Heuristics (ordered by severity)
 

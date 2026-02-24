@@ -1,10 +1,17 @@
+---
+id: B4
+name: Data Transformation Errors
+category: Behavioral
+baseline: false
+---
+
 # Data Transformation Error Review
 
 > Evaluate whether data flowing through parse, map, filter, convert, and serialize steps preserves its meaning and precision — catching silent corruption that produces wrong results with no errors.
 
 ## Mental Model
 
-Data flows through transformations: parse, map, filter, convert, serialize. At each step, invariants can be silently violated. The code "works" because tests use data that happens to survive the transformation intact. A float-to-int cast is fine for 3.0 but destroys 3.7. A serialization round-trip preserves flat objects but drops nested Maps. The reviewer must trace data through the entire transformation pipeline and ask at each step: "what valid input would this step corrupt?"
+Data flows through transformations — parse, map, filter, convert, serialize — and at each step, invariants can be silently violated. The code "works" because tests use data that happens to survive intact (a float-to-int cast is fine for 3.0 but destroys 3.7). The reviewer must trace data through the entire pipeline and ask at each step: "what valid input would this step corrupt?"
 
 ## Detection Heuristics (ordered by severity)
 

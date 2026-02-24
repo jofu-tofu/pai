@@ -31,11 +31,11 @@ TestDriven provides 10 authoritative principles and 8 actionable workflows that 
 | Anti-patterns as a dedicated file | Consolidated in Rules/AntiPatterns.md with cross-references | Scattered across individual rule files | Central anti-pattern catalog aids review workflows and quick diagnosis |
 | Workflow for AI validation | Dedicated AIValidation workflow | Fold into DiagnoseTest or ReviewTests | AI-refactored code has unique risks (silent behavior changes with passing weak tests) |
 | Evals skill delegation for LLM semantic testing | LLMTesting routes semantic evaluation to Evals skill | Build semantic evaluation into TestDriven | Avoid duplicating Evals capabilities; TestDriven covers structural LLM testing only |
-| No language-specific rule files | Single pseudocode principle, multi-language workflow examples | Per-language rule variants | Principles don't change by language; CodingStandards skill handles language specifics |
+| No language-specific rule files | Single pseudocode principle, multi-language workflow examples | Per-language rule variants | Principles don't change by language; StandardsReview skill handles language specifics |
 
 ## Explicit Out-of-Scope
 
-- **Language-specific test framework configuration** — TestDriven teaches principles; CodingStandards handles pytest/Jest/xUnit setup
+- **Language-specific test framework configuration** — TestDriven teaches principles; StandardsReview handles pytest/Jest/xUnit setup
 - **CI/CD pipeline configuration** — TestDriven covers what to test; deployment workflows are elsewhere
 - **Performance testing** — Load testing, benchmarking, and profiling are distinct disciplines
 - **Security testing** — SAST/DAST/penetration testing has its own methodology

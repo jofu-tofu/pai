@@ -1,3 +1,10 @@
+---
+id: A2
+name: Modifiability & Extensibility
+category: Architecture
+baseline: false
+---
+
 # Modifiability & Extensibility Review
 
 > Evaluates the cost of future change — whether the architecture makes it easy to add new behavior without modifying existing code.

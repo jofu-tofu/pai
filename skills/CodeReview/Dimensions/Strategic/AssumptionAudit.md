@@ -1,3 +1,10 @@
+---
+id: D3
+name: Assumption Audit
+category: Strategic
+baseline: true
+---
+
 # Assumption Audit Review
 
 > Evaluates what a change silently assumes about the rest of the system and what should have been changed alongside it but wasn't — the negative space of a review.

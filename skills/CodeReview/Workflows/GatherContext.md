@@ -2,6 +2,17 @@
 
 > Internal workflow — invoked by Review.md, not user-facing.
 
+## Input / Output
+
+**Input:**
+- Review target: commit range (diff mode) or target path (audit mode)
+- Requested lenses: any `/SkillName` arguments from user
+- Review mode: diff or audit
+
+**Output:**
+- Writes context layer to `$REVIEW_DIR/context.md`
+- Returns the absolute path to `context.md`
+
 Gather everything a fresh orchestrator needs to intelligently partition code review into focused, disjoint review agents — not just the changes, but the full landscape of standards, rules, and context that determine what "good" looks like for these specific changes.
 
 ## First Principles
@@ -107,7 +118,7 @@ This is the step most review systems skip. Beyond the diff, gather everything th
 
 | Category | What to look for | Examples |
 |----------|-----------------|----------|
-| **Coding standards** | Language-specific rules, style guides, best practices | CodingStandards skill — read `skills/CodingStandards/Dimensions/[LANGUAGE]/INDEX.md` for each language in the fingerprint. Available: `React/INDEX.md`, `TypeScript/INDEX.md`, `Svelte/INDEX.md`, `Tailwind/INDEX.md`, `Python/INDEX.md`, `CSharp/INDEX.md`. Rust rules: `skills/CodingStandards/Rules/Rust/`. Also: `.eslintrc`, `biome.json`, project style guides |
+| **Coding standards** | Language-specific rules, style guides, best practices | `.eslintrc`, `biome.json`, `.prettierrc`, `tsconfig.json` strict settings, project style guides, `CONTRIBUTING.md` |
 | **Testing philosophy** | How this project approaches tests, what coverage expectations exist | TestDriven skill (10 core principles), test config files, existing test patterns |
 | **Project conventions** | Architecture decisions, patterns, constraints documented in the project | `CLAUDE.md`, `DEVELOPMENT.md`, ADRs (`docs/adr/`), `CONTRIBUTING.md` |
 | **Domain-specific rules** | Security policies, accessibility standards, performance budgets | WebDesign skill (WCAG rules), security policies, performance configs |
@@ -118,20 +129,9 @@ This is the step most review systems skip. Beyond the diff, gather everything th
 **How to gather:**
 1. Check what the user passed as arguments — these are mandatory lenses
 2. Read `CLAUDE.md` and any project convention files in the repo root
-3. For each language in the change fingerprint, use the Read tool to check for matching CodingStandards dimensions:
-   - Use Glob: `skills/CodingStandards/Dimensions/*/INDEX.md` to discover available languages
-   - For each matching language, read its INDEX.md to get the list of dimension files and rule counts
-   - Available languages and paths:
-     - **React**: `skills/CodingStandards/Dimensions/React/INDEX.md` (65 rules across Architecture, DataFetching, ServerComponents, RenderingPerf, BundleSize, JavaScriptPerf)
-     - **TypeScript**: `skills/CodingStandards/Dimensions/TypeScript/INDEX.md` (19 rules across TypeSafety, TypeModeling, ErrorHandling, Conventions)
-     - **Svelte**: `skills/CodingStandards/Dimensions/Svelte/INDEX.md` (36 rules across Reactivity, Architecture, TypeSystem, DataForms, PerformanceSSR)
-     - **Tailwind**: `skills/CodingStandards/Dimensions/Tailwind/INDEX.md` (32 rules across ClassOrganization, ResponsiveDesign, Theming, Accessibility, Philosophy)
-     - **Python**: `skills/CodingStandards/Dimensions/Python/INDEX.md` (18 rules across DefensiveProgramming, TypeSystem, Performance, CodeOrganization)
-     - **C#**: `skills/CodingStandards/Dimensions/CSharp/INDEX.md` (18 rules across AsyncPatterns, MemberDesign, NullSafety, Architecture)
-     - **Rust**: `skills/CodingStandards/Rules/Rust/` directory (73 individual rule files)
-4. For other matched PAI skills (TestDriven, WebDesign, etc.), read their key rules/principles — extract the SUBSET relevant to the changed files, not the entire skill
-5. Check for config files that encode standards (`.eslintrc`, `tsconfig.json`, `biome.json`, etc.)
-6. Look for ADRs or decision documents if the changes touch architectural boundaries
+3. For other matched PAI skills (TestDriven, WebDesign, etc.), read their key rules/principles — extract the SUBSET relevant to the changed files, not the entire skill
+4. Check for config files that encode standards (`.eslintrc`, `tsconfig.json`, `biome.json`, etc.)
+5. Look for ADRs or decision documents if the changes touch architectural boundaries
 
 **The goal is not to load everything** — it's to identify which rules and standards the review agents need to know about so they can evaluate the changes against the right criteria. Extract the relevant subset, not the full content.
 
@@ -170,7 +170,7 @@ Compress everything into a structured context layer — designed to be injected 
 
 **[Category]: [Source name]**
 - [Key rules/principles relevant to these changes, extracted — not full content]
-- [Number of rules extracted, e.g., "12 TypeScript rules from CodingStandards"]
+- [Number of relevant rules/configs found]
 
 **[Category]: [Source name]**
 - [Key rules/principles relevant to these changes]
@@ -198,8 +198,12 @@ REVIEW_DIR=_output/contexts/[context-slug]/reviews/codereview/[YYYYMMDD-HHMMSS]
 
 Write context layer to: `$REVIEW_DIR/context.md`
 
-All downstream workflows write their outputs to this same directory (`findings.md`, `agent-outputs.md`, `report.md`).
+**This Write is the handoff contract.** The orchestrator checks for the existence of `context.md` before spawning the next agent — if this file is missing, the pipeline cannot proceed. Use the Write tool to create the file. After writing, verify it exists.
+
+Do NOT pass context inline or in memory. The file on disk IS the context delivery mechanism.
+
+All downstream workflows write their outputs to this same directory (`dimension-[id].md`, `verified-findings.md`, `report.md`).
 
 ## Follow-Up
 
-Always chains to → **DelegateAgents** (pass the context layer path)
+Returns the path to `context.md` to the orchestrator. The orchestrator passes this path to the next agent (SelectDimensions).

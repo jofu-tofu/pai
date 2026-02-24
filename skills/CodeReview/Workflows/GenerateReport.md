@@ -2,17 +2,63 @@
 
 > Internal workflow — invoked by Review.md, not user-facing.
 
-Transform verified findings into a report the user will actually read — clear, concise, severity-ordered, with an architectural map of what changed and why it matters.
+## Input / Output
+
+**Input:**
+- Path to `$REVIEW_DIR/verified-findings.md` (verified findings from VerifyClaims)
+- Path to `$REVIEW_DIR/context.md` (review context)
+
+**Output:**
+- Writes report to `$REVIEW_DIR/report.md`
+- Returns the report content AND the absolute path to `report.md`
+
+This workflow does two jobs: **synthesize** the verified findings (deduplicate, resolve severity conflicts, build architectural map) and then **generate** the final report.
 
 ## Purpose
 
 The report is the product. Everything before this was machinery. A technically correct but unreadable report fails the success criteria as much as a wrong one does. The goal: the user reads every word, doesn't skim, and comes away with a clear picture of (1) what they must fix, (2) what they should fix, and (3) what changed architecturally.
 
-## Inputs
+## Phase 1: Synthesize Findings
 
-- Verified findings from `$REVIEW_DIR/findings.md`
-- Context layer from `$REVIEW_DIR/context.md`
-- Verification tally from VerifyClaims
+Multiple agents reviewing the same diff will overlap. Two agents may flag the same null check. This phase collapses duplicates, resolves conflicts, and produces a unified findings list before report formatting.
+
+### Step S1: Deduplicate
+
+Two findings are duplicates when they reference the **same file AND overlapping line ranges** (within 5 lines of each other) AND describe the same category of issue.
+
+**Dedup rules:**
+- Same file + same line range + same issue category → merge into one finding
+- Same file + overlapping lines + different issue categories → keep both (different concerns)
+- Different files + similar issue pattern → keep both but note the pattern
+
+**When merging duplicates:**
+- Keep the higher severity rating
+- Combine recommendations from both agents
+- Note which agents independently flagged it (multi-agent agreement = higher confidence)
+
+### Step S2: Resolve Severity Conflicts
+
+When two agents flag the same issue with different severities:
+- If one says CRITICAL and another says LOW → use CRITICAL, but note the disagreement
+- General rule: take the higher severity and add a confidence note
+- Exception: if the lower-severity agent provides specific reasoning for downgrading, include that reasoning as context
+
+### Step S3: Build Architectural Map
+
+Using the context layer's change fingerprint and the findings:
+- Group changed files by module/component
+- Identify which modules have findings and which are clean
+- Produce a 3-5 sentence structural summary: "This change touches [modules]. The [X] module has the most findings ([N]). The [Y] module passed clean across all agents."
+
+### Step S4: Identify Clean Domains
+
+For each agent domain that found NO issues, record it:
+- "TypeScript types: No issues found (TypeScript agent reviewed 8 files)"
+- "Security: No vulnerabilities detected (Security agent reviewed auth-related changes)"
+
+This is the "What Looks Good" section — it builds credibility by proving agents actually reviewed, not just that they didn't flag.
+
+## Phase 2: Generate Report
 
 ## Formatting Principles
 
@@ -72,7 +118,7 @@ this is merge-ready."]
 
 ## Step 3: Write Architectural Map
 
-From the SynthesizeFindings architectural summary:
+From the Phase 1 architectural summary:
 - What modules/components changed
 - How they relate to each other
 - What the change accomplishes structurally
@@ -117,7 +163,7 @@ For each severity level that has findings, write a section. Each finding is a **
 
 ## Step 5: Write "What Looks Good"
 
-From the SynthesizeFindings clean domains:
+From the Phase 1 clean domains:
 
 ```markdown
 ## ✅ What Looks Good
@@ -158,4 +204,4 @@ Single-agent findings get no special annotation — they're still valid, just si
 
 ## Follow-Up
 
-End of pipeline — no automatic chains. Report delivered to user.
+Returns the report content and path to the orchestrator. The orchestrator outputs the report to the user.

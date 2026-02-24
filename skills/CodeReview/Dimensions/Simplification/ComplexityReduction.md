@@ -1,3 +1,10 @@
+---
+id: S4
+name: Complexity Reduction
+category: Simplification
+baseline: true
+---
+
 # Complexity Reduction Review
 
 > Evaluate cognitive load and control flow complexity by measuring how much mental state a reader must maintain to trace execution through a function.

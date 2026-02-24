@@ -1,3 +1,10 @@
+---
+id: A5
+name: Design Intent Clarity
+category: Architecture
+baseline: true
+---
+
 # Design Intent Clarity Review
 
 > Evaluates whether the code communicates its own architecture — whether a reader can understand the design without external documentation.

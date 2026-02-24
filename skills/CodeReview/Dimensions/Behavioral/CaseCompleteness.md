@@ -1,3 +1,10 @@
+---
+id: B3
+name: Completeness of Case Handling
+category: Behavioral
+baseline: false
+---
+
 # Completeness of Case Handling Review
 
 > Evaluate whether every branch point handles all possible values of its discriminant — catching silent gaps where unhandled cases produce wrong behavior instead of explicit errors.
