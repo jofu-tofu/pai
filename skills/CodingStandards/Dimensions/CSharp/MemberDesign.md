@@ -53,12 +53,518 @@ Together these six rules create a coherent design philosophy: expose the minimum
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [ReturnImmutableCollections](../../Rules/CSharp/ReturnImmutableCollections.md) | HIGH | Return IReadOnlyList/IReadOnlyCollection to prevent callers from mutating internal state |
-| [MethodOverProperty](../../Rules/CSharp/MethodOverProperty.md) | HIGH | Use methods for expensive or side-effecting operations; properties should be cheap |
-| [SpecificParameters](../../Rules/CSharp/SpecificParameters.md) | HIGH | Accept only the data a method needs, not entire parent objects |
-| [SmallMethods](../../Rules/CSharp/SmallMethods.md) | MEDIUM | Keep methods under 30 lines with a single clear purpose |
-| [NoMagicNumbers](../../Rules/CSharp/NoMagicNumbers.md) | MEDIUM | Replace literal values with named constants that explain intent |
-| [PrivateByDefault](../../Rules/CSharp/PrivateByDefault.md) | MEDIUM | Start with private visibility and widen only when explicitly needed |
+| ReturnImmutableCollections | HIGH | Return IReadOnlyList/IReadOnlyCollection to prevent callers from mutating internal state |
+| MethodOverProperty | HIGH | Use methods for expensive or side-effecting operations; properties should be cheap |
+| SpecificParameters | HIGH | Accept only the data a method needs, not entire parent objects |
+| SmallMethods | MEDIUM | Keep methods under 30 lines with a single clear purpose |
+| NoMagicNumbers | MEDIUM | Replace literal values with named constants that explain intent |
+| PrivateByDefault | MEDIUM | Start with private visibility and widen only when explicitly needed |
+
+
+---
+
+### CS4.1 Return Immutable Collections
+
+**Impact: HIGH (Prevents callers from mutating internal state)**
+
+Returning mutable collections exposes internal state. Callers can modify the returned collection, corrupting the object's data. Return immutable or read-only views instead.
+
+**Incorrect: Returning mutable internal collection**
+
+```csharp
+public class ShoppingCart
+{
+    private readonly List<Item> _items = [];
+
+    public List<Item> GetItems()
+    {
+        return _items;  // Caller gets reference to internal list
+    }
+}
+
+// Caller can corrupt internal state
+var cart = new ShoppingCart();
+cart.AddItem(new Item("Book"));
+
+var items = cart.GetItems();
+items.Clear();  // Cart's internal state destroyed!
+items.Add(new Item("Fake"));  // Injected unauthorized item
+```
+
+**Correct: Return read-only views**
+
+```csharp
+public class ShoppingCart
+{
+    private readonly List<Item> _items = [];
+
+    // Option 1: IReadOnlyList property (preferred)
+    public IReadOnlyList<Item> Items => _items;
+
+    // Option 2: AsReadOnly() for List<T>
+    public IReadOnlyList<Item> GetItems() => _items.AsReadOnly();
+
+    // Option 3: Return copy if mutation of copy is needed
+    public List<Item> GetItemsCopy() => [.._items];
+
+    // Option 4: ImmutableList for full immutability guarantees
+    public ImmutableList<Item> GetImmutableItems() => [.._items];
+}
+
+// Caller can read but not modify
+var items = cart.Items;
+// items.Clear();  // Won't compile - no Clear on IReadOnlyList
+// items.Add(...); // Won't compile - no Add on IReadOnlyList
+```
+
+**Collection expression patterns (C# 12+):**
+
+```csharp
+public class UserGroup
+{
+    private readonly List<User> _members = [];
+
+    // Return as read-only
+    public IReadOnlyList<User> Members => _members;
+
+    // Filter and return new immutable collection
+    public IReadOnlyList<User> GetActiveMembers() =>
+        [.. _members.Where(m => m.IsActive)];
+
+    // Combine collections into new immutable result
+    public IReadOnlyList<User> GetAllUsers(IEnumerable<User> additional) =>
+        [.. _members, .. additional];
+}
+```
+
+---
+
+### CS4.2 Use Methods for Expensive Operations
+
+**Impact: HIGH (Properties imply cheap access)**
+
+Properties should be fast and side-effect free. Developers expect properties to behave like field access - reading a property multiple times should be safe and cheap. Use methods when operations are expensive or have side effects.
+
+**Incorrect: Expensive operations as properties**
+
+```csharp
+public class ReportGenerator
+{
+    // Looks cheap, actually expensive
+    public Report FullReport
+    {
+        get
+        {
+            // Takes seconds, called every time property is read
+            return GenerateFullReport(_data);
+        }
+    }
+
+    // Side effect in property getter
+    public User CurrentUser
+    {
+        get
+        {
+            _accessCount++;  // Side effect!
+            return _user;
+        }
+    }
+
+    // Network call hidden in property
+    public decimal StockPrice => FetchCurrentPrice(_symbol);
+}
+
+// Caller assumes this is cheap
+for (int i = 0; i < 10; i++)
+{
+    Console.WriteLine(generator.FullReport.Title);  // 10 full reports generated!
+}
+```
+
+**Correct: Methods signal cost, properties are cheap**
+
+```csharp
+public class ReportGenerator
+{
+    // Method signals this might take time
+    public Report GenerateFullReport()
+    {
+        return GenerateFullReport(_data);
+    }
+
+    // Property is just field access
+    public User CurrentUser => _user;
+
+    // Separate property for access tracking
+    public int AccessCount => _accessCount;
+    public void RecordAccess() => _accessCount++;
+
+    // Method for network operations
+    public async Task<decimal> FetchStockPriceAsync()
+    {
+        return await FetchCurrentPrice(_symbol);
+    }
+}
+
+// Caller knows to cache the result
+var report = generator.GenerateFullReport();
+for (int i = 0; i < 10; i++)
+{
+    Console.WriteLine(report.Title);  // Reuses single report
+}
+```
+
+**Property guidelines:**
+- Should complete instantly (O(1) or close)
+- Should be idempotent (same value on repeated reads)
+- Should have no visible side effects
+- Use `Async` suffix for async operations (always methods)
+
+---
+
+### CS4.3 Accept Specific Parameters
+
+**Impact: HIGH (Accept only needed data, not entire objects)**
+
+Methods should accept only the data they need, not entire objects containing that data. This reduces coupling, improves testability, and makes dependencies explicit.
+
+**Incorrect: Accepting entire objects**
+
+```csharp
+// Takes entire User when only email is needed
+public void SendWelcomeEmail(User user)
+{
+    _emailService.Send(user.Email, "Welcome!");
+}
+
+// Takes entire Order when only calculating shipping
+public decimal CalculateShipping(Order order)
+{
+    return order.Items.Sum(i => i.Weight) * _ratePerKg;
+}
+
+// Hard to test - must construct entire Order
+[Test]
+public void CalculateShipping_ReturnsCorrectAmount()
+{
+    var order = new Order
+    {
+        Id = 1,
+        UserId = 1,
+        CreatedAt = DateTime.Now,
+        Status = OrderStatus.Pending,
+        // ... many other required properties
+        Items = [new OrderItem { Weight = 2.5m }]
+    };
+    var result = _service.CalculateShipping(order);
+}
+```
+
+**Correct: Accept only what's needed**
+
+```csharp
+// Takes only what's needed
+public void SendWelcomeEmail(string email)
+{
+    _emailService.Send(email, "Welcome!");
+}
+
+// Takes the specific data required
+public decimal CalculateShipping(IEnumerable<decimal> itemWeights)
+{
+    return itemWeights.Sum() * _ratePerKg;
+}
+
+// Or with a focused interface
+public interface IShippable
+{
+    decimal TotalWeight { get; }
+}
+
+public decimal CalculateShipping(IShippable item)
+{
+    return item.TotalWeight * _ratePerKg;
+}
+
+// Easy to test
+[Test]
+public void CalculateShipping_ReturnsCorrectAmount()
+{
+    var weights = new[] { 2.5m, 1.0m };
+    var result = _service.CalculateShipping(weights);
+    Assert.Equal(3.5m * _ratePerKg, result);
+}
+```
+
+**Benefits:**
+- Clearer API - parameters show what's actually used
+- Easier testing - no need to construct complex objects
+- Better reusability - works with any source of the data
+- Reduced coupling - method doesn't depend on User/Order structure
+
+---
+
+### CS4.4 Keep Methods Small
+
+**Impact: MEDIUM (Easier to understand, test, and modify)**
+
+Small methods with clear names are easier to read, test, and modify. Long methods mix multiple concerns, making bugs harder to find and changes riskier.
+
+**Incorrect: Large method with multiple concerns**
+
+```csharp
+public async Task<OrderResult> ProcessOrder(Order order)
+{
+    // Validation (lines 1-20)
+    if (order.Items.Count == 0)
+        return OrderResult.Failed("No items");
+    if (order.CustomerId <= 0)
+        return OrderResult.Failed("Invalid customer");
+    foreach (var item in order.Items)
+    {
+        if (item.Quantity <= 0)
+            return OrderResult.Failed("Invalid quantity");
+        // ... more validation
+    }
+
+    // Inventory check (lines 21-40)
+    foreach (var item in order.Items)
+    {
+        var stock = await _inventory.GetStock(item.ProductId);
+        if (stock < item.Quantity)
+            return OrderResult.Failed("Insufficient stock");
+        // ... more inventory logic
+    }
+
+    // Price calculation (lines 41-70)
+    decimal subtotal = 0;
+    foreach (var item in order.Items)
+    {
+        var price = await _pricing.GetPrice(item.ProductId);
+        subtotal += price * item.Quantity;
+        // ... discounts, taxes
+    }
+
+    // Payment processing (lines 71-100)
+    // ... payment logic
+
+    // Order creation (lines 101-130)
+    // ... persistence logic
+
+    return OrderResult.Success(orderId);
+}
+```
+
+**Correct: Small methods with single purpose**
+
+```csharp
+public async Task<OrderResult> ProcessOrder(Order order)
+{
+    var validation = ValidateOrder(order);
+    if (!validation.IsValid)
+        return OrderResult.Failed(validation.Error);
+
+    var stockCheck = await CheckInventoryAsync(order.Items);
+    if (!stockCheck.Available)
+        return OrderResult.Failed("Insufficient stock");
+
+    var pricing = await CalculatePricingAsync(order.Items);
+
+    var payment = await ProcessPaymentAsync(order.CustomerId, pricing.Total);
+    if (!payment.Success)
+        return OrderResult.Failed(payment.Error);
+
+    var orderId = await CreateOrderAsync(order, pricing, payment);
+
+    return OrderResult.Success(orderId);
+}
+
+private ValidationResult ValidateOrder(Order order)
+{
+    if (order.Items.Count == 0)
+        return ValidationResult.Invalid("No items");
+    if (order.CustomerId <= 0)
+        return ValidationResult.Invalid("Invalid customer");
+    // Focused validation logic
+    return ValidationResult.Valid();
+}
+
+private async Task<StockCheckResult> CheckInventoryAsync(IEnumerable<OrderItem> items)
+{
+    // Focused inventory logic
+}
+
+private async Task<PricingResult> CalculatePricingAsync(IEnumerable<OrderItem> items)
+{
+    // Focused pricing logic
+}
+```
+
+**Guideline: Methods should fit on one screen (~20-30 lines)**
+
+---
+
+### CS4.5 No Magic Numbers
+
+**Impact: MEDIUM (Named constants explain intent)**
+
+Literal numbers scattered through code are "magic" - their meaning is unclear. Named constants make code self-documenting and changes safer (update one place, not many).
+
+**Incorrect: Magic numbers**
+
+```csharp
+public class OrderProcessor
+{
+    public decimal CalculateTotal(decimal subtotal)
+    {
+        // What is 0.08? Tax rate? Which jurisdiction?
+        var tax = subtotal * 0.08m;
+
+        // What is 100? Minimum for free shipping?
+        if (subtotal > 100)
+            return subtotal + tax;
+
+        // What is 5.99? Shipping cost?
+        return subtotal + tax + 5.99m;
+    }
+
+    public bool IsValidOrder(Order order)
+    {
+        // What do these numbers mean?
+        return order.Items.Count <= 50
+            && order.Items.All(i => i.Quantity <= 999)
+            && order.TotalWeight <= 70;
+    }
+}
+```
+
+**Correct: Named constants**
+
+```csharp
+public class OrderProcessor
+{
+    private const decimal TaxRate = 0.08m;
+    private const decimal FreeShippingThreshold = 100m;
+    private const decimal StandardShippingCost = 5.99m;
+
+    private const int MaxItemsPerOrder = 50;
+    private const int MaxQuantityPerItem = 999;
+    private const decimal MaxShippingWeightKg = 70m;
+
+    public decimal CalculateTotal(decimal subtotal)
+    {
+        var tax = subtotal * TaxRate;
+
+        if (subtotal > FreeShippingThreshold)
+            return subtotal + tax;
+
+        return subtotal + tax + StandardShippingCost;
+    }
+
+    public bool IsValidOrder(Order order)
+    {
+        return order.Items.Count <= MaxItemsPerOrder
+            && order.Items.All(i => i.Quantity <= MaxQuantityPerItem)
+            && order.TotalWeight <= MaxShippingWeightKg;
+    }
+}
+```
+
+**When literals are acceptable:**
+- 0, 1, -1 in obvious contexts (initialization, increment)
+- Mathematical constants (2 for doubling, 100 for percentage)
+- Array indices when meaning is clear from context
+
+```csharp
+// These are fine
+for (int i = 0; i < items.Count; i++)  // 0 is obvious
+var doubled = value * 2;  // 2 is obvious
+var percentage = ratio * 100;  // 100 is obvious
+```
+
+---
+
+### CS4.6 Private by Default
+
+**Impact: MEDIUM (Start restrictive, open up as needed)**
+
+Making members public exposes implementation details and creates maintenance burden. Start with `private`, only increase visibility when there's a clear need. It's easy to make private things public later, but hard to make public things private.
+
+**Incorrect: Everything public**
+
+```csharp
+public class UserService
+{
+    public IDbConnection Connection;  // Internal detail exposed
+    public ILogger Logger;  // Internal detail exposed
+
+    public string ConnectionString;  // Sensitive data exposed
+    public int RetryCount = 3;  // Configuration as public field
+
+    public void ValidateInternal(User user) { }  // Helper exposed
+    public User TransformUser(User user) { }  // Helper exposed
+
+    public User GetUser(int id)
+    {
+        ValidateInternal(user);  // Implementation detail
+        return TransformUser(LoadFromDb(id));
+    }
+}
+
+// Users depend on internal details
+var service = new UserService();
+service.Connection = null;  // Can break internal state
+service.ValidateInternal(user);  // Calling internal helper
+```
+
+**Correct: Minimal public surface**
+
+```csharp
+public class UserService
+{
+    private readonly IDbConnection _connection;
+    private readonly ILogger _logger;
+    private readonly UserServiceOptions _options;
+
+    public UserService(
+        IDbConnection connection,
+        ILogger logger,
+        UserServiceOptions options)
+    {
+        _connection = connection;
+        _logger = logger;
+        _options = options;
+    }
+
+    // Only truly public operations
+    public User? GetUser(int id)
+    {
+        Validate(id);
+        return Transform(LoadFromDb(id));
+    }
+
+    public void CreateUser(User user)
+    {
+        ValidateUser(user);
+        SaveToDb(user);
+    }
+
+    // Internal helpers are private
+    private void Validate(int id) { }
+    private void ValidateUser(User user) { }
+    private User? LoadFromDb(int id) { }
+    private void SaveToDb(User user) { }
+    private User Transform(User? user) { }
+}
+```
+
+**Visibility guidelines:**
+- `private` - default for fields and helper methods
+- `private protected` - subclass access in same assembly
+- `protected` - subclass access (use sparingly)
+- `internal` - assembly access for shared utilities
+- `public` - only for intentional API surface
+
 
 ## Rule Interactions
 

@@ -32,10 +32,258 @@ Define the Result type once and import it everywhere. Write functions that can f
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [ResultOverTryCatch](../../Rules/TypeScript/ResultOverTryCatch.md) | CRITICAL | Return `Result<T, E>` instead of throwing so callers see failure in the type signature |
-| [CustomErrorClasses](../../Rules/TypeScript/CustomErrorClasses.md) | HIGH | Use Error subclasses with structured data instead of generic `new Error(message)` strings |
-| [ZodForExternalData](../../Rules/TypeScript/ZodForExternalData.md) | HIGH | Validate external data with Zod schemas instead of `as` assertions at system boundaries |
-| [InferFromSchemas](../../Rules/TypeScript/InferFromSchemas.md) | HIGH | Derive TypeScript types from Zod schemas with `z.infer` — never maintain parallel definitions |
+| ResultOverTryCatch | CRITICAL | Return `Result<T, E>` instead of throwing so callers see failure in the type signature |
+| CustomErrorClasses | HIGH | Use Error subclasses with structured data instead of generic `new Error(message)` strings |
+| ZodForExternalData | HIGH | Validate external data with Zod schemas instead of `as` assertions at system boundaries |
+| InferFromSchemas | HIGH | Derive TypeScript types from Zod schemas with `z.infer` — never maintain parallel definitions |
+
+
+---
+
+### TS3.1 Result Types Over Try/Catch
+
+**Impact: CRITICAL (Try/catch hides error cases from function signatures — callers don't know a function can fail until it does)**
+
+A function that throws has an invisible failure mode. Callers must read the implementation to know what errors are possible. A `Result<T, E>` return type makes success and failure explicit in the signature — the compiler forces callers to handle both cases.
+
+**Incorrect: Thrown errors are invisible in types**
+
+```typescript
+// Signature says it returns User — but it can throw
+async function getUser(id: string): Promise<User> {
+  const res = await fetch(`/api/users/${id}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+// Caller has no idea this can fail
+const user = await getUser("123");
+console.log(user.name);  // crashes if getUser threw
+```
+
+**Correct: Result type makes failure explicit**
+
+```typescript
+type Result<T, E = Error> =
+  | { success: true; data: T }
+  | { success: false; error: E };
+
+async function getUser(id: string): Promise<Result<User>> {
+  try {
+    const res = await fetch(`/api/users/${id}`);
+    if (!res.ok) {
+      return { success: false, error: new Error(`HTTP ${res.status}`) };
+    }
+    const data = await res.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error : new Error(String(error)) };
+  }
+}
+
+// Caller MUST handle both cases — compiler enforces it
+const result = await getUser("123");
+if (!result.success) {
+  console.error(result.error.message);
+  return;
+}
+console.log(result.data.name);  // TypeScript knows this is User
+```
+
+**When acceptable:**
+- Truly exceptional conditions (out of memory, stack overflow) that callers can't reasonably handle
+- Top-level error boundaries in frameworks (Express middleware, React error boundaries) that catch everything
+- Library functions matching ecosystem conventions (e.g., `JSON.parse` throws — wrapping every stdlib call in Result is impractical)
+
+---
+
+### TS3.2 Custom Error Classes
+
+**Impact: HIGH (Generic Error messages force string parsing — custom Error subclasses enable typed catch blocks and discriminated error handling)**
+
+When everything throws `new Error("something went wrong")`, error handling becomes string matching. Custom Error subclasses carry structured data, enable `instanceof` checks, and make error handling as type-safe as the rest of your code.
+
+**Incorrect: Generic errors with string messages**
+
+```typescript
+async function transferFunds(from: string, to: string, amount: number) {
+  const account = await getAccount(from);
+  if (!account) throw new Error("Account not found");
+  if (account.balance < amount) throw new Error("Insufficient funds");
+  if (amount <= 0) throw new Error("Invalid amount");
+  // ...
+}
+
+// Caller must parse strings to determine error type
+try {
+  await transferFunds(from, to, amount);
+} catch (e) {
+  if (e.message.includes("not found")) { /* ... */ }      // fragile
+  else if (e.message.includes("Insufficient")) { /* ... */ } // breaks on typo
+}
+```
+
+**Correct: Typed error subclasses**
+
+```typescript
+class NotFoundError extends Error {
+  constructor(public readonly entity: string, public readonly id: string) {
+    super(`${entity} not found: ${id}`);
+    this.name = "NotFoundError";
+  }
+}
+
+class InsufficientFundsError extends Error {
+  constructor(public readonly balance: number, public readonly required: number) {
+    super(`Insufficient funds: have ${balance}, need ${required}`);
+    this.name = "InsufficientFundsError";
+  }
+}
+
+class ValidationError extends Error {
+  constructor(public readonly field: string, public readonly reason: string) {
+    super(`Validation failed: ${field} — ${reason}`);
+    this.name = "ValidationError";
+  }
+}
+
+// Caller uses instanceof — typed and refactor-safe
+try {
+  await transferFunds(from, to, amount);
+} catch (e) {
+  if (e instanceof NotFoundError) {
+    console.log(`Missing ${e.entity}: ${e.id}`);  // structured access
+  } else if (e instanceof InsufficientFundsError) {
+    console.log(`Need ${e.required - e.balance} more`);
+  }
+}
+```
+
+**When acceptable:**
+- Simple scripts where a plain `Error` with a descriptive message is sufficient
+- When using Result types (Rule 7.1) — the error branch of a Result can be a simple type instead of an Error subclass
+
+---
+
+### TS3.3 Zod for External Data Validation
+
+**Impact: HIGH (Type assertions on external data are lies — Zod validates at runtime and infers types, closing the compile-time/runtime gap)**
+
+Data from APIs, user input, environment variables, and JSON files has no type at runtime. A type assertion (`as User`) tells the compiler "trust me" but performs zero validation. Zod schemas validate the actual data structure and infer the TypeScript type, giving you both runtime safety and compile-time types from a single source.
+
+**Incorrect: Type assertions on unvalidated data**
+
+```typescript
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  age: number;
+}
+
+async function fetchUser(id: string): Promise<User> {
+  const res = await fetch(`/api/users/${id}`);
+  const data = await res.json();
+  return data as User;  // DANGEROUS: no runtime validation
+}
+
+// If API returns { id: 123, nm: "Alice" } — no error, silent corruption
+const user = await fetchUser("1");
+console.log(user.name.toUpperCase());  // runtime crash: undefined.toUpperCase()
+```
+
+**Correct: Zod schema as single source of truth**
+
+```typescript
+import { z } from "zod";
+
+const UserSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1),
+  email: z.string().email(),
+  age: z.number().int().positive(),
+});
+
+type User = z.infer<typeof UserSchema>;  // type derived from schema
+
+async function fetchUser(id: string): Promise<User> {
+  const res = await fetch(`/api/users/${id}`);
+  const data = await res.json();
+  return UserSchema.parse(data);  // throws ZodError with details on mismatch
+}
+
+// For non-throwing validation
+const result = UserSchema.safeParse(data);
+if (!result.success) {
+  console.error(result.error.issues);  // structured error details
+  return;
+}
+const user = result.data;  // typed as User
+```
+
+**When acceptable:**
+- Internal data passed between trusted functions in the same process — validation at system boundaries is sufficient
+- Performance-critical hot paths where Zod's overhead matters — but profile first, don't assume
+
+---
+
+### TS3.4 Infer Types From Schemas
+
+**Impact: HIGH (Manually maintaining both a Zod schema and a TypeScript interface creates drift — derive the type from the schema)**
+
+When you define a Zod schema AND a separate TypeScript interface, they will diverge. Someone adds a field to the interface but forgets the schema, or vice versa. Use `z.infer<typeof Schema>` to derive the type from the schema — single source of truth, zero drift.
+
+**Incorrect: Parallel type and schema definitions**
+
+```typescript
+// These WILL drift apart over time
+interface CreateOrderInput {
+  productId: string;
+  quantity: number;
+  shippingAddress: string;
+  couponCode?: string;
+}
+
+const CreateOrderSchema = z.object({
+  productId: z.string(),
+  quantity: z.number().int().positive(),
+  shippingAddress: z.string().min(10),
+  // forgot couponCode — silent drift
+});
+
+function createOrder(input: CreateOrderInput) {
+  const validated = CreateOrderSchema.parse(input);
+  // validated is missing couponCode — type says it's there
+}
+```
+
+**Correct: Schema is the source of truth**
+
+```typescript
+const CreateOrderSchema = z.object({
+  productId: z.string().uuid(),
+  quantity: z.number().int().positive(),
+  shippingAddress: z.string().min(10),
+  couponCode: z.string().optional(),
+});
+
+// Type derived from schema — always in sync
+type CreateOrderInput = z.infer<typeof CreateOrderSchema>;
+
+// For output types with transforms
+const OrderResponseSchema = CreateOrderSchema.extend({
+  id: z.string().uuid(),
+  total: z.number(),
+  createdAt: z.coerce.date(),
+});
+
+type OrderResponse = z.infer<typeof OrderResponseSchema>;
+```
+
+**When acceptable:**
+- Types that are never validated at runtime (internal state, UI-only types) don't need schemas
+- Third-party types you can't control — wrap with Zod at the boundary but keep the original type internally
+
 
 ## Rule Interactions
 

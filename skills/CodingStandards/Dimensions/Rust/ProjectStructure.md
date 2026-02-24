@@ -36,13 +36,441 @@ Use `[workspace.dependencies]` for every shared dependency. Use the `dep:` synta
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [WorkspaceForMultiCrate](../../Rules/Rust/WorkspaceForMultiCrate.md) | HIGH | Use Cargo workspaces with shared dependencies for multi-crate projects |
-| [AdditiveFeatureFlags](../../Rules/Rust/AdditiveFeatureFlags.md) | CRITICAL | Feature flags must be additive; test all combinations in CI |
-| [MinimalDefaultFeatures](../../Rules/Rust/MinimalDefaultFeatures.md) | MEDIUM | Default features cover the 80% use case; core works without defaults |
-| [ModulePerFeature](../../Rules/Rust/ModulePerFeature.md) | MEDIUM | Organize by feature domain, not technical layer; use pub(crate) internally |
-| [AvoidWildcardImports](../../Rules/Rust/AvoidWildcardImports.md) | MEDIUM | No wildcard imports except in tests and curated preludes |
-| [ReExportPublicDependencies](../../Rules/Rust/ReExportPublicDependencies.md) | HIGH | Re-export dependency types exposed in public API signatures |
-| [SemverDiscipline](../../Rules/Rust/SemverDiscipline.md) | HIGH | Run cargo-semver-checks in CI; understand what constitutes a breaking change |
+| WorkspaceForMultiCrate | HIGH | Use Cargo workspaces with shared dependencies for multi-crate projects |
+| AdditiveFeatureFlags | CRITICAL | Feature flags must be additive; test all combinations in CI |
+| MinimalDefaultFeatures | MEDIUM | Default features cover the 80% use case; core works without defaults |
+| ModulePerFeature | MEDIUM | Organize by feature domain, not technical layer; use pub(crate) internally |
+| AvoidWildcardImports | MEDIUM | No wildcard imports except in tests and curated preludes |
+| ReExportPublicDependencies | HIGH | Re-export dependency types exposed in public API signatures |
+| SemverDiscipline | HIGH | Run cargo-semver-checks in CI; understand what constitutes a breaking change |
+
+
+---
+
+### RS10.1 WorkspaceForMultiCrate
+
+**Impact: HIGH (Prevents dependency version divergence and duplicated build artifacts across crates)**
+
+Any project with two or more crates should use a Cargo workspace. Without one, each crate resolves dependencies independently, leading to version conflicts, duplicated compilation, and inconsistent dependency trees that only surface at integration time.
+
+**Incorrect: Separate projects with independent Cargo.toml files**
+
+```rust
+// crate-a/Cargo.toml
+[package]
+name = "crate-a"
+version = "0.1.0"
+
+[dependencies]
+serde = "1.0.193"
+tokio = { version = "1.35", features = ["full"] }
+
+// crate-b/Cargo.toml
+[package]
+name = "crate-b"
+version = "0.1.0"
+
+[dependencies]
+serde = "1.0.180"  # different version than crate-a
+tokio = { version = "1.35", features = ["rt"] }  # different features
+crate-a = { path = "../crate-a" }
+// Two different serde versions compiled, types are incompatible across crates
+```
+
+**Correct: Workspace with shared dependency definitions**
+
+```rust
+// Cargo.toml (workspace root)
+[workspace]
+members = ["crate-a", "crate-b"]
+
+[workspace.dependencies]
+serde = { version = "1.0.193", features = ["derive"] }
+tokio = { version = "1.35", features = ["full"] }
+
+// crate-a/Cargo.toml
+[package]
+name = "crate-a"
+version = "0.1.0"
+
+[dependencies]
+serde = { workspace = true }
+tokio = { workspace = true }
+
+// crate-b/Cargo.toml
+[package]
+name = "crate-b"
+version = "0.1.0"
+
+[dependencies]
+serde = { workspace = true }
+tokio = { workspace = true }
+crate-a = { path = "../crate-a" }
+// Single version of each dependency, single Cargo.lock, shared build cache
+```
+
+**When acceptable:**
+- Truly independent projects that share a repository but have no dependency relationship
+- Prototyping a single-crate project that has not yet split into multiple crates
+
+---
+
+### RS10.2 AdditiveFeatureFlags
+
+**Impact: CRITICAL (Mutually exclusive features cause compilation failures in dependency trees)**
+
+Cargo features must be additive: enabling any combination of features must compile and produce correct behavior. When a downstream crate enables features from two of its dependencies that transitively activate conflicting features in your crate, compilation fails or behavior silently changes. This is unfixable by the downstream consumer.
+
+**Incorrect: Mutually exclusive features that break when combined**
+
+```rust
+// Cargo.toml
+[features]
+default = ["json"]
+json = ["serde_json"]
+yaml = ["serde_yaml"]
+
+// src/lib.rs
+#[cfg(feature = "json")]
+mod serializer {
+    pub fn serialize(data: &Data) -> String {
+        serde_json::to_string(data).unwrap()
+    }
+}
+
+#[cfg(feature = "yaml")]
+mod serializer {  // ERROR: duplicate module when both features enabled
+    pub fn serialize(data: &Data) -> String {
+        serde_yaml::to_string(data).unwrap()
+    }
+}
+// A dependency tree that activates both "json" and "yaml" fails to compile
+```
+
+**Correct: Additive features that compose safely**
+
+```rust
+// Cargo.toml
+[features]
+default = ["json"]
+json = ["serde_json"]
+yaml = ["serde_yaml"]
+
+// src/lib.rs
+#[cfg(feature = "json")]
+pub mod json {
+    pub fn serialize(data: &Data) -> String {
+        serde_json::to_string(data).unwrap()
+    }
+}
+
+#[cfg(feature = "yaml")]
+pub mod yaml {
+    pub fn serialize(data: &Data) -> String {
+        serde_yaml::to_string(data).unwrap()
+    }
+}
+
+// CI: test feature combinations
+// cargo test --no-default-features
+// cargo test --features json
+// cargo test --features yaml
+// cargo test --all-features
+```
+
+**When acceptable:**
+- Binary crates (not libraries) where the author controls the full feature matrix
+- Features gated behind `#[cfg(target_os = ...)]` where mutual exclusion is enforced by the platform
+
+---
+
+### RS10.3 MinimalDefaultFeatures
+
+**Impact: MEDIUM (Bloated defaults force unnecessary dependencies on all consumers)**
+
+Default features should cover the common use case (roughly 80% of consumers) without pulling in heavy or optional dependencies. Consumers who specify `default-features = false` must still get a functional core crate that compiles and passes its own tests.
+
+**Incorrect: Kitchen-sink defaults that penalize minimal consumers**
+
+```rust
+// Cargo.toml
+[features]
+default = ["tls-native", "compression", "tracing-subscriber", "cli", "serde"]
+tls-native = ["native-tls"]
+tls-rustls = ["rustls"]
+compression = ["flate2", "brotli"]
+tracing-subscriber = ["tracing-subscriber/fmt"]
+cli = ["clap"]
+serde = ["serde", "serde_json"]
+
+// A library consumer who just wants HTTP types now
+// depends on native-tls (C library), flate2, brotli, clap, etc.
+```
+
+**Correct: Lean defaults with opt-in extras**
+
+```rust
+// Cargo.toml
+[features]
+default = ["tls-rustls"]
+tls-native = ["dep:native-tls"]
+tls-rustls = ["dep:rustls"]
+compression = ["dep:flate2", "dep:brotli"]
+tracing = ["dep:tracing-subscriber"]
+cli = ["dep:clap"]
+serde = ["dep:serde", "dep:serde_json"]
+
+// Core crate compiles with: default-features = false
+// Most consumers get TLS out of the box with just the default
+// Heavy extras are explicit opt-in
+
+// Using dep: syntax to avoid implicit feature activation
+[dependencies]
+native-tls = { version = "0.2", optional = true }
+rustls = { version = "0.23", optional = true }
+flate2 = { version = "1.0", optional = true }
+```
+
+**When acceptable:**
+- Application crates where there are no downstream consumers
+- Crates where the entire feature set is lightweight and nearly all users need everything
+
+---
+
+### RS10.4 ModulePerFeature
+
+**Impact: MEDIUM (Layer-based organization scatters related logic and increases coupling)**
+
+Organize modules by feature or domain concept, not by technical layer. A change to a feature should touch files in one module subtree, not scatter across `models/`, `handlers/`, `services/`, and `repositories/`. Use `pub(crate)` for internal types to keep the public surface minimal.
+
+**Incorrect: Layer-based organization**
+
+```rust
+// src/
+//   models/
+//     user.rs
+//     order.rs
+//   handlers/
+//     user_handler.rs
+//     order_handler.rs
+//   services/
+//     user_service.rs
+//     order_service.rs
+//   repositories/
+//     user_repo.rs
+//     order_repo.rs
+
+// Adding "order cancellation" touches 4 directories
+// user_handler.rs imports from models, services, repositories
+// Every layer depends on every other layer's types
+```
+
+**Correct: Feature-based organization**
+
+```rust
+// src/
+//   user/
+//     mod.rs        // pub struct User, pub fn endpoints()
+//     auth.rs       // pub(crate) fn verify_credentials()
+//     storage.rs    // pub(crate) fn save_user()
+//   order/
+//     mod.rs        // pub struct Order, pub fn endpoints()
+//     fulfillment.rs // pub(crate) fn fulfill()
+//     storage.rs    // pub(crate) fn save_order()
+//   shared/
+//     db.rs         // pub(crate) connection pool
+//     error.rs      // pub error types
+
+// src/order/mod.rs
+pub struct Order { /* ... */ }
+
+pub fn endpoints() -> Router {
+    Router::new()
+        .route("/orders", post(create))
+        .route("/orders/:id/cancel", post(cancel))
+}
+
+// Internal implementation hidden from other modules
+pub(crate) use storage::save_order;
+
+// Adding "order cancellation" only touches src/order/
+```
+
+**When acceptable:**
+- Very small crates (under ~500 lines) where a flat module structure is clearer
+- Framework-mandated layouts (some ORMs expect a specific directory structure)
+
+---
+
+### RS10.5 AvoidWildcardImports
+
+**Impact: MEDIUM (Wildcard imports cause name collisions and obscure where symbols originate)**
+
+Glob imports (`use foo::*`) pull every public symbol into scope. When two glob imports export the same name, the code fails to compile. Even without collisions, readers cannot determine where a type or function comes from without checking every imported module. Explicit imports serve as documentation.
+
+**Incorrect: Wildcard imports causing ambiguity and collision**
+
+```rust
+use std::io::*;
+use std::fmt::*;
+
+// Both modules export `Result` and `Error`
+// This fails to compile:
+fn process() -> Result<String> {  // ambiguous: io::Result or fmt::Result?
+    Ok("done".to_string())
+}
+
+// Even without collision, the reader cannot tell where `BufReader` comes from
+use crate::parsing::*;
+use crate::networking::*;
+
+fn handle(stream: TcpStream) {
+    let reader = BufReader::new(stream);  // from parsing? networking? std::io?
+    let msg = decode(reader);             // which module defines decode()?
+}
+```
+
+**Correct: Explicit imports document origin**
+
+```rust
+use std::io::{self, BufReader, Read};
+use std::fmt;
+
+fn process() -> io::Result<String> {
+    Ok("done".to_string())
+}
+
+use crate::parsing::decode;
+use crate::networking::TcpStream;
+
+fn handle(stream: TcpStream) {
+    let reader = BufReader::new(stream);  // clearly from std::io
+    let msg = decode(reader);             // clearly from crate::parsing
+}
+```
+
+**When acceptable:**
+- Test modules: `use super::*` in `#[cfg(test)] mod tests` is idiomatic for accessing all items under test
+- Crate-defined preludes: `use mycrate::prelude::*` when the prelude is intentionally curated and small
+- Enum variants in match arms: `use MyEnum::*` inside a function to reduce repetition
+
+---
+
+### RS10.6 ReExportPublicDependencies
+
+**Impact: HIGH (Consumers forced to find and match exact dependency versions you use internally)**
+
+When your public API exposes types from a dependency (in function signatures, trait bounds, or struct fields), you must re-export those types. Otherwise consumers must add the same dependency at a compatible version, and a semver-incompatible upgrade in your dependency becomes a silent breaking change for them.
+
+**Incorrect: Public API leaks dependency types without re-export**
+
+```rust
+// my-http-client/src/lib.rs
+use http::StatusCode;  // from the `http` crate
+
+pub struct Response {
+    pub status: StatusCode,  // consumers must depend on `http` crate directly
+    pub body: Vec<u8>,
+}
+
+pub fn get(url: &str) -> Response { /* ... */ }
+
+// Consumer's Cargo.toml must add:
+//   http = "0.2"  # must match exact major version my-http-client uses
+// If my-http-client upgrades to http 1.0, consumer's code silently breaks
+// because http::StatusCode 0.2 != http::StatusCode 1.0
+```
+
+**Correct: Re-export dependency types used in public API**
+
+```rust
+// my-http-client/src/lib.rs
+pub use http::StatusCode;  // re-exported: consumers use my_http_client::StatusCode
+
+pub struct Response {
+    pub status: StatusCode,
+    pub body: Vec<u8>,
+}
+
+pub fn get(url: &str) -> Response { /* ... */ }
+
+// Consumer code:
+//   use my_http_client::{get, StatusCode};
+//   let resp = get("https://example.com");
+//   assert_eq!(resp.status, StatusCode::OK);
+// No need to independently depend on `http` crate
+// Version upgrades are handled by my-http-client's semver
+```
+
+**When acceptable:**
+- Types from `std` which are always available and version-stable
+- Internal (non-public) API boundaries within a workspace where version coupling is intentional
+
+---
+
+### RS10.7 SemverDiscipline
+
+**Impact: HIGH (Undetected breaking changes in patch releases corrupt downstream dependency trees)**
+
+Rust's ecosystem depends on semver for safe dependency resolution. A breaking change released as a patch or minor version can cause compilation failures across the entire dependency tree. Use `cargo-semver-checks` in CI to catch accidental breaking changes before they ship.
+
+**Incorrect: No automated semver verification**
+
+```rust
+// Cargo.toml
+[package]
+name = "my-lib"
+version = "1.2.3"
+
+// src/lib.rs -- v1.2.3 -> v1.2.4 (patch release)
+// Removed a public function (BREAKING!)
+// pub fn parse(input: &str) -> Result<Data, Error> { ... }  // deleted
+
+// Changed a public struct field type (BREAKING!)
+pub struct Config {
+    pub timeout: u64,  // was Duration in v1.2.3
+}
+
+// CI: only runs cargo test
+// Breaking changes ship undetected as a patch release
+```
+
+**Correct: Semver-checks enforced in CI**
+
+```rust
+// .github/workflows/ci.yml (or equivalent CI config)
+// jobs:
+//   semver:
+//     runs-on: ubuntu-latest
+//     steps:
+//       - uses: actions/checkout@v4
+//       - uses: obi1kenobi/cargo-semver-checks-action@v2
+//
+//   test:
+//     runs-on: ubuntu-latest
+//     steps:
+//       - uses: actions/checkout@v4
+//       - run: cargo test --all-features
+
+// Common breaking changes cargo-semver-checks catches:
+// - Removing or renaming public items
+// - Changing function signatures
+// - Adding required fields to public structs
+// - Tightening trait bounds
+// - Removing trait implementations
+// - Changing types in public API
+
+// Release checklist:
+// 1. cargo semver-checks (passes for minor/patch)
+// 2. cargo test --all-features
+// 3. Update CHANGELOG.md
+// 4. cargo publish
+```
+
+**When acceptable:**
+- Pre-1.0 crates (`0.x.y`) where the API is explicitly unstable and consumers expect breakage
+- Internal crates in a workspace that are never published to crates.io
+
 
 ## Rule Interactions
 

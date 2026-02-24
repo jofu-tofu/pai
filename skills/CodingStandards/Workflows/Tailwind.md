@@ -10,7 +10,7 @@ Apply Tailwind CSS coding standards covering utility-first philosophy, class org
 
 ## Reference Material
 
-- `../Rules/Tailwind/` — 32 individual rule files across 8 categories
+- `../Dimensions/Tailwind/` — 32 rules inlined across 8 categories
 
 ## Quick Decision Tree
 
@@ -25,7 +25,7 @@ Apply Tailwind CSS coding standards covering utility-first philosophy, class org
 7. **Dynamic classes or build config?** → Category 7: Performance & Build Safety (CRITICAL)
 8. **Group/peer modifiers or layout?** → Category 8: State Modifiers & Layout (HIGH)
 
-**For detailed implementation:** Read the specific rule file from `../Rules/Tailwind/` folder.
+**For detailed implementation:** Read the relevant dimension file from `../Dimensions/Tailwind/` folder (rules are inlined).
 
 ## Priority Hierarchy
 
@@ -107,21 +107,21 @@ const button = cva("rounded font-medium", {
 
 ## How to Use Rules
 
-**Pattern:** When applying a rule, read its specific file from `../Rules/Tailwind/` folder.
+**Pattern:** When applying a rule, find it in the relevant dimension file from `../Dimensions/Tailwind/` (rules are inlined).
 
 ```
 Decision tree identifies: Category 7 (Performance & Build Safety)
 Quick ref shows: NoDynamicClassConstruction rule
-Action: Read ../Rules/Tailwind/NoDynamicClassConstruction.md
+Action: Read ../Dimensions/Tailwind/NoDynamicClassConstruction.md (rule is inlined in the dimension file)
 Result: Complete code examples and implementation guidance
 ```
 
 ### Rule File Naming Convention
 
 Rules use TitleCase naming for PAI compliance:
-- `no-dynamic-class-construction` → `../Rules/Tailwind/NoDynamicClassConstruction.md`
-- `mobile-first-breakpoints` → `../Rules/Tailwind/MobileFirstBreakpoints.md`
-- `screen-reader-only-usage` → `../Rules/Tailwind/ScreenReaderOnlyUsage.md`
+- `no-dynamic-class-construction` → search in the relevant dimension file
+- `mobile-first-breakpoints` → search in the relevant dimension file
+- `screen-reader-only-usage` → search in the relevant dimension file
 
 ## Complete Rule Index
 
@@ -191,8 +191,8 @@ For agents that need focused subsets rather than the full rule set, read `../Dim
 |-----------|------|------------|-----------|
 | Philosophy | Philosophy.md | 6 | Utility-first approach, component extraction, @apply decisions |
 | Class Organization | ClassOrganization.md | 9 | Class ordering, conflicts, state modifiers, layout |
-| Responsive Design | ResponsiveDesign.md | 4 | Breakpoints, mobile-first, container queries, spacing |
-| Theming | Theming.md | 4 | Dark mode, semantic tokens, custom properties |
+| Layout and Theming | LayoutAndTheming.md | 4 | Breakpoints, mobile-first, container queries, spacing |
+
 | Accessibility | Accessibility.md | 9 | Screen readers, focus, motion, touch targets, build safety |
 
 **Default:** Load Philosophy for any Tailwind task.

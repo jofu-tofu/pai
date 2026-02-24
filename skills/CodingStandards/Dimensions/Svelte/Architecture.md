@@ -32,15 +32,367 @@ Define props with an interface and `$props()`, providing defaults via destructur
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [SnippetsOverSlots](../../Rules/Svelte/SnippetsOverSlots.md) | HIGH | Use {#snippet} and {@render} instead of slots for type-safe template delegation |
-| [TypedProps](../../Rules/Svelte/TypedProps.md) | HIGH | Type props with $props() and a TypeScript interface |
-| [TypeSafeContext](../../Rules/Svelte/TypeSafeContext.md) | HIGH | Wrap setContext/getContext in typed functions with symbol keys |
-| [NoMutateProps](../../Rules/Svelte/NoMutateProps.md) | HIGH | Never mutate props directly -- use callback props for upward communication |
-| [CallbacksOverBind](../../Rules/Svelte/CallbacksOverBind.md) | HIGH | Prefer callback props over bind: for explicit data flow |
-| [RouteGroups](../../Rules/Svelte/RouteGroups.md) | MEDIUM | Use (groupName) directories to segment layouts without affecting URLs |
-| [LayoutDataForShared](../../Rules/Svelte/LayoutDataForShared.md) | MEDIUM | Load shared data in +layout.server.ts, not duplicated per page |
-| [ServerHooks](../../Rules/Svelte/ServerHooks.md) | MEDIUM | Centralize auth, logging, and middleware in hooks.server.ts |
-| [EnvVarSafety](../../Rules/Svelte/EnvVarSafety.md) | HIGH | Use $env/static/private for secrets; never import in client code |
+| SnippetsOverSlots | HIGH | Use {#snippet} and {@render} instead of slots for type-safe template delegation |
+| TypedProps | HIGH | Type props with $props() and a TypeScript interface |
+| TypeSafeContext | HIGH | Wrap setContext/getContext in typed functions with symbol keys |
+| NoMutateProps | HIGH | Never mutate props directly -- use callback props for upward communication |
+| CallbacksOverBind | HIGH | Prefer callback props over bind: for explicit data flow |
+| RouteGroups | MEDIUM | Use (groupName) directories to segment layouts without affecting URLs |
+| LayoutDataForShared | MEDIUM | Load shared data in +layout.server.ts, not duplicated per page |
+| ServerHooks | MEDIUM | Centralize auth, logging, and middleware in hooks.server.ts |
+| EnvVarSafety | HIGH | Use $env/static/private for secrets; never import in client code |
+
+
+---
+
+### SV2.1 Use Snippets Instead of Slots
+
+**Impact: HIGH (more readable, type-safe, and composable than slots)**
+
+Svelte 5 replaces slots with snippets (`{#snippet}` + `{@render}`). Snippets are first-class values, fully typed, and can be passed as props.
+
+**Incorrect: Svelte 4 slot pattern — no type safety**
+
+```svelte
+<!-- Parent -->
+<Card>
+  <span slot="header">Title</span>
+  <p>Body content</p>
+</Card>
+
+<!-- Card.svelte -->
+<div class="card">
+  <slot name="header" />
+  <slot />
+</div>
+```
+
+**Correct: Svelte 5 snippets — typed and composable**
+
+```svelte
+<!-- Parent -->
+<Card>
+  {#snippet header()}
+    <span>Title</span>
+  {/snippet}
+  <p>Body content</p>
+</Card>
+
+<!-- Card.svelte -->
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+  interface Props { header?: Snippet; children: Snippet; }
+  const { header, children } = $props();
+</script>
+
+<div class="card">
+  {#if header}{@render header()}{/if}
+  {@render children()}
+</div>
+```
+
+---
+
+### SV2.2 Type Props with $props() and Interface
+
+**Impact: HIGH (replaces export let with type-safe prop destructuring)**
+
+Use `$props()` with a TypeScript interface to declare component props. This replaces Svelte 4's `export let` pattern with full type safety and default values.
+
+**Incorrect: Svelte 4 export let pattern**
+
+```svelte
+<script lang="ts">
+  export let title: string;
+  export let count: number = 0;
+  export let variant: 'primary' | 'secondary' = 'primary';
+</script>
+```
+
+**Correct: Svelte 5 $props() with interface**
+
+```svelte
+<script lang="ts">
+  interface Props {
+    title: string;
+    count?: number;
+    variant?: 'primary' | 'secondary';
+  }
+
+  const { title, count = 0, variant = 'primary' } = $props<Props>();
+</script>
+```
+
+---
+
+### SV2.3 Use Symbol Keys and Typed Helpers for Context
+
+**Impact: HIGH (prevents key collisions and provides type safety)**
+
+Use `Symbol` keys with typed wrapper functions for `setContext` / `getContext` instead of raw string keys. This prevents collisions and gives consumers full type inference.
+
+**Incorrect: string key — no type safety, collision risk**
+
+```svelte
+<script lang="ts">
+  import { setContext } from 'svelte';
+
+  setContext('modal', { open: false, toggle: () => {} });
+</script>
+
+<!-- Consumer has no type info -->
+<script lang="ts">
+  import { getContext } from 'svelte';
+
+  const modal = getContext('modal'); // any
+</script>
+```
+
+**Correct: Symbol key with typed helpers**
+
+```svelte
+<!-- context.ts -->
+<script context="module" lang="ts">
+  import { setContext, getContext } from 'svelte';
+
+  interface ModalContext { open: boolean; toggle: () => void; }
+
+  const KEY = Symbol('modal');
+
+  export function setModalContext(ctx: ModalContext) {
+    setContext(KEY, ctx);
+  }
+
+  export function getModalContext(): ModalContext {
+    return getContext<ModalContext>(KEY);
+  }
+</script>
+```
+
+---
+
+### SV2.4 Never Mutate Prop Objects Directly
+
+**Impact: HIGH (prevents unexpected parent state mutations)**
+
+Props flow down, events flow up. Mutating a prop object directly changes the parent's data without the parent knowing, breaking unidirectional data flow.
+
+**Incorrect: mutating prop object directly**
+
+```svelte
+<script lang="ts">
+  interface Props { user: { name: string; age: number }; }
+  let { user } = $props<Props>();
+
+  function incrementAge() {
+    user.age++; // Mutates parent's data!
+  }
+</script>
+```
+
+**Correct: emit callback to parent**
+
+```svelte
+<script lang="ts">
+  interface Props {
+    user: { name: string; age: number };
+    onchange?: (user: { name: string; age: number }) => void;
+  }
+  let { user, onchange } = $props<Props>();
+
+  function incrementAge() {
+    onchange?.({ ...user, age: user.age + 1 });
+  }
+</script>
+```
+
+---
+
+### SV2.5 Prefer Callbacks Over Excessive $bindable
+
+**Impact: MEDIUM (makes data flow explicit and traceable)**
+
+Two-way binding with `$bindable` is convenient but obscures data flow. Prefer explicit callbacks for complex components — save `bind:` for simple form inputs.
+
+**Incorrect: $bindable hides data flow**
+
+```svelte
+<!-- Counter.svelte -->
+<script lang="ts">
+  interface Props { count: number; }
+  let { count = $bindable(0) } = $props<Props>();
+</script>
+
+<button onclick={() => count++}>{count}</button>
+
+<!-- Parent: implicit two-way sync -->
+<Counter bind:count />
+```
+
+**Correct: explicit callback — data flow is visible**
+
+```svelte
+<!-- Counter.svelte -->
+<script lang="ts">
+  interface Props { count: number; onchange?: (n: number) => void; }
+  let { count, onchange } = $props<Props>();
+</script>
+
+<button onclick={() => onchange?.(count + 1)}>{count}</button>
+
+<!-- Parent: explicit one-way + callback -->
+<Counter {count} onchange={(v) => count = v} />
+```
+
+---
+
+### SV2.6 Use Route Groups for Layout Organization
+
+**Impact: MEDIUM (organizes routes that share layouts without affecting URLs)**
+
+Use route groups `(groupName)` to organize routes that share a layout or need to break out of a parent layout. Groups don't affect the URL path.
+
+**Incorrect: duplicating layout logic across routes**
+
+```
+routes/
+  login/+page.svelte     ← No shared auth layout
+  register/+page.svelte  ← Duplicates auth layout
+  dashboard/+page.svelte ← Different layout entirely
+```
+
+**Correct: route groups share layouts**
+
+```
+routes/
+  (auth)/
+    +layout.svelte       ← Shared auth layout (centered card)
+    login/+page.svelte
+    register/+page.svelte
+  (app)/
+    +layout.svelte       ← Shared app layout (sidebar + nav)
+    dashboard/+page.svelte
+    settings/+page.svelte
+```
+
+---
+
+### SV2.7 Use Layout Load for Shared Data
+
+**Impact: HIGH (eliminates duplicated data fetching across routes)**
+
+Use `+layout.server.ts` for data shared across child routes (user session, theme, locale). This runs once and is inherited by all child pages.
+
+**Incorrect: every page fetches user data**
+
+```typescript
+// routes/dashboard/+page.server.ts
+export async function load({ locals }) {
+  const user = await getUser(locals.userId);
+  const dashData = await getDashboard();
+  return { user, dashData };
+}
+
+// routes/settings/+page.server.ts
+export async function load({ locals }) {
+  const user = await getUser(locals.userId); // Duplicated!
+  const settings = await getSettings();
+  return { user, settings };
+}
+```
+
+**Correct: layout loads shared data once**
+
+```typescript
+// routes/(app)/+layout.server.ts
+export async function load({ locals }) {
+  return { user: await getUser(locals.userId) };
+}
+
+// routes/(app)/dashboard/+page.server.ts
+export async function load() {
+  return { dashData: await getDashboard() };
+  // user is inherited from layout
+}
+```
+
+---
+
+### SV2.8 Use hooks.server.ts for Cross-Cutting Concerns
+
+**Impact: HIGH (centralizes auth, logging, and request processing)**
+
+Use `hooks.server.ts` for cross-cutting concerns like authentication guards, request logging, and locale detection instead of duplicating logic in every load function.
+
+**Incorrect: auth check duplicated in every load function**
+
+```typescript
+// routes/dashboard/+page.server.ts
+export async function load({ cookies }) {
+  const session = cookies.get('session');
+  if (!session) throw redirect(303, '/login');
+  const user = await validateSession(session);
+  // ... page-specific logic
+}
+
+// routes/settings/+page.server.ts
+export async function load({ cookies }) {
+  const session = cookies.get('session'); // Duplicated!
+  if (!session) throw redirect(303, '/login');
+  const user = await validateSession(session);
+  // ... page-specific logic
+}
+```
+
+**Correct: centralized in hooks.server.ts**
+
+```typescript
+// src/hooks.server.ts
+import type { Handle } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
+
+export const handle: Handle = async ({ event, resolve }) => {
+  const session = event.cookies.get('session');
+
+  if (session) {
+    event.locals.user = await validateSession(session);
+  }
+
+  if (event.url.pathname.startsWith('/app') && !event.locals.user) {
+    throw redirect(303, '/login');
+  }
+
+  return resolve(event);
+};
+```
+
+---
+
+### SV2.9 Use Correct $env Module for Server vs Client
+
+**Impact: HIGH (prevents secret leakage through incorrect env imports)**
+
+Use `$env/static/private` for server-only secrets and `$env/static/public` for client-safe values. SvelteKit enforces this at build time — importing private env in client code is a build error.
+
+**Incorrect: using public env for secrets**
+
+```typescript
+// +page.svelte — client code!
+import { DATABASE_URL } from '$env/static/public'; // Exposes secret!
+```
+
+**Correct: private env in server files only**
+
+```typescript
+// +page.server.ts — server only
+import { DATABASE_URL, API_SECRET } from '$env/static/private';
+
+// +page.svelte — client-safe public env only
+import { PUBLIC_APP_NAME } from '$env/static/public';
+```
+
+**The rule:** If the value is a secret (database URL, API key, signing key), it MUST come from `$env/static/private` and only be imported in `.server.ts` files, `hooks.server.ts`, or server-side load functions.
+
 
 ## Rule Interactions
 

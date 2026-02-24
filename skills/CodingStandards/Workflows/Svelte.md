@@ -10,7 +10,7 @@ Apply Svelte 5 and SvelteKit coding standards covering runes & reactivity, compo
 
 ## Reference Material
 
-- `../Rules/Svelte/` — 36 individual rule files across 8 categories
+- `../Dimensions/Svelte/` — 36 rules inlined across 8 categories
 
 ## Quick Decision Tree
 
@@ -25,7 +25,7 @@ Apply Svelte 5 and SvelteKit coding standards covering runes & reactivity, compo
 7. **Bundle size or rendering perf?** → Category 7: Performance (HIGH)
 8. **Error handling or SSR issues?** → Category 8: Error Handling & SSR (MEDIUM)
 
-**For detailed implementation:** Read the specific rule file from `../Rules/Svelte/` folder.
+**For detailed implementation:** Read the relevant dimension file from `../Dimensions/Svelte/` folder (rules are inlined).
 
 ## Priority Hierarchy
 
@@ -103,21 +103,21 @@ export function setUser(u) { user = u; }
 
 ## How to Use Rules
 
-**Pattern:** When applying a rule, read its specific file from `../Rules/Svelte/` folder.
+**Pattern:** When applying a rule, find it in the relevant dimension file from `../Dimensions/Svelte/` (rules are inlined).
 
 ```
 Decision tree identifies: Category 1 (Runes & Reactivity)
 Quick ref shows: DerivedOverEffect rule
-Action: Read ../Rules/Svelte/DerivedOverEffect.md
+Action: Read ../Dimensions/Svelte/DerivedOverEffect.md (rule is inlined in the dimension file)
 Result: Complete code examples and implementation guidance
 ```
 
 ### Rule File Naming Convention
 
 Rules use TitleCase naming for PAI compliance:
-- `derived-over-effect` → `../Rules/Svelte/DerivedOverEffect.md`
-- `typed-props` → `../Rules/Svelte/TypedProps.md`
-- `form-actions-over-fetch` → `../Rules/Svelte/FormActionsOverFetch.md`
+- `derived-over-effect` → search in the relevant dimension file
+- `typed-props` → search in the relevant dimension file
+- `form-actions-over-fetch` → search in the relevant dimension file
 
 ## Complete Rule Index
 

@@ -32,12 +32,197 @@ Start every element with utility classes in markup. Resist the urge to create a 
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [UtilityFirstApproach](../../Rules/Tailwind/UtilityFirstApproach.md) | CRITICAL | Style with utility classes in markup, not custom CSS files |
-| [AvoidApplyOveruse](../../Rules/Tailwind/AvoidApplyOveruse.md) | CRITICAL | Limit @apply to third-party style overrides only |
-| [ExtractComponentsNotClasses](../../Rules/Tailwind/ExtractComponentsNotClasses.md) | CRITICAL | Extract framework components, not CSS classes with @apply |
-| [AvoidPrematureAbstraction](../../Rules/Tailwind/AvoidPrematureAbstraction.md) | HIGH | Build with utilities first, extract only after 3+ repetitions |
-| [TypeSafeVariantSystem](../../Rules/Tailwind/TypeSafeVariantSystem.md) | HIGH | Use CVA or typed lookup maps for component variants |
-| [SeparateDomainFromUI](../../Rules/Tailwind/SeparateDomainFromUI.md) | HIGH | Apply Tailwind only in UI components, not domain components |
+| UtilityFirstApproach | CRITICAL | Style with utility classes in markup, not custom CSS files |
+| AvoidApplyOveruse | CRITICAL | Limit @apply to third-party style overrides only |
+| ExtractComponentsNotClasses | CRITICAL | Extract framework components, not CSS classes with @apply |
+| AvoidPrematureAbstraction | HIGH | Build with utilities first, extract only after 3+ repetitions |
+| TypeSafeVariantSystem | HIGH | Use CVA or typed lookup maps for component variants |
+| SeparateDomainFromUI | HIGH | Apply Tailwind only in UI components, not domain components |
+
+
+---
+
+### TW1.1 Style with Utility Classes, Not Custom CSS Files
+
+**Impact: CRITICAL (utility-first is the core Tailwind paradigm)**
+
+Style elements directly in markup using utility classes. Do not default to writing custom CSS in external stylesheets. Utilities are the primary API of Tailwind — they co-locate style with structure, eliminate naming overhead, and make changes isolated.
+
+**Incorrect: custom CSS class in external stylesheet**
+
+```css
+/* styles.css */
+.card-header {
+  padding: 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+```
+```html
+<div class="card-header">Title</div>
+```
+
+**Correct: utility classes directly in markup**
+
+```html
+<div class="p-4 text-xl font-bold text-gray-900">Title</div>
+```
+
+---
+
+### TW1.2 Limit @apply to Third-Party Style Overrides Only
+
+**Impact: CRITICAL (breaks utility-first paradigm and increases CSS bundle size)**
+
+The `@apply` directive re-introduces the problems Tailwind solves: naming things, coupled changes, growing CSS bundles. The Tailwind team actively discourages `@apply` in v4. Use it only to override third-party library styles where you cannot control the markup. For your own code, extract framework components instead.
+
+**Incorrect: @apply for reusable button style**
+
+```css
+.btn-primary {
+  @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600;
+}
+```
+
+**Correct: utility classes in markup, or extract a component**
+
+```html
+<button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+  Save
+</button>
+```
+
+---
+
+### TW1.3 Extract Framework Components, Not CSS Classes
+
+**Impact: CRITICAL (components encapsulate structure + style; CSS classes only encapsulate style)**
+
+When utility combinations repeat, extract a reusable framework component (React, Vue, Svelte), NOT a CSS class with `@apply`. Components encapsulate both markup structure and styling, making changes safer and more maintainable.
+
+**Incorrect: creating a CSS abstraction with @apply**
+
+```css
+.card {
+  @apply rounded-lg shadow-md p-6 bg-white;
+}
+```
+
+**Correct: extract a framework component**
+
+```jsx
+function Card({ children }) {
+  return (
+    <div className="rounded-lg shadow-md p-6 bg-white">
+      {children}
+    </div>
+  );
+}
+```
+
+---
+
+### TW1.4 Build with Utilities First, Extract Only When Duplicated
+
+**Impact: HIGH (premature abstraction creates rigid, hard-to-change code)**
+
+Build everything with utilities first. Only extract components when you see the same pattern repeated 3+ times. Premature abstraction creates components that are hard to modify because they serve imagined future needs rather than actual current patterns.
+
+**Incorrect: extracting a Badge component used exactly once**
+
+```jsx
+// Created before any duplication exists
+function Badge({ children }) { /* ... */ }
+// Used in exactly one place
+```
+
+**Correct: use utilities inline until genuine repetition emerges**
+
+```html
+<span class="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+  Active
+</span>
+<!-- When this pattern appears 3+ times, THEN extract a <Badge> component -->
+```
+
+---
+
+### TW1.5 Use a Type-Safe Variant System for Component Variants
+
+**Impact: HIGH (eliminates error-prone string concatenation for variants)**
+
+Use a variant management library like Class Variance Authority (CVA) to define component variants declaratively. Combine with `clsx` and `tailwind-merge` for conditional and overridable classes. Alternatives include `tailwind-variants` and manual lookup maps — the key principle is type-safe, declarative variant definitions rather than string concatenation.
+
+**Incorrect: manual string concatenation for variants**
+
+```jsx
+function Button({ variant, size }) {
+  let classes = "px-4 py-2 rounded";
+  if (variant === "primary") classes += " bg-blue-500 text-white";
+  if (size === "sm") classes += " text-sm px-2 py-1";
+  return <button className={classes}>...</button>;
+}
+```
+
+**Correct: declarative variant definition with CVA**
+
+```jsx
+import { cva } from "class-variance-authority";
+
+const button = cva("rounded font-medium", {
+  variants: {
+    variant: {
+      primary: "bg-blue-500 text-white hover:bg-blue-600",
+      secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300",
+    },
+    size: {
+      sm: "text-sm px-2 py-1",
+      md: "text-base px-4 py-2",
+    },
+  },
+  defaultVariants: { variant: "primary", size: "md" },
+});
+
+function Button({ variant, size, className }) {
+  return <button className={button({ variant, size, className })}>...</button>;
+}
+```
+
+---
+
+### TW1.6 Use Tailwind Only in UI Components, Not Domain Components
+
+**Impact: HIGH (prevents duplication and enforces design system consistency)**
+
+Apply Tailwind utilities only in reusable UI-level components (Button, Card, Input). Domain-level components (CheckoutForm, UserProfile) should compose UI components, never reaching for raw Tailwind utilities. This prevents duplicate styling and ensures visual consistency.
+
+**Incorrect: domain component using raw Tailwind utilities**
+
+```jsx
+function CheckoutForm() {
+  return (
+    <div className="rounded-lg bg-white p-6 shadow">
+      <input className="w-full rounded border px-3 py-2" />
+      <button className="rounded bg-blue-500 px-4 py-2 text-white">Pay</button>
+    </div>
+  );
+}
+```
+
+**Correct: domain component composes UI components**
+
+```jsx
+function CheckoutForm() {
+  return (
+    <Card>
+      <Input placeholder="Card number" />
+      <Button variant="primary">Pay</Button>
+    </Card>
+  );
+}
+```
+
 
 ## Rule Interactions
 

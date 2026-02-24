@@ -32,14 +32,497 @@ Default to channels over shared state. Use bounded channels and choose capacity 
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [NoMutexAcrossAwait](../../Rules/Rust/NoMutexAcrossAwait.md) | CRITICAL | Never hold a std::sync::Mutex guard across an .await point |
-| [MessagePassingOverSharedState](../../Rules/Rust/MessagePassingOverSharedState.md) | HIGH | Prefer channels over Arc<Mutex<T>> to make data flow explicit |
-| [SpawnBlockingForCpuWork](../../Rules/Rust/SpawnBlockingForCpuWork.md) | CRITICAL | Offload CPU-intensive work to spawn_blocking to avoid starving the async runtime |
-| [SendSyncAwareness](../../Rules/Rust/SendSyncAwareness.md) | HIGH | Ensure types across .await points are Send + 'static for spawned tasks |
-| [StructuredConcurrency](../../Rules/Rust/StructuredConcurrency.md) | HIGH | Use JoinSet, select!, or FuturesUnordered instead of fire-and-forget spawns |
-| [ChannelCapacityBounds](../../Rules/Rust/ChannelCapacityBounds.md) | HIGH | Always use bounded channels in production to enforce back-pressure |
-| [AsyncTraitConsiderations](../../Rules/Rust/AsyncTraitConsiderations.md) | MEDIUM | Prefer native async fn in traits (1.75+) over the async-trait crate |
-| [DeadlockPrevention](../../Rules/Rust/DeadlockPrevention.md) | HIGH | Establish consistent lock ordering and prefer RwLock for read-heavy workloads |
+| NoMutexAcrossAwait | CRITICAL | Never hold a std::sync::Mutex guard across an .await point |
+| MessagePassingOverSharedState | HIGH | Prefer channels over Arc<Mutex<T>> to make data flow explicit |
+| SpawnBlockingForCpuWork | CRITICAL | Offload CPU-intensive work to spawn_blocking to avoid starving the async runtime |
+| SendSyncAwareness | HIGH | Ensure types across .await points are Send + 'static for spawned tasks |
+| StructuredConcurrency | HIGH | Use JoinSet, select!, or FuturesUnordered instead of fire-and-forget spawns |
+| ChannelCapacityBounds | HIGH | Always use bounded channels in production to enforce back-pressure |
+| AsyncTraitConsiderations | MEDIUM | Prefer native async fn in traits (1.75+) over the async-trait crate |
+| DeadlockPrevention | HIGH | Establish consistent lock ordering and prefer RwLock for read-heavy workloads |
+
+
+---
+
+### RS3.1 NoMutexAcrossAwait
+
+**Impact: CRITICAL (Holding std::sync::Mutex across .await can deadlock the entire tokio runtime)**
+
+A std::sync::Mutex blocks the OS thread while waiting to acquire the lock. In an async runtime, that thread is a worker thread shared among many tasks. If a task holds a std::sync::Mutex guard and then yields at an .await point, the worker thread is blocked for the entire duration the task is suspended -- potentially forever if the task that needs to release the lock is scheduled on the same (now-blocked) worker thread. This is a deadlock that only manifests under load.
+
+**Incorrect: Mutex guard held across .await**
+
+```rust
+use std::sync::Mutex;
+use std::sync::Arc;
+
+async fn update_and_notify(
+    state: Arc<Mutex<Vec<String>>>,
+    msg: String,
+) {
+    let mut guard = state.lock().unwrap();
+    guard.push(msg);
+    // Guard is still alive here -- the worker thread is blocked
+    // while waiting for the network call to complete
+    notify_subscribers(&guard).await;
+    // guard dropped here, far too late
+}
+```
+
+**Correct: Drop guard before .await**
+
+```rust
+use std::sync::Mutex;
+use std::sync::Arc;
+
+async fn update_and_notify(
+    state: Arc<Mutex<Vec<String>>>,
+    msg: String,
+) {
+    // Scope the lock so the guard is dropped before .await
+    let snapshot = {
+        let mut guard = state.lock().unwrap();
+        guard.push(msg);
+        guard.clone() // take a snapshot if needed downstream
+    };
+    // Guard is dropped, worker thread is free
+    notify_subscribers(&snapshot).await;
+}
+
+// Alternative: use tokio::sync::Mutex when you truly need
+// to hold the lock across an await point
+use tokio::sync::Mutex as AsyncMutex;
+
+async fn update_and_notify_async(
+    state: Arc<AsyncMutex<Vec<String>>>,
+    msg: String,
+) {
+    let mut guard = state.lock().await; // async-aware lock
+    guard.push(msg);
+    notify_subscribers(&guard).await; // safe to hold across .await
+}
+```
+
+**When acceptable:**
+- Using tokio::sync::Mutex, which is designed to be held across .await points
+- The critical section is guaranteed to contain no .await points and is wrapped in a block scope that makes this visually obvious
+- Single-threaded runtime (flavor = "current_thread") where deadlock from thread starvation cannot occur
+
+---
+
+### RS3.2 MessagePassingOverSharedState
+
+**Impact: HIGH (Shared mutable state via Arc<Mutex<T>> scatters synchronization logic and invites deadlocks)**
+
+Channels encode the communication protocol in the type system: a sender and receiver make the data flow direction explicit and the compiler ensures only one consumer receives each message. Arc<Mutex<T>> hides the protocol -- any holder can read or write at any time, and the synchronization discipline exists only in the developer's head. Channels also eliminate lock contention entirely; senders never block on receivers and vice versa (with bounded back-pressure as the exception, which is desirable).
+
+**Incorrect: Shared counter with Arc<Mutex<T>>**
+
+```rust
+use std::sync::{Arc, Mutex};
+use tokio::task;
+
+async fn count_events(urls: Vec<String>) -> usize {
+    let counter = Arc::new(Mutex::new(0usize));
+    let mut handles = Vec::new();
+
+    for url in urls {
+        let counter = Arc::clone(&counter);
+        handles.push(task::spawn(async move {
+            let count = fetch_event_count(&url).await;
+            // Every task contends on the same lock
+            let mut guard = counter.lock().unwrap();
+            *guard += count;
+        }));
+    }
+
+    for h in handles {
+        h.await.unwrap();
+    }
+    *counter.lock().unwrap()
+}
+```
+
+**Correct: Message-passing with mpsc channel**
+
+```rust
+use tokio::sync::mpsc;
+use tokio::task;
+
+async fn count_events(urls: Vec<String>) -> usize {
+    let (tx, mut rx) = mpsc::channel::<usize>(urls.len());
+
+    for url in urls {
+        let tx = tx.clone();
+        task::spawn(async move {
+            let count = fetch_event_count(&url).await;
+            let _ = tx.send(count).await;
+        });
+    }
+    drop(tx); // close the sender so rx.recv() returns None when done
+
+    let mut total = 0;
+    while let Some(count) = rx.recv().await {
+        total += count;
+    }
+    total
+}
+```
+
+**When acceptable:**
+- Read-heavy caches where RwLock contention is minimal and the data structure cannot be practically serialized through a channel
+- Small, simple state (e.g., an AtomicBool shutdown flag) where channels add unnecessary ceremony
+- When multiple tasks need random-access reads of a shared data structure and message-passing would require duplicating the entire structure
+
+---
+
+### RS3.3 SpawnBlockingForCpuWork
+
+**Impact: CRITICAL (CPU-bound work on the async runtime starves all other tasks on that worker thread)**
+
+Tokio's async runtime uses a small pool of worker threads (typically equal to CPU cores). Each worker cooperatively multiplexes thousands of tasks by switching at .await points. A task that performs CPU-intensive computation without yielding monopolizes its worker thread -- every other task scheduled on that thread stops making progress. Under load this cascades: timeouts fire, health checks fail, and the service appears hung even though only one task is doing heavy computation.
+
+**Incorrect: CPU-intensive hash on the async runtime**
+
+```rust
+use sha2::{Sha256, Digest};
+
+async fn hash_password(password: String) -> Vec<u8> {
+    // This burns CPU for milliseconds, blocking the worker thread.
+    // Every other task on this thread is frozen.
+    let mut hasher = Sha256::new();
+    for _ in 0..100_000 {
+        hasher.update(password.as_bytes());
+    }
+    hasher.finalize().to_vec()
+}
+```
+
+**Correct: Offload to spawn_blocking**
+
+```rust
+use sha2::{Sha256, Digest};
+use tokio::task;
+
+async fn hash_password(password: String) -> Vec<u8> {
+    // Runs on a dedicated blocking thread pool, async runtime stays free
+    task::spawn_blocking(move || {
+        let mut hasher = Sha256::new();
+        for _ in 0..100_000 {
+            hasher.update(password.as_bytes());
+        }
+        hasher.finalize().to_vec()
+    })
+    .await
+    .expect("blocking task panicked")
+}
+```
+
+**When acceptable:**
+- Computation completes in microseconds (e.g., a single SHA-256 hash of a short input) where the overhead of spawn_blocking exceeds the work itself
+- You are already running on a dedicated thread (inside spawn_blocking or a non-async context)
+- The runtime is configured with a large thread pool specifically for mixed workloads and the CPU work is bounded
+
+---
+
+### RS3.4 SendSyncAwareness
+
+**Impact: HIGH (Using non-Send types across .await points causes confusing compiler errors and incorrect fixes)**
+
+When you spawn a tokio task, the future must be Send + 'static because the runtime may move it between worker threads at any .await point. Types like Rc, RefCell, and MutexGuard (from std) are not Send. If they are alive across an .await, the compiler rejects the future with an error that points at the spawn call, not at the offending type -- making diagnosis difficult. Understanding Send/Sync boundaries prevents developers from reaching for incorrect fixes like unsafe impl Send.
+
+**Incorrect: Rc<RefCell<T>> across .await**
+
+```rust
+use std::cell::RefCell;
+use std::rc::Rc;
+
+async fn process(data: Rc<RefCell<Vec<String>>>) {
+    // Rc is not Send -- this future cannot be spawned on tokio
+    let snapshot = data.borrow().clone();
+    // The Rc is still alive across this .await point
+    send_report(&snapshot).await;
+    data.borrow_mut().clear();
+}
+
+// ERROR: future cannot be sent between threads safely
+// tokio::spawn(process(shared_data));
+```
+
+**Correct: Arc<tokio::sync::Mutex<T>> for shared async state**
+
+```rust
+use std::sync::Arc;
+use tokio::sync::Mutex;
+
+async fn process(data: Arc<Mutex<Vec<String>>>) {
+    // Arc is Send + Sync, tokio::sync::Mutex is Send + Sync
+    let snapshot = {
+        let guard = data.lock().await;
+        guard.clone()
+    };
+    send_report(&snapshot).await;
+    data.lock().await.clear();
+}
+
+// Compiles and runs correctly:
+// tokio::spawn(process(shared_data));
+```
+
+**When acceptable:**
+- Single-threaded runtime (flavor = "current_thread") where futures are never moved between threads, making Send unnecessary
+- Local tasks spawned with tokio::task::spawn_local, which does not require Send
+- Non-async code or synchronous threads where Rc/RefCell is the correct lightweight choice
+
+---
+
+### RS3.5 StructuredConcurrency
+
+**Impact: HIGH (Unstructured task spawning leaks tasks, loses errors, and makes cancellation impossible to reason about)**
+
+Fire-and-forget tokio::spawn scatters tasks across the runtime with no parent-child relationship. Errors from spawned tasks are silently dropped if the JoinHandle is not awaited. Cancellation requires manually tracking every handle. Structured concurrency tools -- select!, JoinSet, and FuturesUnordered -- bind task lifetimes to a scope, propagate errors to the caller, and make cancellation automatic when the scope exits.
+
+**Incorrect: Manual handle tracking with fire-and-forget**
+
+```rust
+use tokio::task::JoinHandle;
+
+async fn process_batch(items: Vec<Item>) -> Vec<Result<Output, Error>> {
+    let mut handles: Vec<JoinHandle<Result<Output, Error>>> = Vec::new();
+
+    for item in items {
+        // No limit on concurrency, no structured cancellation
+        handles.push(tokio::spawn(async move {
+            process_item(item).await
+        }));
+    }
+
+    let mut results = Vec::new();
+    for handle in handles {
+        // If one task panics, unwrap crashes the whole collector
+        results.push(handle.await.unwrap());
+    }
+    results
+}
+```
+
+**Correct: JoinSet for structured task management**
+
+```rust
+use tokio::task::JoinSet;
+
+async fn process_batch(items: Vec<Item>) -> Vec<Result<Output, Error>> {
+    let mut set = JoinSet::new();
+
+    for item in items {
+        set.spawn(async move {
+            process_item(item).await
+        });
+    }
+
+    let mut results = Vec::new();
+    // JoinSet handles panics gracefully via JoinError
+    while let Some(result) = set.join_next().await {
+        match result {
+            Ok(inner) => results.push(inner),
+            Err(join_err) => {
+                eprintln!("Task failed: {join_err}");
+                // Optionally: set.abort_all() to cancel remaining
+            }
+        }
+    }
+    // When set is dropped, all remaining tasks are cancelled
+    results
+}
+```
+
+**When acceptable:**
+- Long-lived background services (metrics collectors, health checkers) that intentionally outlive any single request scope
+- One-shot daemon tasks spawned at startup that run for the entire application lifetime
+- Cases where FuturesUnordered with stream combinators provides better ergonomics for pipeline-style processing
+
+---
+
+### RS3.6 ChannelCapacityBounds
+
+**Impact: HIGH (Unbounded channels convert back-pressure failures into OOM kills)**
+
+An unbounded channel will accept messages as fast as the sender can produce them, regardless of how fast the receiver consumes them. If the producer outpaces the consumer -- due to a slow downstream service, a burst of traffic, or a bug -- the channel's internal buffer grows without limit until the process is killed by the OOM reaper. Bounded channels make back-pressure explicit: when the buffer is full, the sender's .send().await suspends, naturally throttling the producer to match the consumer's pace.
+
+**Incorrect: Unbounded channel hides back-pressure**
+
+```rust
+use tokio::sync::mpsc;
+
+async fn ingest_events(mut stream: EventStream) {
+    // No limit -- if processing is slow, memory grows unbounded
+    let (tx, mut rx) = mpsc::unbounded_channel::<Event>();
+
+    tokio::spawn(async move {
+        while let Some(event) = stream.next().await {
+            // unbounded_send never blocks, never signals overload
+            tx.send(event).unwrap();
+        }
+    });
+
+    while let Some(event) = rx.recv().await {
+        process_event(event).await; // if this is slow, queue grows forever
+    }
+}
+```
+
+**Correct: Bounded channel with explicit capacity**
+
+```rust
+use tokio::sync::mpsc;
+
+async fn ingest_events(mut stream: EventStream) {
+    // Bounded: sender suspends when buffer is full
+    let (tx, mut rx) = mpsc::channel::<Event>(1024);
+
+    tokio::spawn(async move {
+        while let Some(event) = stream.next().await {
+            // Awaits when buffer is full -- applies back-pressure
+            if tx.send(event).await.is_err() {
+                break; // receiver dropped, stop producing
+            }
+        }
+    });
+
+    while let Some(event) = rx.recv().await {
+        process_event(event).await;
+    }
+}
+```
+
+**When acceptable:**
+- Command channels with guaranteed-small message volumes (e.g., shutdown signals, configuration reloads)
+- Test harnesses where simplicity matters more than memory safety
+- Situations where the producer is strictly slower than the consumer by design and this invariant is documented
+
+---
+
+### RS3.7 AsyncTraitConsiderations
+
+**Impact: MEDIUM (The async-trait crate introduces hidden heap allocations and obscures error messages)**
+
+Since Rust 1.75, async fn is supported natively in traits. The async-trait crate, which was necessary before this stabilization, works by desugaring every async method into a `Pin<Box<dyn Future + Send>>` -- a heap allocation per call that also erases the concrete future type. This makes error messages harder to read, prevents the compiler from optimizing across await points, and adds a performance tax on every invocation. Native async fn in traits avoids all of these costs.
+
+**Incorrect: async-trait macro when native is available**
+
+```rust
+use async_trait::async_trait;
+
+#[async_trait]
+trait DataStore {
+    // Desugars to: fn get(&self, key: &str)
+    //   -> Pin<Box<dyn Future<Output = Option<Vec<u8>>> + Send + '_>>
+    async fn get(&self, key: &str) -> Option<Vec<u8>>;
+    async fn set(&self, key: &str, value: Vec<u8>) -> Result<(), StoreError>;
+}
+
+#[async_trait]
+impl DataStore for RedisStore {
+    async fn get(&self, key: &str) -> Option<Vec<u8>> {
+        self.client.get(key).await.ok()
+    }
+    async fn set(&self, key: &str, value: Vec<u8>) -> Result<(), StoreError> {
+        self.client.set(key, value).await.map_err(StoreError::from)
+    }
+}
+```
+
+**Correct: Native async fn in trait (Rust 1.75+)**
+
+```rust
+trait DataStore {
+    // Zero-cost: compiler generates an opaque future type per impl
+    async fn get(&self, key: &str) -> Option<Vec<u8>>;
+    async fn set(&self, key: &str, value: Vec<u8>) -> Result<(), StoreError>;
+}
+
+impl DataStore for RedisStore {
+    async fn get(&self, key: &str) -> Option<Vec<u8>> {
+        self.client.get(key).await.ok()
+    }
+    async fn set(&self, key: &str, value: Vec<u8>) -> Result<(), StoreError> {
+        self.client.set(key, value).await.map_err(StoreError::from)
+    }
+}
+```
+
+**When acceptable:**
+- Targeting Rust editions before 1.75 where native async fn in traits is not available
+- The trait must be object-safe (dyn Trait) -- native async fn in traits does not support dynamic dispatch without the trait_variant crate or manual desugaring
+- Libraries that must support a wide range of Rust compiler versions where async-trait provides compatibility
+
+---
+
+### RS3.8 DeadlockPrevention
+
+**Impact: HIGH (Inconsistent lock ordering causes deadlocks that only manifest under specific scheduling conditions)**
+
+Deadlock occurs when two tasks each hold a lock the other needs. This is a product of ordering: if task A locks X then Y, and task B locks Y then X, they can permanently block each other. The fix is a global lock ordering convention -- always acquire locks in the same order everywhere in the codebase. For read-heavy workloads, RwLock reduces contention by allowing concurrent readers, but the ordering discipline still applies to multiple RwLocks.
+
+**Incorrect: Inconsistent lock ordering invites deadlock**
+
+```rust
+use std::sync::{Arc, Mutex};
+
+struct Bank {
+    accounts: Vec<Arc<Mutex<Account>>>,
+}
+
+impl Bank {
+    // Task 1 calls transfer(a, b) -- locks a then b
+    // Task 2 calls transfer(b, a) -- locks b then a
+    // DEADLOCK: each holds what the other needs
+    fn transfer(&self, from: usize, to: usize, amount: f64) {
+        let mut from_acc = self.accounts[from].lock().unwrap();
+        let mut to_acc = self.accounts[to].lock().unwrap();
+        from_acc.balance -= amount;
+        to_acc.balance += amount;
+    }
+}
+```
+
+**Correct: Consistent lock ordering by account ID**
+
+```rust
+use std::sync::{Arc, Mutex};
+
+struct Bank {
+    accounts: Vec<Arc<Mutex<Account>>>,
+}
+
+impl Bank {
+    fn transfer(&self, from: usize, to: usize, amount: f64) {
+        // Always lock the lower-indexed account first
+        let (first, second) = if from < to {
+            (from, to)
+        } else {
+            (to, from)
+        };
+
+        let mut first_guard = self.accounts[first].lock().unwrap();
+        let mut second_guard = self.accounts[second].lock().unwrap();
+
+        if from < to {
+            first_guard.balance -= amount;
+            second_guard.balance += amount;
+        } else {
+            second_guard.balance -= amount;
+            first_guard.balance += amount;
+        }
+    }
+}
+```
+
+**When acceptable:**
+- Single-lock scenarios where only one mutex is ever held at a time (ordering is irrelevant)
+- Using try_lock with fallback logic to detect and break potential deadlocks at runtime
+- Lock-free data structures (atomics, crossbeam) that eliminate the deadlock class entirely
+
 
 ## Rule Interactions
 

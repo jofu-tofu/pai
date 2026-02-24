@@ -9,16 +9,16 @@ A static, indexed knowledge base of coding standards for React/Next.js, Rust, Sv
 
 ## Language Lookup
 
-| Language | File Signals | Workflow | Rules Directory | Count |
+| Language | File Signals | Workflow | Dimensions Directory | Rules |
 |----------|-------------|---------|-----------------|-------|
-| React / Next.js | `.tsx`, `.jsx`, React imports (`from 'react'`), `next.config.*`, `use client`, `use server` | `Workflows/React.md` | `Rules/React/` | 65 |
-| Rust | `.rs`, `Cargo.toml`, `Cargo.lock`, `build.rs`, `.cargo/config.toml` | `Workflows/Rust.md` | `Rules/Rust/` | 73 |
-| Svelte / SvelteKit | `.svelte`, `.svelte.ts`, `svelte.config.*`, `+page.svelte`, `+layout.svelte`, `+page.server.ts` | `Workflows/Svelte.md` | `Rules/Svelte/` | 36 |
-| Tailwind CSS | `tailwind.config.*`, `@tailwind`, `@apply`, `@theme`, `@import "tailwindcss"`, utility class patterns in HTML/JSX | `Workflows/Tailwind.md` | `Rules/Tailwind/` | 32 |
-| TypeScript | `.ts` (non-React), `tsconfig.json`, generics, `z.infer`, Zod imports | `Workflows/TypeScript.md` | `Rules/TypeScript/` | 19 |
-| C# / .NET | `.cs`, `.csproj`, `.sln`, `using` statements, `namespace` declarations | `Workflows/CSharp.md` | `Rules/CSharp/` | 18 |
-| Python | `.py`, `requirements.txt`, `pyproject.toml`, `setup.py`, `__init__.py` | `Workflows/Python.md` | `Rules/Python/` | 18 |
-| MUMPS / M / Caché / IRIS | `.m`, `.mac`, `.int`, M commands (`set`, `kill`, `do`, `quit`), globals (`^`), special vars (`$H`, `$J`) | `Workflows/MUMPS.md` | `Rules/MUMPS/` | 22 |
+| React / Next.js | `.tsx`, `.jsx`, React imports (`from 'react'`), `next.config.*`, `use client`, `use server` | `Workflows/React.md` | `Dimensions/React/` | 65 |
+| Rust | `.rs`, `Cargo.toml`, `Cargo.lock`, `build.rs`, `.cargo/config.toml` | `Workflows/Rust.md` | `Dimensions/Rust/` | 73 |
+| Svelte / SvelteKit | `.svelte`, `.svelte.ts`, `svelte.config.*`, `+page.svelte`, `+layout.svelte`, `+page.server.ts` | `Workflows/Svelte.md` | `Dimensions/Svelte/` | 36 |
+| Tailwind CSS | `tailwind.config.*`, `@tailwind`, `@apply`, `@theme`, `@import "tailwindcss"`, utility class patterns in HTML/JSX | `Workflows/Tailwind.md` | `Dimensions/Tailwind/` | 32 |
+| TypeScript | `.ts` (non-React), `tsconfig.json`, generics, `z.infer`, Zod imports | `Workflows/TypeScript.md` | `Dimensions/TypeScript/` | 19 |
+| C# / .NET | `.cs`, `.csproj`, `.sln`, `using` statements, `namespace` declarations | `Workflows/CSharp.md` | `Dimensions/CSharp/` | 18 |
+| Python | `.py`, `requirements.txt`, `pyproject.toml`, `setup.py`, `__init__.py` | `Workflows/Python.md` | `Dimensions/Python/` | 18 |
+| MUMPS / M / Caché / IRIS | `.m`, `.mac`, `.int`, M commands (`set`, `kill`, `do`, `quit`), globals (`^`), special vars (`$H`, `$J`) | `Workflows/MUMPS.md` | `Dimensions/MUMPS/` | 22 |
 
 **When a workflow is matched, read its file and follow the steps within it.**
 
@@ -45,16 +45,16 @@ For focused tasks (code review, design, planning), load a specific **dimension**
 
 | Task Type | React | Rust | Svelte | TypeScript | Tailwind | C# | Python | MUMPS |
 |-----------|-------|------|--------|------------|----------|----|--------|-------|
-| **Component/Type Design** | `Dimensions/React/Architecture.md` | `Dimensions/Rust/TypeSystem.md` | `Dimensions/Svelte/Architecture.md` | `Dimensions/TypeScript/TypeModeling.md` | `Dimensions/Tailwind/Philosophy.md` | `Dimensions/CSharp/Architecture.md` | `Dimensions/Python/CodeOrganization.md` | `Dimensions/MUMPS/NamingAndDocumentation.md` |
-| **Performance Review** | `Dimensions/React/RenderingPerf.md` | `Dimensions/Rust/Performance.md` | `Dimensions/Svelte/PerformanceSSR.md` | — | `Dimensions/Tailwind/Accessibility.md` | — | `Dimensions/Python/Performance.md` | `Dimensions/MUMPS/DataGlobals.md` |
-| **Data/Async Patterns** | `Dimensions/React/DataFetching.md` | `Dimensions/Rust/Concurrency.md` | `Dimensions/Svelte/DataForms.md` | `Dimensions/TypeScript/ErrorHandling.md` | — | `Dimensions/CSharp/AsyncPatterns.md` | `Dimensions/Python/DefensiveProgramming.md` | `Dimensions/MUMPS/ConcurrencyAndErrors.md` |
+| **Component/Type Design** | `Dimensions/React/Architecture.md` | `Dimensions/Rust/TypeSystem.md` | `Dimensions/Svelte/Architecture.md` | `Dimensions/TypeScript/TypeModeling.md` | `Dimensions/Tailwind/Philosophy.md` | `Dimensions/CSharp/Architecture.md` | `Dimensions/Python/CodeOrganization.md` | `Dimensions/MUMPS/Standards.md` |
+| **Performance Review** | `Dimensions/React/RenderingPerf.md` | `Dimensions/Rust/Performance.md` | `Dimensions/Svelte/PerformanceSSR.md` | — | `Dimensions/Tailwind/Accessibility.md` | — | `Dimensions/Python/DefensiveAndPerformance.md` | `Dimensions/MUMPS/SafetyPatterns.md` |
+| **Data/Async Patterns** | `Dimensions/React/DataFetching.md` | `Dimensions/Rust/Concurrency.md` | `Dimensions/Svelte/DataForms.md` | `Dimensions/TypeScript/ErrorHandling.md` | — | `Dimensions/CSharp/AsyncPatterns.md` | `Dimensions/Python/DefensiveAndPerformance.md` | `Dimensions/MUMPS/SafetyPatterns.md` |
 | **Type Safety** | — | `Dimensions/Rust/Ownership.md` | `Dimensions/Svelte/TypeSystem.md` | `Dimensions/TypeScript/TypeSafety.md` | — | `Dimensions/CSharp/NullSafety.md` | `Dimensions/Python/TypeSystem.md` | — |
 | **Styling/Layout** | — | — | — | — | `Dimensions/Tailwind/ClassOrganization.md` | — | — | — |
-| **Theming/Responsive** | — | — | — | — | `Dimensions/Tailwind/Theming.md`, `Dimensions/Tailwind/ResponsiveDesign.md` | — | — | — |
-| **Unsafe/FFI** | — | `Dimensions/Rust/UnsafeCode.md` | — | — | — | — | — | `Dimensions/MUMPS/Portability.md` |
-| **API Design** | — | `Dimensions/Rust/APIDesign.md` | — | — | — | — | — | `Dimensions/MUMPS/DataGlobals.md` |
-| **Testing** | — | `Dimensions/Rust/Testing.md` | — | — | — | — | — | `Dimensions/MUMPS/ConcurrencyAndErrors.md` |
-| **Project Structure** | — | `Dimensions/Rust/ProjectStructure.md` | — | — | — | — | — | `Dimensions/MUMPS/NamingAndDocumentation.md` |
+| **Theming/Responsive** | — | — | — | — | `Dimensions/Tailwind/LayoutAndTheming.md` | — | — | — |
+| **Unsafe/FFI** | — | `Dimensions/Rust/UnsafeCode.md` | — | — | — | — | — | `Dimensions/MUMPS/Standards.md` |
+| **API Design** | — | `Dimensions/Rust/APIDesign.md` | — | — | — | — | — | `Dimensions/MUMPS/SafetyPatterns.md` |
+| **Testing** | — | `Dimensions/Rust/Testing.md` | — | — | — | — | — | `Dimensions/MUMPS/SafetyPatterns.md` |
+| **Project Structure** | — | `Dimensions/Rust/ProjectStructure.md` | — | — | — | — | — | `Dimensions/MUMPS/Standards.md` |
 
 **How to use dimensions:** Read `Dimensions/[Language]/INDEX.md` for the full routing table with "Load When" triggers. Each dimension doc includes a Consumer Guide with sections for reviewing, designing, and implementing.
 
@@ -67,9 +67,12 @@ For focused tasks (code review, design, planning), load a specific **dimension**
 1. Identify language via file signals in Language Lookup table above
 2. Read the matching Workflow file (full context) or Dimension INDEX (focused context)
 3. Use the workflow's decision tree to identify the relevant category
-4. Read specific rule file(s) from `Rules/[Language]/` directory
+4. Read the relevant dimension file — all rules are inlined directly in dimension files
 
 See `LanguageIndex.md` for full coverage registry, gap list, and instructions for adding new languages.
+
+
+> **Architecture note:** All rule content is inlined directly in dimension files. There is no separate Rules/ directory — do not create one. New rules are added directly to the appropriate dimension file using the `### ID RuleName` format.
 
 ## Examples
 
@@ -78,7 +81,7 @@ See `LanguageIndex.md` for full coverage registry, gap list, and instructions fo
 User: "I need to optimize this component that re-renders too often"
 -> Matches React signal (.tsx, re-render concern)
 -> Reads Workflows/React.md
--> Applies RerenderMemo, RerenderDerivedState rules from Rules/React/
+-> Applies RerenderMemo, RerenderDerivedState rules from Dimensions/React/
 ```
 
 **Example 2: TypeScript type safety review**

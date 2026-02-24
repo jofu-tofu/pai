@@ -8,7 +8,7 @@ Apply C# and .NET coding standards covering type design, null safety, async patt
 
 ## Reference Material
 
-- `../Rules/CSharp/` — 18 individual rule files across 5 categories
+- `../Dimensions/CSharp/` — 18 rules inlined across 5 categories
 
 ## Quick Decision Tree
 
@@ -20,7 +20,7 @@ Apply C# and .NET coding standards covering type design, null safety, async patt
 4. **Method signature issues?** → Category 4: Member Design (HIGH)
 5. **Code readability concerns?** → Category 5: Maintainability (MEDIUM)
 
-**For detailed implementation:** Read the specific rule file from `../Rules/CSharp/` folder.
+**For detailed implementation:** Read the relevant dimension file from `../Dimensions/CSharp/` folder (rules are inlined).
 
 ## Priority Hierarchy
 
@@ -93,21 +93,21 @@ public async Task<string> GetDataAsync()
 
 ## How to Use Rules
 
-**Pattern:** When applying a rule, read its specific file from `../Rules/CSharp/` folder.
+**Pattern:** When applying a rule, find it in the relevant dimension file from `../Dimensions/CSharp/` (rules are inlined).
 
 ```
 Decision tree identifies: Category 2 (Null Safety)
 Quick ref shows: EnableNullableContext rule
-Action: Read ../Rules/CSharp/EnableNullableContext.md
+Action: Read ../Dimensions/CSharp/EnableNullableContext.md (rule is inlined in the dimension file)
 Result: Complete code examples and implementation guidance
 ```
 
 ### Rule File Naming Convention
 
 Rules use TitleCase naming for PAI compliance:
-- `enable-nullable-context` → `../Rules/CSharp/EnableNullableContext.md`
-- `single-responsibility` → `../Rules/CSharp/SingleResponsibility.md`
-- `cancellation-tokens` → `../Rules/CSharp/CancellationTokens.md`
+- `enable-nullable-context` → search in the relevant dimension file
+- `single-responsibility` → search in the relevant dimension file
+- `cancellation-tokens` → search in the relevant dimension file
 
 ## Complete Rule Index
 

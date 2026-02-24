@@ -34,10 +34,268 @@ Annotate every function signature completely. Use modern syntax: `list[int]` ins
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [TypeHintsRequired](../../Rules/Python/TypeHintsRequired.md) | CRITICAL | Every function must have complete type annotations on parameters and return type |
-| [TypeLiteralValues](../../Rules/Python/TypeLiteralValues.md) | CRITICAL | Use Literal types instead of bare str/int for parameters with known value sets |
-| [TypeAvoidAny](../../Rules/Python/TypeAvoidAny.md) | CRITICAL | Avoid Any -- use specific types, generics, or Protocol for structural typing |
-| [TypeOptionalNullable](../../Rules/Python/TypeOptionalNullable.md) | CRITICAL | Mark nullable values explicitly with X | None to force callers to handle None |
+| TypeHintsRequired | CRITICAL | Every function must have complete type annotations on parameters and return type |
+| TypeLiteralValues | CRITICAL | Use Literal types instead of bare str/int for parameters with known value sets |
+| TypeAvoidAny | CRITICAL | Avoid Any -- use specific types, generics, or Protocol for structural typing |
+| TypeOptionalNullable | CRITICAL | Mark nullable values explicitly with X | None to force callers to handle None |
+
+
+---
+
+### PY2.1 Type Hints Required
+
+**Impact: CRITICAL (Types are documentation that runs)**
+
+Type hints catch bugs before runtime, serve as always-accurate documentation, and enable IDE features like autocomplete and refactoring. Untyped code accumulates maintenance debt.
+
+**Incorrect: No type information**
+
+```python
+# What types does this accept? What does it return?
+def process(data, threshold):
+    return [x for x in data if x > threshold]
+
+# Readers must trace through code to understand types
+def fetch_user(user_id):
+    response = api.get(f"/users/{user_id}")
+    return response.json() if response.ok else None
+```
+
+**Correct: Explicit types everywhere**
+
+```python
+def process(data: list[float], threshold: float) -> list[float]:
+    return [x for x in data if x > threshold]
+
+def fetch_user(user_id: int) -> User | None:
+    response = api.get(f"/users/{user_id}")
+    return User(**response.json()) if response.ok else None
+```
+
+**Type hint patterns:**
+
+```python
+from typing import Callable, TypeVar
+from collections.abc import Iterator, Mapping
+
+# Generic functions
+T = TypeVar("T")
+def first(items: list[T]) -> T | None:
+    return items[0] if items else None
+
+# Callable types
+Handler = Callable[[Request], Response]
+def register(path: str, handler: Handler) -> None: ...
+
+# Collection protocols (prefer over concrete types)
+def summarize(data: Mapping[str, int]) -> int:
+    return sum(data.values())
+
+# Class attributes
+class Config:
+    timeout: int
+    retries: int = 3
+    base_url: str | None = None
+```
+
+---
+
+### PY2.2 Use Literal Types
+
+**Impact: CRITICAL (Catches typos at type-check time)**
+
+`Literal` types restrict values to specific constants, catching typos and invalid values before runtime. The type checker enforces valid values at every call site.
+
+**Incorrect: String accepts any value**
+
+```python
+def set_log_level(level: str) -> None:
+    # Typo "DEUBG" won't be caught until runtime
+    valid = {"DEBUG", "INFO", "WARNING", "ERROR"}
+    if level not in valid:
+        raise ValueError(f"Invalid level: {level}")
+    ...
+
+# Caller can pass anything
+set_log_level("DEUBG")  # Typo passes type check, fails at runtime
+```
+
+**Correct: Literal restricts to valid values**
+
+```python
+from typing import Literal
+
+LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
+
+def set_log_level(level: LogLevel) -> None:
+    # No runtime validation needed - type system guarantees valid input
+    ...
+
+# Type checker catches the typo immediately
+set_log_level("DEUBG")  # Error: Argument of type "DEUBG" cannot be assigned
+set_log_level("DEBUG")  # OK
+```
+
+**Common Literal patterns:**
+
+```python
+from typing import Literal
+
+# HTTP methods
+HttpMethod = Literal["GET", "POST", "PUT", "DELETE", "PATCH"]
+
+# Status values
+Status = Literal["pending", "processing", "complete", "failed"]
+
+# Direction/mode values
+SortOrder = Literal["asc", "desc"]
+Mode = Literal["read", "write", "append"]
+
+# Boolean-like with semantic meaning
+OnOff = Literal["on", "off"]  # Clearer than bool for some APIs
+
+# Combining with overloads for return type narrowing
+from typing import overload
+
+@overload
+def fetch(url: str, format: Literal["json"]) -> dict: ...
+@overload
+def fetch(url: str, format: Literal["text"]) -> str: ...
+def fetch(url: str, format: Literal["json", "text"]) -> dict | str:
+    ...
+```
+
+---
+
+### PY2.3 Avoid Any Type
+
+**Impact: CRITICAL (Any defeats the purpose of type checking)**
+
+`Any` is a type-checking escape hatch that disables all verification. Code using `Any` can't be validated, and `Any` spreads virally - one `Any` infects everything it touches.
+
+**Incorrect: Any disables type safety**
+
+```python
+from typing import Any
+
+def process(data: Any) -> Any:
+    # Type checker can't verify anything about this function
+    return data.foo.bar()  # Could crash, no warning
+
+# Any spreads to callers
+result = process(user)  # result is Any
+result.nonexistent_method()  # No error - type checking disabled
+```
+
+**Correct: Use specific types or generics**
+
+```python
+from typing import TypeVar
+from collections.abc import Mapping
+
+# Option 1: Specific type
+def process(data: UserData) -> ProcessedResult:
+    return ProcessedResult(data.foo.bar())
+
+# Option 2: Generic for flexible but type-safe code
+T = TypeVar("T")
+def identity(value: T) -> T:
+    return value
+
+# Option 3: Protocol for structural typing
+from typing import Protocol
+
+class HasFooBar(Protocol):
+    @property
+    def foo(self) -> "HasBar": ...
+
+class HasBar(Protocol):
+    def bar(self) -> str: ...
+
+def process(data: HasFooBar) -> str:
+    return data.foo.bar()  # Type-safe access
+```
+
+**When Any is acceptable:**
+
+```python
+# Truly dynamic code (rare)
+def json_loads(s: str) -> Any:  # JSON can be any structure
+    ...
+
+# Gradual typing migration (temporary)
+def legacy_function(x: Any) -> Any:  # TODO: Add proper types
+    ...
+
+# Third-party untyped libraries (use type: ignore comment instead)
+result = untyped_library.call()  # type: ignore[no-untyped-call]
+```
+
+---
+
+### PY2.4 Optional for Nullable
+
+**Impact: CRITICAL (Explicit null handling prevents surprises)**
+
+Use `X | None` (or `Optional[X]`) to explicitly mark values that can be null. This forces callers to handle the null case and lets the type checker catch missing null checks.
+
+**Incorrect: Implicit nullability**
+
+```python
+# Return type doesn't indicate possible None
+def find_user(user_id: int) -> User:
+    result = db.query(User).filter_by(id=user_id).first()
+    return result  # Could be None!
+
+# Caller assumes non-null
+user = find_user(123)
+print(user.name)  # AttributeError if user is None
+```
+
+**Correct: Explicit nullable return**
+
+```python
+def find_user(user_id: int) -> User | None:
+    return db.query(User).filter_by(id=user_id).first()
+
+# Type checker forces null handling
+user = find_user(123)
+print(user.name)  # Error: user might be None
+
+# Caller must handle null
+user = find_user(123)
+if user is not None:
+    print(user.name)  # OK - type narrowed to User
+
+# Or use guard clause
+user = find_user(123)
+if user is None:
+    raise NotFoundError(f"User {user_id} not found")
+print(user.name)  # OK - type narrowed to User
+```
+
+**Nullable patterns:**
+
+```python
+# Function parameters with None default
+def greet(name: str | None = None) -> str:
+    return f"Hello, {name or 'stranger'}!"
+
+# Distinguishing "not provided" from "explicitly None"
+from typing import Literal
+
+_UNSET: Literal["_UNSET"] = "_UNSET"
+
+def update(value: str | None | Literal["_UNSET"] = _UNSET) -> None:
+    if value is _UNSET:
+        return  # Not provided, don't update
+    # value is str | None here - explicitly provided
+
+# Optional in containers
+def get_values() -> dict[str, int | None]:
+    return {"a": 1, "b": None, "c": 3}
+```
+
 
 ## Rule Interactions
 

@@ -8,7 +8,7 @@ Apply TypeScript coding standards covering compiler strictness, type safety, dis
 
 ## Reference Material
 
-- `../Rules/TypeScript/` — 19 individual rule files across 10 categories
+- `../Dimensions/TypeScript/` — 19 rules inlined across 10 categories
 
 ## Quick Decision Tree
 
@@ -25,7 +25,7 @@ Apply TypeScript coding standards covering compiler strictness, type safety, dis
 9. **Import organization?** → Category 9: Import Organization (MEDIUM)
 10. **Naming or file structure?** → Category 10: Naming & Files (MEDIUM)
 
-**For detailed implementation:** Read the specific rule file from `../Rules/TypeScript/` folder.
+**For detailed implementation:** Read the relevant dimension file from `../Dimensions/TypeScript/` folder (rules are inlined).
 
 ## Priority Hierarchy
 
@@ -85,21 +85,21 @@ User: "Add type-safe validation to this API response"
 
 ## How to Use Rules
 
-**Pattern:** When applying a rule, read its specific file from `../Rules/TypeScript/` folder.
+**Pattern:** When applying a rule, find it in the relevant dimension file from `../Dimensions/TypeScript/` (rules are inlined).
 
 ```
 Decision tree identifies: Category 2 (Type Safety)
 Quick ref shows: NeverAny rule
-Action: Read ../Rules/TypeScript/NeverAny.md
+Action: Read ../Dimensions/TypeScript/NeverAny.md (rule is inlined in the dimension file)
 Result: Complete code examples and implementation guidance
 ```
 
 ### Rule File Naming Convention
 
 Rules use TitleCase naming for PAI compliance:
-- `strict-mode-always` → `../Rules/TypeScript/StrictModeAlways.md`
-- `never-any` → `../Rules/TypeScript/NeverAny.md`
-- `result-over-try-catch` → `../Rules/TypeScript/ResultOverTryCatch.md`
+- `strict-mode-always` → search in the relevant dimension file
+- `never-any` → search in the relevant dimension file
+- `result-over-try-catch` → search in the relevant dimension file
 
 ## Complete Rule Index
 

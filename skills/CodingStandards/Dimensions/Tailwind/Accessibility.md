@@ -36,15 +36,235 @@ Add `sr-only` spans or `aria-label` to every icon-only interactive element. Mark
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [ScreenReaderOnlyUsage](../../Rules/Tailwind/ScreenReaderOnlyUsage.md) | CRITICAL | Always pair icon-only buttons with sr-only text |
-| [FocusVisibleOverFocus](../../Rules/Tailwind/FocusVisibleOverFocus.md) | CRITICAL | Use focus-visible: instead of focus: for keyboard rings |
-| [ReducedMotionRespect](../../Rules/Tailwind/ReducedMotionRespect.md) | HIGH | Provide motion-reduce: alternatives for all animations |
-| [MinimumTouchTargetSize](../../Rules/Tailwind/MinimumTouchTargetSize.md) | CRITICAL | Interactive elements must meet 44x44px touch target minimum |
-| [ContrastRatioCompliance](../../Rules/Tailwind/ContrastRatioCompliance.md) | CRITICAL | Verify WCAG AA contrast ratios for all text colors |
-| [NoDynamicClassConstruction](../../Rules/Tailwind/NoDynamicClassConstruction.md) | CRITICAL | Never interpolate class names; use complete strings |
-| [SafelistSparingly](../../Rules/Tailwind/SafelistSparingly.md) | HIGH | Only safelist genuinely dynamic external-source classes |
-| [LimitArbitraryValues](../../Rules/Tailwind/LimitArbitraryValues.md) | HIGH | Extract repeated arbitrary values into theme tokens |
-| [ContentConfigurationPaths](../../Rules/Tailwind/ContentConfigurationPaths.md) | CRITICAL | Include all file types that reference Tailwind classes |
+| ScreenReaderOnlyUsage | CRITICAL | Always pair icon-only buttons with sr-only text |
+| FocusVisibleOverFocus | CRITICAL | Use focus-visible: instead of focus: for keyboard rings |
+| ReducedMotionRespect | HIGH | Provide motion-reduce: alternatives for all animations |
+| MinimumTouchTargetSize | CRITICAL | Interactive elements must meet 44x44px touch target minimum |
+| ContrastRatioCompliance | CRITICAL | Verify WCAG AA contrast ratios for all text colors |
+| NoDynamicClassConstruction | CRITICAL | Never interpolate class names; use complete strings |
+| SafelistSparingly | HIGH | Only safelist genuinely dynamic external-source classes |
+| LimitArbitraryValues | HIGH | Extract repeated arbitrary values into theme tokens |
+| ContentConfigurationPaths | CRITICAL | Include all file types that reference Tailwind classes |
+
+
+---
+
+### TW5.1 Always Pair Icon-Only Buttons with Screen Reader Text
+
+**Impact: CRITICAL (icon-only buttons without labels are invisible to screen readers)**
+
+Icon-only buttons and links MUST include screen-reader-accessible text using Tailwind's `sr-only` class. Tailwind handles styling, not semantics — you are responsible for semantic HTML and ARIA attributes.
+
+**Incorrect: no accessible label**
+
+```html
+<button class="p-2">
+  <svg><!-- close icon --></svg>
+</button>
+```
+
+**Correct: sr-only text provides accessible label**
+
+```html
+<button class="p-2" aria-label="Close dialog">
+  <svg aria-hidden="true"><!-- close icon --></svg>
+  <span class="sr-only">Close dialog</span>
+</button>
+```
+
+---
+
+### TW5.2 Use focus-visible: Instead of focus: for Keyboard Focus Rings
+
+**Impact: CRITICAL (focus: shows rings on mouse clicks too, annoying users)**
+
+Use `focus-visible:` variant instead of `focus:`. `focus-visible` only shows focus indicators during keyboard navigation, not mouse clicks. This provides proper keyboard accessibility without visual noise for mouse users.
+
+**Incorrect: focus ring appears on mouse click**
+
+```html
+<button class="focus:ring-2 focus:ring-blue-500">Click</button>
+```
+
+**Correct: focus ring only for keyboard navigation**
+
+```html
+<button class="focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
+  Click
+</button>
+```
+
+---
+
+### TW5.3 Provide motion-reduce: Alternatives for All Animations
+
+**Impact: HIGH (users with vestibular disorders experience discomfort from animations)**
+
+Use `motion-reduce:` variant to disable or simplify animations for users who have enabled "prefer reduced motion" in OS settings. Apply to all transitions and animations.
+
+**Incorrect: animation with no reduced-motion alternative**
+
+```html
+<div class="transition-transform duration-300 hover:scale-105">
+```
+
+**Correct: motion-reduce variant disables the animation**
+
+```html
+<div class="transition-transform duration-300 hover:scale-105 motion-reduce:transition-none motion-reduce:hover:scale-100">
+```
+
+---
+
+### TW5.4 Interactive Elements Must Meet Minimum 44x44px Touch Target
+
+**Impact: CRITICAL (small touch targets cause mis-taps on mobile devices)**
+
+Interactive elements must meet WCAG 2.5.8 minimum target size of 24x24px (Level AA), with 44x44px recommended (Level AAA). Use `min-h-11 min-w-11` (44px in Tailwind's default scale) to expand small icons into adequate touch targets.
+
+**Incorrect: tiny touch target**
+
+```html
+<button class="p-1">
+  <svg class="h-4 w-4"><!-- icon --></svg>
+</button>
+```
+
+**Correct: minimum 44x44px touch target**
+
+```html
+<button class="inline-flex min-h-11 min-w-11 items-center justify-center p-2">
+  <svg class="h-5 w-5" aria-hidden="true"><!-- icon --></svg>
+  <span class="sr-only">Delete item</span>
+</button>
+```
+
+---
+
+### TW5.5 Verify WCAG AA Contrast Ratios for Text Colors
+
+**Impact: CRITICAL (Tailwind defaults do NOT guarantee contrast compliance)**
+
+Ensure text meets WCAG AA contrast ratios: 4.5:1 for normal text, 3:1 for large text. Tailwind's default palette does not guarantee compliance — for example, `text-gray-400` (#9ca3af) on white has only ~2.9:1 ratio, failing WCAG AA. Verify both light and dark mode.
+
+**Incorrect: gray-400 on white fails WCAG AA (2.9:1 ratio)**
+
+```html
+<p class="bg-white text-gray-400">Low contrast text</p>
+```
+
+**Correct: gray-600 on white passes WCAG AA (7.0:1 ratio)**
+
+```html
+<p class="bg-white text-gray-600">Readable text</p>
+```
+
+---
+
+### TW5.6 Never Construct Class Names with String Interpolation
+
+**Impact: CRITICAL (dynamically constructed classes are silently purged in production)**
+
+Tailwind scans source files as plain text for complete class strings. It cannot parse string interpolation, concatenation, or template literals. Dynamically constructed class names will not be included in the CSS output. Always use complete, unbroken class strings in lookup maps.
+
+**Incorrect: Tailwind cannot detect these classes**
+
+```jsx
+<div className={`bg-${color}-500 text-${size}`}>
+<div className={"bg-" + color + "-500"}>
+```
+
+**Correct: complete class strings in a lookup map**
+
+```jsx
+const colorMap = {
+  blue: "bg-blue-500 text-white",
+  red: "bg-red-500 text-white",
+  green: "bg-green-500 text-white",
+};
+<div className={colorMap[color]}>
+```
+
+---
+
+### TW5.7 Only Safelist Classes That Are Genuinely Dynamic from External Sources
+
+**Impact: HIGH (over-safelisting bloats CSS bundle and defeats tree-shaking)**
+
+The safelist forces Tailwind to generate classes even if they aren't detected in source files. Use it only for truly dynamic classes from CMS content or user-selected themes. Prefer lookup maps in code over safelisting.
+
+**Incorrect: safelisting hundreds of classes "just in case"**
+
+```js
+safelist: [
+  { pattern: /bg-(red|blue|green|yellow)-(100|200|300|400|500|600|700|800|900)/ },
+]
+```
+
+**Correct: safelist only what's genuinely dynamic**
+
+```js
+safelist: ['bg-brand-primary', 'bg-brand-secondary']
+// And prefer lookup maps in source code over safelisting
+```
+
+---
+
+### TW5.8 Extract Repeated Arbitrary Values into Theme Tokens
+
+**Impact: HIGH (arbitrary values bypass the design system and increase CSS output)**
+
+Arbitrary values (`p-[13px]`, `w-[237px]`) are an escape hatch, not a primary tool. Each unique arbitrary value generates a unique CSS class. If an arbitrary value appears in more than one file, extract it to a theme token.
+
+**Incorrect: same arbitrary values in multiple files**
+
+```html
+<!-- ComponentA.tsx -->
+<div class="w-[340px] p-[13px]">
+<!-- ComponentB.tsx -->
+<div class="max-w-[340px] p-[13px]">
+```
+
+**Correct: extract to theme tokens**
+
+```css
+@theme {
+  --width-card: 340px;
+  --spacing-card: 0.8125rem;
+}
+```
+```html
+<div class="w-card p-card">
+```
+
+---
+
+### TW5.9 Include All File Types That Reference Tailwind Classes in Content Config
+
+**Impact: CRITICAL (missing paths cause used classes to be stripped in production)**
+
+In v3, configure the `content` array to include all files that reference Tailwind classes — HTML, JSX, TSX, Vue, Svelte, and JS files that dynamically toggle classes. In v4, auto-detection handles most cases, but use `@source` for non-standard paths.
+
+**Incorrect: content config misses JSX/TSX files**
+
+```js
+// tailwind.config.js (v3)
+content: ['./src/**/*.html']
+// Misses .jsx, .tsx, .vue, .svelte files
+```
+
+**Correct: include all file types that use Tailwind**
+
+```js
+// tailwind.config.js (v3)
+content: ['./src/**/*.{html,js,jsx,ts,tsx,vue,svelte}']
+```
+```css
+/* v4: auto-detects, but add non-standard paths if needed */
+@import "tailwindcss";
+@source "../content/**/*.md";
+```
+
 
 ## Rule Interactions
 

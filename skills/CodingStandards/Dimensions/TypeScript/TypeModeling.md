@@ -32,12 +32,335 @@ Write discriminated unions with a string literal discriminant. Always add an `as
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [UnionsOverEnums](../../Rules/TypeScript/UnionsOverEnums.md) | HIGH | Use string literal unions or `as const` objects instead of enums — zero runtime overhead, full narrowing |
-| [ExhaustivenessChecking](../../Rules/TypeScript/ExhaustivenessChecking.md) | HIGH | Assign the default case to `never` so the compiler catches unhandled union variants |
-| [ConstrainGenerics](../../Rules/TypeScript/ConstrainGenerics.md) | HIGH | Use `extends` to constrain generics to types with the properties the function needs |
-| [InferOverExplicit](../../Rules/TypeScript/InferOverExplicit.md) | HIGH | Let TypeScript infer generic type arguments from usage instead of annotating them explicitly |
-| [PreferBuiltinUtilities](../../Rules/TypeScript/PreferBuiltinUtilities.md) | MEDIUM | Use `Partial`, `Pick`, `Omit`, `Record` instead of manually defining subset interfaces |
-| [MappedTypes](../../Rules/TypeScript/MappedTypes.md) | MEDIUM | Write mapped types for custom type transformations when built-in utilities do not fit |
+| UnionsOverEnums | HIGH | Use string literal unions or `as const` objects instead of enums — zero runtime overhead, full narrowing |
+| ExhaustivenessChecking | HIGH | Assign the default case to `never` so the compiler catches unhandled union variants |
+| ConstrainGenerics | HIGH | Use `extends` to constrain generics to types with the properties the function needs |
+| InferOverExplicit | HIGH | Let TypeScript infer generic type arguments from usage instead of annotating them explicitly |
+| PreferBuiltinUtilities | MEDIUM | Use `Partial`, `Pick`, `Omit`, `Record` instead of manually defining subset interfaces |
+| MappedTypes | MEDIUM | Write mapped types for custom type transformations when built-in utilities do not fit |
+
+
+---
+
+### TS2.1 Unions Over Enums
+
+**Impact: HIGH (Enums generate runtime code, can't be tree-shaken, and have surprising numeric behavior)**
+
+TypeScript enums are not erasable syntax — they emit JavaScript objects at runtime that increase bundle size and can't be tree-shaken. String literal unions with `as const` provide the same developer experience with zero runtime overhead, full type narrowing, and better composability.
+
+**Incorrect: Enums generate runtime artifacts**
+
+```typescript
+// Emits a JavaScript object — can't be tree-shaken
+enum Status {
+  Pending = "PENDING",
+  Active = "ACTIVE",
+  Inactive = "INACTIVE",
+}
+
+// Numeric enums are worse — surprising bidirectional mapping
+enum Direction {
+  Up,    // 0
+  Down,  // 1
+}
+const d: Direction = 99;  // no error — any number assignable
+```
+
+**Correct: String literal unions with as const**
+
+```typescript
+const STATUS = {
+  Pending: "PENDING",
+  Active: "ACTIVE",
+  Inactive: "INACTIVE",
+} as const;
+
+type Status = (typeof STATUS)[keyof typeof STATUS];
+// type Status = "PENDING" | "ACTIVE" | "INACTIVE"
+
+// Or simpler — direct union type
+type Direction = "up" | "down" | "left" | "right";
+
+// Both provide full autocomplete, narrowing, and zero runtime cost
+function handleStatus(status: Status) {
+  if (status === "PENDING") { /* narrowed */ }
+}
+```
+
+**When acceptable:**
+- `const enum` in projects that don't use `--isolatedModules` (rare — most modern setups use isolated modules)
+- Interop with APIs that expect numeric enum values — but consider a mapping object instead
+
+---
+
+### TS2.2 Exhaustiveness Checking
+
+**Impact: HIGH (Compiler catches unhandled union cases — adding a new variant immediately shows every switch/if that needs updating)**
+
+When you switch over a discriminated union, assign the default case to `never`. If a new variant is added to the union, every switch statement that doesn't handle it becomes a compile error. This turns the compiler into your changelog reviewer.
+
+**Incorrect: Default case silently swallows new variants**
+
+```typescript
+type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; side: number };
+
+function area(shape: Shape): number {
+  switch (shape.kind) {
+    case "circle":
+      return Math.PI * shape.radius ** 2;
+    case "square":
+      return shape.side ** 2;
+    default:
+      return 0;  // if "triangle" is added, silently returns 0
+  }
+}
+```
+
+**Correct: Never type catches missing cases**
+
+```typescript
+type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; side: number }
+  | { kind: "triangle"; base: number; height: number };
+
+function assertNever(value: never): never {
+  throw new Error(`Unhandled case: ${JSON.stringify(value)}`);
+}
+
+function area(shape: Shape): number {
+  switch (shape.kind) {
+    case "circle":
+      return Math.PI * shape.radius ** 2;
+    case "square":
+      return shape.side ** 2;
+    case "triangle":
+      return 0.5 * shape.base * shape.height;
+    default:
+      return assertNever(shape);  // compile error if any case is missed
+  }
+}
+```
+
+**When acceptable:**
+- Intentional catch-all for extensible union types (e.g., plugin systems where you can't know all variants)
+- Logging/telemetry where you want to handle unknown values gracefully at runtime
+
+---
+
+### TS2.3 Constrain Generics
+
+**Impact: HIGH (Unconstrained generics accept anything — constraints make generic functions actually useful by limiting input to valid types)**
+
+A generic function `<T>` with no constraint is barely better than `any` — it accepts everything and knows nothing. Use `extends` to constrain generics to types that have the properties your function actually needs. This gives you autocomplete inside the function and type errors at the call site.
+
+**Incorrect: Unconstrained generic knows nothing about T**
+
+```typescript
+function getProperty<T>(obj: T, key: string): unknown {
+  return (obj as any)[key];  // forced to use any — T has no known shape
+}
+
+function merge<T, U>(a: T, b: U): T & U {
+  return { ...a, ...b };  // works but callers get no useful constraints
+}
+
+// Accepts nonsense
+getProperty(42, "name");          // no error — T is number
+getProperty(null, "anything");    // no error — T is null
+```
+
+**Correct: Constraints give the compiler useful information**
+
+```typescript
+function getProperty<T extends object, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];  // fully typed — no assertions needed
+}
+
+function merge<T extends object, U extends object>(a: T, b: U): T & U {
+  return { ...a, ...b };
+}
+
+// Now enforced at call sites
+getProperty({ name: "Alice", age: 30 }, "name");  // returns string
+getProperty({ name: "Alice" }, "email");           // compile error — "email" not in keyof
+```
+
+**When acceptable:**
+- Identity functions: `<T>(x: T) => T` — the constraint IS the return type relationship
+- Container types like `Array<T>`, `Promise<T>` — the container doesn't need to know what T is
+
+---
+
+### TS2.4 Infer Over Explicit Type Arguments
+
+**Impact: HIGH (Let TypeScript infer generic arguments from usage — explicit type arguments add noise and can lie)**
+
+TypeScript's inference engine is powerful. When you call a generic function, the compiler infers type arguments from the values you pass. Explicit type arguments (`fn<string>(...)`) add visual noise and can be wrong if the value doesn't match — they're assertions in disguise.
+
+**Incorrect: Explicit type arguments add noise and can lie**
+
+```typescript
+const names = ["Alice", "Bob", "Charlie"];
+
+// Unnecessary — TypeScript infers string from the callback
+const upper = names.map<string>((name) => name.toUpperCase());
+
+// Dangerous — explicit type argument doesn't match actual data
+const ids = [1, 2, 3];
+const result = ids.reduce<string[]>((acc, id) => {
+  acc.push(id);  // pushing number into string[] — no error with explicit type arg!
+  return acc;
+}, []);
+
+// Redundant type parameter on function declaration
+function identity<T>(value: T): T { return value; }
+const x = identity<number>(42);  // TypeScript already infers number from 42
+```
+
+**Correct: Let inference work**
+
+```typescript
+const names = ["Alice", "Bob", "Charlie"];
+const upper = names.map((name) => name.toUpperCase());  // inferred: string[]
+
+const ids = [1, 2, 3];
+const result = ids.reduce((acc, id) => {
+  acc.push(id);
+  return acc;
+}, [] as number[]);  // seed value drives inference
+
+const x = identity(42);  // inferred: number — clean and correct
+```
+
+**When acceptable:**
+- Ambiguous inference: when TypeScript can't infer correctly from arguments alone (e.g., `createContext<Theme>()` with no default)
+- Readability: when the inferred type is complex and explicit annotation helps readers
+- Return type annotation on exported functions — explicit return types help API consumers and catch implementation drift
+
+---
+
+### TS2.5 Prefer Built-in Utility Types
+
+**Impact: MEDIUM (Reduces type duplication — built-in utilities are well-tested, well-documented, and universally understood)**
+
+TypeScript ships with utility types (`Partial`, `Required`, `Pick`, `Omit`, `Record`, `Readonly`, `Extract`, `Exclude`) that transform existing types. Reimplementing these manually creates drift, bugs, and cognitive overhead.
+
+**Incorrect: Manual type transformations**
+
+```typescript
+// Manually making fields optional — drifts when User changes
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: "admin" | "user";
+}
+
+interface UserUpdate {
+  id?: string;
+  name?: string;
+  email?: string;
+  role?: "admin" | "user";
+}
+
+// Manual subset — must be updated when User changes
+interface UserSummary {
+  id: string;
+  name: string;
+}
+```
+
+**Correct: Derive types from the source**
+
+```typescript
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: "admin" | "user";
+}
+
+type UserUpdate = Partial<User>;
+type UserSummary = Pick<User, "id" | "name">;
+type UserWithoutEmail = Omit<User, "email">;
+type ReadonlyUser = Readonly<User>;
+type UserLookup = Record<string, User>;
+
+// Compose utilities for complex transformations
+type CreateUserInput = Omit<User, "id"> & { password: string };
+type AdminUser = Extract<User["role"], "admin">;
+```
+
+**When acceptable:**
+- When you need a named type for documentation: `type UserId = string` is clearer than using `string` everywhere, even though it's not a utility
+- Custom mapped types when built-in utilities don't cover the transformation (see Rule 5.2)
+
+---
+
+### TS2.6 Mapped Types for Custom Transformations
+
+**Impact: MEDIUM (When built-in utilities don't fit, mapped types transform types programmatically — DRY at the type level)**
+
+Mapped types iterate over keys and transform each property. They're the `Array.map()` of the type system. Use them when `Partial`, `Pick`, etc. don't express the transformation you need.
+
+**Incorrect: Manual per-property transformations**
+
+```typescript
+interface ApiResponse {
+  users: User[];
+  posts: Post[];
+  comments: Comment[];
+}
+
+// Manually wrapping each property — breaks when ApiResponse changes
+interface AsyncApiResponse {
+  users: Promise<User[]>;
+  posts: Promise<Post[]>;
+  comments: Promise<Comment[]>;
+}
+
+// Manually creating nullable versions
+interface NullableApiResponse {
+  users: User[] | null;
+  posts: Post[] | null;
+  comments: Comment[] | null;
+}
+```
+
+**Correct: Mapped types derive transformations**
+
+```typescript
+interface ApiResponse {
+  users: User[];
+  posts: Post[];
+  comments: Comment[];
+}
+
+// Generic mapped type — reusable across any interface
+type Promisified<T> = {
+  [K in keyof T]: Promise<T[K]>;
+};
+
+type Nullable<T> = {
+  [K in keyof T]: T[K] | null;
+};
+
+type AsyncApiResponse = Promisified<ApiResponse>;
+type NullableApiResponse = Nullable<ApiResponse>;
+
+// Conditional mapped type — transform only array properties
+type ArraysToSets<T> = {
+  [K in keyof T]: T[K] extends Array<infer U> ? Set<U> : T[K];
+};
+```
+
+**When acceptable:**
+- Prefer built-in utilities (Rule 5.1) when they fit — `Partial`, `Required`, `Readonly` are mapped types already
+- Avoid deeply nested conditional mapped types — if the type is harder to read than the manual version, use the manual version
+
 
 ## Rule Interactions
 

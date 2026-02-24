@@ -42,10 +42,344 @@ Together these rules create a layered defense: the nullable context provides the
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [EnableNullableContext](../../Rules/CSharp/EnableNullableContext.md) | CRITICAL | Turn on compiler null tracking to catch null bugs before runtime |
-| [NeverReturnNull](../../Rules/CSharp/NeverReturnNull.md) | CRITICAL | Return empty collections instead of null to eliminate caller null checks |
-| [NullConditionalOperators](../../Rules/CSharp/NullConditionalOperators.md) | CRITICAL | Use `?.` and `??` instead of nested null-check blocks |
-| [RequiredProperties](../../Rules/CSharp/RequiredProperties.md) | CRITICAL | Mark mandatory properties `required` to prevent incomplete construction |
+| EnableNullableContext | CRITICAL | Turn on compiler null tracking to catch null bugs before runtime |
+| NeverReturnNull | CRITICAL | Return empty collections instead of null to eliminate caller null checks |
+| NullConditionalOperators | CRITICAL | Use `?.` and `??` instead of nested null-check blocks |
+| RequiredProperties | CRITICAL | Mark mandatory properties `required` to prevent incomplete construction |
+
+
+---
+
+### CS2.1 Enable Nullable Reference Types
+
+**Impact: CRITICAL (Compiler catches null bugs before runtime)**
+
+Nullable reference types make null a compile-time concern rather than a runtime crash. The compiler tracks nullability flow and warns about potential null dereferences.
+
+**Incorrect: Nullable context disabled**
+
+```csharp
+// Nullable not enabled - compiler doesn't track null
+public class UserService
+{
+    public User GetUser(int id)
+    {
+        return _repository.Find(id);  // Might return null
+    }
+
+    public string GetDisplayName(User user)
+    {
+        return user.Name;  // NullReferenceException if user is null
+    }
+}
+
+// Caller has no indication that null is possible
+var user = service.GetUser(123);
+Console.WriteLine(user.Name);  // Crash at runtime
+```
+
+**Correct: Nullable context enabled**
+
+```csharp
+#nullable enable
+
+public class UserService
+{
+    public User? GetUser(int id)
+    {
+        return _repository.Find(id);  // Return type shows null is possible
+    }
+
+    public string GetDisplayName(User user)
+    {
+        return user.Name ?? "Unknown";  // Handle potential null name
+    }
+}
+
+// Compiler enforces null checks
+var user = service.GetUser(123);
+Console.WriteLine(user.Name);  // Warning: user may be null
+
+// Fixed with null check
+var user = service.GetUser(123);
+if (user is not null)
+{
+    Console.WriteLine(user.Name);  // OK - null checked
+}
+
+// Or with null-conditional
+Console.WriteLine(user?.Name ?? "Not found");
+```
+
+**Enable project-wide in .csproj:**
+
+```xml
+<PropertyGroup>
+    <Nullable>enable</Nullable>
+</PropertyGroup>
+```
+
+**Nullable annotations:**
+- `string` - never null
+- `string?` - might be null
+- `[NotNull]` - parameter validated to be non-null
+- `[MaybeNull]` - return value might be null even if type says otherwise
+
+---
+
+### CS2.2 Never Return Null Collections
+
+**Impact: CRITICAL (Eliminates null checks at every call site)**
+
+Returning null for "no items" forces every caller to check for null before iterating. Return empty collections instead - callers can safely iterate without null checks.
+
+**Incorrect: Null for empty collections**
+
+```csharp
+public class OrderService
+{
+    public List<Order>? GetOrdersByUser(int userId)
+    {
+        var orders = _repository.FindByUser(userId);
+        return orders.Any() ? orders : null;  // Null for "no orders"
+    }
+}
+
+// Every caller must check for null
+var orders = service.GetOrdersByUser(userId);
+if (orders != null)  // Required null check
+{
+    foreach (var order in orders)
+    {
+        // ...
+    }
+}
+
+// Easy to forget the check
+var total = service.GetOrdersByUser(userId).Sum(o => o.Total);  // NullReferenceException
+```
+
+**Correct: Empty collection for no items**
+
+```csharp
+public class OrderService
+{
+    public IReadOnlyList<Order> GetOrdersByUser(int userId)
+    {
+        var orders = _repository.FindByUser(userId);
+        return orders;  // Empty list if no orders, never null
+    }
+}
+
+// Callers can iterate safely without null checks
+var orders = service.GetOrdersByUser(userId);
+foreach (var order in orders)  // Works for empty list
+{
+    // ...
+}
+
+// LINQ operations work directly
+var total = service.GetOrdersByUser(userId).Sum(o => o.Total);  // Returns 0 for empty
+```
+
+**Use collection expressions (C# 12+) for empty returns:**
+
+```csharp
+public IReadOnlyList<Order> GetPendingOrders()
+{
+    if (!_hasPendingOrders)
+        return [];  // Empty collection expression
+
+    return _repository.GetPending();
+}
+```
+
+**Standard empty collection patterns:**
+
+```csharp
+// Arrays
+return Array.Empty<Order>();  // Cached empty array
+
+// Lists (return interface, not concrete type)
+return Enumerable.Empty<Order>().ToList();
+
+// Modern C# 12+
+return [];  // Collection expression - compiler picks optimal type
+```
+
+---
+
+### CS2.3 Use Null-Conditional Operators
+
+**Impact: CRITICAL (Cleaner than nested null checks)**
+
+Null-conditional operators (`?.` and `?[]`) replace verbose nested null checks with concise, readable expressions. They short-circuit on null, returning null instead of throwing.
+
+**Incorrect: Nested null checks**
+
+```csharp
+// Deeply nested null checks
+string? city = null;
+if (user != null)
+{
+    if (user.Address != null)
+    {
+        if (user.Address.City != null)
+        {
+            city = user.Address.City;
+        }
+    }
+}
+
+// Verbose conditional for method calls
+string? displayName = null;
+if (user != null)
+{
+    displayName = user.GetDisplayName();
+}
+```
+
+**Correct: Null-conditional operators**
+
+```csharp
+// Chain through nullable references
+string? city = user?.Address?.City;
+
+// Method calls
+string? displayName = user?.GetDisplayName();
+
+// Array/indexer access
+string? firstTag = user?.Tags?[0];
+
+// Combined with null-coalescing for defaults
+string city = user?.Address?.City ?? "Unknown";
+
+// Combined with null-coalescing assignment
+user ??= new User();  // Assign only if null
+```
+
+**Null-conditional with delegates:**
+
+```csharp
+// Instead of checking delegate for null
+if (OnUserCreated != null)
+{
+    OnUserCreated(user);
+}
+
+// Use null-conditional invoke
+OnUserCreated?.Invoke(user);
+```
+
+**Pattern matching for more complex scenarios:**
+
+```csharp
+// When you need to do more than just access
+if (user?.Address is { City: var city, PostalCode: var zip })
+{
+    Console.WriteLine($"{city}, {zip}");
+}
+
+// Switch expression with null handling
+var status = user?.Status switch
+{
+    UserStatus.Active => "Active",
+    UserStatus.Pending => "Pending",
+    null => "Unknown",
+    _ => "Other"
+};
+```
+
+---
+
+### CS2.4 Required Properties
+
+**Impact: CRITICAL (Prevents incomplete object construction) - C# 11+**
+
+The `required` modifier ensures properties must be set during object initialization. This catches missing required data at compile time rather than discovering it as null at runtime.
+
+**Incorrect: Optional properties with runtime validation**
+
+```csharp
+public class CreateUserRequest
+{
+    public string? Email { get; set; }
+    public string? Name { get; set; }
+    public string? Password { get; set; }
+}
+
+// Compiler allows incomplete initialization
+var request = new CreateUserRequest
+{
+    Email = "user@example.com"
+    // Name and Password forgotten - compiles fine
+};
+
+// Must validate at runtime
+if (string.IsNullOrEmpty(request.Name))
+    throw new ValidationException("Name is required");  // Runtime crash
+```
+
+**Correct: Required properties enforce initialization**
+
+```csharp
+public class CreateUserRequest
+{
+    public required string Email { get; init; }
+    public required string Name { get; init; }
+    public required string Password { get; init; }
+    public string? OptionalNickname { get; init; }  // Truly optional
+}
+
+// Compiler error if required properties are missing
+var request = new CreateUserRequest
+{
+    Email = "user@example.com"
+    // Error CS9035: Required member 'Name' must be set
+    // Error CS9035: Required member 'Password' must be set
+};
+
+// Must provide all required properties
+var request = new CreateUserRequest
+{
+    Email = "user@example.com",
+    Name = "John Doe",
+    Password = "secure123"
+    // OptionalNickname can be omitted
+};
+```
+
+**With primary constructors (C# 12+):**
+
+```csharp
+public class User(string email, string name)
+{
+    public string Email { get; } = email;
+    public string Name { get; } = name;
+    public string? Bio { get; init; }  // Optional via init
+}
+
+// Constructor enforces required parameters
+var user = new User("user@example.com", "John");
+```
+
+**SetsRequiredMembers for constructor initialization:**
+
+```csharp
+public class Config
+{
+    public required string ConnectionString { get; init; }
+    public required int Timeout { get; init; }
+
+    [SetsRequiredMembers]
+    public Config(string connectionString, int timeout)
+    {
+        ConnectionString = connectionString;
+        Timeout = timeout;
+    }
+}
+```
+
 
 ## Rule Interactions
 

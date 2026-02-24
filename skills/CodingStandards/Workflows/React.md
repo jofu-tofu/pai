@@ -8,7 +8,7 @@ Apply React and Next.js coding standards covering component architecture, perfor
 
 ## Reference Material
 
-- `../Rules/React/` — 65 individual rule files across 9 categories
+- `../Dimensions/React/` — 65 rules inlined across 9 categories
 
 ## Quick Decision Tree
 
@@ -17,7 +17,7 @@ Apply React and Next.js coding standards covering component architecture, perfor
 ### Building or designing components?
 → **Category 0: Component Architecture & Composition** (HIGH)
   - Compound components, state lifting, explicit variants, React 19 APIs
-  - Read: `../Rules/React/ArchitectureAvoidBooleanProps.md`, `../Rules/React/ArchitectureCompoundComponents.md`, `../Rules/React/StateContextInterface.md`
+  - Read: `../Dimensions/React/ArchitectureAvoidBooleanProps.md`, `../Dimensions/React/ArchitectureCompoundComponents.md`, `../Dimensions/React/StateContextInterface.md`
 
 ### Optimizing existing code?
 1. **See sequential awaits?** → Category 1: Eliminating Waterfalls (CRITICAL)
@@ -29,7 +29,7 @@ Apply React and Next.js coding standards covering component architecture, perfor
 7. **JavaScript bottlenecks?** → Category 7: JavaScript Performance (LOW-MEDIUM)
 8. **Edge cases or initialization?** → Category 8: Advanced Patterns (LOW)
 
-**For detailed implementation:** Read the specific rule file from `../Rules/React/` folder (see Complete Rule Index below).
+**For detailed implementation:** Read the relevant dimension file from `../Dimensions/React/` folder (rules are inlined) (see Complete Rule Index below).
 
 ## Priority Hierarchy
 
@@ -102,21 +102,21 @@ import X from 'lucide-react/dist/esm/icons/x'
 
 ## How to Use Rules
 
-**Pattern:** When applying a rule, read its specific file from `../Rules/React/` folder.
+**Pattern:** When applying a rule, find it in the relevant dimension file from `../Dimensions/React/` (rules are inlined).
 
 ```
 Decision tree identifies: Category 0 (Architecture)
 Quick ref shows: architecture-compound-components rule
-Action: Read ../Rules/React/ArchitectureCompoundComponents.md
+Action: Read ../Dimensions/React/ArchitectureCompoundComponents.md (rule is inlined in the dimension file)
 Result: Complete code examples and implementation guidance
 ```
 
 ### Rule File Naming Convention
 
 Rules use TitleCase naming for PAI compliance:
-- `async-parallel` → `../Rules/React/AsyncParallel.md`
-- `architecture-compound-components` → `../Rules/React/ArchitectureCompoundComponents.md`
-- `state-context-interface` → `../Rules/React/StateContextInterface.md`
+- `async-parallel` → search in the relevant dimension file
+- `architecture-compound-components` → search in the relevant dimension file
+- `state-context-interface` → search in the relevant dimension file
 
 ## Complete Rule Index
 

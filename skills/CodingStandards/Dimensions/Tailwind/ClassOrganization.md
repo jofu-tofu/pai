@@ -34,15 +34,233 @@ Install and configure `prettier-plugin-tailwindcss` so class sorting happens on 
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [AutomaticClassSorting](../../Rules/Tailwind/AutomaticClassSorting.md) | HIGH | Use prettier-plugin-tailwindcss for consistent class ordering |
-| [NoContradictingClasses](../../Rules/Tailwind/NoContradictingClasses.md) | HIGH | Never apply two utilities targeting the same CSS property |
-| [UseShorthandUtilities](../../Rules/Tailwind/UseShorthandUtilities.md) | MEDIUM | Prefer axis/all-sides shorthands to reduce class count |
-| [ImportantUsageSparingly](../../Rules/Tailwind/ImportantUsageSparingly.md) | MEDIUM | Use ! modifier only for third-party style overrides |
-| [GroupModifierForParentState](../../Rules/Tailwind/GroupModifierForParentState.md) | HIGH | Use group/group-hover for parent-child state styling |
-| [NamedGroupsForNesting](../../Rules/Tailwind/NamedGroupsForNesting.md) | HIGH | Use named groups (group/card) when nesting group contexts |
-| [PeerModifierOrdering](../../Rules/Tailwind/PeerModifierOrdering.md) | HIGH | Peer element must come before styled siblings in DOM |
-| [FlexVsGridSelection](../../Rules/Tailwind/FlexVsGridSelection.md) | MEDIUM | Flex for 1D layouts, grid for 2D layouts |
-| [GapOverSpaceBetween](../../Rules/Tailwind/GapOverSpaceBetween.md) | MEDIUM | Prefer gap over space-x/space-y for flex and grid spacing |
+| AutomaticClassSorting | HIGH | Use prettier-plugin-tailwindcss for consistent class ordering |
+| NoContradictingClasses | HIGH | Never apply two utilities targeting the same CSS property |
+| UseShorthandUtilities | MEDIUM | Prefer axis/all-sides shorthands to reduce class count |
+| ImportantUsageSparingly | MEDIUM | Use ! modifier only for third-party style overrides |
+| GroupModifierForParentState | HIGH | Use group/group-hover for parent-child state styling |
+| NamedGroupsForNesting | HIGH | Use named groups (group/card) when nesting group contexts |
+| PeerModifierOrdering | HIGH | Peer element must come before styled siblings in DOM |
+| FlexVsGridSelection | MEDIUM | Flex for 1D layouts, grid for 2D layouts |
+| GapOverSpaceBetween | MEDIUM | Prefer gap over space-x/space-y for flex and grid spacing |
+
+
+---
+
+### TW2.1 Use Prettier Plugin for Consistent Class Ordering
+
+**Impact: HIGH (eliminates class ordering debates and merge conflicts)**
+
+Install `prettier-plugin-tailwindcss` to automatically sort utility classes in a consistent order. The plugin follows the box model: layout/positioning → box model → borders → backgrounds → typography → decorative. The order is intentionally not customizable (same philosophy as Prettier itself).
+
+**Incorrect: random/inconsistent class ordering**
+
+```html
+<div class="text-white rounded-lg flex bg-blue-500 p-4 items-center shadow-md">
+```
+
+**Correct: sorted by Prettier plugin**
+
+```html
+<div class="flex items-center rounded-lg bg-blue-500 p-4 text-white shadow-md">
+```
+
+---
+
+### TW2.2 Never Apply Conflicting Utility Classes
+
+**Impact: HIGH (contradicting classes produce unpredictable results)**
+
+Never apply two utilities that set the same CSS property to different values on the same element. The winning class depends on CSS source order, not class attribute order, making the result unpredictable. The `eslint-plugin-tailwindcss/no-contradicting-classname` rule catches this automatically.
+
+**Incorrect: conflicting padding values**
+
+```html
+<div class="p-3 p-4 text-sm text-lg">
+```
+
+**Correct: single value per property**
+
+```html
+<div class="p-4 text-lg">
+```
+
+---
+
+### TW2.3 Prefer Shorthand Utilities to Reduce Class Count
+
+**Impact: MEDIUM (cleaner markup, fewer classes to read)**
+
+Use axis-based (`mx-`, `py-`) or all-sides (`p-`, `m-`) utilities when values are symmetric. The `eslint-plugin-tailwindcss/enforces-shorthand` rule catches this automatically.
+
+**Incorrect: redundant per-side utilities**
+
+```html
+<div class="ml-2 mr-2 pt-4 pb-4">
+```
+
+**Correct: shorthand axis utilities**
+
+```html
+<div class="mx-2 py-4">
+```
+
+---
+
+### TW2.4 Use the Important Modifier Only as a Last Resort
+
+**Impact: MEDIUM (overusing ! creates specificity wars)**
+
+Tailwind's `!` modifier (e.g., `!text-red-500`) maps to CSS `!important`. Use it only to override third-party styles you cannot control. In Tailwind v4, cascade layers handle specificity correctly, making `!important` even less necessary. If you find yourself using `!` on your own components, the real fix is restructuring your class application.
+
+**Incorrect: ! modifier to fix self-inflicted specificity issue**
+
+```html
+<div class="text-blue-500 !text-red-500">
+```
+
+**Correct: remove the conflicting class instead**
+
+```html
+<div class="text-red-500">
+```
+
+---
+
+### TW2.5 Use group/group-hover: for Styling Children Based on Parent State
+
+**Impact: HIGH (eliminates JavaScript class toggling for parent-child interactions)**
+
+Use `group` on a parent and `group-hover:`, `group-focus:`, etc. on children to style child elements based on parent state. This is pure CSS — no JavaScript needed for hover/focus propagation.
+
+**Incorrect: JavaScript event handlers to toggle child classes**
+
+```html
+<div onmouseenter="..." onmouseleave="...">
+  <span id="child">Show on hover</span>
+</div>
+```
+
+**Correct: group modifier for CSS-only parent-child state**
+
+```html
+<div class="group cursor-pointer rounded p-4">
+  <span class="text-gray-500 group-hover:text-blue-500 group-hover:underline">
+    Show on hover
+  </span>
+</div>
+```
+
+---
+
+### TW2.6 Use Named Groups When Nesting Multiple Group Contexts
+
+**Impact: HIGH (unnamed nested groups cause ambiguous targeting)**
+
+When group contexts are nested, use named groups (`group/card`, `group/item`) so inner children can target the correct ancestor. Without naming, `group-hover:` targets the nearest `group` parent, which may not be intended.
+
+**Incorrect: ambiguous unnamed nested groups**
+
+```html
+<div class="group">
+  <div class="group">
+    <span class="group-hover:text-red-500">
+      <!-- Targets inner group, but was outer intended? -->
+    </span>
+  </div>
+</div>
+```
+
+**Correct: named groups for explicit targeting**
+
+```html
+<div class="group/card">
+  <div class="group/item">
+    <span class="group-hover/card:text-red-500 group-hover/item:underline">
+      Explicitly targets both ancestors
+    </span>
+  </div>
+</div>
+```
+
+---
+
+### TW2.7 Peer Element Must Come Before Styled Siblings in DOM
+
+**Impact: HIGH (peer modifiers silently fail if DOM order is wrong)**
+
+The `peer` modifier only works on elements that come AFTER the peer in the DOM, because it uses the CSS `~` general sibling combinator. Place the triggering element (with `peer` class) before the element that reacts to it.
+
+**Incorrect: styled element is BEFORE the peer — does nothing**
+
+```html
+<p class="peer-invalid:text-red-500">Error message</p>
+<input class="peer" type="email" />
+```
+
+**Correct: peer comes FIRST, styled element comes AFTER**
+
+```html
+<input class="peer" type="email" />
+<p class="hidden peer-invalid:block peer-invalid:text-red-500">
+  Please enter a valid email
+</p>
+```
+
+---
+
+### TW2.8 Use Flex for One-Dimensional, Grid for Two-Dimensional Layouts
+
+**Impact: MEDIUM (wrong layout model adds complexity for no benefit)**
+
+Use flexbox (`flex`) for one-dimensional layouts: nav bars, button groups, centering. Use CSS grid (`grid`) for two-dimensional layouts: card grids, page layouts, form layouts. Do not force grid behavior with flex or vice versa.
+
+**Incorrect: flex with manual widths to simulate a grid**
+
+```html
+<div class="flex flex-wrap">
+  <div class="w-1/3 p-2">Card</div>
+  <div class="w-1/3 p-2">Card</div>
+  <div class="w-1/3 p-2">Card</div>
+</div>
+```
+
+**Correct: grid for actual grid layouts**
+
+```html
+<div class="grid grid-cols-3 gap-4">
+  <div>Card</div>
+  <div>Card</div>
+  <div>Card</div>
+</div>
+```
+
+---
+
+### TW2.9 Prefer gap-* Over space-x-*/space-y-* for Flex and Grid Spacing
+
+**Impact: MEDIUM (space-* breaks with wrapping and conditionally rendered children)**
+
+Prefer `gap-*` over `space-x-*`/`space-y-*` for spacing flex and grid children. `gap` works correctly with wrapping, doesn't use margin hacks (`> * + *` selectors), and has no issues with conditionally rendered children.
+
+**Incorrect: space-x breaks on wrap**
+
+```html
+<div class="flex flex-wrap space-x-4">
+  <span>Tag 1</span>
+  <span>Tag 2</span>
+</div>
+```
+
+**Correct: gap works correctly with wrapping**
+
+```html
+<div class="flex flex-wrap gap-4">
+  <span>Tag 1</span>
+  <span>Tag 2</span>
+</div>
+```
+
 
 ## Rule Interactions
 

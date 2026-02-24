@@ -30,12 +30,243 @@ For dynamic imports, store the dynamically loaded component in a `$state` variab
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [DynamicImports](../../Rules/Svelte/DynamicImports.md) | HIGH | Lazy-load heavy components with dynamic import() for smaller initial bundles |
-| [OnclickOverOnClick](../../Rules/Svelte/OnclickOverOnClick.md) | MEDIUM | Use Svelte 5 event attributes (onclick) instead of deprecated on:click directives |
-| [EventDelegation](../../Rules/Svelte/EventDelegation.md) | MEDIUM | Leverage Svelte 5's automatic event delegation; avoid manual delegation patterns |
-| [ExpectedVsUnexpected](../../Rules/Svelte/ExpectedVsUnexpected.md) | HIGH | Use error() for expected errors; let unexpected errors propagate to global handler |
-| [NoDeterministicSSR](../../Rules/Svelte/NoDeterministicSSR.md) | HIGH | Avoid non-deterministic values during SSR; initialize them after mount |
-| [ErrorBoundaries](../../Rules/Svelte/ErrorBoundaries.md) | MEDIUM | Use svelte:boundary to isolate component errors and show fallback UI |
+| DynamicImports | HIGH | Lazy-load heavy components with dynamic import() for smaller initial bundles |
+| OnclickOverOnClick | MEDIUM | Use Svelte 5 event attributes (onclick) instead of deprecated on:click directives |
+| EventDelegation | MEDIUM | Leverage Svelte 5's automatic event delegation; avoid manual delegation patterns |
+| ExpectedVsUnexpected | HIGH | Use error() for expected errors; let unexpected errors propagate to global handler |
+| NoDeterministicSSR | HIGH | Avoid non-deterministic values during SSR; initialize them after mount |
+| ErrorBoundaries | MEDIUM | Use svelte:boundary to isolate component errors and show fallback UI |
+
+
+---
+
+### SV5.1 Lazy-Load Heavy Components with Dynamic Imports
+
+**Impact: HIGH (reduces initial bundle size for rarely-shown UI)**
+
+Use dynamic imports to lazy-load heavy components (modals, charts, rich text editors) that aren't needed for initial render.
+
+**Incorrect: top-level import — loaded even if never shown**
+
+```svelte
+<script lang="ts">
+  import Chart from './Chart.svelte';
+
+  let showChart = $state(false);
+</script>
+
+<button onclick={() => showChart = true}>Show Chart</button>
+{#if showChart}
+  <Chart data={chartData} />
+{/if}
+```
+
+**Correct: dynamic import on demand**
+
+```svelte
+<script lang="ts">
+  let showChart = $state(false);
+  let Chart: typeof import('./Chart.svelte').default | null = $state(null);
+
+  async function loadChart() {
+    Chart = (await import('./Chart.svelte')).default;
+    showChart = true;
+  }
+</script>
+
+<button onclick={loadChart}>Show Chart</button>
+{#if showChart && Chart}
+  <Chart data={chartData} />
+{/if}
+```
+
+---
+
+### SV5.2 Use Svelte 5 Event Attribute Syntax
+
+**Impact: MEDIUM (Svelte 5 standard — on:event directive is deprecated)**
+
+Use lowercase event attributes (`onclick`, `onsubmit`) instead of Svelte 4's `on:click` directive syntax. The new syntax is standard HTML and aligns with Svelte 5's move toward HTML-native patterns.
+
+**Incorrect: Svelte 4 directive syntax — deprecated**
+
+```svelte
+<button on:click={handleClick}>Click me</button>
+<form on:submit|preventDefault={handleSubmit}>
+  <input on:input={handleInput} />
+</form>
+```
+
+**Correct: Svelte 5 event attribute syntax**
+
+```svelte
+<button onclick={handleClick}>Click me</button>
+<form onsubmit={(e) => { e.preventDefault(); handleSubmit(e); }}>
+  <input oninput={handleInput} />
+</form>
+```
+
+---
+
+### SV5.3 Use Event Delegation for Large Lists
+
+**Impact: HIGH (reduces memory usage from N listeners to 1)**
+
+For large lists, use a single event listener on the parent element instead of attaching listeners to each item. Read the target item from data attributes.
+
+**Incorrect: one listener per item — N listeners**
+
+```svelte
+<ul>
+  {#each items as item}
+    <li onclick={() => selectItem(item.id)}>
+      {item.name}
+    </li>
+  {/each}
+</ul>
+```
+
+**Correct: single delegated listener — 1 listener**
+
+```svelte
+<script lang="ts">
+  function handleListClick(event: MouseEvent) {
+    const target = (event.target as HTMLElement).closest('[data-item-id]');
+    if (target) {
+      const id = target.getAttribute('data-item-id')!;
+      selectItem(id);
+    }
+  }
+</script>
+
+<ul onclick={handleListClick}>
+  {#each items as item}
+    <li data-item-id={item.id}>
+      {item.name}
+    </li>
+  {/each}
+</ul>
+```
+
+---
+
+### SV5.4 Use error() for Expected Errors
+
+**Impact: HIGH (provides proper HTTP status codes and error page rendering)**
+
+Use SvelteKit's `error()` helper for expected errors (404, 403, etc.) — it sets the correct HTTP status and renders the nearest `+error.svelte`. Throw regular errors only for unexpected failures.
+
+**Incorrect: generic throw — no status code control**
+
+```typescript
+// +page.server.ts
+export async function load({ params }) {
+  const post = await db.post.findUnique({ where: { slug: params.slug } });
+  if (!post) {
+    throw new Error('Not found'); // 500 status, generic error page
+  }
+  return { post };
+}
+```
+
+**Correct: error() with status code**
+
+```typescript
+// +page.server.ts
+import { error } from '@sveltejs/kit';
+
+export async function load({ params }) {
+  const post = await db.post.findUnique({ where: { slug: params.slug } });
+  if (!post) {
+    throw error(404, 'Post not found'); // 404 status, +error.svelte
+  }
+  return { post };
+}
+```
+
+---
+
+### SV5.5 Avoid Non-Deterministic Values During SSR
+
+**Impact: HIGH (prevents hydration mismatch between server and client)**
+
+Non-deterministic values (`Date.now()`, `Math.random()`, browser APIs) produce different results on server vs client, causing hydration mismatches. Initialize them only after mount.
+
+**Incorrect: Date.now() during SSR — different on server and client**
+
+```svelte
+<script lang="ts">
+  // Runs on server AND client — produces different values
+  let timestamp = $state(Date.now());
+  let randomId = $state(Math.random().toString(36));
+</script>
+
+<span>{timestamp}</span>
+```
+
+**Correct: set non-deterministic values after mount**
+
+```svelte
+<script lang="ts">
+  import { onMount } from 'svelte';
+
+  let timestamp = $state(0);
+  let randomId = $state('');
+
+  onMount(() => {
+    timestamp = Date.now();
+    randomId = Math.random().toString(36);
+  });
+</script>
+
+{#if timestamp}
+  <span>{timestamp}</span>
+{/if}
+```
+
+---
+
+### SV5.6 Use svelte:boundary for Error Recovery
+
+**Impact: MEDIUM (prevents child errors from crashing entire page)**
+
+Wrap error-prone components with `<svelte:boundary>` to catch errors locally and show a fallback UI instead of crashing the entire page.
+
+**Incorrect: unhandled error crashes page**
+
+```svelte
+<!-- If UserProfile throws, the entire page crashes -->
+<main>
+  <UserProfile userId={id} />
+  <RecentActivity />
+</main>
+```
+
+**Correct: boundary catches error with fallback**
+
+```svelte
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+
+  function handleError(error: Error) {
+    console.error('Component error:', error);
+  }
+</script>
+
+<main>
+  <svelte:boundary onerror={handleError}>
+    <UserProfile userId={id} />
+    {#snippet failed(error)}
+      <div class="error-card">
+        <p>Failed to load profile</p>
+        <button onclick={() => location.reload()}>Retry</button>
+      </div>
+    {/snippet}
+  </svelte:boundary>
+  <RecentActivity />
+</main>
+```
+
 
 ## Rule Interactions
 

@@ -30,12 +30,248 @@ Place all load functions that touch secrets or databases in `+page.server.ts`. U
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [ServerLoadForSecrets](../../Rules/Svelte/ServerLoadForSecrets.md) | HIGH | Use +page.server.ts for load functions accessing secrets or databases |
-| [ParallelLoading](../../Rules/Svelte/ParallelLoading.md) | HIGH | Fetch independent data in parallel with Promise.all in load functions |
-| [FormActionsOverFetch](../../Rules/Svelte/FormActionsOverFetch.md) | HIGH | Use SvelteKit form actions with use:enhance instead of manual fetch |
-| [ValidateServerSide](../../Rules/Svelte/ValidateServerSide.md) | HIGH | Always validate form data on the server, not just the client |
-| [LeanLoadFunctions](../../Rules/Svelte/LeanLoadFunctions.md) | MEDIUM | Keep load functions focused on fetching; defer transformations to client |
-| [SeparateServerClientState](../../Rules/Svelte/SeparateServerClientState.md) | HIGH | Keep server-loaded data and client UI state in separate reactive structures |
+| ServerLoadForSecrets | HIGH | Use +page.server.ts for load functions accessing secrets or databases |
+| ParallelLoading | HIGH | Fetch independent data in parallel with Promise.all in load functions |
+| FormActionsOverFetch | HIGH | Use SvelteKit form actions with use:enhance instead of manual fetch |
+| ValidateServerSide | HIGH | Always validate form data on the server, not just the client |
+| LeanLoadFunctions | MEDIUM | Keep load functions focused on fetching; defer transformations to client |
+| SeparateServerClientState | HIGH | Keep server-loaded data and client UI state in separate reactive structures |
+
+
+---
+
+### SV4.1 Use +page.server.ts for Secrets and Databases
+
+**Impact: HIGH (prevents secrets from leaking to client bundle)**
+
+Use `+page.server.ts` (not `+page.ts`) for load functions that access secrets, databases, or private APIs. Server-only load functions never reach the browser.
+
+**Incorrect: database query in universal load — leaks to client**
+
+```typescript
+// +page.ts — this code ships to the browser!
+import { db } from '$lib/database';
+
+export async function load() {
+  const users = await db.query('SELECT * FROM users');
+  return { users };
+}
+```
+
+**Correct: server-only load function**
+
+```typescript
+// +page.server.ts — never reaches the browser
+import { db } from '$lib/database';
+
+export async function load() {
+  const users = await db.query('SELECT * FROM users');
+  return { users };
+}
+```
+
+---
+
+### SV4.2 Fetch Data in Parallel with Promise.all
+
+**Impact: HIGH (reduces page load latency by eliminating waterfalls)**
+
+Use `Promise.all` in load functions to fetch independent data sources in parallel instead of sequentially.
+
+**Incorrect: sequential fetches — doubles latency**
+
+```typescript
+// +page.server.ts
+export async function load({ fetch }) {
+  const user = await fetch('/api/user').then(r => r.json());
+  const posts = await fetch('/api/posts').then(r => r.json());
+  const comments = await fetch('/api/comments').then(r => r.json());
+  return { user, posts, comments };
+}
+```
+
+**Correct: parallel fetches — latency = slowest single request**
+
+```typescript
+// +page.server.ts
+export async function load({ fetch }) {
+  const [user, posts, comments] = await Promise.all([
+    fetch('/api/user').then(r => r.json()),
+    fetch('/api/posts').then(r => r.json()),
+    fetch('/api/comments').then(r => r.json()),
+  ]);
+  return { user, posts, comments };
+}
+```
+
+---
+
+### SV4.3 Use Form Actions Over fetch for Mutations
+
+**Impact: HIGH (enables progressive enhancement — works without JavaScript)**
+
+Use SvelteKit form actions with `use:enhance` for data mutations. This pattern works without JavaScript enabled and provides automatic form state management.
+
+**Incorrect: fetch-based mutation — breaks without JS**
+
+```svelte
+<script lang="ts">
+  async function addTodo() {
+    await fetch('/api/todos', {
+      method: 'POST',
+      body: JSON.stringify({ text: newTodo }),
+    });
+  }
+</script>
+
+<button onclick={addTodo}>Add</button>
+```
+
+**Correct: form action with progressive enhancement**
+
+```svelte
+<!-- +page.svelte -->
+<script lang="ts">
+  import { enhance } from '$app/forms';
+</script>
+
+<form method="POST" action="?/addTodo" use:enhance>
+  <input name="text" required />
+  <button type="submit">Add</button>
+</form>
+```
+
+```typescript
+// +page.server.ts
+import type { Actions } from './$types';
+
+export const actions = {
+  addTodo: async ({ request }) => {
+    const data = await request.formData();
+    const text = data.get('text') as string;
+    await db.todo.create({ data: { text } });
+  },
+} satisfies Actions;
+```
+
+---
+
+### SV4.4 Validate Form Data Server-Side with fail()
+
+**Impact: HIGH (prevents invalid data and provides structured error responses)**
+
+Always validate form data in server actions and return structured errors via `fail()`. This ensures validation works even without client-side JavaScript.
+
+**Incorrect: no validation or unstructured errors**
+
+```typescript
+// +page.server.ts
+export const actions = {
+  create: async ({ request }) => {
+    const data = await request.formData();
+    const text = data.get('text') as string;
+    await db.todo.create({ data: { text } }); // No validation!
+  },
+};
+```
+
+**Correct: server-side validation with structured errors**
+
+```typescript
+// +page.server.ts
+import { fail } from '@sveltejs/kit';
+import type { Actions } from './$types';
+
+export const actions = {
+  create: async ({ request }) => {
+    const data = await request.formData();
+    const text = data.get('text')?.toString().trim();
+
+    if (!text) {
+      return fail(400, { error: 'Text is required', field: 'text' });
+    }
+    if (text.length > 200) {
+      return fail(400, { error: 'Text must be under 200 characters', field: 'text' });
+    }
+
+    await db.todo.create({ data: { text } });
+    return { success: true };
+  },
+} satisfies Actions;
+```
+
+---
+
+### SV4.5 Return Only Above-the-Fold Data from Load
+
+**Impact: HIGH (reduces serialization cost and improves time-to-interactive)**
+
+Load functions should return only the data needed for initial render. Paginate large datasets and defer below-the-fold content.
+
+**Incorrect: loading all data upfront**
+
+```typescript
+// +page.server.ts
+export async function load() {
+  const allPosts = await db.post.findMany(); // Could be 10,000 rows
+  return { posts: allPosts };
+}
+```
+
+**Correct: paginated initial load**
+
+```typescript
+// +page.server.ts
+export async function load({ url }) {
+  const page = Number(url.searchParams.get('page') ?? '1');
+  const posts = await db.post.findMany({
+    take: 20,
+    skip: (page - 1) * 20,
+    orderBy: { createdAt: 'desc' },
+  });
+  const total = await db.post.count();
+  return { posts, total, page };
+}
+```
+
+---
+
+### SV4.6 Separate Server Data from Client State
+
+**Impact: CRITICAL (prevents hydration mismatches and state desync)**
+
+Keep server data (from load functions) as read-only derived values and client state (filters, UI toggles) as separate `$state` variables. Never copy server data into `$state`.
+
+**Incorrect: copying server data to $state — hydration mismatch**
+
+```svelte
+<script lang="ts">
+  import { page } from '$app/stores';
+
+  // Copies server data to client state — desyncs on navigation
+  let items = $state($page.data.items);
+  let filter = $state('all');
+</script>
+```
+
+**Correct: $derived for server data, $state for client-only**
+
+```svelte
+<script lang="ts">
+  import { page } from '$app/stores';
+
+  // Server data stays reactive and read-only
+  let serverItems = $derived($page.data.items);
+  // Client-only UI state
+  let filter = $state('all');
+  // Combine in a derived value
+  let visibleItems = $derived.by(() => {
+    if (filter === 'all') return serverItems;
+    return serverItems.filter(i => i.status === filter);
+  });
+</script>
+```
+
 
 ## Rule Interactions
 

@@ -39,10 +39,334 @@ These four rules reinforce each other. A class that follows SingleResponsibility
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [SingleResponsibility](../../Rules/CSharp/SingleResponsibility.md) | CRITICAL | Each class should have exactly one reason to change |
-| [InterfaceSegregation](../../Rules/CSharp/InterfaceSegregation.md) | CRITICAL | Keep interfaces small so consumers depend only on what they use |
-| [PreferComposition](../../Rules/CSharp/PreferComposition.md) | CRITICAL | Assemble behavior from injected components instead of inheriting it |
-| [EncapsulateState](../../Rules/CSharp/EncapsulateState.md) | CRITICAL | Hide internal fields and collections behind controlled access |
+| SingleResponsibility | CRITICAL | Each class should have exactly one reason to change |
+| InterfaceSegregation | CRITICAL | Keep interfaces small so consumers depend only on what they use |
+| PreferComposition | CRITICAL | Assemble behavior from injected components instead of inheriting it |
+| EncapsulateState | CRITICAL | Hide internal fields and collections behind controlled access |
+
+
+---
+
+### CS1.1 Single Responsibility Principle
+
+**Impact: CRITICAL (Classes with multiple responsibilities break unpredictably)**
+
+A class should have only one reason to change. When a class handles multiple concerns, a change to one concern risks breaking unrelated functionality.
+
+**Incorrect: Multiple responsibilities mixed**
+
+```csharp
+public class UserService
+{
+    private readonly IDbConnection _db;
+
+    // Responsibility 1: User validation
+    public bool ValidateUser(User user)
+    {
+        if (string.IsNullOrEmpty(user.Email)) return false;
+        if (!user.Email.Contains("@")) return false;
+        return true;
+    }
+
+    // Responsibility 2: Database persistence
+    public void SaveUser(User user)
+    {
+        _db.Execute("INSERT INTO Users ...", user);
+    }
+
+    // Responsibility 3: Email notification
+    public void SendWelcomeEmail(User user)
+    {
+        var smtp = new SmtpClient();
+        smtp.Send(new MailMessage("noreply@app.com", user.Email));
+    }
+}
+```
+
+**Correct: Single responsibility per class**
+
+```csharp
+public class UserValidator
+{
+    public bool Validate(User user)
+    {
+        if (string.IsNullOrEmpty(user.Email)) return false;
+        if (!user.Email.Contains("@")) return false;
+        return true;
+    }
+}
+
+public class UserRepository
+{
+    private readonly IDbConnection _db;
+
+    public UserRepository(IDbConnection db) => _db = db;
+
+    public void Save(User user)
+    {
+        _db.Execute("INSERT INTO Users ...", user);
+    }
+}
+
+public class WelcomeEmailSender
+{
+    private readonly IEmailService _email;
+
+    public WelcomeEmailSender(IEmailService email) => _email = email;
+
+    public void Send(User user)
+    {
+        _email.Send("noreply@app.com", user.Email, "Welcome!");
+    }
+}
+```
+
+**Benefits:**
+- Each class is independently testable
+- Changes to validation don't affect persistence
+- Email implementation can change without touching user logic
+
+---
+
+### CS1.2 Interface Segregation
+
+**Impact: CRITICAL (Small interfaces enable testing and flexibility)**
+
+Clients shouldn't depend on methods they don't use. Large interfaces force implementers to stub unused methods and make mocking difficult.
+
+**Incorrect: Fat interface**
+
+```csharp
+public interface IUserService
+{
+    User GetById(int id);
+    IEnumerable<User> GetAll();
+    void Create(User user);
+    void Update(User user);
+    void Delete(int id);
+    void SendEmail(int userId, string message);
+    void ResetPassword(int userId);
+    void VerifyEmail(int userId);
+    AuditLog GetAuditHistory(int userId);
+}
+
+// Component that only needs to read users must implement everything
+public class UserDisplayComponent : IUserService
+{
+    public User GetById(int id) { /* actual implementation */ }
+    public IEnumerable<User> GetAll() { /* actual implementation */ }
+
+    // Forced to stub all these unused methods
+    public void Create(User user) => throw new NotImplementedException();
+    public void Update(User user) => throw new NotImplementedException();
+    public void Delete(int id) => throw new NotImplementedException();
+    // ... more stubs
+}
+```
+
+**Correct: Segregated interfaces**
+
+```csharp
+public interface IUserReader
+{
+    User? GetById(int id);
+    IEnumerable<User> GetAll();
+}
+
+public interface IUserWriter
+{
+    void Create(User user);
+    void Update(User user);
+    void Delete(int id);
+}
+
+public interface IUserNotification
+{
+    void SendEmail(int userId, string message);
+    void ResetPassword(int userId);
+    void VerifyEmail(int userId);
+}
+
+public interface IUserAudit
+{
+    AuditLog GetHistory(int userId);
+}
+
+// Component depends only on what it needs
+public class UserDisplayComponent
+{
+    private readonly IUserReader _users;
+
+    public UserDisplayComponent(IUserReader users) => _users = users;
+
+    public void Display(int id)
+    {
+        var user = _users.GetById(id);
+        // ...
+    }
+}
+```
+
+**Benefits:**
+- Easy to mock in tests (fewer methods to setup)
+- Components declare their actual dependencies
+- Implementation classes can implement only relevant interfaces
+
+---
+
+### CS1.3 Prefer Composition Over Inheritance
+
+**Impact: CRITICAL (Inheritance creates fragile hierarchies)**
+
+Inheritance creates tight coupling between base and derived classes. Changes to base classes ripple through all descendants, and deep hierarchies become difficult to understand and modify.
+
+**Incorrect: Inheritance hierarchy**
+
+```csharp
+public class Animal
+{
+    public virtual void Move() { /* default movement */ }
+    public virtual void Eat() { /* default eating */ }
+}
+
+public class Bird : Animal
+{
+    public override void Move() { /* fly */ }
+    public virtual void Sing() { /* tweet */ }
+}
+
+public class Penguin : Bird
+{
+    // Problem: Penguins can't fly but inherit from Bird
+    public override void Move() { /* walk - violates Liskov */ }
+    public override void Sing() { /* ... */ }
+}
+
+// Fragile: Adding MigrateSouth() to Bird breaks Penguin
+```
+
+**Correct: Composition with behaviors**
+
+```csharp
+public interface IMovementBehavior
+{
+    void Move();
+}
+
+public interface IFeedingBehavior
+{
+    void Eat();
+}
+
+public class FlyingBehavior : IMovementBehavior
+{
+    public void Move() { /* fly */ }
+}
+
+public class WalkingBehavior : IMovementBehavior
+{
+    public void Move() { /* walk */ }
+}
+
+public class Animal
+{
+    private readonly IMovementBehavior _movement;
+    private readonly IFeedingBehavior _feeding;
+
+    public Animal(IMovementBehavior movement, IFeedingBehavior feeding)
+    {
+        _movement = movement;
+        _feeding = feeding;
+    }
+
+    public void Move() => _movement.Move();
+    public void Eat() => _feeding.Eat();
+}
+
+// Penguin gets walking behavior without inheriting flying
+var penguin = new Animal(new WalkingBehavior(), new FishEatingBehavior());
+var eagle = new Animal(new FlyingBehavior(), new MeatEatingBehavior());
+```
+
+**When inheritance is appropriate:**
+- True "is-a" relationships with stable base classes
+- Framework requirements (Controller, DbContext)
+- Sealed classes that won't be extended further
+
+---
+
+### CS1.4 Encapsulate State
+
+**Impact: CRITICAL (Exposed internals invite misuse)**
+
+Public fields and settable properties expose internal state, allowing callers to put objects in invalid states. Encapsulation protects invariants and makes changes safe.
+
+**Incorrect: Exposed internal state**
+
+```csharp
+public class BankAccount
+{
+    public decimal Balance;  // Public field - anyone can set
+    public List<Transaction> Transactions;  // Mutable collection exposed
+
+    public BankAccount()
+    {
+        Balance = 0;
+        Transactions = new List<Transaction>();
+    }
+}
+
+// Callers can corrupt state
+var account = new BankAccount();
+account.Balance = -1000;  // Invalid negative balance
+account.Transactions.Clear();  // History destroyed
+account.Transactions = null;  // Breaks future operations
+```
+
+**Correct: Encapsulated with controlled access**
+
+```csharp
+public class BankAccount
+{
+    private readonly List<Transaction> _transactions = [];
+
+    public decimal Balance { get; private set; }
+
+    public IReadOnlyList<Transaction> Transactions => _transactions;
+
+    public void Deposit(decimal amount)
+    {
+        if (amount <= 0)
+            throw new ArgumentException("Amount must be positive", nameof(amount));
+
+        Balance += amount;
+        _transactions.Add(new Transaction(TransactionType.Deposit, amount));
+    }
+
+    public void Withdraw(decimal amount)
+    {
+        if (amount <= 0)
+            throw new ArgumentException("Amount must be positive", nameof(amount));
+        if (amount > Balance)
+            throw new InvalidOperationException("Insufficient funds");
+
+        Balance -= amount;
+        _transactions.Add(new Transaction(TransactionType.Withdrawal, amount));
+    }
+}
+
+// State changes only through controlled methods
+var account = new BankAccount();
+account.Deposit(100);  // Valid operation
+// account.Balance = -1000;  // Won't compile - private set
+// account.Transactions.Add(...);  // Won't compile - IReadOnlyList
+```
+
+**Guidelines:**
+- Use `private set` or `init` for properties that shouldn't change externally
+- Return `IReadOnlyList<T>` or `IReadOnlyCollection<T>` for collections
+- Validate all inputs in mutation methods
+
 
 ## Rule Interactions
 

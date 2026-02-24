@@ -32,10 +32,162 @@ Define a `Props` interface above the `$props()` call. For generic components, ad
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [GenericSnippets](../../Rules/Svelte/GenericSnippets.md) | HIGH | Use generics attribute for type-safe reusable components with typed snippets |
-| [HtmlAttributes](../../Rules/Svelte/HtmlAttributes.md) | HIGH | Extend HTML*Attributes from svelte/elements for wrapper components |
-| [PropsDestructureType](../../Rules/Svelte/PropsDestructureType.md) | HIGH | Destructure $props() with interface type and defaults in one statement |
-| [ArrowMethodsInClasses](../../Rules/Svelte/ArrowMethodsInClasses.md) | MEDIUM | Use arrow functions for class methods that will be passed as callbacks |
+| GenericSnippets | HIGH | Use generics attribute for type-safe reusable components with typed snippets |
+| HtmlAttributes | HIGH | Extend HTML*Attributes from svelte/elements for wrapper components |
+| PropsDestructureType | HIGH | Destructure $props() with interface type and defaults in one statement |
+| ArrowMethodsInClasses | MEDIUM | Use arrow functions for class methods that will be passed as callbacks |
+
+
+---
+
+### SV3.1 Use Generics for Type-Safe Reusable Components
+
+**Impact: HIGH (enables full type inference for consumers)**
+
+Use `generics` attribute on the script tag to create components that accept typed snippet parameters, preserving type safety across generic list/grid/table components.
+
+**Incorrect: any[] loses type information**
+
+```svelte
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+  interface Props {
+    items: any[];
+    row: Snippet<[any]>;
+  }
+  const { items, row } = $props<Props>();
+</script>
+
+{#each items as item}
+  {@render row(item)}
+{/each}
+```
+
+**Correct: generics preserve type inference**
+
+```svelte
+<script lang="ts" generics="T">
+  import type { Snippet } from 'svelte';
+  interface Props {
+    items: T[];
+    row: Snippet<[T]>;
+  }
+  const { items, row } = $props<Props>();
+</script>
+
+{#each items as item}
+  {@render row(item)}
+{/each}
+```
+
+---
+
+### SV3.2 Extend HTMLAttributes for Wrapper Components
+
+**Impact: HIGH (inherits all native element attributes automatically)**
+
+When building wrapper components around HTML elements, extend the appropriate `HTML*Attributes` type from `svelte/elements` to accept all native attributes.
+
+**Incorrect: manually listing native attributes**
+
+```svelte
+<script lang="ts">
+  interface Props {
+    variant?: 'primary' | 'secondary';
+    disabled?: boolean;
+    type?: string;
+    // Missing dozens of valid button attributes...
+  }
+  const { variant = 'primary', ...rest } = $props<Props>();
+</script>
+
+<button class={variant} {...rest}>
+  <slot />
+</button>
+```
+
+**Correct: extend HTMLButtonAttributes**
+
+```svelte
+<script lang="ts">
+  import type { HTMLButtonAttributes } from 'svelte/elements';
+  import type { Snippet } from 'svelte';
+
+  interface Props extends HTMLButtonAttributes {
+    variant?: 'primary' | 'secondary';
+    children: Snippet;
+  }
+  const { variant = 'primary', children, ...attrs } = $props<Props>();
+</script>
+
+<button class={variant} {...attrs}>
+  {@render children()}
+</button>
+```
+
+---
+
+### SV3.3 Destructure $props() with Named Interface
+
+**Impact: MEDIUM (provides clear prop contracts and reusable types)**
+
+Always define a named `Props` interface and use it with `$props<Props>()`. This creates a clear contract and makes the type reusable for parent components.
+
+**Incorrect: inline or ad-hoc prop typing**
+
+```svelte
+<script lang="ts">
+  const { title, count = 0 } = $props<{ title: string; count?: number }>();
+</script>
+```
+
+**Correct: named Props interface**
+
+```svelte
+<script lang="ts">
+  interface Props {
+    title: string;
+    count?: number;
+  }
+
+  const { title, count = 0 } = $props<Props>();
+</script>
+```
+
+---
+
+### SV3.4 Use Arrow Functions for Class Methods in $state
+
+**Impact: MEDIUM (prevents this-binding bugs when passing methods as callbacks)**
+
+When using classes with `$state` fields, use arrow functions for methods to ensure `this` is preserved when methods are passed as callbacks.
+
+**Incorrect: regular method loses `this` as callback**
+
+```typescript
+// state.svelte.ts
+class TodoState {
+  todos = $state<string[]>([]);
+
+  add(text: string) {
+    this.todos.push(text); // `this` is undefined when called as callback
+  }
+}
+```
+
+**Correct: arrow function preserves `this`**
+
+```typescript
+// state.svelte.ts
+class TodoState {
+  todos = $state<string[]>([]);
+
+  add = (text: string) => {
+    this.todos.push(text); // Arrow function captures `this`
+  };
+}
+```
+
 
 ## Rule Interactions
 

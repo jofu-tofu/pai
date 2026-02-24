@@ -26,7 +26,7 @@ Follow these 5 steps in order:
 1. **Create rules directory** — `Rules/LangName/` with individual rule files (TitleCase naming, one rule per file)
 2. **Create workflow file** — `Workflows/LangName.md` with:
    - Trigger line (file signals: extensions + framework names)
-   - Reference to `../Rules/LangName/`
+   - Reference to `../Dimensions/LangName/`
    - Decision tree, priority hierarchy, top 10 rules, examples, complete rule index
 3. **Update SKILL.md** — Add row to Language Lookup table and Workflow Routing table with file signal patterns
 4. **Update this file** — Add row to Supported table above, remove language from gaps list

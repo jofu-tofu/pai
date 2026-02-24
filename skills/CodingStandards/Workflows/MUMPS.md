@@ -8,7 +8,7 @@ Apply MUMPS (M) coding standards for Chronicles, Caché/IRIS, and GT.M-compatibl
 
 ## Reference Material
 
-- `../Rules/MUMPS/` - 22 individual rule files across portability, syntax, naming, variables, data access, and locking/error handling.
+- `../Dimensions/MUMPS/` - 22 rules inlined across portability, syntax, naming, variables, data access, and locking/error handling.
 
 ## Quick Decision Tree
 
@@ -85,12 +85,12 @@ do zunlock^%Zelibh("ERX",123)
 
 ## How to Use Rules
 
-**Pattern:** Let the decision tree pick a category, then open the specific rule file from `../Rules/MUMPS/`.
+**Pattern:** Let the decision tree pick a category, then read the relevant dimension file from `../Dimensions/MUMPS/` (rules are inlined).
 
 ```
 Decision tree identifies: Category 5 (Data Access and Globals)
 Quick ref identifies: PreferChroniclesApisOverDirectGlobals
-Action: Read ../Rules/MUMPS/PreferChroniclesApisOverDirectGlobals.md
+Action: Read ../Dimensions/MUMPS/PreferChroniclesApisOverDirectGlobals.md (rule is inlined in the dimension file)
 Result: Concrete standards and examples for safe access patterns
 ```
 
@@ -144,14 +144,10 @@ For focused context, read `../Dimensions/MUMPS/INDEX.md`.
 
 | Dimension | File | Rule Count | Load When |
 |-----------|------|------------|-----------|
-| Portability | Portability.md | 4 | ANSI compliance, cross-implementation behavior |
-| Syntax and Formatting | SyntaxFormatting.md | 4 | Readability and parser-sensitive syntax issues |
-| Naming and Documentation | NamingAndDocumentation.md | 4 | Routine/tag contracts and naming consistency |
-| Variable Scope | VariableScope.md | 4 | NEW/KILL discipline and parameter hygiene |
-| Data and Globals | DataGlobals.md | 4 | API-first access and global safety |
-| Concurrency and Errors | ConcurrencyAndErrors.md | 2 | Lock wrappers and standard trap handling |
+| Standards | Standards.md | 12 | ANSI compliance, syntax formatting, naming conventions, portability |
+| Safety Patterns | SafetyPatterns.md | 10 | Variable scope, data/globals access, concurrency, error traps |
 
-**Default:** Load Portability for any MUMPS task.
+**Default:** Load Standards for any MUMPS task.
 
 **Use the full workflow (this file) when:** doing full module or routine standards review.
 

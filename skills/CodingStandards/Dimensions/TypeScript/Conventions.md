@@ -34,10 +34,230 @@ Use `import type` for every import that is only used in type positions (type ann
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [ImportTypeForTypes](../../Rules/TypeScript/ImportTypeForTypes.md) | MEDIUM | Use `import type` for type-only imports to eliminate unnecessary runtime module inclusion |
-| [ImportOrdering](../../Rules/TypeScript/ImportOrdering.md) | MEDIUM | Group imports by origin with blank line separators and alphabetize within each group |
-| [NamingConventions](../../Rules/TypeScript/NamingConventions.md) | MEDIUM | Follow TypeScript ecosystem casing: PascalCase types, camelCase values, predicate-prefix booleans |
-| [FileOrganization](../../Rules/TypeScript/FileOrganization.md) | MEDIUM | Co-locate types with implementation; avoid monolithic types files |
+| ImportTypeForTypes | MEDIUM | Use `import type` for type-only imports to eliminate unnecessary runtime module inclusion |
+| ImportOrdering | MEDIUM | Group imports by origin with blank line separators and alphabetize within each group |
+| NamingConventions | MEDIUM | Follow TypeScript ecosystem casing: PascalCase types, camelCase values, predicate-prefix booleans |
+| FileOrganization | MEDIUM | Co-locate types with implementation; avoid monolithic types files |
+
+
+---
+
+### TS4.1 Import Type for Type-Only Imports
+
+**Impact: MEDIUM (Type-only imports are erased at compile time — prevents importing runtime modules just for their types, reducing bundle size)**
+
+When you import a type from a module, `import type` tells the compiler and bundler that this import is types-only and should be completely erased in the output. Without it, the bundler may include the entire module just for a type reference, bloating the bundle.
+
+**Incorrect: Regular imports pull in runtime code for types**
+
+```typescript
+// Imports the entire module — even though we only use the type
+import { UserService } from "./services/user-service";
+import { DatabaseConnection } from "./database";
+
+function createHandler(db: DatabaseConnection): void {
+  // DatabaseConnection is only used as a type here
+  // but the import pulls in the entire database module
+}
+
+// Mixing runtime and type imports without distinction
+import { z } from "zod";
+import { User, Order, ApiResponse } from "./types";
+```
+
+**Correct: Separate type imports from value imports**
+
+```typescript
+// Type-only import — erased at compile time, zero bundle impact
+import type { DatabaseConnection } from "./database";
+import type { UserService } from "./services/user-service";
+
+function createHandler(db: DatabaseConnection): void {
+  // Same type safety, no runtime import
+}
+
+// When you need both values and types from a module
+import { z } from "zod";
+import type { ZodSchema, ZodError } from "zod";
+
+// Enable in tsconfig for enforcement
+// "verbatimModuleSyntax": true
+```
+
+**When acceptable:**
+- When the module is already imported for runtime values — adding a separate `import type` for its types is unnecessary noise
+- Barrel files (`index.ts`) that re-export both types and values — use `export type` for type re-exports
+
+---
+
+### TS4.2 Import Ordering
+
+**Impact: MEDIUM (Consistent import order reduces merge conflicts and makes dependency relationships immediately visible)**
+
+Imports should be grouped by origin and sorted within each group. This makes it obvious where dependencies come from (built-in vs external vs internal) and reduces merge conflicts when multiple developers add imports.
+
+**Incorrect: Random import order**
+
+```typescript
+import { render } from "./utils/render";
+import type { User } from "./types";
+import { z } from "zod";
+import path from "node:path";
+import { useState } from "react";
+import { db } from "../database";
+import { formatDate } from "./utils/date";
+import type { ApiResponse } from "../../shared/types";
+```
+
+**Correct: Grouped by origin with blank line separators**
+
+```typescript
+// 1. Built-in Node.js modules
+import path from "node:path";
+
+// 2. External packages
+import { useState } from "react";
+import { z } from "zod";
+
+// 3. Internal — parent/shared modules
+import type { ApiResponse } from "../../shared/types";
+import { db } from "../database";
+
+// 4. Internal — sibling/local modules
+import type { User } from "./types";
+import { formatDate } from "./utils/date";
+import { render } from "./utils/render";
+```
+
+**Group order:** `built-in` → `external` → `internal (parent)` → `internal (sibling)` → `type-only`
+
+Alphabetize within each group. Enforce with ESLint `import/order` or `@trivago/prettier-plugin-sort-imports`.
+
+**When acceptable:**
+- Side-effect imports (`import "./polyfills"`) go at the top regardless of origin
+- CSS/asset imports follow framework conventions (e.g., CSS modules at the bottom in React components)
+
+---
+
+### TS4.3 Naming Conventions
+
+**Impact: MEDIUM (Consistent naming communicates intent — readers know what something is before reading its definition)**
+
+TypeScript has ecosystem conventions that encode meaning in casing. Following them makes code readable to any TypeScript developer without needing to look up definitions.
+
+**Incorrect: Inconsistent or misleading naming**
+
+```typescript
+// Interface with I-prefix — C# convention, not TypeScript
+interface IUserService { }
+
+// Type with T-prefix — unnecessary in TypeScript
+type TUserProps = { name: string };
+
+// Boolean without predicate prefix
+const active = true;      // active what? Is it a noun or adjective?
+const loading = false;     // is this a verb or state?
+
+// Constants in SCREAMING_CASE for non-environment values
+const MAX_RETRY_COUNT = 3;
+const DEFAULT_PAGE_SIZE = 20;
+
+// Acronyms fully capitalized in multi-word names
+function parseHTMLDocument() { }
+type XMLHTTPRequest = {};
+```
+
+**Correct: TypeScript ecosystem conventions**
+
+```typescript
+// No I-prefix on interfaces — TypeScript uses structural typing
+interface UserService { }
+
+// No T-prefix on types
+type UserProps = { name: string };
+
+// Booleans as predicates — reads like a question
+const isActive = true;
+const hasPermission = false;
+const shouldRetry = true;
+
+// Prefer as const or enum-like objects for named constants
+const config = {
+  maxRetryCount: 3,
+  defaultPageSize: 20,
+} as const;
+
+// Acronyms: only first letter capitalized in multi-word names
+function parseHtmlDocument() { }
+type XmlHttpRequest = {};
+
+// General conventions:
+// PascalCase: types, interfaces, classes, enums, components
+// camelCase: variables, functions, methods, properties
+// UPPER_SNAKE: environment variables only (process.env.DATABASE_URL)
+```
+
+**When acceptable:**
+- `UPPER_SNAKE_CASE` for environment variable references and true compile-time constants
+- Team conventions that differ — consistency within a project matters more than matching ecosystem conventions
+
+---
+
+### TS4.4 File Organization
+
+**Impact: MEDIUM (Co-locating types with implementation reduces navigation and keeps related code together)**
+
+Types should live close to the code that uses them. A single `types.ts` file that holds every type in the project becomes a merge-conflict magnet and forces readers to jump between files. Co-locate types with their implementation; extract shared types to domain-specific files.
+
+**Incorrect: Monolithic types file**
+
+```typescript
+// types.ts — 500+ lines, everything dumped here
+export interface User { /* ... */ }
+export interface Order { /* ... */ }
+export interface Product { /* ... */ }
+export interface CartItem { /* ... */ }
+export interface ShippingAddress { /* ... */ }
+export interface PaymentMethod { /* ... */ }
+// Every change touches this file — merge conflict city
+```
+
+**Correct: Co-locate types with implementation**
+
+```
+src/
+├── users/
+│   ├── user.ts           # User type + user-related types
+│   ├── user-service.ts   # imports User from ./user
+│   └── user-api.ts       # imports User from ./user
+├── orders/
+│   ├── order.ts          # Order, OrderItem, OrderStatus types
+│   ├── order-service.ts
+│   └── order-api.ts
+└── shared/
+    └── api-types.ts      # Only truly cross-domain types (ApiResponse, Pagination)
+```
+
+```typescript
+// users/user.ts — types co-located with their domain
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export type CreateUserInput = Omit<User, "id">;
+export type UserSummary = Pick<User, "id" | "name">;
+
+// users/user-service.ts
+import type { User, CreateUserInput } from "./user";
+```
+
+**When acceptable:**
+- Small projects (< 10 files) where a single `types.ts` is genuinely simpler
+- Generated types (from OpenAPI, GraphQL codegen) that live in a generated output directory
+- Shared DTOs for API contracts between frontend and backend in a monorepo
+
 
 ## Rule Interactions
 

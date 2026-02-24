@@ -34,13 +34,473 @@ Place `#[cfg(test)] mod tests` at the bottom of every file that contains logic. 
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [UnitTestsInSameFile](../../Rules/Rust/UnitTestsInSameFile.md) | HIGH | Place `#[cfg(test)] mod tests` at the bottom of each source file with `use super::*` |
-| [IntegrationTestsInTestsDir](../../Rules/Rust/IntegrationTestsInTestsDir.md) | HIGH | Use `/tests/` for public API tests; shared helpers in `/tests/common/mod.rs` |
-| [PropertyTestingWithProptest](../../Rules/Rust/PropertyTestingWithProptest.md) | MEDIUM | Use proptest for input-space exploration; check in `.proptest-regressions` |
-| [TraitBasedMocking](../../Rules/Rust/TraitBasedMocking.md) | HIGH | Design with traits for testability; use mockall for auto-generated mocks |
-| [DocTestsAsExamples](../../Rules/Rust/DocTestsAsExamples.md) | MEDIUM | Write `///` examples that serve as both documentation and tests |
-| [TestErrorPaths](../../Rules/Rust/TestErrorPaths.md) | HIGH | Test error cases with `unwrap_err()`, `matches!`, `#[should_panic]`, and `-> Result` |
-| [SnapshotAndFuzzTesting](../../Rules/Rust/SnapshotAndFuzzTesting.md) | MEDIUM | Use insta for snapshot tests; cargo fuzz for security-sensitive parsing |
+| UnitTestsInSameFile | HIGH | Place `#[cfg(test)] mod tests` at the bottom of each source file with `use super::*` |
+| IntegrationTestsInTestsDir | HIGH | Use `/tests/` for public API tests; shared helpers in `/tests/common/mod.rs` |
+| PropertyTestingWithProptest | MEDIUM | Use proptest for input-space exploration; check in `.proptest-regressions` |
+| TraitBasedMocking | HIGH | Design with traits for testability; use mockall for auto-generated mocks |
+| DocTestsAsExamples | MEDIUM | Write `///` examples that serve as both documentation and tests |
+| TestErrorPaths | HIGH | Test error cases with `unwrap_err()`, `matches!`, `#[should_panic]`, and `-> Result` |
+| SnapshotAndFuzzTesting | MEDIUM | Use insta for snapshot tests; cargo fuzz for security-sensitive parsing |
+
+
+---
+
+### RS8.1 UnitTestsInSameFile
+
+**Impact: HIGH (Unit tests co-located with code catch regressions immediately and document expected behavior inline)**
+
+Rust's built-in convention places unit tests in a `#[cfg(test)] mod tests` block at the bottom of each source file. This keeps tests physically adjacent to the code they verify, making it trivial to update tests when logic changes and impossible to forget they exist.
+
+**Incorrect: Tests in a separate file mirroring the module**
+
+```rust
+// src/parser.rs
+pub fn parse_header(input: &str) -> Option<Header> {
+    let parts: Vec<&str> = input.splitn(2, ':').collect();
+    if parts.len() == 2 {
+        Some(Header {
+            key: parts[0].trim().to_string(),
+            value: parts[1].trim().to_string(),
+        })
+    } else {
+        None
+    }
+}
+
+// tests/test_parser.rs  <-- separate file, easy to forget, no access to private items
+#[test]
+fn test_parse_header() {
+    let h = parser::parse_header("Content-Type: text/html").unwrap();
+    assert_eq!(h.key, "Content-Type");
+}
+```
+
+**Correct: Test module inside the same file**
+
+```rust
+// src/parser.rs
+pub fn parse_header(input: &str) -> Option<Header> {
+    let parts: Vec<&str> = input.splitn(2, ':').collect();
+    if parts.len() == 2 {
+        Some(Header {
+            key: parts[0].trim().to_string(),
+            value: parts[1].trim().to_string(),
+        })
+    } else {
+        None
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_valid_header() {
+        let h = parse_header("Content-Type: text/html").unwrap();
+        assert_eq!(h.key, "Content-Type");
+        assert_eq!(h.value, "text/html");
+    }
+
+    #[test]
+    fn returns_none_for_missing_colon() {
+        assert!(parse_header("InvalidHeader").is_none());
+    }
+}
+```
+
+**When acceptable:**
+- Integration tests that exercise the public API across multiple modules belong in `/tests/`, not inline
+- Benchmark tests using Criterion belong in `/benches/`
+
+---
+
+### RS8.2 IntegrationTestsInTestsDir
+
+**Impact: HIGH (Integration tests verify the public API as an external consumer would, catching interface regressions)**
+
+Integration tests live in the `/tests/` directory and can only access your crate's public API. This enforces a clean separation: unit tests verify internal logic, integration tests verify that the published interface works correctly. Shared test utilities go in `/tests/common/mod.rs` to avoid Cargo treating them as standalone test files.
+
+**Incorrect: Shared helpers as top-level test files or integration logic in unit tests**
+
+```rust
+// tests/helpers.rs  <-- Cargo treats this as its own test binary
+pub fn setup_test_db() -> TestDb {
+    TestDb::new(":memory:")
+}
+
+// src/lib.rs  <-- integration-level tests crammed into unit test module
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn full_workflow() {
+        let db = Database::connect(":memory:");
+        let user = create_user(&db, "alice");
+        let order = place_order(&db, &user, vec![item("widget", 3)]);
+        let receipt = checkout(&db, &order);
+        assert!(receipt.is_ok());
+    }
+}
+```
+
+**Correct: Integration tests in /tests/ with shared helpers in common/mod.rs**
+
+```rust
+// tests/common/mod.rs  <-- shared helpers, not treated as a test binary
+pub fn setup_test_db() -> TestDb {
+    TestDb::new(":memory:")
+}
+
+pub fn seed_user(db: &TestDb, name: &str) -> User {
+    db.insert_user(name).expect("seed user")
+}
+
+// tests/order_workflow.rs  <-- true integration test
+mod common;
+
+use my_crate::{create_user, place_order, checkout, item};
+
+#[test]
+fn full_order_workflow_produces_receipt() {
+    let db = common::setup_test_db();
+    let user = common::seed_user(&db, "alice");
+    let order = place_order(&db, &user, vec![item("widget", 3)]);
+    let receipt = checkout(&db, &order);
+    assert!(receipt.is_ok());
+    assert_eq!(receipt.unwrap().total(), 3 * item("widget", 1).price());
+}
+```
+
+**When acceptable:**
+- Small libraries with no public API surface beyond a few functions may not need a separate `/tests/` directory
+- When the entire crate is `#[doc(hidden)]` or not intended for external consumption
+
+---
+
+### RS8.3 PropertyTestingWithProptest
+
+**Impact: MEDIUM (Discovers edge cases that hand-written examples miss by exploring the input space systematically)**
+
+Property-based tests define invariants that must hold for all inputs, then let the framework generate thousands of random cases. This catches boundary conditions, overflow, and encoding bugs that developers do not anticipate. Always check in `.proptest-regressions` files so that discovered failures become permanent regression tests.
+
+**Incorrect: Only hand-written examples**
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn encode_decode_roundtrip() {
+        let original = "hello world";
+        let encoded = encode(original);
+        let decoded = decode(&encoded).unwrap();
+        assert_eq!(decoded, original);
+        // Only tests one input; misses empty strings, unicode,
+        // embedded nulls, very long strings, etc.
+    }
+}
+```
+
+**Correct: Property test covering the full input space**
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use proptest::prelude::*;
+
+    // Hand-written test for documentation value
+    #[test]
+    fn encode_decode_basic() {
+        let decoded = decode(&encode("hello")).unwrap();
+        assert_eq!(decoded, "hello");
+    }
+
+    // Property test for exhaustive coverage
+    proptest! {
+        #[test]
+        fn roundtrip_any_string(input in "\\PC*") {
+            let encoded = encode(&input);
+            let decoded = decode(&encoded).unwrap();
+            prop_assert_eq!(decoded, input);
+        }
+
+        #[test]
+        fn encoded_length_bounded(input in "\\PC{0,1000}") {
+            let encoded = encode(&input);
+            prop_assert!(encoded.len() <= input.len() * 4);
+        }
+    }
+}
+```
+
+**When acceptable:**
+- Pure glue code that delegates to well-tested libraries without transformation logic
+- Tests for UI or I/O interactions where generating meaningful inputs is impractical
+- When the invariant is difficult to express without reimplementing the function under test
+
+---
+
+### RS8.4 TraitBasedMocking
+
+**Impact: HIGH (Traits decouple business logic from external dependencies, enabling fast isolated tests)**
+
+Design components against trait interfaces rather than concrete types so that tests can substitute mocks, fakes, or stubs. Use `mockall` for auto-generated mocks when hand-written fakes are too verbose. This prevents tests from requiring network access, databases, or file systems.
+
+**Incorrect: Business logic hardcoded to a concrete HTTP client**
+
+```rust
+use reqwest::Client;
+
+pub struct OrderService {
+    client: Client,  // concrete type -- tests must hit the network
+}
+
+impl OrderService {
+    pub async fn get_price(&self, item_id: &str) -> Result<f64, Error> {
+        let resp = self.client
+            .get(format!("https://api.example.com/items/{item_id}"))
+            .send()
+            .await?;
+        let data: PriceResponse = resp.json().await?;
+        Ok(data.price)
+    }
+}
+
+// Tests require a running API server or complex HTTP mocking
+```
+
+**Correct: Trait interface with mockall for testing**
+
+```rust
+#[cfg_attr(test, mockall::automock)]
+pub trait PriceFetcher {
+    async fn fetch_price(&self, item_id: &str) -> Result<f64, Error>;
+}
+
+pub struct OrderService<P: PriceFetcher> {
+    price_fetcher: P,
+}
+
+impl<P: PriceFetcher> OrderService<P> {
+    pub async fn get_price(&self, item_id: &str) -> Result<f64, Error> {
+        self.price_fetcher.fetch_price(item_id).await
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn returns_fetched_price() {
+        let mut mock = MockPriceFetcher::new();
+        mock.expect_fetch_price()
+            .with(mockall::predicate::eq("widget"))
+            .returning(|_| Ok(9.99));
+
+        let service = OrderService { price_fetcher: mock };
+        assert_eq!(service.get_price("widget").await.unwrap(), 9.99);
+    }
+}
+```
+
+**When acceptable:**
+- Small binaries where the concrete dependency is trivial to construct (e.g., an in-memory `HashMap`)
+- When a hand-written fake is simpler and more readable than a mock framework
+- Performance-sensitive paths where trait object or generic overhead is measurable
+
+---
+
+### RS8.5 DocTestsAsExamples
+
+**Impact: MEDIUM (Doc examples that compile and run guarantee documentation never drifts from actual behavior)**
+
+Rust's `///` doc comments with code blocks are compiled and executed by `cargo test --doc`. This turns every example in your API documentation into a living test. When the API changes and the example breaks, the test suite fails immediately, preventing stale documentation.
+
+**Incorrect: Documentation with no runnable example**
+
+```rust
+/// Parses a duration string into seconds.
+///
+/// Supports formats like "5s", "3m", "2h".
+/// Returns None if the format is invalid.
+pub fn parse_duration(input: &str) -> Option<u64> {
+    // ...
+}
+// No example -- users must guess the API;
+// nothing verifies the documentation is correct.
+```
+
+**Correct: Doc comment with tested example**
+
+```rust
+/// Parses a duration string into seconds.
+///
+/// Supports formats like `"5s"`, `"3m"`, `"2h"`.
+/// Returns `None` if the format is invalid.
+///
+/// # Examples
+///
+/// ```
+/// use my_crate::parse_duration;
+///
+/// assert_eq!(parse_duration("5s"), Some(5));
+/// assert_eq!(parse_duration("3m"), Some(180));
+/// assert_eq!(parse_duration("2h"), Some(7200));
+/// assert_eq!(parse_duration("bad"), None);
+/// ```
+pub fn parse_duration(input: &str) -> Option<u64> {
+    // ...
+}
+```
+
+**When acceptable:**
+- Private functions or internal helpers that are not part of the public API
+- Functions whose usage requires complex setup (database, network) where a doc test would be misleading -- use `no_run` or `ignore` annotations with a comment explaining why
+- Trait implementations where the trait-level docs already provide examples
+
+---
+
+### RS8.6 TestErrorPaths
+
+**Impact: HIGH (Untested error paths silently rot; when they finally execute in production, they panic or return wrong values)**
+
+Error handling code is code. It needs tests. Use `#[should_panic]` for functions that must panic under specific conditions, and return `Result<(), E>` from test functions to use `?` for setup while asserting specific error variants. Testing only the happy path leaves the majority of branches unverified.
+
+**Incorrect: Only testing the success path**
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_valid_config() {
+        let cfg = Config::from_str("port=8080\nhost=localhost").unwrap();
+        assert_eq!(cfg.port, 8080);
+        assert_eq!(cfg.host, "localhost");
+    }
+    // No test for missing fields, invalid port, malformed lines,
+    // empty input, duplicate keys...
+}
+```
+
+**Correct: Comprehensive error path coverage**
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_valid_config() {
+        let cfg = Config::from_str("port=8080\nhost=localhost").unwrap();
+        assert_eq!(cfg.port, 8080);
+    }
+
+    #[test]
+    fn rejects_missing_port() {
+        let err = Config::from_str("host=localhost").unwrap_err();
+        assert!(matches!(err, ConfigError::MissingField(f) if f == "port"));
+    }
+
+    #[test]
+    fn rejects_invalid_port() {
+        let err = Config::from_str("port=abc\nhost=localhost").unwrap_err();
+        assert!(matches!(err, ConfigError::InvalidValue { field, .. } if field == "port"));
+    }
+
+    #[test]
+    fn rejects_empty_input() {
+        let err = Config::from_str("").unwrap_err();
+        assert!(matches!(err, ConfigError::EmptyInput));
+    }
+
+    #[test]
+    #[should_panic(expected = "invariant violated")]
+    fn panics_on_invariant_violation() {
+        Config::dangerous_unchecked(0, "");
+    }
+
+    #[test]
+    fn result_returning_test() -> Result<(), ConfigError> {
+        let cfg = Config::from_str("port=8080\nhost=localhost")?;
+        assert_eq!(cfg.port, 8080);
+        Ok(())
+    }
+}
+```
+
+**When acceptable:**
+- Infallible functions that genuinely cannot fail (pure arithmetic on bounded inputs, newtype wrappers)
+- Error paths that are already covered by integration or property-based tests at a higher level
+
+---
+
+### RS8.7 SnapshotAndFuzzTesting
+
+**Impact: MEDIUM (Snapshots catch unintended output changes; fuzzing discovers crashes and panics in parsing code)**
+
+Use `insta` for snapshot testing when outputs are complex structures, formatted text, or serialized data where manual assertions would be fragile. Use `cargo fuzz` for security-sensitive parsing, deserialization, and protocol handling where malformed input could cause panics or undefined behavior.
+
+**Incorrect: Brittle manual assertions on complex output**
+
+```rust
+#[test]
+fn test_error_report() {
+    let report = generate_report(&errors);
+    // Fragile: breaks on any formatting change, hard to review
+    assert_eq!(report, "Error Report\n============\n\n1. FileNotFound: config.toml\n   at line 12\n\n2. ParseError: invalid syntax\n   at line 45\n");
+    // Adding a new field or changing whitespace requires
+    // updating this entire string manually
+}
+```
+
+**Correct: Snapshot testing with insta and fuzz targets**
+
+```rust
+// Snapshot test -- complex output verified against saved snapshot
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use insta::assert_snapshot;
+
+    #[test]
+    fn error_report_format() {
+        let report = generate_report(&sample_errors());
+        assert_snapshot!(report);
+        // First run: creates snapshots/error_report_format.snap
+        // Subsequent runs: compares against saved snapshot
+        // Review changes with: cargo insta review
+    }
+
+    #[test]
+    fn structured_output() {
+        let output = build_manifest(&config());
+        insta::assert_yaml_snapshot!(output);
+    }
+}
+
+// Fuzz target -- in fuzz/fuzz_targets/parse_message.rs
+#![no_main]
+use libfuzzer_sys::fuzz_target;
+use my_crate::parse_message;
+
+fuzz_target!(|data: &[u8]| {
+    // Must not panic on any input
+    let _ = parse_message(data);
+});
+```
+
+**When acceptable:**
+- Simple return values where `assert_eq!` is clear and stable (booleans, small numbers, single strings)
+- Fuzz testing is overkill for pure business logic that does not handle untrusted binary input
+- When snapshot churn from frequent format changes would make reviews noisy -- stabilize the format first
+
 
 ## Rule Interactions
 

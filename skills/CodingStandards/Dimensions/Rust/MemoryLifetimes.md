@@ -34,12 +34,413 @@ Default to stack allocation. Use `Box` only for recursive types, trait objects, 
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [StackOverHeapDefault](../../Rules/Rust/StackOverHeapDefault.md) | HIGH | Stack allocation by default; Box only for recursive types, trait objects, and large buffers |
-| [PinForAsyncAndSelfRef](../../Rules/Rust/PinForAsyncAndSelfRef.md) | HIGH | Pin futures for self-referential state; pin!() for stack, Box::pin() for heap |
-| [LifetimeParameterDesign](../../Rules/Rust/LifetimeParameterDesign.md) | MEDIUM | Minimize lifetime params in public APIs; name descriptively when required |
-| [RAIIResourceManagement](../../Rules/Rust/RAIIResourceManagement.md) | HIGH | Drop for deterministic cleanup; guard types over manual cleanup code |
-| [ArenaForGraphStructures](../../Rules/Rust/ArenaForGraphStructures.md) | MEDIUM | Arena allocation with index references for graphs and trees over Rc<RefCell<T>> |
-| [AvoidLeakingMemory](../../Rules/Rust/AvoidLeakingMemory.md) | MEDIUM | Don't rely on Drop for correctness; document intentional leaks |
+| StackOverHeapDefault | HIGH | Stack allocation by default; Box only for recursive types, trait objects, and large buffers |
+| PinForAsyncAndSelfRef | HIGH | Pin futures for self-referential state; pin!() for stack, Box::pin() for heap |
+| LifetimeParameterDesign | MEDIUM | Minimize lifetime params in public APIs; name descriptively when required |
+| RAIIResourceManagement | HIGH | Drop for deterministic cleanup; guard types over manual cleanup code |
+| ArenaForGraphStructures | MEDIUM | Arena allocation with index references for graphs and trees over Rc<RefCell<T>> |
+| AvoidLeakingMemory | MEDIUM | Don't rely on Drop for correctness; document intentional leaks |
+
+
+---
+
+### RS9.1 StackOverHeapDefault
+
+**Impact: HIGH (Stack allocation avoids heap overhead and improves cache locality)**
+
+Rust defaults to stack allocation, which is faster and requires no allocator interaction. Reserve `Box<T>` for cases that genuinely require indirection: recursive types, trait objects, and large buffers that would overflow the stack. Unnecessarily boxing small structs adds allocation cost and pointer chasing for zero benefit.
+
+**Incorrect: Boxing small structs that fit on the stack**
+
+```rust
+// Pointless heap allocation for a 24-byte struct
+struct Point3D {
+    x: f64,
+    y: f64,
+    z: f64,
+}
+
+fn compute_centroid(points: &[Box<Point3D>]) -> Box<Point3D> {
+    let mut sum = Box::new(Point3D { x: 0.0, y: 0.0, z: 0.0 });
+    for p in points {
+        sum.x += p.x;
+        sum.y += p.y;
+        sum.z += p.z;
+    }
+    let n = points.len() as f64;
+    sum.x /= n;
+    sum.y /= n;
+    sum.z /= n;
+    sum
+}
+```
+
+**Correct: Stack-allocated structs with Box only where required**
+
+```rust
+struct Point3D {
+    x: f64,
+    y: f64,
+    z: f64,
+}
+
+// Recursive type genuinely needs indirection
+enum Expr {
+    Literal(f64),
+    Add(Box<Expr>, Box<Expr>),
+    Mul(Box<Expr>, Box<Expr>),
+}
+
+fn compute_centroid(points: &[Point3D]) -> Point3D {
+    let n = points.len() as f64;
+    Point3D {
+        x: points.iter().map(|p| p.x).sum::<f64>() / n,
+        y: points.iter().map(|p| p.y).sum::<f64>() / n,
+        z: points.iter().map(|p| p.z).sum::<f64>() / n,
+    }
+}
+```
+
+**When acceptable:**
+- Recursive data structures (trees, linked lists, ASTs) where indirection is required by the type system
+- Trait objects (`Box<dyn Trait>`) for dynamic dispatch
+- Very large structs (>= several KB) that risk stack overflow, especially in deeply recursive call chains
+- FFI boundaries where heap allocation is required by the C API contract
+
+---
+
+### RS9.2 PinForAsyncAndSelfRef
+
+**Impact: HIGH (Incorrect pinning causes undefined behavior or compiler errors with async futures)**
+
+Async futures in Rust are state machines that may contain self-referential pointers across `.await` points. Moving such a future after it has been polled invalidates those internal pointers. `Pin<T>` guarantees the value will not be moved, making it safe to hold self-references. Use `pin!()` for stack-pinned locals and `Box::pin()` when the future must be heap-allocated or returned from a function.
+
+**Incorrect: Attempting to use a self-referential future without pinning**
+
+```rust
+use std::future::Future;
+
+// Returning an unboxed future that the caller cannot pin correctly
+fn make_retry_future(url: &str) -> impl Future<Output = Result<String, Error>> {
+    // This future holds references to its own state across awaits
+    async {
+        let client = reqwest::Client::new();
+        let response = client.get(url).send().await?;
+        // After this await, the future is self-referential --
+        // moving it would invalidate internal pointers
+        let body = response.text().await?;
+        Ok(body)
+    }
+}
+
+// Caller tries to store futures in a Vec and poll them --
+// without pinning, this is unsound or won't compile
+let mut futures: Vec<Box<dyn Future<Output = Result<String, Error>>>> = vec![];
+futures.push(Box::new(make_retry_future("https://example.com")));
+```
+
+**Correct: Pin futures appropriately for stack and heap contexts**
+
+```rust
+use std::pin::{Pin, pin};
+use std::future::Future;
+
+// Return a pinned, boxed future for dynamic dispatch or storage
+fn make_retry_future(
+    url: String,
+) -> Pin<Box<dyn Future<Output = Result<String, reqwest::Error>> + Send>> {
+    Box::pin(async move {
+        let client = reqwest::Client::new();
+        let response = client.get(&url).send().await?;
+        let body = response.text().await?;
+        Ok(body)
+    })
+}
+
+// Stack-pinning with pin!() for local futures
+async fn fetch_with_timeout(url: &str) -> Result<String, reqwest::Error> {
+    let future = pin!(reqwest::get(url));
+    // `future` is now Pin<&mut impl Future> and cannot be moved
+    future.await?.text().await
+}
+```
+
+**When acceptable:**
+- Simple futures that do not hold self-references across `.await` points (the compiler will tell you)
+- When using `tokio::spawn` or `tokio::select!`, which handle pinning internally
+- When a combinator like `.map()` or `.then()` already returns a pinned future
+
+---
+
+### RS9.3 LifetimeParameterDesign
+
+**Impact: MEDIUM (Descriptive lifetimes make borrow relationships readable; excessive parameters create API friction)**
+
+Lifetime parameters are part of your public API surface. Minimize their count by relying on elision where possible, and when explicit lifetimes are necessary, name them descriptively to communicate what they borrow. Names like `'a` and `'b` force readers to trace data flow manually; names like `'input`, `'conn`, or `'query` make the borrowing relationship self-documenting.
+
+**Incorrect: Excessive and opaque lifetime parameters**
+
+```rust
+// Three single-letter lifetimes -- reader cannot tell what each borrows
+struct QueryResult<'a, 'b, 'c> {
+    connection: &'a Connection,
+    query: &'b str,
+    params: &'c [Value],
+}
+
+// Unnecessary lifetime parameter -- could return owned String
+fn format_name<'a>(first: &'a str, last: &'a str) -> &'a str {
+    // This can't actually work -- you'd need to allocate
+    // The lifetime param here signals a misunderstanding
+    todo!()
+}
+
+impl<'a, 'b, 'c> QueryResult<'a, 'b, 'c> {
+    fn execute(&self) -> Vec<Row> { todo!() }
+}
+```
+
+**Correct: Minimal, descriptively named lifetime parameters**
+
+```rust
+// Single lifetime when all borrows share the same scope
+struct QueryResult<'conn> {
+    connection: &'conn Connection,
+    query: String,        // Owned -- no lifetime needed
+    params: Vec<Value>,   // Owned -- no lifetime needed
+}
+
+// Elision handles the common case -- no annotation needed
+fn first_word(s: &str) -> &str {
+    s.split_whitespace().next().unwrap_or("")
+}
+
+// When multiple lifetimes are genuinely needed, name them
+fn merge_results<'left, 'right>(
+    left: &'left SearchIndex,
+    right: &'right SearchIndex,
+) -> MergedView<'left, 'right> {
+    todo!()
+}
+```
+
+**When acceptable:**
+- Single-letter lifetimes (`'a`) in short, private helper functions where the scope is obvious
+- Trait implementations where the trait definition dictates the lifetime parameter names
+- Closure or iterator adaptor chains where descriptive names would add noise to already dense generic bounds
+
+---
+
+### RS9.4 RAIIResourceManagement
+
+**Impact: HIGH (Drop-based cleanup prevents resource leaks on every exit path including panics)**
+
+Rust's `Drop` trait provides deterministic resource cleanup that runs on every exit path: normal returns, early returns with `?`, and panics (in unwind mode). Manual cleanup code is fragile because every new `return` or `?` introduces a path that can skip the cleanup. Wrap resources in RAII guard types so that cleanup is structurally guaranteed by the compiler.
+
+**Incorrect: Manual cleanup that leaks on early return**
+
+```rust
+fn process_file(path: &Path) -> Result<Stats, Error> {
+    let lock_path = path.with_extension("lock");
+    std::fs::write(&lock_path, "locked")?;
+
+    let data = std::fs::read_to_string(path)?; // <-- early return leaks lock file
+
+    let parsed = parse_data(&data)?;            // <-- early return leaks lock file
+
+    let stats = compute_stats(&parsed);
+
+    std::fs::remove_file(&lock_path)?;          // cleanup only runs on success
+    Ok(stats)
+}
+```
+
+**Correct: RAII guard ensures cleanup on all paths**
+
+```rust
+struct LockFile {
+    path: PathBuf,
+}
+
+impl LockFile {
+    fn acquire(path: PathBuf) -> std::io::Result<Self> {
+        std::fs::write(&path, "locked")?;
+        Ok(Self { path })
+    }
+}
+
+impl Drop for LockFile {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.path);
+    }
+}
+
+fn process_file(path: &Path) -> Result<Stats, Error> {
+    let _lock = LockFile::acquire(path.with_extension("lock"))?;
+    // Lock is released on ANY exit: normal return, ?, or panic
+
+    let data = std::fs::read_to_string(path)?;
+    let parsed = parse_data(&data)?;
+    Ok(compute_stats(&parsed))
+}
+```
+
+**When acceptable:**
+- Trivial scopes with a single possible exit point where a guard type would be over-engineering
+- Performance-critical inner loops where the Drop overhead of creating and destroying guards per iteration is measurable
+- When using `ManuallyDrop` for FFI types where Rust must not run the destructor because ownership transfers to C
+
+---
+
+### RS9.5 ArenaForGraphStructures
+
+**Impact: MEDIUM (Arenas eliminate reference-counting overhead and borrow checker friction for graph/tree structures)**
+
+Graph and tree structures with shared or cyclic references are notoriously difficult to express with Rust's ownership model. The `Rc<RefCell<Node>>` pattern compiles but introduces runtime overhead (reference counting, borrow checking) and panics on borrow violations. Arena allocation with index-based references sidesteps these problems: all nodes live in a single allocation, references are plain indices, and the borrow checker works naturally because you borrow the arena, not individual nodes.
+
+**Incorrect: Rc<RefCell<Node>> graph with runtime overhead and panic risk**
+
+```rust
+use std::cell::RefCell;
+use std::rc::Rc;
+
+type NodeRef = Rc<RefCell<Node>>;
+
+struct Node {
+    value: i32,
+    children: Vec<NodeRef>,
+}
+
+fn sum_tree(node: &NodeRef) -> i32 {
+    let borrowed = node.borrow(); // panics if already mutably borrowed
+    let mut total = borrowed.value;
+    for child in &borrowed.children {
+        total += sum_tree(child);
+    }
+    total
+}
+```
+
+**Correct: Arena with index-based references**
+
+```rust
+use slotmap::{SlotMap, new_key_type};
+
+new_key_type! { struct NodeKey; }
+
+struct Node {
+    value: i32,
+    children: Vec<NodeKey>,
+}
+
+struct Tree {
+    nodes: SlotMap<NodeKey, Node>,
+    root: NodeKey,
+}
+
+impl Tree {
+    fn sum(&self, key: NodeKey) -> i32 {
+        let node = &self.nodes[key];
+        let child_keys: Vec<NodeKey> = node.children.clone();
+        let mut total = node.value;
+        for child_key in child_keys {
+            total += self.sum(child_key);
+        }
+        total
+    }
+
+    fn add_child(&mut self, parent: NodeKey, value: i32) -> NodeKey {
+        let child = self.nodes.insert(Node { value, children: vec![] });
+        self.nodes[parent].children.push(child);
+        child
+    }
+}
+```
+
+**When acceptable:**
+- Simple trees with clear single ownership (parent owns children) where `Vec<Box<Node>>` works naturally
+- Short-lived temporary structures where `Rc` overhead is negligible
+- When interfacing with libraries that expect `Rc`-based APIs
+- Prototyping where borrow checker friction slows iteration and correctness is verified later
+
+---
+
+### RS9.6 AvoidLeakingMemory
+
+**Impact: MEDIUM (Leaked memory is permanent for the process lifetime; leaked Drop obligations silently skip cleanup)**
+
+Rust guarantees memory safety but does not guarantee destructors will run. `std::mem::forget`, `Box::leak`, and reference cycles with `Rc` all prevent `Drop` from executing. If your program relies on `Drop` for correctness (not just cleanup), these leaks become logic bugs. Design types so that leaking them is wasteful but not incorrect, and document intentional leaks with clear comments explaining the lifetime rationale.
+
+**Incorrect: Relying on Drop for correctness, then leaking**
+
+```rust
+struct TempDir {
+    path: PathBuf,
+}
+
+impl Drop for TempDir {
+    fn drop(&mut self) {
+        // Correctness depends on this running -- leaked TempDir
+        // leaves orphaned directories forever
+        std::fs::remove_dir_all(&self.path).ok();
+    }
+}
+
+fn setup_environment() -> &'static Path {
+    let dir = Box::new(TempDir {
+        path: PathBuf::from("/tmp/myapp-work"),
+    });
+    std::fs::create_dir_all(&dir.path).unwrap();
+    // Leak to get 'static reference -- Drop NEVER runs
+    let leaked: &'static TempDir = Box::leak(dir);
+    &leaked.path
+}
+```
+
+**Correct: Intentional leaks documented; Drop not required for correctness**
+
+```rust
+/// Application-wide configuration loaded once at startup.
+/// Intentionally leaked to get a 'static reference because:
+/// 1. The config lives for the entire process lifetime
+/// 2. No cleanup is needed -- it's read-only data
+/// 3. The OS reclaims memory on process exit
+fn init_config() -> &'static Config {
+    let config = Box::new(Config::load_from_env().expect("config required"));
+    Box::leak(config)
+}
+
+/// Temporary directory with explicit cleanup method.
+/// Drop serves as a safety net, but callers should use cleanup()
+/// for guaranteed removal since Drop may not run.
+struct TempDir {
+    path: PathBuf,
+    cleaned: bool,
+}
+
+impl TempDir {
+    fn cleanup(mut self) -> std::io::Result<()> {
+        std::fs::remove_dir_all(&self.path)?;
+        self.cleaned = true;
+        Ok(())
+    }
+}
+
+impl Drop for TempDir {
+    fn drop(&mut self) {
+        if !self.cleaned {
+            eprintln!("warning: TempDir dropped without explicit cleanup: {:?}", self.path);
+            std::fs::remove_dir_all(&self.path).ok();
+        }
+    }
+}
+```
+
+**When acceptable:**
+- Leaking process-lifetime singletons (logger, config, thread pool) where the OS reclaims memory on exit
+- `Box::leak` for string literals or lookup tables that genuinely live for `'static`
+- Test harnesses where leaked allocations are cleaned up by process exit
+
 
 ## Rule Interactions
 

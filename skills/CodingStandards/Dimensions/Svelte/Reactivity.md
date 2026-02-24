@@ -30,17 +30,411 @@ Start with `$state` for mutable values and `$derived` for anything computed. Onl
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [DerivedOverEffect](../../Rules/Svelte/DerivedOverEffect.md) | CRITICAL | Use $derived for computations, never $effect writing to $state |
-| [EffectCleanup](../../Rules/Svelte/EffectCleanup.md) | CRITICAL | Return cleanup functions from $effect for timers, listeners, subscriptions |
-| [DerivedByForComplex](../../Rules/Svelte/DerivedByForComplex.md) | HIGH | Use $derived.by() for multi-statement derived computations |
-| [UntrackExplicit](../../Rules/Svelte/UntrackExplicit.md) | HIGH | Use untrack() to read reactive values without creating dependencies |
-| [NoStateInEffect](../../Rules/Svelte/NoStateInEffect.md) | CRITICAL | Do not declare $state inside $effect -- state belongs at component/module scope |
-| [NoStateForConstants](../../Rules/Svelte/NoStateForConstants.md) | MEDIUM | Use plain const for values that never change -- $state adds unnecessary overhead |
-| [NarrowReactiveDeps](../../Rules/Svelte/NarrowReactiveDeps.md) | HIGH | Destructure objects before use in $derived/$effect to minimize re-execution |
-| [RunesInSvelteTs](../../Rules/Svelte/RunesInSvelteTs.md) | CRITICAL | Use runes in .svelte.ts files for shared reactive state |
-| [NoExportRawState](../../Rules/Svelte/NoExportRawState.md) | CRITICAL | Never export raw $state -- use accessor functions or classes |
-| [StateClasses](../../Rules/Svelte/StateClasses.md) | HIGH | Use classes with $state fields for complex state models |
-| [RunesOverStores](../../Rules/Svelte/RunesOverStores.md) | MEDIUM | Prefer runes over svelte/store for all new Svelte 5 code |
+| DerivedOverEffect | CRITICAL | Use $derived for computations, never $effect writing to $state |
+| EffectCleanup | CRITICAL | Return cleanup functions from $effect for timers, listeners, subscriptions |
+| DerivedByForComplex | HIGH | Use $derived.by() for multi-statement derived computations |
+| UntrackExplicit | HIGH | Use untrack() to read reactive values without creating dependencies |
+| NoStateInEffect | CRITICAL | Do not declare $state inside $effect -- state belongs at component/module scope |
+| NoStateForConstants | MEDIUM | Use plain const for values that never change -- $state adds unnecessary overhead |
+| NarrowReactiveDeps | HIGH | Destructure objects before use in $derived/$effect to minimize re-execution |
+| RunesInSvelteTs | CRITICAL | Use runes in .svelte.ts files for shared reactive state |
+| NoExportRawState | CRITICAL | Never export raw $state -- use accessor functions or classes |
+| StateClasses | HIGH | Use classes with $state fields for complex state models |
+| RunesOverStores | MEDIUM | Prefer runes over svelte/store for all new Svelte 5 code |
+
+
+---
+
+### SV1.1 Use $derived Over $effect for Computations
+
+**Impact: CRITICAL (prevents unnecessary subscriptions and potential infinite loops)**
+
+Use `$derived` for pure computations instead of `$effect`. This is the most common Svelte 5 anti-pattern — using `$effect` to synchronize derived state creates extra subscriptions and risks infinite update loops.
+
+**Incorrect: using $effect to sync derived state**
+
+```svelte
+<script lang="ts">
+  let count = $state(0);
+  let doubled = $state(0);
+
+  // Anti-pattern: $effect for pure computation
+  $effect(() => {
+    doubled = count * 2;
+  });
+</script>
+
+<p>{doubled}</p>
+```
+
+**Correct: $derived for pure computations**
+
+```svelte
+<script lang="ts">
+  let count = $state(0);
+  let doubled = $derived(count * 2);
+</script>
+
+<p>{doubled}</p>
+```
+
+---
+
+### SV1.2 Return Cleanup Functions from $effect
+
+**Impact: CRITICAL (prevents memory leaks from subscriptions, timers, event listeners)**
+
+Always return a cleanup function from `$effect` when the effect creates subscriptions, timers, or event listeners. Without cleanup, these leak on component destroy or when dependencies change.
+
+**Incorrect: no cleanup — timer leaks on component destroy**
+
+```svelte
+<script lang="ts">
+  let elapsed = $state(0);
+
+  $effect(() => {
+    const timer = setInterval(() => {
+      elapsed += 1;
+    }, 1000);
+    // Missing cleanup!
+  });
+</script>
+```
+
+**Correct: cleanup function prevents leak**
+
+```svelte
+<script lang="ts">
+  let elapsed = $state(0);
+
+  $effect(() => {
+    const timer = setInterval(() => {
+      elapsed += 1;
+    }, 1000);
+    return () => clearInterval(timer);
+  });
+</script>
+```
+
+---
+
+### SV1.3 Use $derived.by for Multi-Line Derivations
+
+**Impact: HIGH (improves readability of complex derived computations)**
+
+Use `$derived.by(() => {...})` when derived values need intermediate variables or complex logic that doesn't fit in a single expression.
+
+**Incorrect: long unreadable $derived expression**
+
+```svelte
+<script lang="ts">
+  let items = $state<Item[]>([]);
+  let search = $state('');
+
+  // Hard to read — filter + sort + slice in one expression
+  let results = $derived(items.filter(i => i.name.includes(search)).sort((a, b) => a.date - b.date).slice(0, 10));
+</script>
+```
+
+**Correct: $derived.by with intermediate variables**
+
+```svelte
+<script lang="ts">
+  let items = $state<Item[]>([]);
+  let search = $state('');
+
+  let results = $derived.by(() => {
+    const filtered = items.filter(i => i.name.includes(search));
+    const sorted = filtered.sort((a, b) => a.date - b.date);
+    return sorted.slice(0, 10);
+  });
+</script>
+```
+
+---
+
+### SV1.4 Use untrack() to Exclude Dependencies
+
+**Impact: HIGH (prevents infinite loops from accidental dependency tracking)**
+
+Use `untrack()` when you intentionally want to read a reactive variable inside `$effect` without subscribing to it. This prevents infinite loops where an effect modifies a value it also reads.
+
+**Incorrect: infinite loop — effect tracks what it modifies**
+
+```svelte
+<script lang="ts">
+  import { untrack } from 'svelte';
+
+  let count = $state(0);
+  let renderCount = $state(0);
+
+  $effect(() => {
+    console.log(count);
+    renderCount++; // Tracked! Triggers re-run → infinite loop
+  });
+</script>
+```
+
+**Correct: untrack prevents subscription**
+
+```svelte
+<script lang="ts">
+  import { untrack } from 'svelte';
+
+  let count = $state(0);
+  let renderCount = $state(0);
+
+  $effect(() => {
+    console.log(count);
+    untrack(() => { renderCount++; }); // Not tracked
+  });
+</script>
+```
+
+---
+
+### SV1.5 Don't Set $state in $effect When $derived Works
+
+**Impact: HIGH (eliminates unnecessary reactive overhead)**
+
+Effects are for side effects (DOM manipulation, API calls, logging) — not for synchronizing state. If an `$effect` sets a `$state` variable based on other state, it should almost always be `$derived` instead.
+
+**Incorrect: $effect setting $state — should be $derived**
+
+```svelte
+<script lang="ts">
+  let items = $state<string[]>([]);
+  let count = $state(0);
+
+  $effect(() => {
+    count = items.length; // Synchronizing state — use $derived
+  });
+</script>
+```
+
+**Correct: $derived for computed values**
+
+```svelte
+<script lang="ts">
+  let items = $state<string[]>([]);
+  let count = $derived(items.length);
+</script>
+```
+
+---
+
+### SV1.6 Don't Wrap Constants in $state
+
+**Impact: MEDIUM (reduces unnecessary reactive overhead)**
+
+Immutable values that never change don't need reactive tracking. Wrapping them in `$state` adds overhead for zero benefit.
+
+**Incorrect: constant wrapped in $state**
+
+```svelte
+<script lang="ts">
+  let API_BASE = $state('https://api.example.com');
+  let MAX_RETRIES = $state(3);
+</script>
+```
+
+**Correct: plain const for immutable values**
+
+```svelte
+<script lang="ts">
+  const API_BASE = 'https://api.example.com';
+  const MAX_RETRIES = 3;
+</script>
+```
+
+---
+
+### SV1.7 Narrow Reactive Dependencies with $derived
+
+**Impact: HIGH (minimizes unnecessary re-renders)**
+
+Extract specific derived values to narrow what triggers re-renders. Reading an entire object when you only need one property causes updates on every property change.
+
+**Incorrect: component re-renders on any user property change**
+
+```svelte
+<script lang="ts">
+  let user = $state({ name: 'Alice', email: 'a@b.com', age: 30 });
+
+  // Reads entire user object — re-renders when name OR age change
+  $effect(() => {
+    sendAnalytics(user.email);
+  });
+</script>
+```
+
+**Correct: narrow to specific property**
+
+```svelte
+<script lang="ts">
+  let user = $state({ name: 'Alice', email: 'a@b.com', age: 30 });
+  let userEmail = $derived(user.email);
+
+  // Only re-runs when email changes
+  $effect(() => {
+    sendAnalytics(userEmail);
+  });
+</script>
+```
+
+---
+
+### SV1.8 Use Runes in .svelte.ts for Shared State
+
+**Impact: CRITICAL (replaces writable stores with fine-grained reactivity)**
+
+Use runes (`$state`, `$derived`) in `.svelte.ts` files for shared reactive state. This replaces the Svelte 4 `writable`/`derived` store pattern with simpler, more performant code.
+
+**Incorrect: Svelte 4 writable store pattern**
+
+```typescript
+// stores.ts
+import { writable, derived } from 'svelte/store';
+
+export const user = writable<User | null>(null);
+export const isLoggedIn = derived(user, $u => $u !== null);
+```
+
+**Correct: runes in .svelte.ts**
+
+```typescript
+// appState.svelte.ts
+let user = $state<User | null>(null);
+
+export function getUser() { return user; }
+export function setUser(u: User | null) { user = u; }
+export function isLoggedIn() { return user !== null; }
+```
+
+---
+
+### SV1.9 Never Export Raw $state Variables
+
+**Impact: CRITICAL (Svelte enforces reference stability — raw export won't compile)**
+
+Svelte 5 prevents directly exporting `$state` bindings. Use accessor functions or a class to expose shared state.
+
+**Incorrect: raw $state export — compile error**
+
+```typescript
+// state.svelte.ts
+export let user = $state<User | null>(null); // ERROR: Cannot export $state
+```
+
+**Correct: accessor functions**
+
+```typescript
+// state.svelte.ts
+let user = $state<User | null>(null);
+
+export function getUser() { return user; }
+export function setUser(u: User | null) { user = u; }
+```
+
+**Also correct: class with $state fields**
+
+```typescript
+// state.svelte.ts
+class AppState {
+  user = $state<User | null>(null);
+  get isLoggedIn() { return this.user !== null; }
+}
+
+export const appState = new AppState();
+```
+
+---
+
+### SV1.10 Use Classes for Complex State Models
+
+**Impact: HIGH (encapsulates state, methods, and computed properties together)**
+
+For state with multiple operations and computed values, use a class with `$state` fields. This keeps related logic together and provides a clean API.
+
+**Incorrect: scattered state and functions**
+
+```typescript
+// state.svelte.ts
+let todos = $state<Todo[]>([]);
+let filter = $state<'all' | 'active' | 'done'>('all');
+
+export function getTodos() { return todos; }
+export function getFilter() { return filter; }
+export function addTodo(text: string) { todos.push({ text, done: false }); }
+export function toggleTodo(i: number) { todos[i].done = !todos[i].done; }
+export function getFiltered() {
+  if (filter === 'all') return todos;
+  return todos.filter(t => filter === 'done' ? t.done : !t.done);
+}
+```
+
+**Correct: class encapsulates everything**
+
+```typescript
+// state.svelte.ts
+class TodoState {
+  todos = $state<Todo[]>([]);
+  filter = $state<'all' | 'active' | 'done'>('all');
+
+  get filtered() {
+    if (this.filter === 'all') return this.todos;
+    return this.todos.filter(t =>
+      this.filter === 'done' ? t.done : !t.done
+    );
+  }
+
+  add = (text: string) => {
+    this.todos.push({ text, done: false });
+  };
+
+  toggle = (i: number) => {
+    this.todos[i].done = !this.todos[i].done;
+  };
+}
+
+export const todoState = new TodoState();
+```
+
+---
+
+### SV1.11 Prefer Runes Over Stores for New Code
+
+**Impact: MEDIUM (simplifies reactive patterns and reduces boilerplate)**
+
+For new Svelte 5 code, prefer runes (`$state`, `$derived`) over stores (`writable`, `derived`). Keep stores only for legacy Svelte 4 code or third-party libraries that require the store contract.
+
+**Incorrect: reaching for stores in new Svelte 5 code**
+
+```typescript
+// new-feature.ts
+import { writable, derived } from 'svelte/store';
+
+export const count = writable(0);
+export const doubled = derived(count, $c => $c * 2);
+```
+
+**Correct: runes in .svelte.ts for new code**
+
+```typescript
+// new-feature.svelte.ts
+let count = $state(0);
+let doubled = $derived(count * 2);
+
+export function getCount() { return count; }
+export function increment() { count++; }
+export function getDoubled() { return doubled; }
+```
+
+**When stores are still appropriate:**
+- Legacy Svelte 4 components not yet migrated
+- Third-party libraries requiring store contracts
+- Interop with non-Svelte code expecting subscribe/set interface
+
 
 ## Rule Interactions
 

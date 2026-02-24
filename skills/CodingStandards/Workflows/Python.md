@@ -8,7 +8,7 @@ Apply Python coding standards covering defensive programming, type system usage,
 
 ## Reference Material
 
-- `../Rules/Python/` — 18 individual rule files across 5 categories
+- `../Dimensions/Python/` — 18 rules inlined across 5 categories
 
 ## Quick Decision Tree
 
@@ -20,7 +20,7 @@ Apply Python coding standards covering defensive programming, type system usage,
 4. **Code organization problems?** → Category 4: Code Organization (HIGH)
 5. **Error handling gaps?** → Category 5: Error Handling (MEDIUM)
 
-**For detailed implementation:** Read the specific rule file from `../Rules/Python/` folder.
+**For detailed implementation:** Read the relevant dimension file from `../Dimensions/Python/` folder (rules are inlined).
 
 ## Priority Hierarchy
 
@@ -89,21 +89,21 @@ def append_item(item: str, items: list[str] | None = None) -> list[str]:
 
 ## How to Use Rules
 
-**Pattern:** When applying a rule, read its specific file from `../Rules/Python/` folder.
+**Pattern:** When applying a rule, find it in the relevant dimension file from `../Dimensions/Python/` (rules are inlined).
 
 ```
 Decision tree identifies: Category 1 (Defensive Programming)
 Quick ref shows: DefensiveLbyl rule
-Action: Read ../Rules/Python/DefensiveLbyl.md
+Action: Read ../Dimensions/Python/DefensiveLbyl.md (rule is inlined in the dimension file)
 Result: Complete code examples and implementation guidance
 ```
 
 ### Rule File Naming Convention
 
 Rules use TitleCase naming for PAI compliance:
-- `defensive-lbyl` → `../Rules/Python/DefensiveLbyl.md`
-- `type-hints-required` → `../Rules/Python/TypeHintsRequired.md`
-- `org-keyword-arguments` → `../Rules/Python/OrgKeywordArguments.md`
+- `defensive-lbyl` → search in the relevant dimension file
+- `type-hints-required` → search in the relevant dimension file
+- `org-keyword-arguments` → search in the relevant dimension file
 
 ## Complete Rule Index
 
@@ -147,9 +147,9 @@ For agents that need focused subsets rather than the full rule set, read `../Dim
 
 | Dimension | File | Rule Count | Load When |
 |-----------|------|------------|-----------|
-| Defensive Programming | DefensiveProgramming.md | 4 | Input validation, LBYL patterns, path checking |
+| Defensive Programming and Performance | DefensiveAndPerformance.md | 4 | Input validation, LBYL patterns, path checking |
 | Type System | TypeSystem.md | 4 | Type hints, Literal types, avoiding Any |
-| Performance | Performance.md | 3 | Magic methods, import deferral, mutable defaults |
+
 | Code Organization | CodeOrganization.md | 7 | Keyword args, declaration scope, error handling |
 
 **Default:** Load Defensive Programming for any Python task.

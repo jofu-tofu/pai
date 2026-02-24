@@ -8,7 +8,7 @@ Apply Rust coding standards covering ownership, error handling, concurrency, per
 
 ## Reference Material
 
-- `../Rules/Rust/` — 73 individual rule files across 10 categories
+- `../Dimensions/Rust/` — 73 rules inlined across 10 categories
 
 ## Quick Decision Tree
 
@@ -25,7 +25,7 @@ Apply Rust coding standards covering ownership, error handling, concurrency, per
 9. **Lifetime/memory questions?** → Category 9: Memory & Lifetimes (HIGH)
 10. **Project organization?** → Category 10: Project Structure (HIGH)
 
-**For detailed implementation:** Read the specific rule file from `../Rules/Rust/` folder.
+**For detailed implementation:** Read the relevant dimension file from `../Dimensions/Rust/` folder (rules are inlined).
 
 ## Priority Hierarchy
 
@@ -96,21 +96,21 @@ do_async_work(&value).await;
 
 ## How to Use Rules
 
-**Pattern:** When applying a rule, read its specific file from `../Rules/Rust/` folder.
+**Pattern:** When applying a rule, find it in the relevant dimension file from `../Dimensions/Rust/` (rules are inlined).
 
 ```
 Decision tree identifies: Category 1 (Ownership & Borrowing)
 Quick ref shows: PreferBorrowOverClone rule
-Action: Read ../Rules/Rust/PreferBorrowOverClone.md
+Action: Read ../Dimensions/Rust/PreferBorrowOverClone.md (rule is inlined in the dimension file)
 Result: Complete code examples and implementation guidance
 ```
 
 ### Rule File Naming Convention
 
 Rules use TitleCase naming for PAI compliance:
-- `prefer-borrow-over-clone` → `../Rules/Rust/PreferBorrowOverClone.md`
-- `thiserror-for-libs-anyhow-for-apps` → `../Rules/Rust/ThiserrorForLibsAnyhowForApps.md`
-- `no-mutex-across-await` → `../Rules/Rust/NoMutexAcrossAwait.md`
+- `prefer-borrow-over-clone` → search in the relevant dimension file
+- `thiserror-for-libs-anyhow-for-apps` → search in the relevant dimension file
+- `no-mutex-across-await` → search in the relevant dimension file
 
 ## Complete Rule Index
 

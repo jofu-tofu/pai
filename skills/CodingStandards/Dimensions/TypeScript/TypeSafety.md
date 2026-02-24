@@ -32,11 +32,263 @@ Enable all strict flags before writing the first line of code. Use `unknown` ins
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [StrictModeAlways](../../Rules/TypeScript/StrictModeAlways.md) | CRITICAL | Enable `strict: true` in every tsconfig — without it, TypeScript is JavaScript with extra syntax |
-| [NoUncheckedIndexAccess](../../Rules/TypeScript/NoUncheckedIndexAccess.md) | CRITICAL | Enable `noUncheckedIndexedAccess` so array and record indexing returns `T \| undefined` |
-| [NeverAny](../../Rules/TypeScript/NeverAny.md) | CRITICAL | Replace `any` with `unknown` and narrow — `any` disables type checking and spreads virally |
-| [NarrowBeforeUse](../../Rules/TypeScript/NarrowBeforeUse.md) | CRITICAL | Use type guards to prove types at runtime instead of `as` assertions that bypass safety |
-| [BrandedForValidation](../../Rules/TypeScript/BrandedForValidation.md) | MEDIUM | Use branded types to distinguish semantically different values that share the same primitive type |
+| StrictModeAlways | CRITICAL | Enable `strict: true` in every tsconfig — without it, TypeScript is JavaScript with extra syntax |
+| NoUncheckedIndexAccess | CRITICAL | Enable `noUncheckedIndexedAccess` so array and record indexing returns `T \| undefined` |
+| NeverAny | CRITICAL | Replace `any` with `unknown` and narrow — `any` disables type checking and spreads virally |
+| NarrowBeforeUse | CRITICAL | Use type guards to prove types at runtime instead of `as` assertions that bypass safety |
+| BrandedForValidation | MEDIUM | Use branded types to distinguish semantically different values that share the same primitive type |
+
+
+---
+
+### TS1.1 Strict Mode Always
+
+**Impact: CRITICAL (Catches entire classes of bugs — null errors, implicit any, unsafe binds — at compile time instead of production)**
+
+TypeScript without `strict: true` is JavaScript with extra syntax. Strict mode enables `strictNullChecks`, `noImplicitAny`, `strictFunctionTypes`, and other flags that make the type system actually useful. Enabling it on an existing codebase surfaces real bugs.
+
+**Incorrect: Permissive compiler misses real bugs**
+
+```typescript
+// tsconfig.json — "strict" not enabled
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext"
+    // strict defaults to false — silent bugs everywhere
+  }
+}
+
+// This compiles without error but crashes at runtime
+function getUser(id) {           // id is implicitly 'any'
+  return users.find(u => u.id === id);
+}
+const name = getUser(1).name;    // potential null dereference — no warning
+```
+
+**Correct: Strict mode catches bugs at compile time**
+
+```typescript
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true
+  }
+}
+
+// Compiler now requires explicit types and null handling
+function getUser(id: number): User | undefined {
+  return users.find(u => u.id === id);
+}
+const user = getUser(1);
+const name = user?.name ?? "Unknown";  // forced to handle undefined
+```
+
+**When acceptable:**
+- Gradual migration: use `// @ts-expect-error` with explanatory comments on specific lines, never `// @ts-ignore`
+- Third-party type conflicts: isolate in a `.d.ts` file with targeted overrides
+- Never acceptable to leave `strict: false` in a new project
+
+---
+
+### TS1.2 No Unchecked Index Access
+
+**Impact: CRITICAL (Prevents undefined-at-runtime from array/object indexing that TypeScript normally assumes safe)**
+
+By default, TypeScript treats `array[0]` as the element type, not `T | undefined`. This is a lie — the index may not exist. `noUncheckedIndexedAccess` forces you to handle the `undefined` case, catching a class of bugs that `strict: true` alone misses.
+
+**Incorrect: Array indexing assumed safe**
+
+```typescript
+// tsconfig: noUncheckedIndexedAccess is NOT enabled
+const users = ["Alice", "Bob"];
+const third = users[2];         // TypeScript says: string
+console.log(third.toUpperCase()); // Runtime: Cannot read properties of undefined
+
+const config: Record<string, string> = { theme: "dark" };
+const lang = config["language"]; // TypeScript says: string
+console.log(lang.split("-"));    // Runtime: crash
+```
+
+**Correct: Index access returns T | undefined**
+
+```typescript
+// tsconfig: "noUncheckedIndexedAccess": true
+const users = ["Alice", "Bob"];
+const third = users[2];          // TypeScript says: string | undefined
+
+if (third) {
+  console.log(third.toUpperCase()); // safe — narrowed to string
+}
+
+const config: Record<string, string> = { theme: "dark" };
+const lang = config["language"] ?? "en-US"; // explicit fallback
+```
+
+**When acceptable:**
+- After a bounds check: `if (i < array.length)` followed by `array[i]` — but narrowing with `at()` or optional chaining is still preferred
+- Tuple types with known length already have correct types at specific indices
+
+---
+
+### TS1.3 Never Use Any
+
+**Impact: CRITICAL (Any disables type checking and spreads virally — one `any` infects every value it touches)**
+
+`any` is a type-checking escape hatch that turns TypeScript back into JavaScript. It's not "flexible" — it's invisible. Values typed as `any` pass through every check silently, and `any` propagates: a function returning `any` makes its callers untyped too. Use `unknown` when you genuinely don't know the type.
+
+**Incorrect: Any disables the type system**
+
+```typescript
+function parseConfig(raw: any): any {
+  return raw.settings.theme;     // no error if raw is null
+}
+
+const config = parseConfig(null); // config is any
+config.nonexistent.deep.access;   // no error — crashes at runtime
+
+// any spreads to everything it touches
+const theme = config.theme;       // theme is any
+const upper = theme.toUpperCase(); // any — no safety
+```
+
+**Correct: Use unknown and narrow**
+
+```typescript
+function parseConfig(raw: unknown): AppConfig {
+  if (!isRecord(raw) || !isRecord(raw.settings)) {
+    throw new Error("Invalid config structure");
+  }
+  return raw.settings as AppConfig; // validated before assertion
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+```
+
+**When acceptable:**
+- Inside generic function implementations where the type parameter constrains the public API (Matt Pocock's "any in generics" pattern)
+- Typing third-party libraries with no `@types` package — isolate in a `.d.ts` file
+- `JSON.parse()` return — but immediately validate with Zod (see Rule 8.1)
+
+---
+
+### TS1.4 Narrow Before Use
+
+**Impact: CRITICAL (Type assertions lie to the compiler — type guards prove correctness)**
+
+Type assertions (`as`) tell the compiler "trust me" without evidence. Type guards (`typeof`, `in`, `instanceof`, custom predicates) prove the type through runtime checks that the compiler can verify. Assertions hide bugs; narrowing catches them.
+
+**Incorrect: Type assertions bypass safety**
+
+```typescript
+interface AdminUser {
+  role: "admin";
+  permissions: string[];
+}
+
+function getPermissions(user: unknown): string[] {
+  const admin = user as AdminUser;     // no runtime check
+  return admin.permissions;            // crashes if user isn't AdminUser
+}
+
+// Even with known types, 'as' is dangerous
+const input = document.getElementById("email") as HTMLInputElement;
+input.value = "test";  // crashes if element is null or not an input
+```
+
+**Correct: Type guards prove the type**
+
+```typescript
+function isAdminUser(user: unknown): user is AdminUser {
+  return (
+    typeof user === "object" &&
+    user !== null &&
+    "role" in user &&
+    (user as { role: unknown }).role === "admin"
+  );
+}
+
+function getPermissions(user: unknown): string[] {
+  if (!isAdminUser(user)) {
+    throw new Error("Expected admin user");
+  }
+  return user.permissions;  // TypeScript knows this is AdminUser
+}
+
+// Narrow DOM elements properly
+const input = document.getElementById("email");
+if (input instanceof HTMLInputElement) {
+  input.value = "test";  // safe — proven to be HTMLInputElement
+}
+```
+
+**When acceptable:**
+- `as const` for literal type assertions — this is safe and encouraged
+- After Zod `.parse()` which performs runtime validation (see Rule 8.1)
+- Double assertion `as unknown as T` in test factories where you intentionally create partial mocks
+
+---
+
+### TS1.5 Branded Types for Validated Data
+
+**Impact: MEDIUM (Prevents mixing semantically different values that share the same primitive type — UserId vs OrderId are both strings but not interchangeable)**
+
+TypeScript is structurally typed — two `string` types are interchangeable even when they represent different domains. Branded types add a phantom property that makes them nominally distinct, so the compiler prevents you from passing a `UserId` where an `OrderId` is expected.
+
+**Incorrect: Primitive types allow semantic misuse**
+
+```typescript
+function getUser(id: string): User { /* ... */ }
+function getOrder(id: string): Order { /* ... */ }
+
+const userId = "usr_123";
+const orderId = "ord_456";
+
+// No error — both are string, but this is a bug
+getUser(orderId);
+getOrder(userId);
+```
+
+**Correct: Branded types enforce domain boundaries**
+
+```typescript
+type Brand<T, B extends string> = T & { readonly __brand: B };
+
+type UserId = Brand<string, "UserId">;
+type OrderId = Brand<string, "OrderId">;
+
+// Creation functions validate and brand
+function UserId(id: string): UserId {
+  if (!id.startsWith("usr_")) throw new Error(`Invalid user ID: ${id}`);
+  return id as UserId;
+}
+
+function OrderId(id: string): OrderId {
+  if (!id.startsWith("ord_")) throw new Error(`Invalid order ID: ${id}`);
+  return id as OrderId;
+}
+
+function getUser(id: UserId): User { /* ... */ }
+function getOrder(id: OrderId): Order { /* ... */ }
+
+const userId = UserId("usr_123");
+const orderId = OrderId("ord_456");
+
+getUser(orderId);  // compile error — OrderId is not assignable to UserId
+getUser(userId);   // works
+```
+
+**When acceptable:**
+- Internal utility code where the overhead of branding isn't worth the safety
+- Types already distinguished by structure (interfaces with different properties don't need branding)
+- Prototyping — add brands when the domain model stabilizes
+
 
 ## Rule Interactions
 

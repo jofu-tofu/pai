@@ -36,13 +36,525 @@ Use `*` in function signatures to enforce keyword-only arguments for functions w
 
 | Rule | Impact | Summary |
 |------|--------|---------|
-| [OrgKeywordArguments](../../Rules/Python/OrgKeywordArguments.md) | HIGH | Use keyword-only arguments for functions with 3+ parameters or boolean params |
-| [OrgDeclareCloseToUse](../../Rules/Python/OrgDeclareCloseToUse.md) | HIGH | Declare variables immediately before their first use, not at function top |
-| [OrgDefaultValuesDangerous](../../Rules/Python/OrgDefaultValuesDangerous.md) | HIGH | Remove defaults from parameters where callers should make explicit decisions |
-| [OrgSingleResponsibility](../../Rules/Python/OrgSingleResponsibility.md) | HIGH | Each function should have exactly one responsibility |
-| [ErrorContextManagers](../../Rules/Python/ErrorContextManagers.md) | MEDIUM | Use context managers for all resource acquisition and cleanup |
-| [ErrorSpecificExceptions](../../Rules/Python/ErrorSpecificExceptions.md) | MEDIUM | Catch specific exception types, never bare except or except Exception |
-| [ErrorMeaningfulMessages](../../Rules/Python/ErrorMeaningfulMessages.md) | MEDIUM | Include failed value, expected constraint, and context in error messages |
+| OrgKeywordArguments | HIGH | Use keyword-only arguments for functions with 3+ parameters or boolean params |
+| OrgDeclareCloseToUse | HIGH | Declare variables immediately before their first use, not at function top |
+| OrgDefaultValuesDangerous | HIGH | Remove defaults from parameters where callers should make explicit decisions |
+| OrgSingleResponsibility | HIGH | Each function should have exactly one responsibility |
+| ErrorContextManagers | MEDIUM | Use context managers for all resource acquisition and cleanup |
+| ErrorSpecificExceptions | MEDIUM | Catch specific exception types, never bare except or except Exception |
+| ErrorMeaningfulMessages | MEDIUM | Include failed value, expected constraint, and context in error messages |
+
+
+---
+
+### PY4.1 Keyword Arguments for Complex Functions
+
+**Impact: HIGH (Self-documenting call sites)**
+
+Functions with multiple parameters of the same type become confusing at call sites. Keyword arguments make calls self-documenting and prevent argument order mistakes.
+
+**Incorrect: Positional arguments obscure meaning**
+
+```python
+def create_rectangle(x1: int, y1: int, x2: int, y2: int) -> Rectangle:
+    ...
+
+# Which is width? Which is height? Which corner is which?
+rect = create_rectangle(10, 20, 100, 200)
+
+def send_email(
+    recipient: str,
+    sender: str,
+    subject: str,
+    body: str
+) -> None:
+    ...
+
+# Easy to swap recipient and sender by mistake
+send_email("alice@co.com", "bob@co.com", "Hello", "Message")
+```
+
+**Correct: Keyword-only arguments enforce clarity**
+
+```python
+def create_rectangle(
+    *,  # Forces all following to be keyword-only
+    x1: int,
+    y1: int,
+    x2: int,
+    y2: int,
+) -> Rectangle:
+    ...
+
+# Call site is self-documenting
+rect = create_rectangle(x1=10, y1=20, x2=100, y2=200)
+
+def send_email(
+    *,
+    recipient: str,
+    sender: str,
+    subject: str,
+    body: str,
+) -> None:
+    ...
+
+# Can't accidentally swap arguments
+send_email(
+    recipient="alice@co.com",
+    sender="bob@co.com",
+    subject="Hello",
+    body="Message",
+)
+```
+
+**Guidelines:**
+- Use `*` to force keyword-only for 3+ parameters
+- Use keyword-only when parameters have same type
+- Use keyword-only for boolean parameters (avoid `do_thing(True, False)`)
+- First 1-2 "obvious" parameters can remain positional
+
+```python
+# OK: First parameter is obvious, rest are keyword-only
+def fetch(url: str, *, timeout: int = 30, retries: int = 3) -> Response:
+    ...
+
+fetch("https://api.example.com", timeout=60, retries=5)
+```
+
+---
+
+### PY4.2 Declare Variables Close to Use
+
+**Impact: HIGH (Reduces cognitive load, clarifies data flow)**
+
+Variables declared far from their use force readers to scroll back and forth, increasing cognitive load. Declaring close to use makes data flow obvious and reduces the "working memory" needed to understand code.
+
+**Incorrect: Variables declared far from use**
+
+```python
+def process_order(order: Order) -> Receipt:
+    # Variables declared at top, used much later
+    tax_rate = 0.08
+    discount_multiplier = 0.9
+    shipping_cost = 5.99
+
+    # ... 50 lines of validation ...
+
+    # ... 30 lines of inventory checks ...
+
+    # Finally using the variables
+    subtotal = calculate_subtotal(order.items)
+    tax = subtotal * tax_rate  # Where was tax_rate defined?
+    total = subtotal * discount_multiplier + tax + shipping_cost
+
+    return Receipt(total=total)
+```
+
+**Correct: Variables declared at point of use**
+
+```python
+def process_order(order: Order) -> Receipt:
+    validate_order(order)
+    check_inventory(order.items)
+
+    # Variables declared right where they're used
+    subtotal = calculate_subtotal(order.items)
+
+    tax_rate = 0.08
+    tax = subtotal * tax_rate
+
+    discount_multiplier = 0.9
+    discounted = subtotal * discount_multiplier
+
+    shipping_cost = 5.99
+    total = discounted + tax + shipping_cost
+
+    return Receipt(total=total)
+```
+
+**Additional benefits:**
+- Easier to extract functions (related code is grouped)
+- Reduces variable scope (fewer places where bugs can hide)
+- Makes dead code obvious (unused variables near their declaration)
+
+**Exception: Configuration/constants at module or class level**
+
+```python
+# OK at module level - these are configuration
+TAX_RATE = 0.08
+SHIPPING_BASE = 5.99
+
+class OrderProcessor:
+    # OK at class level - shared by all methods
+    DEFAULT_DISCOUNT = 0.9
+```
+
+---
+
+### PY4.3 Default Values Are Dangerous
+
+**Impact: HIGH (Callers forget to provide, causes surprises)**
+
+Default values seem convenient but hide required decisions. Callers rely on defaults without understanding them, leading to bugs when defaults don't match their use case.
+
+**Incorrect: Defaults hide important decisions**
+
+```python
+def fetch_data(
+    url: str,
+    timeout: int = 30,
+    retries: int = 3,
+    verify_ssl: bool = True,
+) -> Response:
+    ...
+
+# Caller uses defaults without thinking
+data = fetch_data("https://api.example.com")
+# Is 30s timeout appropriate? Are 3 retries right for this call?
+
+def create_user(
+    name: str,
+    role: str = "user",
+    active: bool = True,
+) -> User:
+    ...
+
+# Accidentally creates active admin users
+admin = create_user("Alice", role="admin")  # active=True by default
+```
+
+**Correct: Require explicit decisions for important parameters**
+
+```python
+def fetch_data(
+    url: str,
+    *,
+    timeout: int,  # No default - caller must decide
+    retries: int,  # No default - caller must decide
+    verify_ssl: bool = True,  # OK - safe default
+) -> Response:
+    ...
+
+# Caller forced to think about timeout and retries
+data = fetch_data(
+    "https://api.example.com",
+    timeout=10,  # Appropriate for this use case
+    retries=1,   # Don't retry this particular call
+)
+
+def create_user(
+    name: str,
+    *,
+    role: str,     # No default - force explicit role assignment
+    active: bool,  # No default - force explicit activation decision
+) -> User:
+    ...
+
+# Caller must explicitly decide
+admin = create_user("Alice", role="admin", active=False)
+```
+
+**When defaults are appropriate:**
+- Truly optional parameters with safe, obvious defaults
+- Backward compatibility (but consider deprecation)
+- Parameters where 90%+ of callers want the same value
+
+---
+
+### PY4.4 Single Responsibility
+
+**Impact: HIGH (Easier to test, modify, understand)**
+
+Functions and classes that do one thing well are easier to test, modify, and compose. When a function has multiple responsibilities, changes to one responsibility risk breaking others.
+
+**Incorrect: Multiple responsibilities mixed**
+
+```python
+def process_and_save_user(data: dict) -> User:
+    # Responsibility 1: Validation
+    if not data.get("email"):
+        raise ValueError("Email required")
+    if not data.get("name"):
+        raise ValueError("Name required")
+
+    # Responsibility 2: Transformation
+    user = User(
+        email=data["email"].lower(),
+        name=data["name"].strip(),
+        created_at=datetime.now(),
+    )
+
+    # Responsibility 3: Persistence
+    db.session.add(user)
+    db.session.commit()
+
+    # Responsibility 4: Notification
+    send_welcome_email(user)
+
+    return user
+```
+
+**Correct: Single responsibility per function**
+
+```python
+def validate_user_data(data: dict) -> None:
+    """Validate user data, raise ValueError if invalid."""
+    if not data.get("email"):
+        raise ValueError("Email required")
+    if not data.get("name"):
+        raise ValueError("Name required")
+
+def create_user_from_data(data: dict) -> User:
+    """Transform raw data into User object."""
+    return User(
+        email=data["email"].lower(),
+        name=data["name"].strip(),
+        created_at=datetime.now(),
+    )
+
+def save_user(user: User) -> None:
+    """Persist user to database."""
+    db.session.add(user)
+    db.session.commit()
+
+def notify_new_user(user: User) -> None:
+    """Send welcome notification to new user."""
+    send_welcome_email(user)
+
+# Compose as needed
+def register_user(data: dict) -> User:
+    """Orchestrate user registration."""
+    validate_user_data(data)
+    user = create_user_from_data(data)
+    save_user(user)
+    notify_new_user(user)
+    return user
+```
+
+**Benefits:**
+- Each function is independently testable
+- Responsibilities can be reused (validate without save)
+- Changes to one responsibility don't affect others
+- Clear names describe what each function does
+
+---
+
+### PY4.5 Use Context Managers
+
+**Impact: MEDIUM (Guarantees resource cleanup)**
+
+Context managers ensure resources are properly released even when exceptions occur. Without them, files stay open, locks remain held, and connections leak under error conditions.
+
+**Incorrect: Manual resource management**
+
+```python
+# File may stay open if exception occurs
+f = open("data.txt")
+data = f.read()
+process(data)
+f.close()  # Never reached if process() raises
+
+# Lock may stay held
+lock.acquire()
+do_critical_work()
+lock.release()  # Never reached if work raises
+
+# Connection may leak
+conn = database.connect()
+result = conn.execute(query)
+conn.close()  # Never reached if execute raises
+```
+
+**Correct: Context managers guarantee cleanup**
+
+```python
+# File always closed, even on exception
+with open("data.txt") as f:
+    data = f.read()
+    process(data)
+
+# Lock always released
+with lock:
+    do_critical_work()
+
+# Connection always returned to pool
+with database.connect() as conn:
+    result = conn.execute(query)
+```
+
+**Custom context managers:**
+
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def timed_operation(name: str):
+    """Log duration of an operation."""
+    start = time.perf_counter()
+    try:
+        yield
+    finally:
+        elapsed = time.perf_counter() - start
+        logger.info(f"{name} took {elapsed:.2f}s")
+
+with timed_operation("data_processing"):
+    process_large_dataset()
+
+# Class-based for complex state
+class DatabaseTransaction:
+    def __init__(self, connection):
+        self.conn = connection
+
+    def __enter__(self):
+        self.conn.begin()
+        return self.conn
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            self.conn.commit()
+        else:
+            self.conn.rollback()
+        return False  # Don't suppress exceptions
+```
+
+---
+
+### PY4.6 Catch Specific Exceptions
+
+**Impact: MEDIUM (Bare except hides bugs)**
+
+Catching `Exception` or using bare `except:` hides bugs by treating all failures the same. A typo causing `NameError` looks identical to the network error you intended to handle.
+
+**Incorrect: Overly broad exception handling**
+
+```python
+# Bare except catches everything, including bugs
+try:
+    result = process_data(data)
+except:
+    result = default_value
+
+# Catching Exception hides programming errors
+try:
+    user = users[user_id]  # KeyError if missing
+    email = user.email.lower()  # AttributeError if no email
+    send_notification(emial)  # NameError: typo in 'email'
+except Exception:
+    logger.error("Failed to send notification")
+    # Bug hidden - typo never discovered
+```
+
+**Correct: Catch specific expected exceptions**
+
+```python
+# Catch only what you expect and can handle
+try:
+    result = process_data(data)
+except ValueError as e:
+    logger.warning(f"Invalid data format: {e}")
+    result = default_value
+except ConnectionError as e:
+    logger.error(f"Network error: {e}")
+    raise  # Re-raise if we can't handle it
+
+# Multiple specific exceptions
+try:
+    user = users[user_id]
+    email = user.email.lower()
+    send_notification(email)
+except KeyError:
+    logger.warning(f"User {user_id} not found")
+except AttributeError:
+    logger.warning(f"User {user_id} has no email")
+except NotificationError as e:
+    logger.error(f"Notification failed: {e}")
+# NameError from typo will propagate and be discovered
+```
+
+**Group related exceptions when appropriate:**
+
+```python
+# OK to group when handling is identical
+try:
+    data = fetch_from_api(url)
+except (ConnectionError, TimeoutError, HTTPError) as e:
+    logger.error(f"API request failed: {e}")
+    raise ServiceUnavailableError("External service down") from e
+```
+
+---
+
+### PY4.7 Meaningful Error Messages
+
+**Impact: MEDIUM (Debugging without context wastes time)**
+
+Error messages without context require developers to reproduce the issue and add logging to understand what went wrong. Good error messages include what failed, why, and relevant state.
+
+**Incorrect: Vague error messages**
+
+```python
+# No context about what failed
+if not user:
+    raise ValueError("Invalid user")
+
+# No information about the bad value
+if age < 0:
+    raise ValueError("Invalid age")
+
+# No guidance on what's expected
+if not re.match(r"^\d{3}-\d{4}$", phone):
+    raise ValueError("Invalid phone number")
+```
+
+**Correct: Contextual error messages**
+
+```python
+# Include what was attempted and what was found
+if not user:
+    raise ValueError(f"User not found for id={user_id}")
+
+# Include the invalid value
+if age < 0:
+    raise ValueError(f"Age must be non-negative, got {age}")
+
+# Include what was expected and what was received
+if not re.match(r"^\d{3}-\d{4}$", phone):
+    raise ValueError(
+        f"Phone number must be in format XXX-XXXX, got {phone!r}"
+    )
+```
+
+**Error message patterns:**
+
+```python
+# Include operation context
+def process_file(path: Path) -> Data:
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Cannot process file: {path} does not exist"
+        )
+    if not path.is_file():
+        raise ValueError(
+            f"Expected file, got directory: {path}"
+        )
+
+# Include relevant IDs for debugging
+def transfer_funds(from_account: str, to_account: str, amount: Decimal):
+    if amount <= 0:
+        raise ValueError(
+            f"Transfer amount must be positive, got {amount} "
+            f"(from={from_account}, to={to_account})"
+        )
+
+# Chain exceptions to preserve original context
+try:
+    data = json.loads(raw_content)
+except json.JSONDecodeError as e:
+    raise ConfigurationError(
+        f"Invalid JSON in config file {config_path}: {e}"
+    ) from e
+```
+
 
 ## Rule Interactions
 
