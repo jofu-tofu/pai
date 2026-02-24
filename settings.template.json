@@ -7,7 +7,7 @@
     "BASH_DEFAULT_TIMEOUT_MS": "600000",
     "PAI_CONFIG_DIR": "$HOME/.config/PAI",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_CODE_GIT_BASH_PATH": "C:/Program Files/Git/usr/bin/bash.exe"
+    "CLAUDE_CODE_GIT_BASH_PATH": "C:\\Program Files\\Git\\usr\\bin\\bash.exe"
   },
   "daidentity": {
     "name": "PAI",
