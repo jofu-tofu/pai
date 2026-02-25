@@ -51,5 +51,6 @@ User: "Update the Prompting skill description to include template generation"
 ```
 User: "Audit the Research skill"
 -> Invokes ReviewSkill workflow
--> Runs structural validation + quality review, produces PASS/WARN/FAIL report
+-> Evaluates skill against agent behavior research
+-> Produces prioritized findings ranked by impact on agent compliance
 ```
