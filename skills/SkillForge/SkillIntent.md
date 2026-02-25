@@ -45,7 +45,7 @@ SkillForge provides a safe, auditable path for skill lifecycle management — fr
 | No evolution changelog in SkillIntent | Design anchor captures WHY via principles, decisions, constraints | Evolution Notes tracking WHAT changed | Implementation history is git's job; WHY content belongs in Design Decisions and Constraints |
 | Eliminated 7-agent orchestrator | Single-agent ReviewSkill + ValidateSkill.ts | 7 parallel evaluation agents with per-dimension rubrics | Dispatching 7 agents to evaluate markdown files is disproportionate. ValidateSkill.ts handles structural checks programmatically. Agent judgment handles subjective quality. Token cost of orchestration far exceeded quality improvement. |
 | Eliminated workflow chaining | Simple "run ValidateSkill.ts after changes" per workflow | 12-entry chain table with Always/Conditional tiers, mandatory chain decision logs | Agents did not reliably follow cascading chain logic. A single validation instruction achieves the same outcome with dramatically less complexity. |
-| Universal PromptingStandards loading | SKILL.md universal instruction + per-workflow Reference Material (belt-and-suspenders) | Per-workflow Step 1 only | Every workflow needs prompting standards. Universal instruction covers the happy path; Reference Material covers direct workflow entry. |
+| Universal PromptingStandards loading | SKILL.md universal instruction + per-workflow Step 1 + Reference Material (belt-and-suspenders) | Per-workflow Reference Material only | Every workflow needs prompting standards. Universal instruction covers the happy path; explicit Step 1 ensures loading even on direct workflow entry; Reference Material provides the path. Self-contained via local Standards/PromptingStandards.md copy. |
 
 ---
 

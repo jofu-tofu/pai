@@ -4,7 +4,7 @@
 
 ## Reference Material
 
-- **Prompting Standards:** `../Standards/PromptingStandards.md`
+- **Prompting Standards:** `../Standards/PromptingStandards.md` — Prompt engineering reference. Read first.
 - **Skill System Spec:** `../Standards/SkillSystem.md`
 - **Target skill's SkillIntent.md** (if present) — Read before modifying to ensure changes don't contradict original purpose.
 
@@ -14,11 +14,15 @@ Modify the content of an existing skill's SKILL.md file, including frontmatter, 
 
 ## Workflow Steps
 
-### Step 1: Identify and Read Target Skill
+### Step 1: Load Prompting Standards
+
+Read `../Standards/PromptingStandards.md`. All content changes must align with its principles (signal density, positive framing, soft trigger language, Claude 4.x patterns).
+
+### Step 2: Identify and Read Target Skill
 
 Verify `$PAI_DIR/skills/[SkillName]/SKILL.md` exists. Read current content. If target skill has SkillIntent.md, read it first. If missing, note it in the output.
 
-### Step 2: Determine Modification Type
+### Step 3: Determine Modification Type
 
 | Modification | Target Section |
 |--------------|----------------|
@@ -28,7 +32,7 @@ Verify `$PAI_DIR/skills/[SkillName]/SKILL.md` exists. Read current content. If t
 | Update examples | `## Examples` section |
 | Add new section | Markdown body |
 
-### Step 3: Apply Changes
+### Step 4: Apply Changes
 
 **For frontmatter changes:**
 - Preserve single-line format for description
@@ -44,14 +48,14 @@ Verify `$PAI_DIR/skills/[SkillName]/SKILL.md` exists. Read current content. If t
 - Follow existing example format
 - Include User prompt and arrow-denoted steps
 
-### Step 4: Validate Changes
+### Step 5: Validate Changes
 
 1. YAML frontmatter parses correctly
 2. `USE WHEN` clause present in description
 3. All workflow references in routing table resolve
 4. TitleCase naming enforced
 
-### Step 5: Report Changes
+### Step 6: Report Changes
 
 ```
 SUMMARY: Updated [SkillName] skill

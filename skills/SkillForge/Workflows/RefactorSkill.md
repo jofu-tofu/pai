@@ -4,7 +4,7 @@
 
 ## Reference Material
 
-- **Prompting Standards:** `../Standards/PromptingStandards.md`
+- **Prompting Standards:** `../Standards/PromptingStandards.md` — Prompt engineering reference. Read first.
 - **Skill System Spec:** `../Standards/SkillSystem.md`
 - **Target skill's SkillIntent.md** (if present) — Read before restructuring; changes must not contradict the skill's stated out-of-scope or constraints.
 
@@ -52,6 +52,10 @@ Perform major restructuring of an existing skill while preserving functionality.
 - Verify old file gone, new file exists, routing correct
 
 ---
+
+## First Step (All Paths)
+
+Before executing any operation below (Quick or Full), read `../Standards/PromptingStandards.md`. All content changes must align with its principles.
 
 ## Full Refactor
 

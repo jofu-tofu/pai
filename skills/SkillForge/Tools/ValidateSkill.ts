@@ -14,9 +14,10 @@ import { readdir, readFile } from 'fs/promises';
 import { join, basename } from 'path';
 import { existsSync } from 'fs';
 import { homedir } from 'os';
-import { parseFrontmatter as parseFrontmatterUtil, getEnvVar } from '../../../hooks/lib/platform';
+import { parseFrontmatter as parseFrontmatterUtil, getEnvVar, expandEnvVars } from '../../../hooks/lib/platform';
 
-const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
+const rawPaiDir = getEnvVar('PAI_DIR');
+const PAI_DIR = rawPaiDir ? expandEnvVars(rawPaiDir) : join(homedir(), 'projects', 'pai');
 const SKILLS_DIR = join(PAI_DIR, 'skills');
 
 interface ValidationResult {

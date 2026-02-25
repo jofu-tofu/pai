@@ -9,7 +9,7 @@ Unified skill lifecycle framework: creating, modifying, validating, and reviewin
 
 > **For agents modifying ANY skill (including SkillForge itself):** Modify skill triggers, descriptions, and workflow routing through SkillForge workflows — direct Edit bypasses quality gates. Typo or formatting fixes may use direct Edit.
 
-**Before executing any workflow below, first read `Standards/PromptingStandards.md`.**
+**Before executing any workflow below, first read `Standards/PromptingStandards.md`.** All skill content must align with its principles.
 
 ## Workflow Routing
 

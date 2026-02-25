@@ -43,8 +43,7 @@ Previous architecture had all workflow files read in a single LLM session. The L
 | 2 | GatherContext | Commit range or target path | `context.md` | File exists, non-empty |
 | 3 | SelectDimensions | `context.md` + `Dimensions/` | `dimensions.json` | Valid JSON with dimension array |
 | 4 | Review Agents (parallel) | Dimension file + `context.md` + file list | `dimension-[id].md` per agent | All agent output files exist |
-| 5 | VerifyClaims | Agent output file paths + `context.md` | `verified-findings.md` | File exists |
-| 6 | GenerateReport | `verified-findings.md` + `context.md` | `report.md` (synthesis + report) | File exists, output to user |
+| 5 | VerifyAndReport | Agent output file paths + `context.md` | `verified-findings.md` + `report.md` | `report.md` exists, output to user |
 
 When triggered, you MUST:
 1. Read `Workflows/Review.md` FIRST — before reading any source code or diffs
@@ -64,7 +63,7 @@ Running the **Review** workflow from the **CodeReview** skill...
 |----------|---------|------|
 | **Review** | "code review", "review my PR", "review this branch", "review my changes", "review my commits", "review last N commits", "check my code", "audit my changes", "what did I change", "do a code review", "run a review", "audit this module", "audit this directory", "review this codebase", "audit code quality", "review code health", "audit architecture" | `Workflows/Review.md` |
 
-> **Pipeline stages** (GatherContext, SelectDimensions, VerifyClaims, GenerateReport) are internal — each runs as a separate agent. Review.md is the orchestrator.
+> **Pipeline stages** (GatherContext, SelectDimensions, VerifyAndReport) are internal — each runs as a separate agent. Review.md is the orchestrator.
 
 ## Dimension System
 
@@ -85,7 +84,7 @@ Running the **Review** workflow from the **CodeReview** skill...
 ```
 User: "Do a code review of my last 3 commits"
 -> Invokes Review workflow
--> Orchestrator spawns agents: GatherContext → SelectDimensions → N Review Agents → Synthesize → Verify → Report
+-> Orchestrator spawns agents: GatherContext → SelectDimensions → N Review Agents → VerifyAndReport
 ```
 
 **Example 2: PR review**
@@ -116,8 +115,7 @@ The skill uses a **layered compression strategy**:
 - Context Layer → Dimension Selection (which dimensions are relevant)
 - Dimension Selection → Agent prompts (each agent gets one dimension file + context)
 - Agent outputs → Per-dimension files (each agent writes its own, returns path only)
-- Per-dimension files → Verification (claim-checked against commit range)
-- Verified findings → Report (synthesis + dedup + human-readable, severity-ordered)
+- Per-dimension files → VerifyAndReport (claim-check + synthesis + dedup + human-readable report, severity-ordered)
 
 Agent count scales with **review target size and complexity**:
 

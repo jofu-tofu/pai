@@ -4,6 +4,7 @@
 
 ## Reference Material
 
+- **Prompting Standards:** `../Standards/PromptingStandards.md` — Prompt engineering reference. Read first.
 - **Agent Behavior Research:** `../Standards/AgentBehavior.md`
 
 ## Purpose
@@ -14,11 +15,12 @@ Note: This workflow does NOT run structural validation (TitleCase, frontmatter, 
 
 ## Workflow Steps
 
-1. Read `Standards/AgentBehavior.md` to load the evaluation framework
-2. Read the target skill's full file tree (SKILL.md, workflows, standards, tools)
-3. For each principle in AgentBehavior.md, evaluate how the target skill aligns or violates it
-4. Produce prioritized findings (highest impact on agent compliance first)
-5. Ask user which improvements to apply, then execute selected changes
+1. Read `../Standards/PromptingStandards.md` to load prompt engineering principles
+2. Read `Standards/AgentBehavior.md` to load the evaluation framework
+3. Read the target skill's full file tree (SKILL.md, workflows, standards, tools)
+4. For each principle in AgentBehavior.md, evaluate how the target skill aligns or violates it
+5. Produce prioritized findings (highest impact on agent compliance first)
+6. Ask user which improvements to apply, then execute selected changes
 
 ## Output Format
 

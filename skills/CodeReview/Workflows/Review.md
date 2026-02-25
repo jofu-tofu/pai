@@ -84,18 +84,12 @@ Read $REVIEW_DIR/context.md for what changed, why, and the review scope.
 
 The orchestrator collects file paths only — it does not read agent output content.
 
-## Step 5: Verify Claims
+## Step 5: Verify Claims and Generate Report
 
 Spawn agent:
-- **prompt:** `"Read $SKILL_ROOT/Workflows/VerifyClaims.md and execute it. Agent output files: [list of $REVIEW_DIR/dimension-*.md paths from Step 4]. Context: $REVIEW_DIR/context.md. Write output to: $REVIEW_DIR/verified-findings.md. When done, return the absolute path to verified-findings.md."`
+- **prompt:** `"Read $SKILL_ROOT/Workflows/VerifyAndReport.md and execute it. Agent output files: [list of $REVIEW_DIR/dimension-*.md paths from Step 4]. Context: $REVIEW_DIR/context.md. Write verified findings to: $REVIEW_DIR/verified-findings.md. Write report to: $REVIEW_DIR/report.md. Return the report content AND the path to report.md."`
 - **subagent_type:** `general-purpose`
 
-**CHECK:** `$REVIEW_DIR/verified-findings.md` exists.
-
-## Step 6: Generate Report
-
-Spawn agent:
-- **prompt:** `"Read $SKILL_ROOT/Workflows/GenerateReport.md and execute it. Verified findings: $REVIEW_DIR/verified-findings.md. Context: $REVIEW_DIR/context.md. Write output to: $REVIEW_DIR/report.md. Return the report content AND the path."`
-- **subagent_type:** `general-purpose`
+**CHECK:** `$REVIEW_DIR/report.md` exists.
 
 Output the report to the user.
