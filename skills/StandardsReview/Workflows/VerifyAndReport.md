@@ -21,7 +21,7 @@ Three jobs in one pass: **verify** findings trace to actual changed lines and ar
 
 ## Verify
 
-Read all agent output files. Extract every finding (severity, file, line, heuristic, description, recommendation). Tag each with its source dimension.
+Read all agent output files. Extract every finding (RULE_ID, severity, file, line, description, recommendation). Tag each with its source dimension.
 
 Check context.md `Mode:` field to determine verification method.
 
@@ -61,57 +61,60 @@ Verification: [N]/[total] findings confirmed
 
 ## Synthesize
 
-- **Deduplicate:** Same file + overlapping lines (within 5 lines) + same issue category = merge. Keep higher severity, combine recommendations, note multi-agent agreement.
+- **Deduplicate:** Same file + overlapping lines (within 5 lines) + same rule category = merge. Keep higher severity, keep most specific rule ID, combine recommendations, note multi-agent agreement.
 - **Architectural map:** Group files by module. Summarize which modules have findings vs. clean.
-- **Clean domains:** Record what each agent reviewed and found clean — this becomes the "What Looks Good" section.
+- **Clean areas:** Record what each language dimension reviewed and found clean — this becomes the "What Looks Good" section.
 
 ---
 
 ## Report
 
-Write to `$REVIEW_DIR/report.md`. Lead with verdict, order by severity, every finding is a card.
+Write to `$REVIEW_DIR/report.md`. Lead with verdict, order by severity, every finding is a card with its rule ID.
 
 ### Report Header
 
 **Diff mode:**
 ```markdown
-# Code Review Report
+# StandardsReview Report
 **Branch/Range:** [from context]
 **Review date:** [today]
-**Agents used:** [N agents — list domains]
-**Findings:** CRITICAL: X | HIGH: Y | MEDIUM: Z | LOW: W | SUGGESTIONS: V
+**Languages:** [detected languages]
+**Dimensions checked:** [N dimensions across M languages]
+**Findings:** CRITICAL: X | HIGH: Y | MEDIUM: Z | LOW: W
 **Verified:** [N]/[M] findings confirmed against changed commits
 ```
 
 **Audit mode:**
 ```markdown
-# Codebase Audit Report
+# StandardsReview Audit Report
 **Target:** [from context]
 **Scope:** [N files across M directories]
 **Review date:** [today]
-**Agents used:** [N agents — list dimensions]
-**Findings:** CRITICAL: X | HIGH: Y | MEDIUM: Z | LOW: W | SUGGESTIONS: V
+**Languages:** [detected languages]
+**Dimensions checked:** [N dimensions across M languages]
+**Findings:** CRITICAL: X | HIGH: Y | MEDIUM: Z | LOW: W
 **Verified:** [N]/[M] findings confirmed against actual code
 ```
 
 ### Verdict
 
-2-3 sentences. Diff: is it safe to merge? Audit: what's the overall health?
+2-3 sentences. Diff: does this change follow language-specific standards? Audit: what's the overall standards health?
 
 ### Finding Card Format
 
 ```markdown
-### [Short title] — `[filename]:[line]`
+### [RULE_ID] [Short title] — `[filename]:[line]`
+**Rule:** [Rule name from dimension file]
 **Why it matters:** [1 sentence]
 **What to do:** [Concrete action]
 **Introduced in:** commit [SHA prefix] "[message]" _(diff mode only)_
 **Verified:** Confirmed in review range
 ```
 
-Findings flagged by multiple agents: note `**Confidence:** Flagged by N agents independently`.
+Rule ID is ALWAYS included — this is what makes StandardsReview findings traceable to specific standards. Findings flagged by multiple agents: note `**Confidence:** Flagged by N agents independently`.
 
 ### Additional Sections
 
-- **What Looks Good** — dimensions/domains that reviewed and found clean
-- **Pre-existing Issues** _(diff mode, if any)_ — issues predating the change, listed for awareness
+- **What Looks Good** — per-language dimensions that reviewed and found clean (e.g., "TypeScript type safety rules all pass (4 files, 5 rules checked)")
+- **Pre-existing Issues** _(diff mode, if any)_ — issues predating the change, listed for awareness. Include RULE_ID.
 - If user requested `--comment` or "post to PR": run `gh pr comment [number] --body-file [report-path]`

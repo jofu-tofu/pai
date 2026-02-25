@@ -16,6 +16,10 @@
 
 Select which language dimensions are relevant to this specific review, based on the detected languages and the available dimension files. No trigger matching — use judgment based on context + dimension descriptions.
 
+## Scope Constraint
+
+Read `context.md` and the dimension files. That is all you need. Do NOT explore the codebase, read source files, or run git commands. The context file already contains the diff, change fingerprint, and risk areas — everything required for dimension selection. Only explore the codebase if context.md is missing critical information that prevents dimension selection (this should be rare — GatherContext already did the exploration).
+
 ## Step 1: Read Context
 
 Read the `context.md` file provided as input. Extract:

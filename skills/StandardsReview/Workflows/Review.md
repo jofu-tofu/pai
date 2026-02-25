@@ -63,18 +63,12 @@ For EACH dimension in the list, spawn an agent IN PARALLEL (`run_in_background: 
 
 **The orchestrator does NOT read agent output content.** It only collects file paths.
 
-## Step 5: Verify Claims
+## Step 5: Verify Claims and Generate Report
 
 Spawn agent:
-- **prompt:** `"Read $SKILL_ROOT/Workflows/VerifyClaims.md and execute it. Agent output files: [list of $REVIEW_DIR/dimension-*.md paths from Step 4]. Context: $REVIEW_DIR/context.md. Write output to: $REVIEW_DIR/verified-findings.md. Return ONLY the path when done."`
+- **prompt:** `"Read $SKILL_ROOT/Workflows/VerifyAndReport.md and execute it. Agent output files: [list of $REVIEW_DIR/dimension-*.md paths from Step 4]. Context: $REVIEW_DIR/context.md. Write verified findings to: $REVIEW_DIR/verified-findings.md. Write report to: $REVIEW_DIR/report.md. Return the report content AND the path to report.md."`
 - **subagent_type:** `general-purpose`
 
-**CHECK:** `$REVIEW_DIR/verified-findings.md` exists.
-
-## Step 6: Generate Report
-
-Spawn agent:
-- **prompt:** `"Read $SKILL_ROOT/Workflows/GenerateReport.md and execute it. Verified findings: $REVIEW_DIR/verified-findings.md. Context: $REVIEW_DIR/context.md. Write output to: $REVIEW_DIR/report.md. Return the report content AND the path."`
-- **subagent_type:** `general-purpose`
+**CHECK:** `$REVIEW_DIR/report.md` exists.
 
 Output the report to the user.
