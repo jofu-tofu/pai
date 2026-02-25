@@ -1,6 +1,6 @@
 ---
 name: DesignReview
-description: Multi-agent design review system with orchestrator-enforced process boundaries. USE WHEN user asks for a design review of a skill, wants to enumerate skill structure, requests readability or signal-density improvements, asks for scope and metadata-boundary checks, or wants visual-first design analysis. Runs dimension agents from dimension files and returns a prioritized report.
+description: Multi-agent design review system with orchestrator-enforced process boundaries. USE WHEN user asks for a design review of a skill or technical design artifact, wants to enumerate structure, requests readability or signal-density improvements, asks for scope and metadata-boundary checks, wants visual-first analysis, or asks for a concise review summary. Runs dimension agents from dimension files and returns a prioritized report.
 ---
 
 # DesignReview
@@ -13,6 +13,7 @@ Multi-agent design review system with process-boundary enforcement.
 2. **Dimension-driven** - Findings come from dedicated dimension files, not free-form ad hoc checks.
 3. **Credible output** - Every finding links to concrete artifacts or verified metadata links.
 4. **Digestible report** - Results are concise, scoped, and visual-first when topology is involved.
+5. **Depth-aligned recommendations** - Suggestions match declared artifact depth and avoid unnecessary implementation-detail demands.
 
 ## Orchestrator Architecture (MANDATORY)
 
@@ -30,7 +31,7 @@ Multi-agent design review system with process-boundary enforcement.
 | Step | Agent | Input | Output | Artifact Check |
 |------|-------|-------|--------|---------------|
 | 1 | Setup | User request | `$REVIEW_DIR` created | Directory exists |
-| 2 | GatherContext | Target skill + scope | `context.md` | Exists and non-empty |
+| 2 | GatherContext | Target artifact + scope | `context.md` | Exists and non-empty |
 | 3 | SelectDimensions | `context.md` + `Dimensions/` | `dimensions.json` | Valid JSON with dimension array |
 | 4 | Dimension Agents (parallel) | Dimension file + `context.md` | `dimension-[id].md` per agent | All outputs exist |
 | 5 | VerifyCoverage | Dimension outputs + `context.md` | `verified-findings.md` | File exists |
@@ -42,7 +43,7 @@ When a workflow is matched, **read its file and follow the steps within it.**
 
 | Workflow | Trigger | File |
 |----------|---------|------|
-| **Review** | "design review skill", "review skill structure", "enumerate skill structure", "audit skill readability", "analyze skill design" | `Workflows/Review.md` |
+| **Review** | "design review skill", "review skill structure", "enumerate skill structure", "audit skill readability", "analyze skill design", "review technical design", "audit design document", "retrospective design doc", "concise design review" | `Workflows/Review.md` |
 
 > Internal workflows (`GatherContext`, `SelectDimensions`, `VerifyCoverage`, `GenerateReport`) are stage agents invoked by `Review.md` and are not user-facing routes.
 
@@ -86,4 +87,13 @@ User: "Show this as a Mermaid diagram instead of long prose."
 -> D7 dimension is prioritized
 -> Produces workflow and structure diagrams
 -> Keeps prose limited to key decisions and actions
+```
+
+**Example 4: Technical design document review**
+```
+User: "Review this technical design document and keep it concise."
+-> Invokes Review workflow
+-> Resolves target as a document artifact (not a skill root)
+-> Runs baseline dimensions plus the most relevant additional dimension
+-> Returns a compact report with prioritized findings
 ```

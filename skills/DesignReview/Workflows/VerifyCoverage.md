@@ -39,9 +39,13 @@ For each finding:
 ## Step 3: Verify External Links (if referenced)
 
 For findings that depend on external links:
-1. Check HTTP status (`200` expected) with `curl -L`.
-2. If link unavailable, mark as `UNVERIFIED-LINK`.
-3. Do not discard the finding if the issue is about missing summaries for linked metadata.
+1. Check HTTP status with `curl -L`.
+2. Classify status:
+   - `200-299` -> `VERIFIED-LINK`
+   - `401` or `403` -> `AUTH-GATED-LINK`
+   - other failures/timeouts -> `UNVERIFIED-LINK`
+3. For `AUTH-GATED-LINK`, keep the finding and verify whether the artifact has an in-doc summary fallback.
+4. Do not discard the finding if the issue is about missing summaries for linked metadata.
 
 ## Step 4: Deduplicate
 

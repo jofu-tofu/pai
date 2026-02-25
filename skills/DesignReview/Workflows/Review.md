@@ -4,12 +4,12 @@
 > Stage agents read their own workflow files and write outputs.
 > Your job: pass file paths, check artifacts, then continue.
 
-## Step 0: Resolve Paths
+## Step 0: Resolve Skill Paths
 
-```bash
-REPO_ROOT=$(git rev-parse --show-toplevel)
-SKILL_ROOT=$REPO_ROOT/skills/DesignReview
-```
+Resolve `SKILL_ROOT` in this order:
+1. If this workflow file path is known, derive `SKILL_ROOT` from its parent (`.../skills/DesignReview`).
+2. Else try git root (`$REPO_ROOT/skills/DesignReview`).
+3. Else require explicit `SKILL_ROOT` from the caller and fail with a clear error if missing.
 
 ## Path Conventions
 
@@ -17,12 +17,14 @@ SKILL_ROOT=$REPO_ROOT/skills/DesignReview
 `_output/contexts/[context-slug]/reviews/designreview/[YYYYMMDD-HHMMSS]`
 
 If no context slug is available, create:
-`YYYYMMDD-HHMM-designreview-[target-skill]`
+`YYYYMMDD-HHMM-designreview-[target-artifact]`
 
 ## Step 1: Setup
 
-Determine target skill from user request.
-If none specified, default to `CodeReview`.
+Determine target artifact from user request:
+1. Explicit file or directory path
+2. Skill name/path
+3. If none specified and request is skill-oriented, default to `CodeReview`
 
 Create review directory:
 
@@ -30,10 +32,14 @@ Create review directory:
 mkdir -p $REVIEW_DIR
 ```
 
+Set report style:
+- `compact` when user asks for short/concise/quick output
+- `full` otherwise
+
 ## Step 2: Gather Context
 
 Spawn agent:
-- **prompt:** `"Read $SKILL_ROOT/Workflows/GatherContext.md and execute it. Target skill: [target]. Requested scope hints: [user hints, if any]. Write your output to: $REVIEW_DIR/context.md. Return the absolute path to context.md."`
+- **prompt:** `"Read $SKILL_ROOT/Workflows/GatherContext.md and execute it. Target artifact: [target]. Requested scope hints: [user hints, if any]. Report style: [compact|full]. Write your output to: $REVIEW_DIR/context.md. Return the absolute path to context.md."`
 - **subagent_type:** `general-purpose`
 
 **CHECK:** `$REVIEW_DIR/context.md` exists and is non-empty.
@@ -52,7 +58,16 @@ Spawn agent:
 
 ## Step 4: Spawn Dimension Agents
 
-Read `$REVIEW_DIR/dimensions.json` and launch one agent per selected dimension in parallel.
+Before launching dimension agents:
+1. Close completed stage agents from Steps 2-3.
+2. Read `$REVIEW_DIR/dimensions.json`.
+3. Launch dimension agents in parallel batches (not one unbounded fanout).
+4. Batch size = `min(agent_cap, available_agent_slots)`.
+
+If spawn fails due agent/thread limits:
+1. Close completed agents.
+2. Retry with a smaller batch.
+3. Continue until all selected dimensions complete.
 
 Per agent prompt:
 
@@ -85,7 +100,7 @@ Spawn agent:
 ## Step 6: Generate Report
 
 Spawn agent:
-- **prompt:** `"Read $SKILL_ROOT/Workflows/GenerateReport.md and execute it. Verified findings: $REVIEW_DIR/verified-findings.md. Context: $REVIEW_DIR/context.md. Template: $SKILL_ROOT/Templates/DesignReviewReportTemplate.md. Write output to: $REVIEW_DIR/report.md. Return report content and absolute path."`
+- **prompt:** `"Read $SKILL_ROOT/Workflows/GenerateReport.md and execute it. Verified findings: $REVIEW_DIR/verified-findings.md. Context: $REVIEW_DIR/context.md. Template: $SKILL_ROOT/Templates/DesignReviewReportTemplate.md. Report style: [compact|full]. Write output to: $REVIEW_DIR/report.md. Return report content and absolute path."`
 - **subagent_type:** `general-purpose`
 
 Output the report to the user.

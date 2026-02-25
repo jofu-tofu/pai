@@ -2,7 +2,7 @@
 
 ## 1. Summary
 
-- **Target:** `[SkillName]`
+- **Target:** `[ArtifactName]`
 - **Overall Score:** `[0-100]`
 - **Top Risk:** `[one sentence]`
 - **Top Opportunity:** `[one sentence]`
@@ -70,16 +70,11 @@ Interpretation: `[1 short paragraph]`
 
 ## 7. Dimension Scores
 
+Include only dimensions that actually ran for this review.
+
 | Dimension | Raw (0-2) | Weight | Weighted Score | Evidence | Recommendation |
 |---|---:|---:|---:|---|---|
-| D1 Audience, Readability, and Accessibility | | | | | |
-| D2 Scope and Boundaries | | | | | |
-| D3 Signal Density and Digestibility | | | | | |
-| D4 Decision Traceability and Tradeoffs | | | | | |
-| D5 Workflow and Ownership Clarity | | | | | |
-| D6 Verification and Credibility | | | | | |
-| D7 Visual Expressiveness (Mermaid-First) | | | | | |
-| D8 Metadata Boundary and Link Hygiene | | | | | |
+| `[DimensionName]` | | | | | |
 
 ## 8. Findings by Priority
 

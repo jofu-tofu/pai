@@ -17,14 +17,16 @@ Evaluate whether the design language matches its audience and stays readable and
 From `context.md`, read:
 - **C1 (Stakeholders)** — Who consumes this design? Calibrate readability expectations to them.
 - **C2 (Design type)** — Technical depth expectations vary by type.
+- **C17 (Declared depth target)** — Respect intended depth (high-level/component-level/implementation-level).
 - **Self-Claims** — Any stated audience or accessibility commitments the design makes about itself.
 
 ## Review Heuristics
 
-1. Language and depth match the stakeholders identified in context (C1). Don't flag technical language if the audience is technical.
-2. Wording is clear, concrete, and avoids unnecessary jargon for the identified audience.
-3. Structure is easy to scan with meaningful headers and concise blocks.
-4. If the design claims a specific audience, content consistently addresses that audience without drifting.
+1. Language and depth match stakeholders (C1) and declared depth target (C17).
+2. Do not recommend deeper technical detail than the declared depth target.
+3. Don't flag technical terminology when the audience is technical; only flag unclear or unexplained terms for that audience.
+4. Structure is easy to scan with meaningful headers and concise blocks.
+5. If the design claims a specific audience, content consistently addresses that audience without drifting.
 
 ## Scoring Rubric
 

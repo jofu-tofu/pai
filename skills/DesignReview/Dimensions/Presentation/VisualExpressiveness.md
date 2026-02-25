@@ -25,6 +25,7 @@ From `context.md`, read:
 2. Sections with 3+ paragraphs describing structure or flow could benefit from a diagram — frame as observation, not requirement.
 3. Existing diagram labels are stable and clear.
 4. Existing diagrams have brief interpretation paragraphs.
+5. For small/simple artifacts (single flow with <=3 stages), missing diagrams should usually be low-severity unless visuals are self-claimed.
 
 ## Scoring Rubric
 

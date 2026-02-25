@@ -16,6 +16,7 @@ Ensure the workflow model is explicit: who does what, in what order, and with wh
 
 From `context.md`, read:
 - **C10 (Entry points)**, **C11 (Internal stages)**, **C12 (Artifact contracts)** — Check whether these are present and adequate.
+- **C17 (Declared depth target)** — Workflow detail should match intended depth.
 - **Self-Claims** — If the design claims a specific architecture (e.g., "thin orchestrator", "parallel agents"), verify the workflow structure matches.
 
 ## Review Heuristics
@@ -24,6 +25,7 @@ From `context.md`, read:
 2. User-facing and internal workflows are clearly separated.
 3. Stage responsibilities are explicit and non-overlapping.
 4. Inputs/outputs between stages are documented where the design type warrants it (per C2).
+5. If a single owner is explicitly declared and realistic for scope, treat that as sufficient; don't require multi-owner matrices by default.
 
 ## Scoring Rubric
 

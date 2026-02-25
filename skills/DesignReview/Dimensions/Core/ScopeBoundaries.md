@@ -16,6 +16,7 @@ Verify that what is in scope, out of scope, and conditionally scoped is explicit
 
 From `context.md`, read:
 - **C4 (Explicit scope)**, **C5 (Non-goals)**, **C6 (Boundary with adjacent systems)** — Check whether these are present and adequate.
+- **C17 (Declared depth target)** — Scope expectations should match intended depth.
 - **Self-Claims** — If the design states its scope, verify the content actually stays within it.
 - **Checklist Summary** — If scope items are marked Missing, assess whether they're genuinely needed given stakeholders (C1) and design type (C2).
 
@@ -25,6 +26,7 @@ From `context.md`, read:
 2. If scope is expected given the stakeholders and design type but absent, note it as a gap — grounding the expectation in context, not a universal rule.
 3. Non-goals are explicit, not implied.
 4. Scope statements are testable and not vague.
+5. Do not recommend adding extra boundary sections unless the missing boundary creates concrete decision risk for this artifact type and depth.
 
 ## Scoring Rubric
 

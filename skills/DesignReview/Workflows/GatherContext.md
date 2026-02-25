@@ -5,8 +5,9 @@
 ## Input / Output
 
 **Input:**
-- Target skill name/path
+- Target artifact name/path (skill, document, or directory)
 - Optional scope hints from user request
+- Optional report style hint (`compact` or `full`)
 
 **Output:**
 - Writes `$REVIEW_DIR/context.md`
@@ -20,9 +21,14 @@ This is not just a structural inventory — it is an **exploration-driven assess
 
 ## Step 1: Resolve Target
 
-1. Resolve target skill directory (`skills/[TargetSkill]`).
-2. If path is invalid, return an explicit error.
-3. Define default in-scope artifacts:
+Resolve target in this order:
+1. If the input is an existing absolute/relative file path, use that file as the target.
+2. If the input is an existing directory path, use that directory as the target root.
+3. If `skills/[Target]` exists, use that skill directory.
+4. If unresolved, return an explicit error with candidate paths checked.
+
+Define default in-scope artifacts by target type:
+1. Skill directory target:
    - `SKILL.md`
    - `SkillIntent.md` (if present)
    - `Workflows/**/*.md`
@@ -30,6 +36,12 @@ This is not just a structural inventory — it is an **exploration-driven assess
    - `Templates/**/*.md` (if present)
    - `Standards/**/*.md` (if present)
    - `Tools/**/*` (if present)
+2. Directory target (non-skill):
+   - `*.md`, `*.markdown`, `*.txt`, `*.html` at root and subdirectories
+   - Include files with names containing `design`, `architecture`, `spec`, `metadata`, `scope`, `claude`
+3. File target:
+   - The target file
+   - Sibling files likely to carry design context (`*metadata*`, `*scope*`, `*claude*`, `*intent*`)
 
 ## Step 2: Build Structural Inventory
 
@@ -57,6 +69,7 @@ This is the core of context gathering. Read the target design's files and assess
 | C1 | **Stakeholders** | Who consumes this design? (developers, maintainers, end users, reviewers, AI agents) |
 | C2 | **Design type** | What kind of artifact is this? (skill, architecture doc, RFC, workflow, API spec, etc.) |
 | C3 | **Purpose statement** | A clear statement of what problem this design solves and why it exists |
+| C17 | **Declared depth target** | Whether the artifact aims to be high-level, component-level, or implementation-level |
 
 #### Scope and Boundaries
 | # | Item | What to look for |
@@ -98,10 +111,11 @@ This is the core of context gathering. Read the target design's files and assess
 3. Assess status (Present / Partial / Missing / N/A).
 4. For **Missing** items: explain WHY it's expected given the stakeholders and design type. Don't mark things missing just because a universal template says so — ground it in context.
 5. For **Partial** items: note what's there and what's lacking.
+6. If depth target is not explicit, infer from audience + scope language and record confidence (`high`, `medium`, `low`).
 
 ## Step 4: Extract Self-Claims
 
-From `SkillIntent.md`, `SKILL.md`, and any standards files, extract:
+From artifact-intent and policy files (for example `SkillIntent.md`, `SKILL.md`, standards docs, or top-level design docs), extract:
 1. What the design says it will do (stated purpose, success criteria)
 2. What constraints it imposes on itself
 3. What policies it declares (e.g., "mermaid-first", "thin orchestrator", "baseline dimensions")
@@ -117,10 +131,12 @@ Write `context.md` with this structure:
 ## DesignReview Context Layer
 
 ### Target
-- Skill: [name]
-- Root: [path]
-- Design type: [skill / architecture doc / RFC / etc.]
+- Artifact: [name]
+- Root or file: [path]
+- Design type: [skill / architecture doc / RFC / technical design / etc.]
 - Primary stakeholders: [who consumes this]
+- Declared depth target: [high-level | component-level | implementation-level | inferred]
+- Report style hint: [compact|full|unspecified]
 
 ### Scope
 - Included: [list]
@@ -144,6 +160,7 @@ Extracted from SkillIntent.md, SKILL.md, and standards files.]
 | C2 | Design type | ... | ... |
 | ... | ... | ... | ... |
 | C16 | In-doc summaries | ... | ... |
+| C17 | Declared depth target | ... | ... |
 
 ### Checklist Summary
 - Present: [count]

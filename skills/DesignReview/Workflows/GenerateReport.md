@@ -8,6 +8,7 @@
 - `$REVIEW_DIR/verified-findings.md`
 - `$REVIEW_DIR/context.md`
 - Report template path
+- Report style (`compact` or `full`)
 
 **Output:**
 - Writes `$REVIEW_DIR/report.md`
@@ -36,6 +37,10 @@ From context and verified findings, produce:
    - Internal stages
    - Artifact contracts
 
+For `compact` style:
+- Keep each coverage section to only the highest-signal rows/bullets.
+- Prefer concise tables over prose paragraphs.
+
 ## Step 3: Render Required Visuals
 
 Include at least:
@@ -51,6 +56,8 @@ For each dimension run:
 2. Add one evidence statement
 3. Add one concrete recommendation (or `Keep`)
 
+Only include dimensions that actually ran in this review (no placeholder rows for non-selected dimensions).
+
 ## Step 5: Write Final Report
 
 Write the report to `$REVIEW_DIR/report.md` in this order:
@@ -63,5 +70,13 @@ Write the report to `$REVIEW_DIR/report.md` in this order:
 7. Dimension Scores
 8. Findings by Priority
 9. Source Links (if used)
+
+Formatting rule by style:
+- `full`: include complete detail per template.
+- `compact`: keep the same section order, but cap to concise content:
+  - Summary: 4 bullets max
+  - Scope: included/excluded lists only
+  - Coverage sections: max 3 rows/bullets each
+  - Findings: max 2 items per priority bucket
 
 Return full report content and the output path.

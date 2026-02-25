@@ -16,6 +16,7 @@ Assess whether the existing design content communicates the most important infor
 
 From `context.md`, read:
 - **C1 (Stakeholders)** — What level of detail do they need? A maintainer needs more depth than a user.
+- **C17 (Declared depth target)** — High-level docs should be concise by design.
 - **Self-Claims** — If the design claims to be concise or visual-first, check whether it follows through.
 
 ## Review Heuristics
@@ -24,6 +25,7 @@ From `context.md`, read:
 2. Long prose is compressed into lists, tables, or visuals when appropriate.
 3. Redundant or repetitive content is minimized.
 4. Detail level is appropriate for the identified stakeholders — don't flag depth that serves a technical audience.
+5. For high-level or compact targets, do not penalize omitted implementation details unless they block understanding of stated decisions.
 
 ## Scoring Rubric
 

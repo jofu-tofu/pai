@@ -25,6 +25,7 @@ From `context.md`, read:
 2. External artifacts are linked with explicit purpose labels.
 3. If the design has external dependencies, linked critical artifacts include in-doc summaries.
 4. Volatile detail is referenced, not embedded, unless required for decisions.
+5. If links are auth-gated but the document includes adequate local summaries, treat this as acceptable boundary hygiene (not a major defect).
 
 ## Scoring Rubric
 

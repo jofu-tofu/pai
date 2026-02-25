@@ -23,6 +23,7 @@ Read `context.md` and extract:
 2. Scope type (`structure-only` or `structure+content`)
 3. Risk signals from the context layer
 4. User-priority hints
+5. Report style hint (`compact` or `full`)
 
 ## Step 2: Discover Dimension Files
 
@@ -43,6 +44,7 @@ Rules:
 1. Include all `baseline: true` dimensions.
 2. If no explicit user scoping is provided, include all dimensions.
 3. If user scope is narrow, include dimensions that match the context signals plus baselines.
+4. If report style is `compact`, keep all baselines and add at most one highest-relevance non-baseline dimension.
 
 Tiering:
 

@@ -4,7 +4,7 @@ Research-backed dimensions for evaluating skill and workflow design quality.
 
 ## Review Philosophy
 
-Dimension agents review designs using the enriched context layer produced by GatherContext. This context includes a **design checklist assessment** (C1–C16) that tells each dimension what the design contains, what it claims about itself, and who its stakeholders are.
+Dimension agents review designs using the enriched context layer produced by GatherContext. This context includes a **design checklist assessment** (C1–C17) that tells each dimension what the design contains, what it claims about itself, who its stakeholders are, and the intended depth of the artifact.
 
 **Core principles:**
 
@@ -82,12 +82,19 @@ Review checks for D8:
 1. Put the highest-impact finding first.
 2. Use short sections with clear headers.
 3. Keep recommendations concrete and scoped.
-4. Separate:
+4. Respect declared depth target (C17): do not recommend implementation-level detail for high-level/component-level artifacts unless they make implemented-state claims.
+5. Prefer smallest-change recommendations; avoid broad rewrites unless multiple findings share one root cause.
+6. Severity must match risk:
+   - High/Critical only when decision quality, delivery confidence, or safety is materially impacted.
+   - Medium/Low/Suggestion for readability or preference improvements.
+7. For auth-gated external links, treat in-doc summaries as acceptable fallback evidence.
+8. Never recommend a section "because templates usually have it"; tie every recommendation to context, self-claims, and stakeholder needs.
+9. Separate:
    - `Must Fix`
    - `Should Fix`
    - `Optional`
-5. Include a `Design Metadata Links` section whenever external artifacts are referenced.
-6. Every recommendation must identify:
+10. Include a `Design Metadata Links` section whenever external artifacts are referenced.
+11. Every recommendation must identify:
    - Owner
    - Artifact to change
    - Expected outcome
