@@ -33,7 +33,7 @@ Code is readable top-to-bottom when the reader never needs to hold a conditional
 
 ## Severity Calibration
 
-CRITICAL = function is effectively unreadable without tracing through line by line. Immediate refactoring needed.
+CRITICAL = function complexity creates conditions for the next developer to introduce bugs during modification — nesting depth, branch count, or interleaved concerns make it impractical to understand behavior without line-by-line tracing. Unreadable code is a safety issue because the probability of incorrect modification is proportional to cognitive load. Immediate refactoring needed.
 HIGH = function requires significant mental effort to understand. Should be refactored in this PR.
 MEDIUM = function is readable but has unnecessary cognitive overhead. Flag for future cleanup.
 

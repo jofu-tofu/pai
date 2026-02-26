@@ -31,7 +31,7 @@ Boolean logic errors are invisible in testing because they produce the correct r
 
 ## Severity Calibration
 
-CRITICAL = logic error produces wrong results for a common input pattern that tests may not cover. The expression evaluates to the wrong truth value. Immediate fix required.
+CRITICAL = logic error that produces wrong results for a reachable input combination — the expression evaluates to the wrong truth value for a subset of inputs. 'Reachable' means the function is called from production code and the input combination is not prevented by upstream validation. Do not discount because 'tests would catch it' — tests are not a substitute for correct logic. Immediate fix required.
 HIGH = logic error produces wrong results for specific input combinations. The code works for most cases but has a logical gap. Should be fixed in this PR.
 MEDIUM = logic issue does not produce wrong results but obscures intent or creates fragility. Flag for clarity improvement.
 

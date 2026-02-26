@@ -34,8 +34,8 @@ Design intent clarity is about self-documenting architecture. The code should ma
 
 ## Severity Calibration
 
-- **CRITICAL** — the unclear design intent will cause the next developer to introduce bugs or architectural violations because they can't understand the intended contract. Fix now.
-- **HIGH** — the code works but a new team member would need significant context to understand how to modify it correctly. Address in this PR.
+- **CRITICAL** — a competent developer reading this code for the first time would make incorrect assumptions about how to extend it — implicit contracts, hidden side effects, or missing boundaries create conditions for architectural violations on the next modification. Do not require evidence that modification has already happened. Fix now.
+- **HIGH** — the code works but its modification path is unclear enough that a developer would need to read surrounding code or external docs to change it safely. This is a risk multiplier on every future change. Address in this PR.
 - **MEDIUM** — readability issue that adds friction without causing errors. Flag for improvement.
 
 ## Language-Specific Notes

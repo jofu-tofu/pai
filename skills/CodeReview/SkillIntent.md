@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Comprehensive multi-agent code review that is trustworthy, proportional, and single-session. The skill exists because AI code review has a fundamental credibility problem: it flags things that were already broken, flags things that don't matter, and produces walls of text that reviewers learn to ignore.
+Comprehensive multi-agent code review that is trustworthy, proportional, and single-session. The skill exists because AI code review has two failure modes. The obvious one: flagging pre-existing issues and producing noise that reviewers learn to ignore. The subtle one: being so afraid of false positives that it misses systemic risks, leaving the reviewer with a clean bill of health on code that degrades the system. Both are credibility failures. A review that catches five null checks but misses an architectural boundary violation is thorough about the wrong things.
 
 This skill solves all three problems with three core mechanisms:
 1. **Parallel specialization** — multiple agents each go deep in one domain rather than one agent going shallow across all
@@ -40,7 +40,17 @@ Agents are expensive. Giving each agent the full codebase context + full diff + 
 
 ### Git Blame Verification
 
-The most important credibility mechanism. An AI review that flags pre-existing issues — that the team already knows about and has decided to live with — immediately loses credibility. Once credibility is lost, the whole report gets ignored. Every finding is verified against the commit range before it reaches the user. Verification is not optional.
+The most important credibility mechanism. An AI review that flags pre-existing issues — that the team already knows about and has decided to live with — immediately loses credibility. Credibility requires two things: every finding must be verifiable (git-blame confirmed, specific file and line), and the findings must address the risks that actually matter (systemic, architectural, production-impacting). Verification remains mandatory. But a verified report that only contains trivial findings is credible but useless — it proves the agents looked without proving they saw what mattered.
+
+### Report Dispositions
+
+Findings have three dispositions after verification:
+
+- **VERIFIED** — finding confirmed against changed commits (diff mode) or actual code (audit mode). Kept in the main findings section.
+- **FALSE POSITIVE** — finding matches a documented convention (CLAUDE.md, ADR, linter config, inline code comment) or has an explicit safeguard in code (catch-and-rethrow, validation check, circuit breaker). Discarded.
+- **RISK-ACKNOWLEDGED** — code is plausibly intentional but creates risk conditions with no documented safeguard. Kept in a separate "Risk-Acknowledged Patterns" section so the fixer can make an informed decision.
+
+RISK-ACKNOWLEDGED lifecycle: the fixer either (1) fixes the risk, (2) adds a safeguard or code comment explaining why it's safe — converting future occurrences to FALSE POSITIVE, or (3) accepts the risk and moves on. The category makes risk acceptance explicit rather than silent. Review agents follow the Evidence Standard defined in Review.md Step 4.
 
 ### Credibility Through Evidence of Work
 

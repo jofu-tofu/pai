@@ -25,6 +25,15 @@ Read all agent output files. Extract every finding (severity, file, line, heuris
 
 Check context.md `Mode:` field to determine verification method.
 
+### Verification Principle
+
+A finding is a FALSE POSITIVE only when the verifier can point to a specific reason it is safe. Discard requires one of:
+1. **Documented convention** — a CLAUDE.md entry, ADR, linter rule, or inline code comment that explicitly explains why this pattern is used. The convention must be in-repo and readable by the agent — tribal knowledge or external runbooks don't count.
+2. **Explicit safeguard in code** — defensive code visible in the diff or file that addresses the flagged risk: a catch block that re-throws or returns an error, a validation check, a circuit breaker, a bounds check. "Logs and continues" is NOT a safeguard.
+3. **Heuristic misapplication** — the finding doesn't match the dimension's heuristic definition (e.g., agent flagged a "boundary error" on code that doesn't do array/index access).
+
+If none of these three conditions are met, the finding is RISK-ACKNOWLEDGED (not FALSE POSITIVE).
+
 ### Diff Mode Verification
 
 Use `git blame` to confirm each finding's line was introduced by a commit in the review range. Also check for self-correction (a later commit in the range fixed the same line).
@@ -32,7 +41,9 @@ Use `git blame` to confirm each finding's line was introduced by a commit in the
 | Condition | Result | Action |
 |---|---|---|
 | Commit in range AND genuine problem | VERIFIED | Keep |
-| Commit in range BUT intentional/idiomatic/not actually problematic | FALSE POSITIVE | Discard |
+| Commit in range BUT matches documented convention OR has explicit safeguards | FALSE POSITIVE | Discard |
+| Commit in range, plausibly intentional but creates risk conditions with no documented safeguard | RISK-ACKNOWLEDGED | Keep, mark "Risk: [description]" |
+| Finding lacks file:line, named heuristic, or failure mechanism | INVALID | Discard — does not meet Evidence Standard |
 | Commit NOT in range | PRE-EXISTING | Move to appendix |
 | Later commit in range fixed the line | SELF-CORRECTED | Discard |
 | Cannot determine (binary, generated, blame unavailable) | UNVERIFIED | Keep, mark "manual review recommended" |
@@ -44,7 +55,9 @@ No commit range. Verify the cited code actually exists at the cited location.
 | Condition | Result | Action |
 |---|---|---|
 | File + lines exist AND genuine problem | VERIFIED | Keep |
-| File + lines exist BUT intentional/idiomatic/not actually problematic | FALSE POSITIVE | Discard |
+| File + lines exist BUT matches documented convention OR has explicit safeguards | FALSE POSITIVE | Discard |
+| File + lines exist, plausibly intentional but creates risk conditions with no documented safeguard | RISK-ACKNOWLEDGED | Keep, mark "Risk: [description]" |
+| Finding lacks file:line, named heuristic, or failure mechanism | INVALID | Discard — does not meet Evidence Standard |
 | File exists BUT lines don't match description | MISLOCATED | Mark "Location uncertain" |
 | File does not exist | INVALID | Discard |
 
@@ -54,7 +67,7 @@ Write to `$REVIEW_DIR/verified-findings.md` with verification status on each fin
 
 ```
 Verification: [N]/[total] findings confirmed
-([M] pre-existing discarded, [F] false positives removed, [P] unverified, [Q] self-corrected)
+([M] pre-existing discarded, [F] false positives removed, [R] risk-acknowledged, [P] unverified, [Q] self-corrected)
 ```
 
 ---
@@ -80,6 +93,7 @@ Write to `$REVIEW_DIR/report.md`. Lead with verdict, order by severity, every fi
 **Review date:** [today]
 **Agents used:** [N agents — list domains]
 **Findings:** CRITICAL: X | HIGH: Y | MEDIUM: Z | LOW: W | SUGGESTIONS: V
+**Risk-Acknowledged:** R
 **Verified:** [N]/[M] findings confirmed against changed commits
 ```
 
@@ -91,6 +105,7 @@ Write to `$REVIEW_DIR/report.md`. Lead with verdict, order by severity, every fi
 **Review date:** [today]
 **Agents used:** [N agents — list dimensions]
 **Findings:** CRITICAL: X | HIGH: Y | MEDIUM: Z | LOW: W | SUGGESTIONS: V
+**Risk-Acknowledged:** R
 **Verified:** [N]/[M] findings confirmed against actual code
 ```
 
@@ -112,6 +127,7 @@ Findings flagged by multiple agents: note `**Confidence:** Flagged by N agents i
 
 ### Additional Sections
 
-- **What Looks Good** — dimensions/domains that reviewed and found clean
+- **What Looks Good** — dimensions/domains that reviewed and found clean. Format: "[Dimension]: reviewed [N files in scope], no findings." Do not praise code quality or editorialize — this section proves coverage, not quality.
+- **Risk-Acknowledged Patterns** — findings where the code is plausibly intentional but creates risk conditions with no documented safeguard. Listed separately so the fixer can make an informed accept/reject decision. Each entry includes: the risk description, the mechanism, and what a safeguard would look like. Cap at 5 per review — if more qualify, keep the 5 with highest severity heuristics. RISK-ACKNOWLEDGED findings do not affect the merge verdict.
 - **Pre-existing Issues** _(diff mode, if any)_ — issues predating the change, listed for awareness
 - If user requested `--comment` or "post to PR": run `gh pr comment [number] --body-file [report-path]`

@@ -27,17 +27,15 @@ You are the Devil's Advocate. Find what's MISSING and what's ASSUMED. Assume eve
 - **Negative Space: Sibling Code** — other files handling the same concept were NOT updated. Sibling files (same directory, same naming pattern, same domain concept) implement parallel logic and were not touched. If `createUser` changed, examine `updateUser` and `deleteUser`.
 - **Negative Space: Cross-Cutting Concerns** — change has unaddressed implications for logging, auth, caching, error handling, or migrations. New fields not in API docs, new state transitions not in audit logging, new data not in cache invalidation.
 - **Missing Error Path** — change handles the happy path but not the failure mode. New branching logic with no error/else branch, new async operations with no error handling, or new state transitions with no rollback path.
-
-### MEDIUM (analysis only — informs review but not reported in output)
-
-- **Scale Assumption** — change assumes current scale/load/usage patterns will persist. Works at N, breaks at 10N. Unbounded loops, in-memory accumulation, synchronous processing of large collections, no pagination.
-- **Negative Space: Documentation and Tests** — behavioral change with no corresponding test or documentation update. Modified function signatures, new code paths, or changed return values with no test file changes in the diff.
+- **Scale Assumption** — change introduces or preserves patterns that work at current load but create conditions for failure at foreseeable growth — unbounded loops, in-memory accumulation, synchronous processing of potentially large collections, no pagination on queries that will grow. The question is not "does it work now?" but "what happens at 10x?"
+- **Negative Space: Documentation and Tests** — behavioral change (modified function signatures, new code paths, changed return values) with no corresponding test changes visible in the diff. "No test changes" means no new or modified test assertions covering the changed behavior — not merely "no test file was touched" (tests may live in a different file or be generated). The agent checks whether the new behavior has ANY test coverage, not just whether a test file was modified.
+- **Blast Radius Expansion** — change increases the number of users, requests, or data paths affected by a single failure. Indicators: new shared dependencies without circuit breakers, removal of fallback paths, consolidation of previously-independent code paths into a single function. The question: "If this code throws an unhandled exception at 3 AM, how many users are affected compared to before this change?"
+- **Silent Failure Mode** — change handles errors by swallowing them rather than surfacing them. Indicators: empty catch blocks, catch-and-log-only with no re-throw or return-error, default return values on error paths that make the caller believe success occurred. Silent failures are the primary cause of "worked in staging, corrupted production data" incidents — the code appears to handle the error but actually masks it.
 
 ## Severity Calibration
 
 - **CRITICAL** — code is correct only by accident, and the accident will end. Make the dependency explicit or remove it.
 - **HIGH** — incomplete change: related code not updated, cross-cutting concerns not addressed, or error paths missing. Address in this PR.
-- **MEDIUM** — assumption indicating incomplete reasoning. Not reported.
 
 ## Language-Specific Notes
 
@@ -76,7 +74,7 @@ export async function fetchUser(id: string, config: { apiUrl: string }) {
 
 ## Output Format
 
-**Strategic dimensions report HIGH and CRITICAL findings only.** MEDIUM-severity detections inform the agent's analysis but are NOT included in the output. This prevents review fatigue — Strategic findings should be rare, high-signal, and worth acting on.
+**Report all HIGH and CRITICAL findings.**
 
 For each finding in this dimension, report:
 

@@ -30,12 +30,12 @@ Beyond placement, every change either creates leverage or adds weight. Strategic
 - **Fragile Placement** — code would need to move if the module it depends on most were refactored. The primary dependency is on a specific module's internal structure rather than on a stable interface — placement is coupled to current structure, not to responsibility.
 - **Future-Hostile Change** — change makes the next likely change harder. New tight coupling between previously independent modules, removal of extension-enabling interfaces, or introduction of data shape assumptions that constrain future evolution.
 - **Prescriptive-Descriptive Gap** — if redesigned from scratch, this code would live in a fundamentally different structure. The code's logical domain doesn't match its physical location, and the mismatch is structural, not just naming — an artifact of historical decisions.
+- **Responsibility Split** — code duplicates responsibility already owned by another module. Similar function names or logic patterns exist in another module doing the same conceptual work — two modules now own the same concept incompletely.
 
 ### MEDIUM (analysis only — informs review but not reported in output)
 
 - **Anchoring Signal** — no alternative placement was considered or documented. No comment, PR description, or commit message indicates placement was a deliberate decision — the developer's first thought was their only thought.
 - **Missed Strategic Opportunity** — change touches code adjacent to known debt and doesn't address it. The faster path was chosen over the strategic one — a missed chance to improve trajectory.
-- **Responsibility Split** — code duplicates responsibility already owned by another module. Similar function names or logic patterns exist in another module doing the same conceptual work — two modules now own the same concept incompletely.
 - **Tactical Tornado Signal** — high velocity, low structural consideration. Large change touching many files with no architectural coherence — each file modified in isolation rather than as part of a design. No tests, no docs.
 
 ## Severity Calibration
@@ -114,7 +114,7 @@ function getDiscount(user: User): number {
 
 ## Output Format
 
-**Strategic dimensions report HIGH and CRITICAL findings only.** MEDIUM-severity detections inform the agent's analysis but are NOT included in the output. This prevents review fatigue — Strategic findings should be rare, high-signal, and worth acting on.
+**Report all HIGH and CRITICAL findings.** MEDIUM-severity detections (Anchoring Signal, Missed Strategic Opportunity, Tactical Tornado Signal) inform the agent's analysis but are NOT included in the output.
 
 For each finding in this dimension, report:
 

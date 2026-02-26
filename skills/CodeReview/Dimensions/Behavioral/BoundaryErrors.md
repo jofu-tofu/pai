@@ -31,7 +31,7 @@ Developers mentally test the "middle" case and assume boundaries follow — the 
 
 ## Severity Calibration
 
-CRITICAL = boundary error produces wrong results or crashes for real-world inputs (empty collections, first/last elements). Immediate fix required.
+CRITICAL = boundary condition that will produce wrong results or crash when the input hits a range edge — empty collections, first/last elements, integer limits. The code path must be reachable (called from production code, not dead code), but you do not need to prove that production traffic currently reaches this edge. Immediate fix required.
 HIGH = boundary error produces wrong results for edge cases that occur in production (pagination boundaries, index conversion). Should be fixed in this PR.
 MEDIUM = boundary error produces wrong results for rare edge cases (odd-sized inputs, single-element collections). Flag for awareness.
 
