@@ -44,6 +44,10 @@ Running the **WorkflowName** workflow from the **PresentationForge** skill...
 | `Standards/ReadabilityStandards.md` | Research-backed readability rules for all content types (35 rules) |
 | `Standards/CodebaseAnalysisStandards.md` | Content-specific rules for codebase analysis documents (~28 rules) |
 
+## Known Gotchas
+
+- Mermaid `11.12.3` parsing is sensitive to label text. In diagram labels/messages, avoid `$`, escaped `\n`, and punctuation-heavy strings when a plain-language label works. If rendering fails, simplify labels and re-open the HTML artifact.
+
 ## Examples
 
 **Example 1: Codebase analysis document**

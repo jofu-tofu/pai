@@ -69,6 +69,13 @@ Build the document with inline/CDN CSS:
 - Prism.js for syntax-highlighted code blocks (Rule CP1)
 - Distinct code block styling with contrast (Rule CP4)
 
+**Mermaid 11.12.3 parser gotcha (required):**
+- Use parser-safe diagram labels/messages.
+- Avoid `$` in node labels or message text (for operations like `$questionnaire-package`, write `questionnaire-package`).
+- Avoid escaped newline text like `\n` inside Mermaid message strings; use separate lines/messages instead.
+- Avoid punctuation-heavy message text (`()`, `/`, `+`) when a plain-language label works.
+- If a diagram fails to render, simplify labels first and re-open the artifact in browser to verify.
+
 ### Step 5: Validate Against Standards
 
 Before delivery, check the document against loaded standards:
