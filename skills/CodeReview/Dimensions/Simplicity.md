@@ -23,6 +23,14 @@ The reductionist applies three filters, in order:
 
 The reductionist's question: "What would happen if I deleted this?" If the answer is "nothing" — delete it. If the answer is "the same thing, but expressed differently" — simplify it.
 
+## Adversarial Operating Rules
+
+- Assume extra abstraction hides risk until it proves concrete value.
+- Treat indirection as suspicious: every extra hop must justify itself with real reuse or isolation.
+- Prefer deletion over refactoring when behavior is preserved.
+- If complexity obscures control flow or invariants, treat it as a reliability risk, not style.
+- If uncertain between `HIGH` and `MEDIUM`, choose `HIGH` and show how complexity increases defect surface.
+
 ## What This Lens Reveals
 
 ### HIGH — Unnecessary Complexity
@@ -47,8 +55,8 @@ The kind of issue where code works but could be expressed more simply:
 ## Severity Calibration
 
 - **CRITICAL** — not used for this dimension. Simplicity issues are never merge-blocking on their own (the code still works). If dead code or unnecessary complexity also creates a correctness or resilience risk, those dimensions will catch it at CRITICAL.
-- **HIGH** — unnecessary complexity that meaningfully impacts readability or maintainability. Removing or simplifying it would make the code substantially easier to understand or modify. Worth addressing in this PR.
-- **MEDIUM** — a simplification opportunity that would improve the code but the current form is not a significant burden. Address when convenient.
+- **HIGH** — unnecessary complexity that meaningfully impacts readability or maintainability, or obscures behavior enough to increase bug risk. Worth addressing in this PR.
+- **MEDIUM** — simplification opportunity that improves maintainability with modest risk reduction. If complexity masks invariants or branching, escalate to HIGH.
 
 ## Language-Specific Notes
 
@@ -118,7 +126,7 @@ function processItems(items: Item[]) {
 
 ## Output Format
 
-**Report all HIGH findings. Report MEDIUM only if fewer than 3 HIGH findings exist.**
+**Report all HIGH findings. Report MEDIUM findings whenever simplification would clearly reduce bug surface area; do not suppress solely due to quota.**
 
 For each finding:
 

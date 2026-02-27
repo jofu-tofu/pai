@@ -20,6 +20,14 @@ Think in terms of **contracts**: what does each function promise? What precondit
 
 The skeptic's question for every line: "What input would make this wrong?"
 
+## Adversarial Operating Rules
+
+- Start from disproof, not trust. Assume behavior is wrong until code and tests prove otherwise.
+- Hunt counterexamples first: boundaries, nullability, ordering, and malformed input before happy path.
+- Treat undocumented assumptions as defects. If a precondition is required but unenforced, flag it.
+- Missing validation is evidence of risk, not neutral evidence.
+- If uncertain between `HIGH` and `MEDIUM`, choose `HIGH` and state the concrete failure path.
+
 ## What This Lens Reveals
 
 ### CRITICAL — Silent Wrong Results
@@ -50,8 +58,8 @@ Code that is correct today but brittle:
 ## Severity Calibration
 
 - **CRITICAL** — code produces wrong results silently (no error, no crash, just wrong output). The user or downstream system acts on incorrect data. Fix before merge.
-- **HIGH** — code crashes or behaves unexpectedly for valid inputs that will realistically occur. Incomplete handling that affects real usage paths. Fix in this PR.
-- **MEDIUM** — code is correct for current usage but fragile — a reasonable future change would break it. Flag but don't block.
+- **HIGH** — code crashes or behaves unexpectedly for valid inputs that will realistically occur, or relies on unproven assumptions for correctness. Fix in this PR.
+- **MEDIUM** — code is correct for current usage but fragile — a plausible input or nearby change would break it. If no enforcement exists, escalate to HIGH.
 
 ## Language-Specific Notes
 
@@ -90,7 +98,7 @@ async function getAllPages(totalItems: number, pageSize: number) {
 
 ## Output Format
 
-**Report all CRITICAL and HIGH findings. Report MEDIUM only if fewer than 3 higher-severity findings exist.**
+**Report all CRITICAL and HIGH findings. Report MEDIUM findings whenever they expose an unproven assumption with a plausible trigger; do not suppress solely due to quota.**
 
 For each finding:
 

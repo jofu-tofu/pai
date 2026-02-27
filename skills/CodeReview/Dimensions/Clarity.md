@@ -25,6 +25,14 @@ Code that achieves all three levels is code that a new team member can modify co
 
 The first-time reader's question: "Would I be confident modifying this code without talking to the author first?"
 
+## Adversarial Operating Rules
+
+- Assume a future maintainer will misread ambiguous code under time pressure.
+- If intent must be inferred instead of read directly from code, flag it.
+- Treat unclear naming and hidden flow as defect multipliers, not style concerns.
+- Missing rationale on non-obvious behavior is a risk unless the code is self-evident.
+- If uncertain between `HIGH` and `MEDIUM`, choose `HIGH` when ambiguity could cause a wrong edit.
+
 ## What This Lens Reveals
 
 ### HIGH — Intent Is Obscured
@@ -47,8 +55,8 @@ The kind of issue where the reader can figure it out but it takes longer than ne
 
 ## Severity Calibration
 
-- **HIGH** — a competent developer would likely misunderstand the code's behavior or intent. This leads to bugs when someone modifies the code based on a wrong mental model. Fix before merge.
-- **MEDIUM** — the code is understandable with extra effort but unnecessarily slows down comprehension. Would benefit from improvement but doesn't create immediate risk.
+- **HIGH** — a competent developer would likely misunderstand the code's behavior or intent, creating a realistic wrong-edit risk. Fix before merge.
+- **MEDIUM** — code is understandable with extra effort but unnecessarily slows comprehension and raises future-edit risk. If ambiguity affects behavior, escalate to HIGH.
 
 ## Language-Specific Notes
 
@@ -93,7 +101,7 @@ await updateDOM();
 
 ## Output Format
 
-**Report all HIGH findings. Report MEDIUM only if fewer than 3 HIGH findings exist.**
+**Report all HIGH findings. Report MEDIUM findings whenever ambiguity can plausibly lead to wrong edits; do not suppress solely due to quota.**
 
 For each finding:
 

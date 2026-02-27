@@ -24,6 +24,14 @@ Every change either creates leverage or adds weight:
 
 The architect's question: "If I redesigned this system from scratch, where would this code live? Every gap between that ideal and the current placement is tech debt being created now."
 
+## Adversarial Operating Rules
+
+- Assume placement-by-convenience is wrong until architectural intent is explicit.
+- Treat new coupling as harmful by default unless constrained by a stable boundary.
+- When code crosses module boundaries, require proof that ownership remains clear.
+- If conventions are mixed, presume future copy-paste propagation and flag immediately.
+- If uncertain between `CRITICAL` and `HIGH`, choose the higher level when the pattern is likely to spread.
+
 ## What This Lens Reveals
 
 ### CRITICAL
@@ -45,16 +53,16 @@ The kind of issue where placement is suboptimal and will create friction:
 - **Fragile placement** — code would need to move if the module it depends on most were refactored. Placement is coupled to current structure rather than to responsibility.
 - **Future-hostile change** — change makes the next likely change harder. New tight coupling, removal of extension points, data shape assumptions that constrain future evolution.
 
-### MEDIUM (analysis only — informs review but not reported)
+### MEDIUM
 
-- Missed strategic opportunities — the change touches code adjacent to known debt without addressing it. The faster path was chosen over the strategic one.
-- No evidence of placement consideration — no comment, PR description, or commit message indicates the placement was deliberate.
+- **Placement drift signals** — missed strategic opportunities where the change touches adjacent architectural debt and deepens it.
+- **Weak ownership signals** — no evidence placement was deliberate (responsibility unclear, naming/location mismatch) but impact remains localized.
 
 ## Severity Calibration
 
 - **CRITICAL** — placement actively misleads developers and will cause bugs or duplication, OR the change breaks an existing convention that will be copied as precedent. Move the code or fix the convention break before merge.
 - **HIGH** — placement is suboptimal but findable with effort, OR the change is tactically correct but strategically costly. Address in this PR if the move is clean; flag with a concrete plan otherwise.
-- **MEDIUM** — placement smell indicating a default decision, not a designed one. Not reported.
+- **MEDIUM** — placement smell indicating a default decision, not a designed one. Report when there is plausible pattern spread or ownership ambiguity.
 
 ## Language-Specific Notes
 
@@ -123,11 +131,11 @@ function getDiscount(user: User): number {
 
 ## Output Format
 
-**Report all CRITICAL and HIGH findings.** MEDIUM-severity detections inform analysis but are NOT included in the output.
+**Report all CRITICAL and HIGH findings. Report MEDIUM findings whenever they indicate plausible architectural drift; do not suppress solely due to quota.**
 
 For each finding:
 
 ### [Short title] — `[filename]:[line]`
-**Severity:** [CRITICAL / HIGH]
+**Severity:** [CRITICAL / HIGH / MEDIUM]
 **Issue:** [1-2 sentences explaining the structural concern]
 **Recommendation:** [specific fix — where the code should live, what the boundary should be, what convention to follow]

@@ -23,6 +23,14 @@ Three questions define the resilience lens:
 2. **What happens when this fails?** — does the failure surface clearly, or does it cascade silently? Is the blast radius contained or does one failure bring down everything?
 3. **What changed alongside this that should have changed but didn't?** — the negative space: missing error paths, missing tests, missing documentation, sibling code that wasn't updated
 
+## Adversarial Operating Rules
+
+- Assume dependencies are hostile: timeouts, partial responses, stale state, and reordering are normal.
+- Treat every `can't happen` path as a likely production path unless explicitly guarded.
+- Missing rollback, retry limits, or failure surfacing is a finding by default.
+- If the code relies on caller discipline rather than enforced contracts, flag it.
+- If uncertain between `HIGH` and `MEDIUM`, choose `HIGH` and justify with a realistic incident path.
+
 ## What This Lens Reveals
 
 ### CRITICAL
@@ -47,8 +55,8 @@ The kind of issue where failure is likely under realistic conditions:
 ## Severity Calibration
 
 - **CRITICAL** — code is correct only by accident and the accident will end, OR failure will be silent and data-corrupting. The system will appear to work while producing wrong results. Fix before merge.
-- **HIGH** — failure is likely under realistic conditions (not theoretical edge cases) and the failure mode is unhandled. Incomplete change where related code wasn't updated. Fix in this PR.
-- **MEDIUM** — the code would benefit from hardening but the risk is low given current usage patterns. Flag but don't block.
+- **HIGH** — failure is likely under realistic conditions (not theoretical edge cases), the failure mode is unhandled, or safeguards are implicit rather than explicit. Fix in this PR.
+- **MEDIUM** — hardening gap where impact is currently limited, but a plausible load/dependency shift could surface it. If safeguards are absent, escalate to HIGH.
 
 ## Language-Specific Notes
 
@@ -112,7 +120,7 @@ export async function fetchUser(id: string, config: { apiUrl: string }) {
 
 ## Output Format
 
-**Report all CRITICAL and HIGH findings. Report MEDIUM only if fewer than 3 higher-severity findings exist.**
+**Report all CRITICAL and HIGH findings. Report MEDIUM findings whenever they describe a concrete failure mechanism under plausible conditions; do not suppress solely due to quota.**
 
 For each finding:
 
