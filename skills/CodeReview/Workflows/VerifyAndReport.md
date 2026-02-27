@@ -23,9 +23,46 @@ Three jobs in one pass: **verify** findings trace to actual changed lines and ar
 
 Read all agent output files. Extract every finding (severity, file, line, heuristic, description, recommendation). Tag each with its source dimension.
 
+**Two-pass verification: Relevance first, then Evidence.**
+
+### Pass 1: Relevance Filter
+
+Before checking whether a finding is technically correct, ask whether it belongs in this review at all. A finding that is technically true but not worth the reader's time is worse than no finding — it trains the reader to skim, which causes them to miss the findings that matter.
+
+Apply these filters **in order**. A finding that fails any filter is discarded with the corresponding tag. Do not proceed to Pass 2 for discarded findings.
+
+**SCOPE — Is this finding about the code under review?**
+
+- Diff mode: Does the finding concern lines changed in the commit range? A finding about unchanged code surrounding the diff is out of scope even if the changed code interacts with it — unless the change *creates a new bug* in the unchanged code (e.g., changing a function signature without updating a caller).
+- Audit mode: Does the finding concern files in the target directory/module? Findings about dependencies or upstream code are out of scope.
+- Tag: `OUT-OF-SCOPE`
+
+**SUBSTANCE — Does this finding describe a real risk or just a preference?**
+
+The test: *"If this finding were ignored, what specific bad thing would happen?"* If you can't name a concrete failure mode (wrong output, crash, data loss, security breach, production incident), the finding lacks substance. Findings that amount to "this could be written differently" or "this isn't how I'd do it" are preferences, not problems.
+
+Discard findings that are:
+- **Style preferences** — naming conventions, formatting, import ordering, brace style, comment style — unless the project has an explicit linter rule that the code violates
+- **Theoretical fragility** — "this might break if someone later changes X" where X is speculative and the code is correct today. The review covers what the code *does*, not what hypothetical future developers *might* do to it.
+- **Redundant with tooling** — type errors a compiler catches, lint violations a linter catches, format issues a formatter catches. Assume CI runs these tools. Don't duplicate their work.
+- **Cosmetic complexity complaints** — "this function is long" or "this has many parameters" without identifying a specific bug, ambiguity, or maintenance trap that results from the length/complexity
+- Tag: `NITPICK`
+
+**PROPORTIONALITY — Is the severity proportional to the actual risk?**
+
+Downgrade or discard findings where the agent inflated severity:
+- A CRITICAL finding must describe a path to silent wrong results, data loss, or security breach in production. If the "critical" issue would only surface in a test environment or requires an implausible input sequence, it's not CRITICAL.
+- A HIGH finding must describe something that will realistically affect users or developers. If it requires three wrong things to happen simultaneously, it's MEDIUM at best.
+- If a finding survives scope and substance checks but its severity is inflated by 2+ levels, downgrade it. If it's already LOW/SUGGESTION after downgrade, discard it — the report has limited attention budget.
+- Tag: `DISPROPORTIONATE`
+
+### Pass 2: Evidence Verification
+
+For findings that survive Pass 1, verify they trace to actual code.
+
 Check context.md `Mode:` field to determine verification method.
 
-### Verification Principle
+#### Verification Principle
 
 A finding is a FALSE POSITIVE only when the verifier can point to a specific reason it is safe. Discard requires one of:
 1. **Documented convention** — a CLAUDE.md entry, ADR, linter rule, or inline code comment that explicitly explains why this pattern is used. The convention must be in-repo and readable by the agent — tribal knowledge or external runbooks don't count.
@@ -34,7 +71,7 @@ A finding is a FALSE POSITIVE only when the verifier can point to a specific rea
 
 If none of these three conditions are met, the finding is RISK-ACKNOWLEDGED (not FALSE POSITIVE).
 
-### Diff Mode Verification
+#### Diff Mode Verification
 
 Use `git blame` to confirm each finding's line was introduced by a commit in the review range. Also check for self-correction (a later commit in the range fixed the same line).
 
@@ -48,7 +85,7 @@ Use `git blame` to confirm each finding's line was introduced by a commit in the
 | Later commit in range fixed the line | SELF-CORRECTED | Discard |
 | Cannot determine (binary, generated, blame unavailable) | UNVERIFIED | Keep, mark "manual review recommended" |
 
-### Audit Mode Verification
+#### Audit Mode Verification
 
 No commit range. Verify the cited code actually exists at the cited location.
 
@@ -66,9 +103,11 @@ No commit range. Verify the cited code actually exists at the cited location.
 Write to `$REVIEW_DIR/verified-findings.md` with verification status on each finding and a tally:
 
 ```
-Verification: [N]/[total] findings confirmed
-([M] pre-existing discarded, [F] false positives removed, [R] risk-acknowledged, [P] unverified, [Q] self-corrected)
+Relevance Filter: [X]/[total raw] findings passed ([S] out-of-scope, [K] nitpicks, [J] disproportionate)
+Evidence Verification: [N]/[X] findings confirmed ([M] pre-existing, [F] false positives, [R] risk-acknowledged, [P] unverified, [Q] self-corrected)
 ```
+
+The relevance tally is as important as the evidence tally — it shows the verifier actively filtered noise rather than rubber-stamping agent output.
 
 ---
 

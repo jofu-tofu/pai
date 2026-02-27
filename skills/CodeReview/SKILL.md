@@ -67,16 +67,17 @@ Running the **Review** workflow from the **CodeReview** skill...
 
 ## Dimension System
 
-13 review dimensions organized into 4 categories. Each dimension file is self-contained with detection heuristics, severity calibration, language-specific notes, examples, and output format.
+5 review dimensions organized by philosophical lens — each gives the agent a different way of looking at the same code. Dimensions are self-contained with persona, mental model, illustrative examples, severity calibration, and output format.
 
-| Category | Dimensions | Baseline |
-|----------|-----------|----------|
-| **Architecture** | A1 ArchitectureQuality, A2 Modifiability, A5 DesignIntent | A5 |
-| **Behavioral** | B1 BoundaryErrors, B2 LogicErrors, B3 CaseCompleteness, B4 DataTransformation, B5 Testability | B1, B2 |
-| **Simplification** | S1 DeadCodeBloat, S2 CouplingRigidity, S4 ComplexityReduction | S4 |
-| **Strategic** | D1 ArchitecturalDirection, D3 AssumptionAudit | D3 |
+| ID | Dimension | Stance | Baseline |
+|----|-----------|--------|----------|
+| COR | **Correctness** | The Skeptic — "Is this right?" | Yes |
+| CLA | **Clarity** | The First-Time Reader — "Does this explain itself?" | No |
+| SIM | **Simplicity** | The Reductionist — "Is this the simplest version?" | Yes |
+| RES | **Resilience** | The Devil's Advocate — "What will break this?" | Yes |
+| STR | **Structure** | The Architect — "Is this where it belongs?" | No |
 
-**Baseline dimensions** are always included unless the review has <10 changed lines. Non-baseline dimensions are selected by the SelectDimensions agent based on context.
+**Baseline dimensions** (COR, SIM, RES) are always included unless the review has <10 changed lines. Non-baseline dimensions (CLA, STR) are selected by the SelectDimensions agent based on context — included by default for medium+ diffs.
 
 ## Examples
 
@@ -121,6 +122,6 @@ Agent count scales with **review target size and complexity**:
 
 | Tier | Diff Lines | Audit Files | Agent Cap |
 |------|-----------|-------------|-----------|
-| Small | 1-50 | 1-10 | 5 |
-| Medium | 50-300 | 10-50 | 8 |
-| Large | 300+ | 50+ | 13 |
+| Small | 1-50 | 1-10 | 3 |
+| Medium | 50-300 | 10-50 | 5 |
+| Large | 300+ | 50+ | 5 |

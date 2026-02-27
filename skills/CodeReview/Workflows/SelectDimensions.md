@@ -34,8 +34,8 @@ Read the `context.md` file provided as input. Extract:
 Glob `Dimensions/**/*.md` (relative to the skill root) to find all dimension files.
 
 For each dimension file found:
-1. Read the YAML frontmatter to get: id, name, category, baseline flag
-2. Read the first paragraph after the heading to understand what the dimension covers
+1. Read the YAML frontmatter to get: id, name, baseline flag
+2. Read the persona and mental model sections to understand what the dimension covers
 
 Build a list of all available dimensions with their metadata.
 
@@ -43,15 +43,14 @@ Build a list of all available dimensions with their metadata.
 
 Using the context from Step 1 and the dimension inventory from Step 2:
 
-1. **Baseline dimensions always included** — any dimension with `baseline: true` in frontmatter is included unless the review has fewer than 10 changed lines. Baselines are: B1 (Boundary Errors), B2 (Logic Errors), S4 (Complexity Reduction), A5 (Design Intent), D3 (Assumption Audit).
+1. **Baseline dimensions always included** — any dimension with `baseline: true` in frontmatter is included unless the review has fewer than 10 changed lines. Baselines are: COR (Correctness), SIM (Simplicity), RES (Resilience).
 
 2. **Context-driven selection** — for non-baseline dimensions, use judgment:
-   - Architecture dimensions (A1, A2) activate when changes touch module boundaries, imports, or multi-file structural changes
-   - Behavioral dimensions (B3, B4, B5) activate based on the nature of code changes (case handling, data transformation, testability concerns)
-   - Simplification dimensions (S1, S2) activate when changes add significant new code or modify existing complex code
-   - Strategic dimensions (D1) activate for larger changes that affect architectural direction
+   - **Clarity (CLA):** Favor including when context signals: new public API surface, renamed/restructured interfaces, new abstractions, changes touching shared/exported modules, or PR description mentions "refactor" or "rename."
+   - **Structure (STR):** Favor including when context signals: changes spanning 3+ directories, new files/modules created, import graph changes, dependency additions, or changes touching module boundaries/index files.
+   - For medium+ diffs (50+ lines), include all 5 lenses by default.
 
-3. **No trigger conditions** — do not parse or match trigger syntax. Read the context, read what the dimension covers, decide if it's relevant.
+3. **No trigger conditions** — do not parse or match trigger syntax. Read the context, read what the dimension covers, decide if it's relevant. These are guidance signals, not rigid triggers — use judgment.
 
 ## Step 4: Determine Sizing
 
@@ -59,19 +58,20 @@ Based on review size from context:
 
 | Tier | Diff Lines | Audit Files | Agent Cap |
 |------|-----------|-------------|-----------|
-| Small | 1-50 | 1-10 | 5 |
-| Medium | 50-300 | 10-50 | 8 |
-| Large | 300+ | 50+ | 13 |
+| Small | 1-50 | 1-10 | 3 |
+| Medium | 50-300 | 10-50 | 5 |
+| Large | 300+ | 50+ | 5 |
 
 If selected dimensions exceed the agent cap, prioritize: baselines first, then by relevance to the specific changes.
 
 ## Step 5: Route Files
 
 For each selected dimension, assign the subset of changed/target files relevant to its concern:
-- Architecture dimensions: entire modules/directories affected
-- Behavioral dimensions (B1, B2): all changed files (these are universal)
-- Language-specific dimensions: files matching the language
-- Simplification dimensions: files with significant additions or modifications
+- Correctness: all changed files (universal)
+- Clarity: files with new/renamed public interfaces, refactored modules
+- Simplicity: files with significant additions or modifications
+- Resilience: all changed files (universal)
+- Structure: entire modules/directories affected, especially new files
 
 ## Step 6: Write Output
 
@@ -81,13 +81,13 @@ Write `dimensions.json` to `$REVIEW_DIR/dimensions.json`:
 {
   "mode": "diff",
   "tier": "MEDIUM",
-  "agent_cap": 8,
+  "agent_cap": 5,
   "dimensions": [
     {
-      "id": "B1",
-      "name": "Boundary & Edge Case Errors",
-      "path": "/absolute/path/to/Dimensions/Behavioral/BoundaryErrors.md",
-      "reason": "Baseline — always relevant for code changes",
+      "id": "COR",
+      "name": "Correctness",
+      "path": "/absolute/path/to/Dimensions/Correctness.md",
+      "reason": "Baseline — always included",
       "files": ["src/auth/login.ts", "src/api/routes.ts"]
     }
   ],
