@@ -24,7 +24,7 @@
 Load these dynamically based on task keywords:
 
 - **CLI testing** → skills/Development/References/cli-testing-standards.md
-- **Browser automation** → skills/Browser/SKILL.md
+- **Browser automation** → skills/Utilities/Browser/SKILL.md
 
 ---
 

@@ -15,8 +15,8 @@
 - **skills/PAI/CONSTITUTION.md** - Constitutional principles
 
 ### Research Standards
-- **skills/Research/SKILL.md** - Research skill workflows and methodologies
-- **skills/Research/Standards.md** - Research quality standards and citation practices
+- **skills/Research/Research/SKILL.md** - Research skill workflows and methodologies
+- **skills/Research/Research/Standards.md** - Research quality standards and citation practices
 
 ---
 
@@ -24,10 +24,10 @@
 
 Load these dynamically based on task keywords:
 
-- **Technical/Code** → skills/Research/Workflows/TechnicalResearch.md
-- **API/Framework** → skills/Research/Workflows/APIResearch.md
-- **Multi-model** → skills/Research/Workflows/MultiModelResearch.md
-- **Live Data** → skills/Research/Workflows/LiveDataResearch.md
+- **Technical/Code** → skills/Research/Research/Workflows/TechnicalResearch.md
+- **API/Framework** → skills/Research/Research/Workflows/APIResearch.md
+- **Multi-model** → skills/Research/Research/Workflows/MultiModelResearch.md
+- **Live Data** → skills/Research/Research/Workflows/LiveDataResearch.md
 
 ---
 

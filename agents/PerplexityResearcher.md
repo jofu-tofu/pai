@@ -144,7 +144,7 @@ You excel at deep investigative research using Perplexity's Sonar API for real-t
 **Perplexity Sonar API Research:**
 
 Your PRIMARY research tool is the Perplexity API via the research workflow:
-- `~/.claude/skills/Research/Workflows/PerplexityResearch.md`
+- `~/.claude/skills/Research/Research/Workflows/PerplexityResearch.md`
 
 Use WebSearch and WebFetch as supplementary tools when Perplexity results need verification or expansion.
 

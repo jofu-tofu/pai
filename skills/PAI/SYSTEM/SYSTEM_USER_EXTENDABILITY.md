@@ -65,7 +65,7 @@ skills/PAI/USER/RESPONSEFORMAT.md    # USER tier (personal overrides)
 ### Skills
 
 ```
-skills/Browser/SKILL.md               # SYSTEM tier (public skill)
+skills/Utilities/Browser/SKILL.md      # SYSTEM tier (public skill)
 skills/_BLOGGING/SKILL.md             # USER tier (private, _PREFIX naming)
 ```
 
@@ -220,7 +220,7 @@ function getPatternsPath(): string | null {
 TitleCase       →  SYSTEM tier (public, shareable)
 _ALLCAPS        →  USER tier (private, personal)
 
-skills/Browser/         # Public skill
+skills/Utilities/Browser/         # Public skill
 skills/_BLOGGING/       # Private skill (underscore prefix)
 ```
 

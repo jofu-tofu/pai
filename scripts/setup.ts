@@ -336,7 +336,7 @@ async function checkDirectories(): Promise<CheckResult> {
 async function checkDependencies(): Promise<CheckResult> {
   const packageDirs = [
     'hooks',
-    'skills/Prompting/Tools',
+    'skills/Utilities/Prompting/Tools',
   ];
 
   const needsInstall: string[] = [];
