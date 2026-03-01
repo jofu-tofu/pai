@@ -7,10 +7,9 @@
  */
 
 import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
-import { getPaiDir } from './paths';
+import { getSettingsPath } from './paths';
 
-const SETTINGS_PATH = join(getPaiDir(), 'settings.json');
+const SETTINGS_PATH = getSettingsPath();
 
 // Default identity (fallback if settings.json doesn't have identity section)
 const DEFAULT_IDENTITY = {
@@ -186,6 +185,18 @@ export function getDefaultIdentity(): Identity {
  */
 export function getDefaultPrincipal(): Principal {
   return { ...DEFAULT_PRINCIPAL };
+}
+
+/**
+ * Get algorithm voice settings from settings.json → daidentity.voices.algorithm
+ * Returns { voiceId, voiceName, stability, similarity_boost, style, speed, use_speaker_boost, volume }
+ * or null if not configured.
+ */
+export function getAlgorithmVoice(): { voiceId: string; voiceName: string; stability: number; similarity_boost: number; style: number; speed: number; use_speaker_boost: boolean; volume?: number } | null {
+  const settings = loadSettings();
+  const voices = (settings.daidentity as any)?.voices;
+  if (!voices?.algorithm?.voiceId) return null;
+  return voices.algorithm;
 }
 
 /**

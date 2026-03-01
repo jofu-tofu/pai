@@ -28,15 +28,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/StartupGreeting.hook.ts"
-          },
-          {
-            "type": "command",
             "command": "bun {{PAI_DIR}}/hooks/LoadContext.hook.ts"
           },
           {
             "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/CheckVersion.hook.ts"
+            "command": "bun {{PAI_DIR}}/hooks/handlers/BuildCLAUDE.ts"
           }
         ]
       }
@@ -117,6 +113,24 @@
         ]
       },
       {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/PRDSync.hook.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/PRDSync.hook.ts"
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -162,10 +176,6 @@
           },
           {
             "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/AutoWorkCreation.hook.ts"
-          },
-          {
-            "type": "command",
             "command": "bun {{PAI_DIR}}/hooks/UpdateTabTitle.hook.ts"
           },
           {
@@ -180,7 +190,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/StopOrchestrator.hook.ts"
+            "command": "bun {{PAI_DIR}}/hooks/LastResponseCache.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/ResponseTabReset.hook.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun {{PAI_DIR}}/hooks/DocIntegrity.hook.ts"
           }
         ]
       }
@@ -194,7 +212,7 @@
           },
           {
             "type": "command",
-            "command": "bun {{PAI_DIR}}/hooks/SessionSummary.hook.ts"
+            "command": "bun {{PAI_DIR}}/hooks/SessionCleanup.hook.ts"
           },
           {
             "type": "command",
