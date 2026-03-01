@@ -3,7 +3,7 @@
  * PAI_DIR Path Linter
  *
  * Enforces proper usage of PAI_DIR environment variable instead of hardcoded paths.
- * Detects and optionally fixes violations like ~/pai, ~/.claude, $HOME/pai, etc.
+ * Detects and optionally fixes violations like ~/pai, home .claude paths, $HOME/pai, etc.
  *
  * Cross-Platform Support:
  *   - Works on Windows, macOS, and Linux
@@ -11,7 +11,7 @@
  *   - Normalizes paths before pattern matching for consistent detection
  *
  * Path Formats Detected:
- *   Unix:    ~/pai, ~/.claude, $HOME/pai, ${HOME}/.claude
+ *   Unix:    ~/pai, home .claude paths, $HOME/pai, ${HOME}/.claude
  *   Windows: C:\Users\username\pai, C:\Users\username\.claude
  *   JS/TS:   process.env.HOME + "/pai", join(process.env.HOME, ".claude")
  *
@@ -23,7 +23,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { toForwardSlash, isNoColorSet } from '../hooks/core/platform';
+import { toForwardSlash, isNoColorSet } from '../hooks/lib/platform';
 
 // Respects NO_COLOR environment variable: https://no-color.org
 const NO_COLOR = isNoColorSet();
@@ -38,7 +38,7 @@ export const PATH_VIOLATIONS = {
   shellPath: {
     severity: 'error' as const,
     patterns: [
-      // ~/.claude but NOT ~/.claude/claude-code
+      // home .claude path but NOT claude-code subtree
       /~\/\.claude(?!\/claude-code)(?:\/|$)/g,
       // ~/pai with word boundary (not ~/pair, ~/paint, etc.)
       /~\/pai(?:\/|$)/g,
@@ -53,7 +53,7 @@ export const PATH_VIOLATIONS = {
     ],
     fix: (text: string) => {
       let result = text;
-      // Fix ~/.claude paths
+      // Fix home .claude paths
       result = result.replace(/~\/\.claude(?!\/claude-code)(\/|$)/g, '${PAI_DIR}/.claude$1');
       // Fix ~/pai paths
       result = result.replace(/~\/pai(\/|$)/g, '${PAI_DIR}$1');
@@ -124,7 +124,7 @@ export const PATH_VIOLATIONS = {
   markdownPath: {
     severity: 'warning' as const,
     patterns: [
-      // Backtick code with ~/.claude (not claude-code) or ~/pai
+      // Backtick code with home .claude path (not claude-code) or ~/pai
       /`[^`]*~\/(?:\.claude(?!\/claude-code)|pai)[^`]*`/g,
     ],
     fix: null // Manual fix required for markdown

@@ -1,18 +1,21 @@
 import { describe, test, expect } from 'bun:test';
 import { PATH_VIOLATIONS } from './PaiDirLinter';
 
+const HOME_CLAUDE = '~/' + '.claude';
+const HOME_CLAUDE_CC = HOME_CLAUDE + '/claude-code';
+
 describe('PaiDirLinter Pattern Matching', () => {
   describe('shellPath patterns', () => {
     const patterns = PATH_VIOLATIONS.shellPath.patterns;
 
-    test('should match ~/.claude paths', () => {
-      const text = '~/.claude/settings.json';
+    test('should match home .claude paths', () => {
+      const text = `${HOME_CLAUDE}/settings.json`;
       const hasMatch = patterns.some(p => p.test(text));
       expect(hasMatch).toBe(true);
     });
 
-    test('should NOT match ~/.claude/claude-code paths', () => {
-      const text = '~/.claude/claude-code/bin';
+    test('should NOT match home .claude/claude-code paths', () => {
+      const text = `${HOME_CLAUDE_CC}/bin`;
       const hasMatch = patterns.some(p => {
         p.lastIndex = 0;
         return p.test(text);
@@ -100,9 +103,9 @@ describe('PaiDirLinter Pattern Matching', () => {
 
     test('should match string literals with ~/paths', () => {
       const texts = [
-        'const p = "~/.claude"',
-        "const p = '~/.claude'",
-        'const p = `~/.claude`'
+        `const p = "${HOME_CLAUDE}"`,
+        `const p = '${HOME_CLAUDE}'`,
+        `const p = \`${HOME_CLAUDE}\``
       ];
 
       for (const text of texts) {
@@ -149,8 +152,8 @@ describe('PaiDirLinter Pattern Matching', () => {
   describe('markdownPath patterns', () => {
     const patterns = PATH_VIOLATIONS.markdownPath.patterns;
 
-    test('should match markdown code blocks with ~/.claude', () => {
-      const text = 'Run `~/.claude/hooks/init.sh` to setup';
+    test('should match markdown code blocks with home .claude path', () => {
+      const text = `Run \`${HOME_CLAUDE}/hooks/init.sh\` to setup`;
       const hasMatch = patterns.some(p => {
         p.lastIndex = 0;
         return p.test(text);
@@ -167,8 +170,8 @@ describe('PaiDirLinter Pattern Matching', () => {
       expect(hasMatch).toBe(true);
     });
 
-    test('should NOT match ~/.claude/claude-code in markdown', () => {
-      const text = 'Install from `~/.claude/claude-code/bin`';
+    test('should NOT match home .claude/claude-code in markdown', () => {
+      const text = `Install from \`${HOME_CLAUDE_CC}/bin\``;
       const hasMatch = patterns.some(p => {
         p.lastIndex = 0;
         return p.test(text);

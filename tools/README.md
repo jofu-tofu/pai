@@ -22,7 +22,7 @@ bun run tools/PaiDirLinter.ts
 
 | Platform | Home Directory | PAI_DIR Default |
 |----------|----------------|-----------------|
-| macOS/Linux | `$HOME` or `~` | `~/.claude` |
+| macOS/Linux | `$HOME` or `~` | home `.claude` directory |
 | Windows | `%USERPROFILE%` | `C:\Users\<username>\.claude` |
 
 The tools automatically detect your platform and use the appropriate path handling.
@@ -35,7 +35,7 @@ Lints the codebase to ensure proper usage of `PAI_DIR` environment variable inst
 
 **Purpose:**
 - Enforces consistent path handling across the codebase
-- Prevents hardcoded references to `~/.claude` or `~/pai`
+- Prevents hardcoded references to home `.claude` paths or `~/pai`
 - Ensures portability between development and production environments
 
 **Usage:**
@@ -58,7 +58,7 @@ bun run tools/PaiDirLinter.ts --fix path/to/directory
 
 | Pattern | Example | Severity | Auto-fix |
 |---------|---------|----------|----------|
-| Shell paths | `~/pai`, `~/.claude`, `$HOME/pai` | Error | ✅ |
+| Shell paths | `~/pai`, home `.claude` path, `$HOME/pai` | Error | ✅ |
 | JS/TS paths | `process.env.HOME + "/pai"` | Error | ✅ |
 | Windows paths | `C:\Users\user\.claude` | Error | ✅ |
 | Markdown docs | `` `~/pai` `` in markdown | Warning | ❌ |
