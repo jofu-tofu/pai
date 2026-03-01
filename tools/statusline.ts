@@ -20,8 +20,8 @@
 import { existsSync, statSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, basename, dirname } from 'path';
 import { spawnSync, type SpawnSyncOptions } from 'child_process';
-import { isWindows, isMacOS, getEnvVar, splitLines, getWindowsSyncSpawnOptions, isNoColorSet } from '../hooks/core/platform';
-import { getPaiDir } from '../hooks/core/paths';
+import { isWindows, isMacOS, getEnvVar, splitLines, getWindowsSyncSpawnOptions, isNoColorSet } from '../hooks/lib/platform';
+import { getPaiDir } from '../hooks/lib/paths';
 
 // Helper for cross-platform spawn options with windowsHide
 function getSpawnOpts(timeout = 2000): SpawnSyncOptions {
@@ -155,6 +155,12 @@ interface Settings {
   daidentity?: {
     name?: string;
     displayName?: string;
+  };
+  principal?: {
+    timezone?: string;
+  };
+  preferences?: {
+    temperatureUnit?: 'celsius' | 'fahrenheit';
   };
   pai?: { version?: string };
   env?: { DA?: string };
@@ -624,7 +630,7 @@ async function fetchLocation(): Promise<{ city: string; state: string }> {
   return { city: 'Unknown', state: '' };
 }
 
-async function fetchWeather(): Promise<string> {
+async function fetchWeather(tempUnit: 'celsius' | 'fahrenheit'): Promise<string> {
   const now = Math.floor(Date.now() / 1000);
   const cacheAge = now - getFileMtime(WEATHER_CACHE);
 
@@ -647,7 +653,7 @@ async function fetchWeather(): Promise<string> {
     }
 
     const response = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=celsius`,
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=${tempUnit}`,
       { signal: AbortSignal.timeout(3000) }
     );
     const data = await response.json();
@@ -706,7 +712,8 @@ async function fetchWeather(): Promise<string> {
           break;
       }
 
-      const weatherStr = `${temp}\u00B0C ${condition}`;
+      const unitSuffix = tempUnit === 'fahrenheit' ? '\u00B0F' : '\u00B0C';
+      const weatherStr = `${temp}${unitSuffix} ${condition}`;
       writeFileSync(WEATHER_CACHE, weatherStr);
       return weatherStr;
     }
@@ -1199,6 +1206,8 @@ async function main(): Promise<void> {
   const settings = readJsonFile<Settings>(SETTINGS_FILE) || {};
   const daName = settings.daidentity?.name || settings.daidentity?.displayName || settings.env?.DA || 'Assistant';
   const paiVersion = settings.pai?.version || '—';
+  const timezone = settings.principal?.timezone || 'UTC';
+  const tempUnit: 'celsius' | 'fahrenheit' = settings.preferences?.temperatureUnit === 'celsius' ? 'celsius' : 'fahrenheit';
 
   // Extract input data
   const currentDir = input.workspace?.current_dir || input.cwd || process.cwd();
@@ -1260,12 +1269,22 @@ async function main(): Promise<void> {
     timeDisplay = `${durationSec}s`;
   }
 
-  // Get current time
-  const now = new Date();
-  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  // Get current time in principal timezone
+  let currentTime = '00:00';
+  try {
+    currentTime = new Intl.DateTimeFormat('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: timezone,
+    }).format(new Date());
+  } catch {
+    const now = new Date();
+    currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  }
 
   // Fetch location and weather (parallel)
-  const [location, weather] = await Promise.all([fetchLocation(), fetchWeather()]);
+  const [location, weather] = await Promise.all([fetchLocation(), fetchWeather(tempUnit)]);
 
   // Get git status
   const gitStatus = getGitStatus(currentDir);
