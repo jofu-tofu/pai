@@ -1,85 +1,44 @@
 # VerifyPage Workflow
 
-Verify a page loads correctly and check for errors.
+> **Trigger:** "verify page", "check page", "debug page load"
 
-## Steps
+## Reference Material
 
-1. **Launch and navigate**
-   ```typescript
-   import { PlaywrightBrowser } from '../index.ts'
-   const browser = new PlaywrightBrowser()
-   await browser.launch({ headless: false })  // Visible by default
+- **Skill file:** `../SKILL.md`
+- **Skill intent:** `../SkillIntent.md`
+- **Quick usage guide:** `../README.md`
 
-   const startTime = Date.now()
-   await browser.navigate(url)
-   const loadTime = Date.now() - startTime
+## Purpose
+
+Verify that a page renders correctly and surface browser-side failures with evidence from the actual rendered page.
+
+## Workflow Steps
+
+1. **Start with the diagnostic command**
+   ```bash
+   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts <url>
+   ```
+   Use this first unless the user already has an active browser session on the target page.
+
+2. **Inspect the default evidence**
+   Review the screenshot path, console errors, failed requests, network summary, page title, and final status.
+
+3. **Check a target selector when the task names one**
+   ```bash
+   bun run $PAI_DIR/skills/Utilities/Browser/examples/verify-page.ts <url> "<selector>"
+   ```
+   Use this when the user cares about a specific heading, button, form, or region.
+
+4. **Drill deeper only where needed**
+   ```bash
+   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts errors
+   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts console
+   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts network
+   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts failed
    ```
 
-2. **Check basic info**
-   ```typescript
-   const title = await browser.getTitle()
-   const finalUrl = browser.getUrl()  // Check for redirects
-   ```
+5. **Capture final proof**
+   Use `screenshot` for visual proof or `a11y` for a lighter-weight structural snapshot.
 
-3. **Verify specific element (optional)**
-   ```typescript
-   await browser.waitForSelector(selector, { timeout: 5000 })
-   const text = await browser.getVisibleText(selector)
-   ```
-
-4. **Check for console errors**
-   ```typescript
-   const errors = browser.getConsoleLogs({ type: 'error' })
-   if (errors.length > 0) {
-     console.log('Console errors:', errors)
-   }
-   ```
-
-5. **Take verification screenshot**
-   ```typescript
-   import { tmpdir } from 'os'
-   import { join } from 'path'
-   await browser.screenshot({ path: join(tmpdir(), 'verify.png') })
-   ```
-
-6. **Close browser**
-   ```typescript
-   await browser.close()
-   ```
-
-## Example: Full Verification
-
-```typescript
-import { PlaywrightBrowser } from '../index.ts'
-import { tmpdir } from 'os'
-import { join } from 'path'
-
-const browser = new PlaywrightBrowser()
-await browser.launch({ headless: false })
-
-await browser.navigate('https://example.com')
-
-// Basic checks
-const title = await browser.getTitle()
-console.log(`Title: ${title}`)
-
-// Check specific element
-await browser.waitForSelector('h1')
-const heading = await browser.getVisibleText('h1')
-console.log(`H1: ${heading}`)
-
-// Console errors
-const errors = browser.getConsoleLogs({ type: 'error' })
-console.log(`Errors: ${errors.length}`)
-
-// Evidence
-await browser.screenshot({ path: join(tmpdir(), 'verify.png') })
-
-await browser.close()
-```
-
-## CLI Usage
-
-```bash
-bun $PAI_DIR/skills/Utilities/Browser/examples/verify-page.ts https://example.com
-```
+6. **Report what the browser proved**
+   If there are console errors or failed requests, report them plainly instead of claiming the page works.

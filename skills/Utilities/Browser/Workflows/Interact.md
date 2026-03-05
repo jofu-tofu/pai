@@ -1,102 +1,37 @@
 # Interact Workflow
 
-Fill forms, click buttons, and interact with page elements.
+> **Trigger:** "reproduce browser flow", "fill form", "click through page"
 
-## Steps
+## Reference Material
 
-1. **Launch and navigate**
-   ```typescript
-   import { PlaywrightBrowser } from '../index.ts'
-   const browser = new PlaywrightBrowser()
-   await browser.launch({ headless: false })  // Watch it work
-   await browser.navigate(url)
+- **Skill file:** `../SKILL.md`
+- **Skill intent:** `../SkillIntent.md`
+- **Verification workflow:** `./VerifyPage.md`
+
+## Purpose
+
+Use minimal browser interaction to reach the page state that needs to be debugged or verified.
+
+## Workflow Steps
+
+1. **Load the starting page with diagnostics**
+   ```bash
+   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts <url>
    ```
 
-2. **Interact with elements**
-   ```typescript
-   await browser.fill('#email', 'test@example.com')
-   await browser.fill('#password', 'secret')
-   await browser.click('button[type="submit"]')
+2. **Use only the interaction needed to reach the target state**
+   ```bash
+   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts fill "<selector>" "<value>"
+   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts click "<selector>"
+   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts type "<selector>" "<text>"
    ```
+   Each command prints the updated accessibility tree so you can confirm the UI changed.
 
-3. **Wait for result**
-   ```typescript
-   await browser.waitForNavigation()
-   // or
-   await browser.waitForSelector('.success-message')
-   ```
+3. **Pause and inspect after meaningful transitions**
+   When the page changes, check the updated a11y output, then use `errors`, `console`, or `failed` if something looks wrong.
 
-4. **Verify and close**
-   ```typescript
-   const result = await browser.getVisibleText('.result')
-   await browser.close()
-   ```
+4. **Finish with verification**
+   Once you reach the desired state, follow the VerifyPage workflow to confirm the final rendered result.
 
-## Common Interactions
-
-### Click
-```typescript
-await browser.click('button')
-await browser.click('#submit-btn')
-await browser.click('a[href="/login"]')
-```
-
-### Fill Input
-```typescript
-await browser.fill('input[name="email"]', 'test@example.com')
-await browser.fill('#search', 'query')
-```
-
-### Type with Delay (Realistic)
-```typescript
-await browser.type('#search', 'query', 50)  // 50ms between keys
-```
-
-### Select Dropdown
-```typescript
-await browser.select('#country', 'US')
-await browser.select('#tags', ['tag1', 'tag2'])  // Multi-select
-```
-
-### Press Keys
-```typescript
-await browser.pressKey('Enter')
-await browser.pressKey('Escape')
-await browser.pressKey('Tab', '#input-field')  // On specific element
-```
-
-### Hover
-```typescript
-await browser.hover('.dropdown-trigger')
-await browser.click('.dropdown-item')  // Now visible
-```
-
-### Drag and Drop
-```typescript
-await browser.drag('#draggable', '#drop-zone')
-```
-
-### File Upload
-```typescript
-await browser.uploadFile('input[type="file"]', '/path/to/file.pdf')
-```
-
-## Example: Login Flow
-
-```typescript
-import { PlaywrightBrowser } from '../index.ts'
-
-const browser = new PlaywrightBrowser()
-await browser.launch({ headless: false })
-
-await browser.navigate('https://example.com/login')
-await browser.fill('#email', 'user@example.com')
-await browser.fill('#password', 'password123')
-await browser.click('button[type="submit"]')
-
-await browser.waitForNavigation()
-const welcomeText = await browser.getVisibleText('.welcome-message')
-console.log(`Logged in: ${welcomeText}`)
-
-await browser.close()
-```
+5. **Keep the workflow narrow**
+   This workflow exists to reproduce short browser flows that support debugging or verification, not to document the entire Playwright feature surface.

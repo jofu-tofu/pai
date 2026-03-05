@@ -7,6 +7,7 @@
 - Deterministic conversion is better than ad-hoc formatting edits.
 - Explicit file mapping prevents silent output mistakes.
 - Verification is required; conversion is not done until output is checked.
+- Visibility in reviewer tools matters as much as conversion success.
 
 ## Problem This Skill Solves
 
@@ -29,11 +30,14 @@ Users often need fast, repeatable Markdown-to-Word export. Without a dedicated s
 ## Success Criteria
 
 - Agent maps each markdown input to an explicit docx output.
+- Agent hardens table visibility so generated tables are readable in Word.
 - Agent verifies every output file exists and is non-empty.
+- Agent opens generated output files automatically after successful conversion.
 - Agent reports actionable failure details when conversion fails.
 
 ## Constraints
 
-- Keep dependencies limited to `pandoc`.
+- Keep conversion engine anchored on `pandoc`.
+- Allow `python-docx` for table-visibility post-processing.
 - Preserve TitleCase file naming and SkillForge structure.
 - Keep triggers focused on markdown-to-docx intent.

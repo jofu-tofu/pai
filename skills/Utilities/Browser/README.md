@@ -1,232 +1,71 @@
-# Browser - Code-First Interface
+# Browser
 
-**Replace the token-heavy Playwright MCP with direct code execution.**
-
-## Why?
-
-| Approach | Tokens | Performance |
-|----------|--------|-------------|
-| Playwright MCP | ~13,700 at load | MCP protocol overhead |
-| Code-first | ~50-200 per op | Direct Playwright API |
-| **Savings** | **99%+** | Faster execution |
+Debug-first Playwright workflow for page verification and frontend troubleshooting.
 
 ## Quick Start
 
 ```bash
 # Install dependencies
-cd $PAI_DIR/skills/Browser
+cd "$PAI_DIR/skills/Utilities/Browser"
 bun install
 
 # Install Chromium browser
 bunx playwright install chromium
 
-# Take a screenshot
-bun examples/screenshot.ts https://example.com
+# Diagnose a page load
+bun run Tools/Browse.ts https://example.com
 
-# Verify a page loads
-bun examples/verify-page.ts https://example.com
+# Verify a page with a specific selector
+bun run examples/verify-page.ts https://example.com "h1"
 ```
 
-## Usage
+## What This Skill Is For
 
-### Basic
+Use Browser when you need to:
+- inspect the rendered page
+- catch console or network failures
+- capture screenshot evidence
+- reproduce a short browser flow before verifying the result
 
-```typescript
-import { PlaywrightBrowser } from './index.ts'
+The main path is diagnostic-first, not general-purpose automation.
 
-const browser = new PlaywrightBrowser()
-await browser.launch()  // Visible by default
-await browser.navigate('https://example.com')
-await browser.screenshot({ path: 'screenshot.png' })
-await browser.close()
+## Core Workflow
+
+1. Run `bun run Tools/Browse.ts <url>`.
+2. Review the screenshot, console output, failed requests, and page status.
+3. If needed, dig deeper with `errors`, `console`, `network`, or `failed`.
+4. Use `click`, `fill`, or `type` only to reach the state you need to inspect.
+5. Capture final evidence with `screenshot` or `a11y` before reporting success.
+
+## Public Commands
+
+```bash
+bun run Tools/Browse.ts <url>
+bun run Tools/Browse.ts a11y
+bun run Tools/Browse.ts errors
+bun run Tools/Browse.ts console
+bun run Tools/Browse.ts network
+bun run Tools/Browse.ts failed
+bun run Tools/Browse.ts screenshot [path]
+bun run Tools/Browse.ts click <selector>
+bun run Tools/Browse.ts fill <selector> <value>
+bun run Tools/Browse.ts type <selector> <text>
+bun run Tools/Browse.ts status
+bun run Tools/Browse.ts restart
+bun run Tools/Browse.ts stop
 ```
 
-### Form Interaction
+## Verification Checklist
 
-```typescript
-const browser = new PlaywrightBrowser()
-await browser.launch({ headless: false }) // Watch it work
-
-await browser.navigate('https://example.com/login')
-await browser.fill('#email', 'test@example.com')
-await browser.fill('#password', 'secret')
-await browser.click('button[type="submit"]')
-await browser.waitForNavigation()
-
-const title = await browser.getTitle()
-console.log(`Logged in! Page: ${title}`)
-
-await browser.close()
-```
-
-### Page Verification
-
-```typescript
-const browser = new PlaywrightBrowser()
-await browser.launch()
-
-await browser.navigate('https://example.com')
-
-// Check specific element exists
-await browser.waitForSelector('h1')
-const heading = await browser.getVisibleText('h1')
-console.log(`Found heading: ${heading}`)
-
-// Check for console errors
-const errors = browser.getConsoleLogs({ type: 'error' })
-if (errors.length > 0) {
-  console.log('Console errors:', errors)
-}
-
-// Get accessibility tree (like MCP uses)
-const a11yTree = await browser.getAccessibilityTree()
-
-await browser.close()
-```
-
-### Device Emulation
-
-```typescript
-const browser = new PlaywrightBrowser()
-await browser.launch()
-
-// Emulate iPhone
-await browser.setDevice('iPhone 14')
-await browser.navigate('https://example.com')
-await browser.screenshot({ path: 'mobile.png' })
-
-// Or set custom viewport
-await browser.resize(375, 812)
-
-await browser.close()
-```
-
-## API Reference
-
-### Constructor
-
-```typescript
-const browser = new PlaywrightBrowser()
-```
-
-### Launch Options
-
-```typescript
-await browser.launch({
-  browser: 'chromium', // 'chromium' | 'firefox' | 'webkit'
-  headless: false,     // false = visible (default)
-  viewport: { width: 1280, height: 720 },
-  userAgent: 'Custom UA'
-})
-```
-
-### Navigation
-
-| Method | Description |
-|--------|-------------|
-| `navigate(url, options?)` | Go to URL |
-| `goBack()` | Browser back |
-| `goForward()` | Browser forward |
-| `reload()` | Refresh page |
-| `getUrl()` | Current URL |
-| `getTitle()` | Page title |
-
-### Capture
-
-| Method | Description |
-|--------|-------------|
-| `screenshot(options?)` | Take screenshot |
-| `getVisibleText(selector?)` | Extract text |
-| `getVisibleHtml(options?)` | Get HTML |
-| `savePdf(path, options?)` | Export PDF |
-| `getAccessibilityTree()` | A11y snapshot |
-
-### Interaction
-
-| Method | Description |
-|--------|-------------|
-| `click(selector)` | Click element |
-| `hover(selector)` | Mouse hover |
-| `fill(selector, value)` | Fill input |
-| `type(selector, text, delay?)` | Type with delay |
-| `select(selector, value)` | Select dropdown |
-| `pressKey(key, selector?)` | Keyboard |
-| `drag(source, target)` | Drag and drop |
-| `uploadFile(selector, path)` | File upload |
-
-### Waiting
-
-| Method | Description |
-|--------|-------------|
-| `waitForSelector(selector)` | Wait for element |
-| `waitForNavigation()` | Wait for page |
-| `waitForNetworkIdle()` | Wait for idle |
-| `wait(ms)` | Fixed delay |
-
-### JavaScript
-
-| Method | Description |
-|--------|-------------|
-| `evaluate(script)` | Run JS |
-| `getConsoleLogs()` | Console output |
-| `setUserAgent(ua)` | Change UA |
-
-### iFrame
-
-| Method | Description |
-|--------|-------------|
-| `iframeClick(iframe, el)` | Click in iframe |
-| `iframeFill(iframe, el, val)` | Fill in iframe |
-
-## Token Savings
-
-The key insight: Playwright MCP loads ~13,700 tokens of tool definitions at startup. This code-first approach:
-
-1. **Zero startup cost** - No tokens until you use a function
-2. **~50-200 tokens per operation** - Just the code you execute
-3. **Full Playwright API** - Not limited to MCP's 21 tools
-
-### Example Calculation
-
-**Scenario:** Take 5 screenshots during a session
-
-| Approach | Tokens |
-|----------|--------|
-| MCP (loaded at start) | 13,700 |
-| Code-first (5 x ~100) | 500 |
-| **Savings** | 96.4% |
-
-## Migration from MCP
-
-### Before (MCP)
-
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": ["@playwright/mcp@latest"]
-    }
-  }
-}
-```
-
-### After (Code-First)
-
-```typescript
-// Just import and use - no MCP server needed
-import { PlaywrightBrowser } from './index.ts'
-
-const browser = new PlaywrightBrowser()
-// ... use it
-```
+Before claiming a web change works:
+- load the changed page in Browser
+- inspect screenshot or accessibility output
+- check console errors
+- check failed requests
+- report issues instead of claiming success if diagnostics are not clean
 
 ## Requirements
 
 - Bun runtime
-- Playwright (`bun install`)
-- Chromium browser (`bunx playwright install chromium`)
-
-## Related
-
-- [Playwright Docs](https://playwright.dev)
+- Playwright dependency installed in this skill directory
+- Chromium installed with `bunx playwright install chromium`

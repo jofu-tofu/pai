@@ -8,7 +8,7 @@
 
 ## Purpose
 
-Convert one or more Markdown files to `.docx` with clear preflight checks and verifiable output.
+Convert one or more Markdown files to `.docx` with clear preflight checks, stronger table visibility, automatic output opening, and verifiable output.
 
 ## Workflow Steps
 
@@ -28,7 +28,12 @@ Check converter availability:
 pandoc --version
 ```
 
-If unavailable, stop and provide install guidance, then wait for user direction.
+Check post-processing dependency:
+```bash
+python -c "import docx; print('python-docx OK')"
+```
+
+If unavailable, stop and provide install guidance (`python -m pip install python-docx`), then wait for user direction.
 
 ### Step 3: Convert Markdown to DOCX
 
@@ -42,7 +47,25 @@ Batch pattern:
 2. Build matching `.docx` output paths.
 3. Run one `pandoc` command per input and collect results.
 
-### Step 4: Verify Output
+### Step 4: Harden Table Visibility
+
+Run the bundled post-processor on generated files:
+
+Single file:
+```bash
+python "$PAI_DIR/skills/MarkdownToDocx/Tools/PostProcessDocx.py" "<output.docx>"
+```
+
+Batch:
+```bash
+python "$PAI_DIR/skills/MarkdownToDocx/Tools/PostProcessDocx.py" "<output1.docx>" "<output2.docx>" ...
+```
+
+This step applies:
+1. `Table Grid` styling when available.
+2. Explicit cell borders for all table cells.
+
+### Step 5: Verify Output
 
 For each expected output file:
 1. Confirm file exists.
@@ -50,9 +73,24 @@ For each expected output file:
 
 Report any failed file with the exact command and error text.
 
-### Step 5: Return a Conversion Summary
+### Step 6: Open Output Automatically
+
+After successful verification, open generated `.docx` files with the system default app:
+
+Single file:
+```bash
+python "$PAI_DIR/skills/MarkdownToDocx/Tools/PostProcessDocx.py" --open-only "<output.docx>"
+```
+
+Batch:
+```bash
+python "$PAI_DIR/skills/MarkdownToDocx/Tools/PostProcessDocx.py" --open-only "<output1.docx>" "<output2.docx>" ...
+```
+
+### Step 7: Return a Conversion Summary
 
 Provide:
 1. Input and output path mapping.
 2. Success/failure per file.
-3. Next-step options when failures occur (retry, install/repair pandoc, or adjust source markdown).
+3. Whether table visibility hardening and auto-open completed.
+4. Next-step options when failures occur (retry, install/repair pandoc, install `python-docx`, or adjust source markdown).

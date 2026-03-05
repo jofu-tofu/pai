@@ -673,7 +673,6 @@ Browse CLI v2.0.0 - Debug-First Browser Automation
 Usage:
   bun run Browse.ts <url>                    Navigate with full diagnostics
   bun run Browse.ts <url> --headless         Navigate in headless mode (faster, no window)
-  bun run Browse.ts detect                   Scan for local dev servers on common ports
   bun run Browse.ts a11y                     Show accessibility tree of current page
   bun run Browse.ts errors                   Show console errors
   bun run Browse.ts warnings                 Show console warnings
@@ -681,13 +680,9 @@ Usage:
   bun run Browse.ts network                  Show network activity
   bun run Browse.ts failed                   Show failed requests (4xx, 5xx)
   bun run Browse.ts screenshot [path]        Take screenshot of current page
-  bun run Browse.ts navigate <url>           Navigate without full report
   bun run Browse.ts click <selector>         Click element
   bun run Browse.ts fill <selector> <value>  Fill input field
   bun run Browse.ts type <selector> <text>   Type with delay
-  bun run Browse.ts eval "<javascript>"      Execute JavaScript
-  bun run Browse.ts codegen [url]            Record interactions and generate test code
-  bun run Browse.ts open <url>               Open in user's browser
   bun run Browse.ts status                   Show session info
   bun run Browse.ts restart                  Restart session (clear state)
   bun run Browse.ts stop                     Stop session

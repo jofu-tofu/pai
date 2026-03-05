@@ -1,283 +1,76 @@
 ---
 name: Browser
-description: Debug-first browser automation with always-on visibility. Console logs, network requests, and errors captured by default. USE WHEN browser, screenshot, debug web, verify UI, troubleshoot frontend.
+description: Debug-first browser automation for Playwright page verification and frontend troubleshooting. Console logs, network failures, screenshots, and accessibility snapshots are part of the primary workflow. USE WHEN verify UI, debug web, inspect rendered page, troubleshoot frontend, take browser screenshot, or reproduce a browser issue.
 version: 2.0.0
 ---
 
-## Customization
+# Browser
 
-**Before executing, check for user customizations at:**
-`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Browser/`
+Debug-first Playwright automation for seeing the rendered page, collecting diagnostics, and verifying browser behavior before you claim a web change works.
 
-If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
+## Workflow Routing
 
-## Session Memory
+When a workflow is matched, **read its file and follow the steps within it.**
 
-**Before running any Browse.ts commands, check for prior session notes at:**
-`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Browser/session-context.md`
+| Workflow | Trigger | File |
+|----------|---------|------|
+| **VerifyPage** | "verify page", "check page", "debug page load" | `Workflows/VerifyPage.md` |
+| **Screenshot** | "take screenshot", "capture page", "browser screenshot" | `Workflows/Screenshot.md` |
+| **Interact** | "reproduce browser flow", "fill form", "click through page" | `Workflows/Interact.md` |
 
-If this file exists, read it FIRST. It may contain:
-- Known working selectors for sites you've tested before
-- Site-specific auth requirements or quirks
-- URLs of active dev servers
-- Known errors that are expected/ignorable
-- Page structure notes that save re-discovery iterations
+## Examples
 
-This file is maintained manually or by future automation. If it doesn't exist, proceed normally.
+**Example 1: Verify a frontend change**
+```
+User: "Verify the settings page loads without browser errors"
+-> Invokes VerifyPage workflow
+-> Runs the diagnostic-first Browser flow against the page
+-> Returns screenshot-backed verification plus any console/network issues
+```
 
-# Browser v2.0.0 - Debug-First Browser Automation
+**Example 2: Debug a broken page**
+```
+User: "Debug why the users page is blank"
+-> Invokes VerifyPage workflow
+-> Loads the page with diagnostics enabled
+-> Uses console and failed request output to identify the breakage
+```
 
-**Debugging visibility by DEFAULT.** Console logs, network requests, and errors are always captured. No opt-in required.
+**Example 3: Reproduce a form flow before verifying**
+```
+User: "Fill the login form and verify the dashboard loads"
+-> Invokes Interact workflow
+-> Uses minimal browser interactions to reach the target state
+-> Finishes with verification evidence from the rendered dashboard
+```
 
----
+## Execution Notes
 
-## Philosophy
+- Check for Browser customizations at `$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Browser/` before running the skill.
+- If `$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Browser/session-context.md` exists, read it first for selectors, auth notes, dev-server URLs, and known quirks.
+- Start with `bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts <url>` whenever you need the clearest diagnostic picture.
+- Use `a11y` when text structure is enough; use screenshots when visual proof matters.
+- Use `click`, `fill`, and `type` only to reach the state you need to inspect or verify.
+- If the page shows console errors or failed requests, report them instead of claiming success.
 
-Debugging shouldn't be opt-in. Like good logging frameworks - you don't turn on logging when you have a problem, you have it enabled from the start so the data exists when problems occur.
-
-**Headed (visible) by default.** All automation runs with the browser window VISIBLE — this is the default and intentional. You can see exactly what's happening. Use `--headless` flag only when you explicitly need faster, invisible execution.
-
-**v2.0.0 Changes:**
-- Session auto-starts on first use (no explicit `session start`)
-- Console and network capture always enabled
-- Diagnostic output included by default
-- 30-minute idle timeout (auto-cleanup)
-- New primary command: `Browse.ts <url>` for full diagnostics
-- Windows-compatible (cross-platform temp paths)
-
----
-
-## Quick Start
+## Public Command Surface
 
 ```bash
-# Navigate with full diagnostics (PRIMARY COMMAND)
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts https://example.com
-
-# Output:
-# Screenshot: C:\Users\...\AppData\Local\Temp\browse-1704614400.png
-# Console Errors (2): ...
-# Failed Requests (1): ...
-# Network: 34 requests | 1.2MB | avg 120ms
-# Page: "Example" loaded successfully
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts <url>
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts a11y
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts errors
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts console
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts network
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts failed
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts screenshot [path]
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts click <selector>
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts fill <selector> <value>
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts type <selector> <text>
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts status
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts restart
+bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts stop
 ```
 
-Session auto-starts. No setup needed.
+## Verification Standard
 
----
-
-## Commands
-
-### Primary - Navigate with Diagnostics
-
-```bash
-bun run Browse.ts <url>
-```
-
-Navigates to URL, takes screenshot, and reports:
-- Console errors and warnings
-- Failed network requests (4xx, 5xx)
-- Network statistics
-- Page load status
-
-### Query Commands
-
-```bash
-bun run Browse.ts a11y        # Accessibility tree (text representation of page)
-bun run Browse.ts errors      # Console errors only
-bun run Browse.ts warnings    # Console warnings only
-bun run Browse.ts console     # All console output
-bun run Browse.ts network     # All network activity
-bun run Browse.ts failed      # Failed requests only (4xx, 5xx)
-```
-
-> **Token-saving tip:** The accessibility tree provides a structured text representation of the page. Use `a11y` instead of `screenshot` when you need to understand page structure without the token cost of an image. Navigation and interaction commands (click, fill, type, navigate) automatically output the accessibility tree after execution.
-
-### Interaction Commands
-
-```bash
-bun run Browse.ts click <selector>           # Click element
-bun run Browse.ts fill <selector> <value>    # Fill input
-bun run Browse.ts type <selector> <text>     # Type with delay
-bun run Browse.ts screenshot [path]          # Take screenshot
-bun run Browse.ts navigate <url>             # Navigate without report
-bun run Browse.ts eval "<javascript>"        # Execute JavaScript
-bun run Browse.ts open <url>                 # Open in user's default browser
-```
-
-### Management Commands
-
-```bash
-bun run Browse.ts status      # Session info
-bun run Browse.ts restart     # Fresh session (clears logs)
-bun run Browse.ts stop        # Stop session (rarely needed)
-```
-
----
-
-## Debugging Workflow
-
-**Scenario: "Why isn't the user list loading?"**
-
-```bash
-# Step 1: Load the page
-$ bun run Browse.ts https://myapp.com/users
-
-Screenshot: C:\Users\...\AppData\Local\Temp\browse-xxx.png
-
-Console Errors (1):
-   - TypeError: Cannot read property 'map' of undefined
-
-Failed Requests (1):
-   - GET /api/users -> 500 Internal Server Error
-
-Network: 23 requests | 847KB | avg 89ms
-Page: "Users" loaded with issues
-```
-
-**Immediately know:**
-1. API returning 500
-2. Frontend JS crashing because no data
-3. Specific error location
-
-**Step 2: Dig deeper**
-
-```bash
-# Full console output
-$ bun run Browse.ts console
-
-# All network activity
-$ bun run Browse.ts network
-
-# Just the failures
-$ bun run Browse.ts failed
-```
-
----
-
-## Architecture
-
-### Auto-Start Session
-
-First command auto-starts a persistent browser session:
-
-```
-Any command -> ensureSession() -> Session running?
-                                    +- Yes -> Execute command
-                                    +- No -> Start session -> Execute command
-```
-
-No explicit `session start` needed.
-
-### Always-On Event Capture
-
-From the moment the browser launches:
-- **Console logs** - All `console.log`, `console.error`, etc.
-- **Network requests** - Every request with headers, timing, size
-- **Network responses** - Status codes, response times, sizes
-- **Page errors** - Uncaught exceptions, promise rejections
-
-### Idle Timeout
-
-Session auto-closes after 30 minutes of inactivity:
-- No zombie processes
-- No manual cleanup needed
-- Restarts automatically on next command
-
----
-
-## Comparison to v1.x
-
-| Aspect | v1.x | v2.0.0 |
-|--------|------|--------|
-| Session management | Manual `session start/stop` | Automatic |
-| Console capture | Only in session mode | Always |
-| Network capture | Only in session mode | Always |
-| Error visibility | Must query explicitly | Default in output |
-| Idle cleanup | Manual stop | Auto 30-min timeout |
-| Primary command | `screenshot <url>` | `<url>` (full diagnostic) |
-
----
-
-## API Reference
-
-### CLI Tool
-
-**Location:** `$PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts`
-
-| Command | Description |
-|---------|-------------|
-| `<url>` | Navigate with full diagnostics + accessibility tree |
-| `a11y` | Show accessibility tree of current page |
-| `errors` | Show console errors |
-| `warnings` | Show console warnings |
-| `console` | Show all console output |
-| `network` | Show network activity |
-| `failed` | Show failed requests |
-| `screenshot [path]` | Take screenshot |
-| `navigate <url>` | Navigate without report |
-| `click <selector>` | Click element |
-| `fill <sel> <val>` | Fill input |
-| `type <sel> <text>` | Type with delay |
-| `eval "<js>"` | Execute JavaScript |
-| `open <url>` | Open in user's default browser |
-| `status` | Session info |
-| `restart` | Fresh session |
-| `stop` | Stop session |
-
-### Server Endpoints
-
-**Location:** `$PAI_DIR/skills/Utilities/Browser/Tools/BrowserSession.ts`
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/diagnostics` | GET | Full diagnostic summary |
-| `/accessibility` | GET | Accessibility tree snapshot |
-| `/console` | GET | Console logs |
-| `/network` | GET | Network logs |
-| `/health` | GET | Health check |
-| `/session` | GET | Session info |
-| `/navigate` | POST | Navigate (clears logs) |
-| `/click` | POST | Click element |
-| `/fill` | POST | Fill input |
-| `/screenshot` | POST | Take screenshot |
-| `/evaluate` | POST | Run JavaScript |
-| `/stop` | POST | Stop server |
-
----
-
-## TypeScript API
-
-For complex automation, use the TypeScript API directly:
-
-```typescript
-import { PlaywrightBrowser } from '$PAI_DIR/skills/Utilities/Browser/index.ts'
-
-const browser = new PlaywrightBrowser()
-await browser.launch({ headless: false })  // Visible by default
-await browser.navigate('https://example.com')
-
-// Get diagnostics
-const errors = browser.getConsoleLogs({ type: 'error' })
-const failed = browser.getNetworkLogs({ status: [400, 404, 500] })
-const stats = browser.getNetworkStats()
-
-await browser.close()
-```
-
-**Full API:** See `index.ts` for all methods.
-
----
-
-## VERIFY Phase Integration
-
-**MANDATORY for verifying web changes:**
-
-```bash
-# Before claiming any web change is "live" or "working":
-bun run Browse.ts https://example.com/changed-page
-
-# Check the screenshot AND diagnostics
-# If errors or failed requests exist, the change is NOT verified
-```
-
-**If you haven't LOOKED at the rendered page and its diagnostics, you CANNOT claim it works.**
+Run the Browser skill against the rendered page before you call a web change verified. Screenshot evidence and diagnostics are the default proof, not optional extras.
