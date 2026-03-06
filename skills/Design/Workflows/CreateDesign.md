@@ -7,6 +7,11 @@
 - Any request to produce a design document at Standard or Full scale
 - If scale assessment yields Quick, redirect to `RecordDecision` workflow instead
 
+## Reference Material
+
+- **Output Quality:** `../OutputQuality.md` — Format selection, density, anti-AI patterns. **Read before producing any output in Step 4.**
+- **Design Principles:** `../Principles.md` — 8 research-backed content patterns.
+
 ---
 
 ## Process
@@ -86,6 +91,18 @@ Synthesize the exploration into a concrete design. This is where the actual arti
 - **Decision log** — key decisions made during the design process with rationale
 
 **Output**: The design document using the template below.
+
+**Before writing, read `../OutputQuality.md` and apply its Section Format Guide.** Default to maximum density — tables and bullets unless content has genuine causality requiring prose. Every format choice must match the data shape.
+
+---
+
+### Step 4.5: Validate Output Quality
+
+Auto-chain the `ValidateOutput` workflow:
+- `artifact`: the completed design document from Step 4
+- `scale`: the assessed scale from Step 1
+
+Fix any FAIL results before delivery.
 
 ---
 

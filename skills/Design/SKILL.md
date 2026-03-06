@@ -52,6 +52,14 @@ Running the **WorkflowName** workflow in the **Design** skill to ACTION...
   - Create a design document, scope a feature, write a proposal → `Workflows/CreateDesign.md`
   - Review or critique an existing design → `Workflows/ReviewDesign.md`
   - Record a decision, write an ADR, capture a decision → `Workflows/RecordDecision.md`
+  - Validate design output quality → `Workflows/ValidateOutput.md`
+
+## Context Files
+
+| File | Purpose |
+|------|---------|
+| `Principles.md` | 8 research-backed content patterns — what to include in designs |
+| `OutputQuality.md` | Format selection, density, anti-AI patterns — how to render output |
 
 ## Examples
 
@@ -91,6 +99,7 @@ What this skill explicitly avoids:
 - **Scope Creep** — The design doc becoming the project. A design should clarify decisions, not replace implementation planning.
 - **Over-Specification** — Boxing in implementers with premature detail. Leave room for implementation judgment.
 - **Missing the "Why Not"** — Designs that show what was chosen but not what was rejected. Alternatives Considered is not optional.
+- **Verbose Prose Where Tables Work** — Using paragraphs to describe what a table could show in half the space. If the data has items x attributes, use a table.
 
 ---
 

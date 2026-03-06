@@ -8,6 +8,10 @@
 - Capturing individual decisions within a larger design
 - Documenting a decision that was made verbally or in a meeting
 
+## Reference Material
+
+- **Output Quality:** `../OutputQuality.md` — Format selection, density, anti-AI patterns. **Read before producing output.**
+
 ---
 
 ## Process
@@ -57,6 +61,14 @@ We will [decision in active voice].
 - **Negative**: [What we lose or accept]
 - **Neutral**: [Side effects that aren't clearly good or bad]
 ```
+
+### Step 4: Validate Output Quality
+
+Auto-chain the `ValidateOutput` workflow:
+- `artifact`: the completed ADR
+- `scale`: `quick`
+
+Fix any FAIL results before delivery.
 
 ---
 

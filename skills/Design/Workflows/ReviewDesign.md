@@ -7,6 +7,11 @@
 - Evaluating someone else's design document
 - Self-review before sharing a design with stakeholders
 
+## Reference Material
+
+- **Output Quality:** `../OutputQuality.md` — Format selection, density, anti-AI patterns.
+- **Design Principles:** `../Principles.md` — 8 research-backed content patterns.
+
 ---
 
 ## Process
@@ -43,6 +48,14 @@ For each pillar, assess the document and note gaps:
 - Are key decisions logged with rationale and date?
 - Will this document still make sense in 6 months?
 
+#### Rendering Quality (via OutputQuality.md)
+
+Read `../OutputQuality.md` and evaluate:
+- Does each section use the correct format for its data shape?
+- Is the document dense? Can any paragraph be compressed to a sentence?
+- Are there AI writing patterns? (banned vocabulary, structural patterns)
+- Do headers tell the story by themselves? (layer-cake test)
+
 ### Step 3: Frame Feedback as "Yes, if..."
 
 For each identified gap, reframe as a constructive contribution rather than a blocker:
@@ -78,6 +91,7 @@ The "Yes, if" frame assumes the design is moving forward and asks what it needs 
 | Trade-off Visibility | Strong / Adequate / Needs Work | [Brief note] |
 | Feedback Loop | Strong / Adequate / Needs Work | [Brief note] |
 | Organizational Memory | Strong / Adequate / Needs Work | [Brief note] |
+| Rendering Quality | Strong / Adequate / Needs Work | [Brief note] |
 
 ### Feedback (Yes, if...)
 
