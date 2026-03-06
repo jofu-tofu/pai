@@ -1,6 +1,6 @@
 # Tooling Landscape (Verified 2026-02-19)
 
-This document captures verified references for presentation and document generation workflows.
+This document captures verified references for document and presentation generation workflows.
 
 ## Scrollable HTML Document Tooling
 
