@@ -32,6 +32,11 @@ Additionally, Philosophy.md serves as a passive shared resource — any PAI skil
 | Rules handling | 54 rules distilled to 15 principle-mapped checkpoints | Keep rules as appendix; Remove entirely | Appendix creates two sources of truth. Removing loses testability. Distillation preserves testability under philosophical framing. |
 | Comprehension layer scope | Passive shared resource (Philosophy.md) | Active convention with enforced Read instruction | Passive avoids coupling. Skills discover and opt in voluntarily. Escalation path exists if passive proves insufficient. |
 | Format extensibility | Single FormatAdapters.md file | Separate adapter files per format | At 2 formats, separate files is premature. One file with clear sections keeps it simple. |
+| Readability scoring | Flesch 60-70 scoped to summary prose | Flesch as universal gate | AHRQ, Redish confirm Flesch produces meaningless results for structured content (bullets, tables). |
+| Diagram framing | Co-equal text-diagram integration | Diagram-first primacy | Mayer's Multimedia Principle supports integration, not hierarchy. Tufte concurs. |
+| Miller citation | Cowan (2001) working memory 3-5 | Miller (1956) 7±2 | Miller's paper was about channel capacity; Cowan's replications establish 3-5 for working memory. |
+| Passive Philosophy.md | Passive with documented escalation path | Immediate active enforcement | 60-78% drift documented (OpsLevel, Springer 2024), but AI agents don't drift between sessions. Escalation to scoped active loading recommended if compliance issues emerge. |
+| RC-14 enforcement | Split: contrast blocks, palette advises | Fully advisory | Council 5/5 consensus. Contrast ratio is deterministic (0% false positive). Palette is judgment-based. |
 
 ---
 
@@ -42,6 +47,8 @@ Additionally, Philosophy.md serves as a passive shared resource — any PAI skil
 - Guaranteed pixel-identical round-trip conversion between HTML and PPT.
 - Deep due-diligence or background-check research workflows (delegate to Research skill).
 - Enforcing other skills to read Philosophy.md (passive resource, not mandate).
+- Documentation placement strategy (handled by DocPhilosophy skill — placement, not content quality).
+- AI context file optimization (handled by ContextLayer skill — AI readers, not human readers).
 
 ---
 

@@ -12,7 +12,7 @@
 
 **WHY:** Most readers need the conclusion, not the proof. Experts can dig deeper; non-experts cannot dig at all.
 
-**WHAT:** Lead with a summary any intelligent non-expert understands. Build depth in 2-3 layers max. 80% of readers get full value from layer 1 alone.
+**WHAT:** Lead with a summary any intelligent non-expert understands. Build depth in 2-3 layers max. Target: 80% of readers get full value from layer 1 alone.
 
 **ANTI-PATTERN:** "Expert Gatekeeping" — opening with jargon, acronyms, or domain-specific framing that excludes the primary audience.
 
@@ -48,13 +48,13 @@
 
 **WHY:** Working memory holds 3-5 chunks. Documents that exceed this per section force re-reading and increase error rates. For technical content, a diagram communicates structure faster and more accurately than prose.
 
-**WHAT:** For technical content, diagrams and visual structures carry the primary narrative load — prose serves as annotation and context, not the other way around. Every major concept must be presented visually first (diagram, table, flow, or comparison grid), then supported with text explanation. Subheadings every 100-150 words. 3-5 groups per heading level. Max 4 heading levels. Alert-Summary-Detail layering. Max 3 type sizes. Every visual element must carry information — remove decoration.
+**WHAT:** For technical content, diagrams and prose are co-equal — each carries the narrative best suited to its medium. Diagrams convey structure and relationships; prose conveys rationale and nuance. Every major concept should have both a visual element (diagram, table, flow, or comparison grid) and supporting text explanation. Subheadings every 100-150 words. 3-5 groups per heading level. Max 4 heading levels. Alert-Summary-Detail layering. Max 3 type sizes. Every visual element must carry information — remove decoration.
 
 **ANTI-PATTERN:** "Wall of Text" — dense paragraphs without structural breaks. "Prose-First" — explaining a system architecture in paragraphs when a diagram would communicate the same structure in seconds. Also "Decoration Theater" — visual elements that look professional but encode no information.
 
 **TEST:** (1) Remove all body text, leaving only headings, bold text, and bullet points. Does the document still tell a coherent story? (2) For each major section in technical content, does a visual element exist that conveys the core idea independently of surrounding prose?
 
-*Sources: Miller's Chunking (1956), Tufte's Data-Ink Ratio, Inverted Pyramid (journalism), Mayer's Multimedia Principle*
+*Sources: Cowan's Working Memory (2001), Tufte's Data-Ink Ratio, Inverted Pyramid (journalism), Mayer's Multimedia Principle*
 
 ### 5. Evidence Over Assertion (Trust Through Specificity)
 
@@ -76,7 +76,7 @@
 
 ### From Principle 1 — Layman First
 
-- **RC-1:** Summary sections target Flesch 60-70 readability. Average sentence length 15-20 words.
+- **RC-1:** Summary prose targets Flesch 60-70 readability (structured content like bullets and tables excluded from scoring). Average sentence length 15-20 words.
 - **RC-2:** Jargon defined on first use. Acronyms expanded on first occurrence.
 
 ### From Principle 2 — Skip-Friendly

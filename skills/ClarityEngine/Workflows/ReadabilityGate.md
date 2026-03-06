@@ -40,6 +40,12 @@ All callers pass this stable interface:
 - Overall verdict: **FAIL** if any Blocker exists; **PASS** otherwise
 - Per-principle summary: `{principle}: {passed}/{total} checkpoints`
 
+### RC-14 Split: Blocking vs Advisory
+
+RC-14 covers two categories with different enforcement levels:
+- **RC-14a** (Blocker, blocks delivery): WCAG AA contrast ratio (4.5:1 body text, 3:1 large text). Mathematically deterministic, near-zero false-positive rate.
+- **RC-14b** (Major, advisory): Colorblind-safe palettes and consistent color semantics. Judgment-based, advisory only.
+
 ## Workflow Steps
 
 ### Step 1: Receive Context
