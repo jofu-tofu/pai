@@ -173,7 +173,7 @@ Every skill SHOULD have a `SkillIntent.md` in its root directory. This is the de
 |------|-----|--------|
 ```
 
-Use the `CreateSkillIntent` workflow to generate this file for any skill.
+Use the `UpdateSkill` workflow (Generate SkillIntent scope) to generate this file for any existing skill, or `CreateSkill` which generates it during creation.
 
 ---
 
@@ -341,8 +341,8 @@ COMPLETED: [SkillName] validation failed - 2 issues found.
 | Broken workflow reference | Check file exists, verify path spelling |
 | Missing Tools/ directory | Create empty `Tools/` directory |
 | Context files in subdirectory | Move to skill root directory |
-| Missing `SkillIntent.md` | Run `CreateSkillIntent` workflow to generate |
-| `SkillIntent.md` lacks `## Success Criteria` | Run `CreateSkillIntent` workflow to add the section |
+| Missing `SkillIntent.md` | Run `UpdateSkill` workflow (Generate SkillIntent scope) to generate |
+| `SkillIntent.md` lacks `## Success Criteria` | Run `UpdateSkill` workflow (Generate SkillIntent scope) to add the section |
 
 ### Why Each Check Matters
 

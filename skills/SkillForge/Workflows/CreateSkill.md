@@ -58,12 +58,50 @@ For each workflow, create `Workflows/[WorkflowName].md` with:
 
 If a workflow calls a CLI tool, include intent-to-flag mapping tables.
 
-### Step 8: Verify
+### Step 8: Generate SkillIntent.md
+
+Using the answers from Step 2, generate a `SkillIntent.md` for the new skill. This captures the design decisions and constraints while the context is fresh.
+
+Write using the standard structure from SkillSystem.md:
+
+```markdown
+# SkillIntent — [SkillName]
+
+> **For agents modifying this skill:** Read this before making any changes.
+
+## First Principles
+[Derive from interview answers — what enduring truths guide this skill's design?]
+
+## Problem This Skill Solves
+[From Q1: what does this skill do? Reframe as the gap it fills.]
+
+## Design Decisions
+| Decision | Chosen Approach | Alternatives Rejected | Why |
+|---|---|---|---|
+
+## Explicit Out-of-Scope
+[What this skill deliberately does NOT handle]
+
+## Success Criteria
+[Binary-testable philosophical states. Minimum 3 criteria.]
+
+## Constraints
+[Non-negotiable rules that must remain true through any update]
+```
+
+**Testability Gate:** Before writing, verify each success criterion:
+- Binary-testable (YES/NO in under 5 seconds)
+- Points to an observable artifact
+- Atomic (no "and" — split if needed)
+- Minimum 3 criteria covering distinct aspects
+
+### Step 9: Verify
 
 - All files use TitleCase naming
 - YAML frontmatter parses correctly with USE WHEN clause
 - All routing table entries resolve to existing files
 - Examples section present with 2-3 patterns
 - Tools/ directory exists
+- SkillIntent.md present with required sections
 
 After creating the skill, run `ValidateSkill.ts` on it.

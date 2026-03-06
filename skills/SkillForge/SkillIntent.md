@@ -46,6 +46,10 @@ SkillForge provides a safe, auditable path for skill lifecycle management — fr
 | Eliminated 7-agent orchestrator | Single-agent ReviewSkill + ValidateSkill.ts | 7 parallel evaluation agents with per-dimension rubrics | Dispatching 7 agents to evaluate markdown files is disproportionate. ValidateSkill.ts handles structural checks programmatically. Agent judgment handles subjective quality. Token cost of orchestration far exceeded quality improvement. |
 | Eliminated workflow chaining | Simple "run ValidateSkill.ts after changes" per workflow | 12-entry chain table with Always/Conditional tiers, mandatory chain decision logs | Agents did not reliably follow cascading chain logic. A single validation instruction achieves the same outcome with dramatically less complexity. |
 | Universal PromptingStandards loading | SKILL.md universal instruction + per-workflow Step 1 + Reference Material (belt-and-suspenders) | Per-workflow Reference Material only | Every workflow needs prompting standards. Universal instruction covers the happy path; explicit Step 1 ensures loading even on direct workflow entry; Reference Material provides the path. Self-contained via local Standards/PromptingStandards.md copy. |
+| Merged ModifyContent + RefactorSkill | Single UpdateSkill with risk-based scope detection | Separate workflows per operation type | Skill-creator makes no content/structure distinction. Artificial boundary caused routing ambiguity. |
+| Folded CreateSkillIntent into CreateSkill | Intent generated during creation interview | Standalone SkillIntent workflow | Intent is part of creation, not a separate operation. Existing skills get intent via UpdateSkill. |
+| Added TestSkill workflow | Behavioral testing via subagent execution | Structure-only validation | Skill-creator's core insight: structural validation doesn't tell you if a skill works. Behavioral testing does. |
+| Added OptimizeDescription workflow | Trigger accuracy testing and iteration | Manual USE WHEN editing | Description is the primary routing mechanism. Untested descriptions are a reliability risk. |
 
 ---
 
@@ -74,7 +78,7 @@ Every skill exiting a SkillForge workflow satisfies these:
 
 These must remain true through any refactoring or content update:
 
-1. **Self-application required** — SkillForge applies its own workflows to itself. Changes to SkillForge's files must route through ModifyContent or RefactorSkill (not direct edits) so that every gate fires on the skill itself.
+1. **Self-application required** — SkillForge applies its own workflows to itself. Changes to SkillForge's files must route through UpdateSkill (not direct edits) so that every gate fires on the skill itself.
 2. **User-confirmed deletion** — Removing files or routing rows requires explicit user confirmation in every case.
 3. **Atomic changes** — Multi-step changes either complete fully or roll back; no partial states.
 4. **Validation as a gate** — Any workflow that modifies skill structure must offer or run ValidateSkill after changes.

@@ -55,6 +55,7 @@ MEMORY/**/*
 **/build/
 **/.cache/
 **/coverage/
+**/__pycache__/
 *.tsbuildinfo
 *.log
 .eslintcache
