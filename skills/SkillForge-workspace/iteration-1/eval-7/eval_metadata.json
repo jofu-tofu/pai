@@ -1,0 +1,11 @@
+{
+  "eval_id": 7,
+  "eval_name": "eval-7",
+  "prompt": "The skill at {eval_dir}/test-target isn't triggering properly. Run the optimize description workflow on it. Skip the interactive HTML review step and accept the generated eval set as-is.",
+  "assertions": [
+    "Eval set JSON generated with should-trigger and should-not-trigger queries (10+ total)",
+    "Resulting description differs from original",
+    "New description contains USE WHEN clause",
+    "Agent invoked run_loop.py or run_eval.py"
+  ]
+}

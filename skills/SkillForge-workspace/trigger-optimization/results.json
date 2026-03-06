@@ -1,0 +1,45 @@
+{
+  "skill_name": "SkillForge",
+  "method": "manual_analysis",
+  "automated_optimization_blocked": true,
+  "blocked_reason": "run_eval.py creates temp command files alongside the real SkillForge skill registration. Claude always prefers the real skill (or works directly), so trigger_rate=0 for all queries regardless of description quality. The eval framework cannot test a skill that's already registered in userSettings.",
+  "iterations_attempted": 2,
+  "iteration_results": [
+    {
+      "iteration": 1,
+      "description": "Create, modify, test, and maintain skills. MANDATORY for ALL skill modifications — direct Edit bypasses quality gates. USE WHEN create skill OR new skill OR update skill OR edit skill OR improve skill OR change skill OR tweak skill OR adjust skill OR add workflow OR remove workflow OR modify skill OR refactor skill OR fix skill structure OR test skill OR try skill OR does this skill work OR run skill test OR evaluate skill OR run evals OR optimize description OR fix triggering OR skill not triggering OR retrospective OR run retrospective OR skill retrospective OR analyze skill OR audit skill OR comprehensive skill check OR what's wrong with this skill OR diagnose skill OR review skill.",
+      "train_accuracy": 0.45,
+      "test_accuracy": 0.43,
+      "precision": 1.0,
+      "recall": 0.0,
+      "note": "Original description. 100% precision (no false triggers), 0% recall (no should-trigger queries detected). All should-trigger queries reference real skill names that Claude routes to directly."
+    },
+    {
+      "iteration": 2,
+      "description": "Skill lifecycle framework for building, modifying, testing, and maintaining skills. MANDATORY for ALL skill modifications — direct Edit bypasses quality gates and validation. USE WHEN build a new skill OR modify any skill's description, workflows, triggers, or structure OR add, remove, rename, or refactor a workflow in a skill OR test a skill, run evals, benchmark skill performance OR optimize a skill's description for better triggering OR review, audit, or diagnose a skill OR create a SkillIntent. Applies to operations on ANY named skill — \"fix the Research skill\", \"add a workflow to ClarityEngine\", \"refactor WebDesign\" are all skill-level modifications requiring this framework.",
+      "train_accuracy": 0.45,
+      "test_accuracy": 0.43,
+      "precision": 1.0,
+      "recall": 0.0,
+      "note": "Improved description with broader phrasing and explicit named-skill examples. Same automated scores — confirms the 0% recall is a measurement artifact, not a description quality issue."
+    }
+  ],
+  "structural_findings": [
+    "run_eval.py creates temp commands (SkillForge-skill-{uuid}.md) in .claude/commands/. The real SkillForge skill is registered in userSettings. Claude always routes to the real registration, not the temp command.",
+    "Even with fictional skill names (InventoryTracker, FooBar, BudgetPlanner) that don't match any real skill, the temp command gets 0% trigger rate. This rules out name collision as the cause.",
+    "The eval detects triggering by checking if Claude's first tool call targets the temp command name. If Claude calls any other tool first (including the REAL SkillForge), it returns False.",
+    "run_eval.py is designed for testing skills that are NOT yet registered. It cannot evaluate a skill that's already active in the environment.",
+    "Leftover temp command files from crashed eval runs pollute the routing system. 9 orphaned files were found and cleaned up."
+  ],
+  "phase1_evidence": {
+    "with_skill_pass_rate": 0.906,
+    "without_skill_pass_rate": 0.639,
+    "delta_pp": 27,
+    "discriminating_assertions": 5,
+    "total_assertions": 30,
+    "interpretation": "Phase 1 behavioral testing demonstrates the skill works well in practice. The +27pp delta over baseline validates that SkillForge's structured guidance provides measurable value. The automated trigger testing reveals a measurement limitation, not a description quality issue."
+  },
+  "best_description": "Create, modify, test, and maintain skills. MANDATORY for ALL skill modifications — direct Edit bypasses quality gates. USE WHEN create skill OR new skill OR update skill OR edit skill OR improve skill OR change skill OR tweak skill OR adjust skill OR add workflow OR remove workflow OR modify skill OR refactor skill OR fix skill structure OR test skill OR try skill OR does this skill work OR run skill test OR evaluate skill OR run evals OR optimize description OR fix triggering OR skill not triggering OR retrospective OR run retrospective OR skill retrospective OR analyze skill OR audit skill OR comprehensive skill check OR what's wrong with this skill OR diagnose skill OR review skill.",
+  "best_description_rationale": "Original description retained. Phase 1 proves it works well in practice (90.6% pass rate). The automated optimization could not generate a validated improvement due to the structural eval limitation. Changing the description without validated evidence would violate the OptimizeDescription workflow's own quality standards.",
+  "recommendation": "Keep current description. Fix run_eval.py to handle already-registered skills before attempting automated optimization on SkillForge again."
+}

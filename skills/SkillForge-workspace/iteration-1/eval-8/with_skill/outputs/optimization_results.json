@@ -1,0 +1,29 @@
+{
+  "mode": "manual",
+  "exit_reason": "manual_mode_fallback - run_loop.py failed due to nested claude -p environment issues (CLAUDECODE env var conflict, stale BadTriggers command files)",
+  "original_description": "A test skill for processing tasks. USE WHEN test target.",
+  "best_description": "Execute general-purpose tasks via structured workflow. USE WHEN test target OR run test target OR do something OR run task OR execute task OR process with test target OR test target task OR handle this task OR run the do something workflow OR use test target.",
+  "improvements_applied": [
+    "Replaced vague 'processing tasks' opening with specific 'Execute general-purpose tasks via structured workflow'",
+    "Expanded USE WHEN from single 'test target' to 10 trigger phrases covering natural variants",
+    "Added workflow-specific trigger 'run the do something workflow' matching the skill's DoSomething workflow",
+    "Added action-verb triggers: 'run task', 'execute task', 'handle this task' matching user intent patterns",
+    "Added compound triggers: 'run test target', 'process with test target', 'use test target' for natural phrasing",
+    "Kept description under 1024 characters per PromptingStandards.md",
+    "Used soft language (no MUST/CRITICAL/ALWAYS) per Claude 4.x guidelines",
+    "Each trigger phrase is 2-4 words per trigger phrase quality rules"
+  ],
+  "prompting_standards_applied": [
+    "Intent-based triggers over exact phrase matching",
+    "Broad coverage with synonyms and natural phrasings",
+    "Concrete signal words users actually say",
+    "USE WHEN prefixed imperative form",
+    "No XML tags",
+    "Soft trigger language (avoid aggressive framing)",
+    "Each trigger phrase passes the say-it-aloud test"
+  ],
+  "eval_set_path": "eval_set.json",
+  "eval_set_size": 20,
+  "should_trigger_count": 10,
+  "should_not_trigger_count": 10
+}

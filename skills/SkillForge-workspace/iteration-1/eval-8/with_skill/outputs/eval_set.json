@@ -1,0 +1,22 @@
+[
+  {"query": "I need to run a test target task on this data", "should_trigger": true},
+  {"query": "can you do something with this file? like the test target thing", "should_trigger": true},
+  {"query": "run the test target skill on the current project", "should_trigger": true},
+  {"query": "I want to test target this - just do something basic with it", "should_trigger": true},
+  {"query": "use the test target to process my input", "should_trigger": true},
+  {"query": "hey can you do the test target processing for me?", "should_trigger": true},
+  {"query": "execute the do something workflow from test target", "should_trigger": true},
+  {"query": "I need test target to handle this task", "should_trigger": true},
+  {"query": "run task on this using the test target approach", "should_trigger": true},
+  {"query": "process this through test target please", "should_trigger": true},
+  {"query": "can you write unit tests for my Python module?", "should_trigger": false},
+  {"query": "I need to set up a CI/CD pipeline with test coverage targets", "should_trigger": false},
+  {"query": "what's the target audience for this marketing campaign?", "should_trigger": false},
+  {"query": "run my pytest suite and show me the failures", "should_trigger": false},
+  {"query": "help me process this CSV file into a chart", "should_trigger": false},
+  {"query": "create a new skill for managing recipes", "should_trigger": false},
+  {"query": "can you do something about the formatting in this markdown file?", "should_trigger": false},
+  {"query": "I need to hit my quarterly sales targets, help me plan", "should_trigger": false},
+  {"query": "build a test harness for this API endpoint", "should_trigger": false},
+  {"query": "process the data in my spreadsheet and generate a report", "should_trigger": false}
+]

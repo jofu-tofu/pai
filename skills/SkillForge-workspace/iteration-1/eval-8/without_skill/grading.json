@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "Eval queries are specific to TestTarget's domain",
+      "passed": false,
+      "evidence": "No eval_set.json was created by the without_skill agent. The agent only optimized the description and did not generate evaluation queries. Without queries to assess, this assertion fails."
+    },
+    {
+      "text": "Description was not degraded",
+      "passed": true,
+      "evidence": "New description retains core original trigger keywords: 'test target', 'do something', 'run task', 'execute task' are all present. New description adds synonyms ('process task', 'perform task', 'run something', 'handle task', 'carry out task'). Some original compound phrases were simplified but the essential trigger vocabulary is preserved."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 1,
+    "total": 2,
+    "pass_rate": 0.5
+  }
+}

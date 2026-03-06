@@ -1,0 +1,11 @@
+{
+  "eval_id": 4,
+  "eval_name": "eval-4",
+  "prompt": "Add a workflow called 'AnalyzeData' to the skill at {eval_dir}/test-target. Triggers: 'analyze data', 'run analysis', 'data report'. The workflow reads a CSV, computes summary statistics, and outputs a markdown report.",
+  "assertions": [
+    "Workflows/AnalyzeData.md exists with TitleCase filename",
+    "Routing table in SKILL.md has AnalyzeData entry with triggers",
+    "Workflow file has ## Purpose section",
+    "Workflow file has ## Workflow Steps section"
+  ]
+}

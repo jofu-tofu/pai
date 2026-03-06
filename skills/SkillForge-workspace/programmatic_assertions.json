@@ -1,0 +1,334 @@
+{
+  "eval-1/with_skill": [
+    {
+      "text": "TitleCase directory RecipeManager/ created",
+      "passed": true,
+      "evidence": "Found: RecipeManager"
+    },
+    {
+      "text": "SKILL.md has valid YAML with name: RecipeManager",
+      "passed": true,
+      "evidence": "Valid YAML with name field"
+    },
+    {
+      "text": "Description contains USE WHEN clause",
+      "passed": true,
+      "evidence": "Contains USE WHEN"
+    },
+    {
+      "text": "## Examples in SKILL.md with 2+ examples",
+      "passed": true,
+      "evidence": "Section 'Examples' found"
+    },
+    {
+      "text": "SkillIntent.md exists with ## Success Criteria (3+ items)",
+      "passed": true,
+      "evidence": "SkillIntent.md exists"
+    },
+    {
+      "text": "2+ workflow files in Workflows/ directory",
+      "passed": true,
+      "evidence": "Found 3 workflow files"
+    },
+    {
+      "text": "Tools/ directory exists",
+      "passed": true,
+      "evidence": "Tools/ exists"
+    }
+  ],
+  "eval-1/without_skill": [
+    {
+      "text": "TitleCase directory RecipeManager/ created",
+      "passed": true,
+      "evidence": "Found: RecipeManager"
+    },
+    {
+      "text": "SKILL.md has valid YAML with name: RecipeManager",
+      "passed": true,
+      "evidence": "Valid YAML with name field"
+    },
+    {
+      "text": "Description contains USE WHEN clause",
+      "passed": true,
+      "evidence": "Contains USE WHEN"
+    },
+    {
+      "text": "## Examples in SKILL.md with 2+ examples",
+      "passed": true,
+      "evidence": "Section 'Examples' found"
+    },
+    {
+      "text": "SkillIntent.md exists with ## Success Criteria (3+ items)",
+      "passed": true,
+      "evidence": "SkillIntent.md exists"
+    },
+    {
+      "text": "2+ workflow files in Workflows/ directory",
+      "passed": true,
+      "evidence": "Found 3 workflow files"
+    },
+    {
+      "text": "Tools/ directory exists",
+      "passed": false,
+      "evidence": "Tools/ not found"
+    }
+  ],
+  "eval-2/with_skill": [
+    {
+      "text": "Agent asked clarifying questions before creating files",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    },
+    {
+      "text": "Created skill has valid structure (SKILL.md + at least 1 workflow + Tools/)",
+      "passed": true,
+      "evidence": "SKILL.md=True, Workflows=True, Tools=True"
+    }
+  ],
+  "eval-2/without_skill": [
+    {
+      "text": "Agent asked clarifying questions before creating files",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    },
+    {
+      "text": "Created skill has valid structure (SKILL.md + at least 1 workflow + Tools/)",
+      "passed": false,
+      "evidence": "SKILL.md=True, Workflows=True, Tools=False"
+    }
+  ],
+  "eval-3/with_skill": [
+    {
+      "text": "SSH/connection handler workflow file exists",
+      "passed": true,
+      "evidence": "Found: SshConnect.md"
+    },
+    {
+      "text": "SSH handler NOT in routing table",
+      "passed": true,
+      "evidence": "'SshConnect' correctly absent from routing table"
+    },
+    {
+      "text": "User-facing workflows in routing table",
+      "passed": true,
+      "evidence": "status=True, deploy=True, logs=True"
+    },
+    {
+      "text": "Routing table contains read-and-follow instruction",
+      "passed": true,
+      "evidence": "Instruction found: True"
+    }
+  ],
+  "eval-3/without_skill": [
+    {
+      "text": "SSH/connection handler workflow file exists",
+      "passed": true,
+      "evidence": "Found: SSHConnect.md"
+    },
+    {
+      "text": "SSH handler NOT in routing table",
+      "passed": false,
+      "evidence": "'SSHConnect' should NOT be in routing table but was found"
+    },
+    {
+      "text": "User-facing workflows in routing table",
+      "passed": true,
+      "evidence": "status=True, deploy=True, logs=True"
+    },
+    {
+      "text": "Routing table contains read-and-follow instruction",
+      "passed": false,
+      "evidence": "Instruction found: False"
+    }
+  ],
+  "eval-4/with_skill": [
+    {
+      "text": "Workflows/AnalyzeData.md exists with TitleCase",
+      "passed": true,
+      "evidence": "Exists at /home/fujos/projects/pai/skills/SkillForge-workspace/iteration-1/eval-4/with_skill/outputs/test-target/Workflows/AnalyzeData.md"
+    },
+    {
+      "text": "Routing table has AnalyzeData entry with triggers",
+      "passed": true,
+      "evidence": "'AnalyzeData' found in routing table"
+    },
+    {
+      "text": "Workflow has ## Purpose section",
+      "passed": true,
+      "evidence": "Section 'Purpose' found"
+    },
+    {
+      "text": "Workflow has ## Workflow Steps section",
+      "passed": true,
+      "evidence": "Section 'Workflow Steps' found"
+    }
+  ],
+  "eval-4/without_skill": [
+    {
+      "text": "Workflows/AnalyzeData.md exists with TitleCase",
+      "passed": true,
+      "evidence": "Exists at /home/fujos/projects/pai/skills/SkillForge-workspace/iteration-1/eval-4/without_skill/outputs/test-target/Workflows/AnalyzeData.md"
+    },
+    {
+      "text": "Routing table has AnalyzeData entry with triggers",
+      "passed": true,
+      "evidence": "'AnalyzeData' found in routing table"
+    },
+    {
+      "text": "Workflow has ## Purpose section",
+      "passed": true,
+      "evidence": "Section 'Purpose' found"
+    },
+    {
+      "text": "Workflow has ## Workflow Steps section",
+      "passed": true,
+      "evidence": "Section 'Workflow Steps' found"
+    }
+  ],
+  "eval-5/with_skill": [
+    {
+      "text": "## Examples section exists in SKILL.md with 2+ examples",
+      "passed": true,
+      "evidence": "Section 'Examples' found"
+    },
+    {
+      "text": "## Success Criteria in SkillIntent.md with 3+ criteria",
+      "passed": true,
+      "evidence": "Section 'Success Criteria' found"
+    },
+    {
+      "text": "Agent read SkillIntent.md before modifying",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    }
+  ],
+  "eval-5/without_skill": [
+    {
+      "text": "## Examples section exists in SKILL.md with 2+ examples",
+      "passed": true,
+      "evidence": "Section 'Examples' found"
+    },
+    {
+      "text": "## Success Criteria in SkillIntent.md with 3+ criteria",
+      "passed": true,
+      "evidence": "Section 'Success Criteria' found"
+    },
+    {
+      "text": "Agent read SkillIntent.md before modifying",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    }
+  ],
+  "eval-6/with_skill": [
+    {
+      "text": "DoSomething.md no longer exists",
+      "passed": true,
+      "evidence": "DoSomething.md removed"
+    },
+    {
+      "text": "ProcessInput.md exists in Workflows/",
+      "passed": true,
+      "evidence": "ProcessInput.md found"
+    },
+    {
+      "text": "Routing table references ProcessInput not DoSomething",
+      "passed": true,
+      "evidence": "ProcessInput=True, DoSomething=False"
+    },
+    {
+      "text": "Agent ran ValidateSkill.ts after changes",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    }
+  ],
+  "eval-6/without_skill": [
+    {
+      "text": "DoSomething.md no longer exists",
+      "passed": true,
+      "evidence": "DoSomething.md removed"
+    },
+    {
+      "text": "ProcessInput.md exists in Workflows/",
+      "passed": true,
+      "evidence": "ProcessInput.md found"
+    },
+    {
+      "text": "Routing table references ProcessInput not DoSomething",
+      "passed": true,
+      "evidence": "ProcessInput=True, DoSomething=False"
+    },
+    {
+      "text": "Agent ran ValidateSkill.ts after changes",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    }
+  ],
+  "eval-7/with_skill": [
+    {
+      "text": "Eval set JSON with should/should-not trigger queries (10+ total)",
+      "passed": true,
+      "evidence": "Found 18 queries in /home/fujos/projects/pai/skills/SkillForge-workspace/iteration-1/eval-7/with_skill/outputs/eval_set.json"
+    },
+    {
+      "text": "Description differs from original",
+      "passed": false,
+      "evidence": "Changed: False"
+    },
+    {
+      "text": "New description contains USE WHEN",
+      "passed": true,
+      "evidence": "USE WHEN present: True"
+    },
+    {
+      "text": "Agent invoked run_loop.py or run_eval.py",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    }
+  ],
+  "eval-7/without_skill": [
+    {
+      "text": "Eval set JSON with should/should-not trigger queries (10+ total)",
+      "passed": false,
+      "evidence": "No eval set JSON found"
+    },
+    {
+      "text": "Description differs from original",
+      "passed": true,
+      "evidence": "Changed: True"
+    },
+    {
+      "text": "New description contains USE WHEN",
+      "passed": true,
+      "evidence": "USE WHEN present: True"
+    },
+    {
+      "text": "Agent invoked run_loop.py or run_eval.py",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    }
+  ],
+  "eval-8/with_skill": [
+    {
+      "text": "Eval queries are specific to TestTarget's domain",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    },
+    {
+      "text": "Description was not degraded",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    }
+  ],
+  "eval-8/without_skill": [
+    {
+      "text": "Eval queries are specific to TestTarget's domain",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    },
+    {
+      "text": "Description was not degraded",
+      "passed": null,
+      "evidence": "GRADER_JUDGMENT_REQUIRED"
+    }
+  ]
+}

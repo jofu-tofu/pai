@@ -1,0 +1,21 @@
+{
+  "tool_calls": {
+    "Read": 3,
+    "Write": 9,
+    "Glob": 3,
+    "Bash": 2,
+    "ToolSearch": 1
+  },
+  "total_tool_calls": 18,
+  "files_created": [
+    "skills/SkillForge-workspace/iteration-1/eval-1/without_skill/outputs/RecipeManager/SKILL.md",
+    "skills/SkillForge-workspace/iteration-1/eval-1/without_skill/outputs/RecipeManager/SkillIntent.md",
+    "skills/SkillForge-workspace/iteration-1/eval-1/without_skill/outputs/RecipeManager/Standards/RecipeSchema.md",
+    "skills/SkillForge-workspace/iteration-1/eval-1/without_skill/outputs/RecipeManager/Standards/DataStorage.md",
+    "skills/SkillForge-workspace/iteration-1/eval-1/without_skill/outputs/RecipeManager/Workflows/AddRecipe.md",
+    "skills/SkillForge-workspace/iteration-1/eval-1/without_skill/outputs/RecipeManager/Workflows/SearchByIngredient.md",
+    "skills/SkillForge-workspace/iteration-1/eval-1/without_skill/outputs/RecipeManager/Workflows/GenerateShoppingList.md",
+    "skills/SkillForge-workspace/iteration-1/eval-1/without_skill/outputs/metrics.json",
+    "skills/SkillForge-workspace/iteration-1/eval-1/without_skill/transcript.md"
+  ]
+}

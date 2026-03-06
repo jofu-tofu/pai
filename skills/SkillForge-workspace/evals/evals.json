@@ -1,0 +1,99 @@
+{
+  "skill_name": "SkillForge",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a skill called RecipeManager for organizing recipes -- adding new recipes, searching by ingredient, generating shopping lists from meal plans. Triggers: recipes, cooking, meal planning.",
+      "expected_output": "A complete skill directory with SKILL.md, SkillIntent.md, Workflows/, Tools/",
+      "files": [],
+      "expectations": [
+        "TitleCase directory RecipeManager/ created",
+        "SKILL.md has valid YAML frontmatter with name: RecipeManager",
+        "Description contains USE WHEN clause",
+        "SkillIntent.md exists with ## Success Criteria section (3+ items)",
+        "2+ workflow files exist in Workflows/ directory",
+        "## Examples section in SKILL.md with 2+ examples",
+        "Tools/ directory exists"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Make me a skill for tracking my reading list",
+      "expected_output": "Agent asks clarifying questions before creating, then produces valid skill structure",
+      "files": [],
+      "expectations": [
+        "Agent asked clarifying questions before creating files",
+        "Created skill has valid structure (SKILL.md + at least 1 workflow + Tools/)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a skill for managing my home server. Workflows: check status, deploy updates, view logs, plus an internal SSH connection handler the others call but the user never invokes directly.",
+      "expected_output": "Skill with internal workflow NOT in routing table, user-facing workflows in routing table",
+      "files": [],
+      "expectations": [
+        "SSH/connection handler workflow file exists in Workflows/ directory",
+        "SSH/connection handler workflow NOT listed in SKILL.md routing table",
+        "User-facing workflows (check status, deploy updates, view logs) ARE in routing table",
+        "Routing table contains instruction to read file and follow steps"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Add a workflow called 'AnalyzeData' to the skill at {eval_dir}/test-target. Triggers: 'analyze data', 'run analysis', 'data report'. The workflow reads a CSV, computes summary statistics, and outputs a markdown report.",
+      "expected_output": "AnalyzeData workflow added with routing table entry",
+      "files": [],
+      "expectations": [
+        "Workflows/AnalyzeData.md exists with TitleCase filename",
+        "Routing table in SKILL.md has AnalyzeData entry with triggers",
+        "Workflow file has ## Purpose section",
+        "Workflow file has ## Workflow Steps section"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Update the skill at {eval_dir}/test-target -- it's missing examples and its SkillIntent.md is incomplete. Fix these issues.",
+      "expected_output": "Examples added to SKILL.md, Success Criteria added to SkillIntent.md",
+      "files": [],
+      "expectations": [
+        "## Examples section now exists in SKILL.md with 2+ examples",
+        "## Success Criteria section now exists in SkillIntent.md with 3+ criteria",
+        "Agent read SkillIntent.md before modifying it"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Refactor the skill at {eval_dir}/test-target. Rename the DoSomething workflow to ProcessInput, update all references, and reorganize to follow best practices. Assume the user approves all confirmations.",
+      "expected_output": "DoSomething renamed to ProcessInput, all references updated",
+      "files": [],
+      "expectations": [
+        "DoSomething.md no longer exists in Workflows/",
+        "ProcessInput.md exists in Workflows/",
+        "Routing table references ProcessInput not DoSomething",
+        "Agent ran ValidateSkill.ts after changes"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "The skill at {eval_dir}/test-target isn't triggering properly. Run the optimize description workflow on it. Skip the interactive HTML review step and accept the generated eval set as-is.",
+      "expected_output": "Eval set generated, optimization run, description improved",
+      "files": [],
+      "expectations": [
+        "Eval set JSON generated with should-trigger and should-not-trigger queries (10+ total)",
+        "Resulting description differs from original",
+        "New description contains USE WHEN clause",
+        "Agent invoked run_loop.py or run_eval.py"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Optimize the description for the skill at {eval_dir}/test-target -- make sure it triggers accurately. Skip the interactive HTML review step.",
+      "expected_output": "Description improved without breaking existing functionality",
+      "files": [],
+      "expectations": [
+        "Eval queries are specific to TestTarget's domain",
+        "Description was not degraded (retains original trigger keywords)"
+      ]
+    }
+  ]
+}

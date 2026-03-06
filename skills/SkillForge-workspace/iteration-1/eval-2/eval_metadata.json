@@ -1,0 +1,9 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-2",
+  "prompt": "Make me a skill for tracking my reading list",
+  "assertions": [
+    "Agent asked clarifying questions before creating files",
+    "Created skill has valid structure (SKILL.md + at least 1 workflow + Tools/)"
+  ]
+}

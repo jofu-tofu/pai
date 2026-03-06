@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Workflows/AnalyzeData.md exists with TitleCase",
+      "passed": true,
+      "evidence": "Exists at /home/fujos/projects/pai/skills/SkillForge-workspace/iteration-1/eval-4/with_skill/outputs/test-target/Workflows/AnalyzeData.md"
+    },
+    {
+      "text": "Routing table has AnalyzeData entry with triggers",
+      "passed": true,
+      "evidence": "'AnalyzeData' found in routing table"
+    },
+    {
+      "text": "Workflow has ## Purpose section",
+      "passed": true,
+      "evidence": "Section 'Purpose' found"
+    },
+    {
+      "text": "Workflow has ## Workflow Steps section",
+      "passed": true,
+      "evidence": "Section 'Workflow Steps' found"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  }
+}

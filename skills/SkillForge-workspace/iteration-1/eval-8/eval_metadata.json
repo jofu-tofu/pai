@@ -1,0 +1,9 @@
+{
+  "eval_id": 8,
+  "eval_name": "eval-8",
+  "prompt": "Optimize the description for the skill at {eval_dir}/test-target -- make sure it triggers accurately. Skip the interactive HTML review step.",
+  "assertions": [
+    "Eval queries are specific to TestTarget's domain",
+    "Description was not degraded (retains original trigger keywords)"
+  ]
+}

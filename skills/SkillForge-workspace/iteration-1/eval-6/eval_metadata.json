@@ -1,0 +1,11 @@
+{
+  "eval_id": 6,
+  "eval_name": "eval-6",
+  "prompt": "Refactor the skill at {eval_dir}/test-target. Rename the DoSomething workflow to ProcessInput, update all references, and reorganize to follow best practices. Assume the user approves all confirmations.",
+  "assertions": [
+    "DoSomething.md no longer exists in Workflows/",
+    "ProcessInput.md exists in Workflows/",
+    "Routing table references ProcessInput not DoSomething",
+    "Agent ran ValidateSkill.ts after changes"
+  ]
+}

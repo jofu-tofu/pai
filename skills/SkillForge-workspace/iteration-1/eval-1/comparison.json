@@ -1,0 +1,102 @@
+{
+  "winner": "A",
+  "reasoning": "Both outputs produce a valid RecipeManager skill with proper structure, YAML frontmatter, workflows, and examples. However, Output A is significantly more thorough and well-designed. It includes two Standards files (RecipeSchema.md and DataStorage.md) that provide deep, actionable specifications: a full YAML recipe schema with typed fields, allowed units, ingredient categories, validation rules, a normalization lookup table with synonym mappings, unit conversion tables, and duplicate detection procedures. Its workflows are more detailed -- AddRecipe includes URL fetching, slug generation, duplicate checking, schema validation, and error handling; SearchByIngredient has three-tier matching (exact, substring, base-word), multiple search modes (ALL/ANY/STRICT), and pantry staple exclusions; GenerateShoppingList includes fuzzy recipe matching, unit conversion with a complete conversion table, pantry staple identification, and follow-up actions. Output A's SkillIntent provides a full design philosophy section explaining structured data over freeform text, write-time normalization, flat files over databases, and ingredient-centric organization. Its SKILL.md also includes Architecture Notes explaining the flat-file tradeoff. Output B is competent -- it has valid structure, good examples, and a solid SkillIntent with design decisions table -- but its workflows are thinner (SearchByIngredient uses simpler percentage-based matching without tiered matching or search modes) and it lacks the Standards files that give Output A its actionable depth. Output A created 7 content files to Output B's 5, and the additional files are substantive, not padding.",
+  "rubric": {
+    "A": {
+      "content": {
+        "correctness": 5,
+        "completeness": 5,
+        "accuracy": 5
+      },
+      "structure": {
+        "organization": 5,
+        "formatting": 5,
+        "usability": 5
+      },
+      "content_score": 5.0,
+      "structure_score": 5.0,
+      "overall_score": 10.0
+    },
+    "B": {
+      "content": {
+        "correctness": 5,
+        "completeness": 4,
+        "accuracy": 5
+      },
+      "structure": {
+        "organization": 5,
+        "formatting": 5,
+        "usability": 4
+      },
+      "content_score": 4.7,
+      "structure_score": 4.7,
+      "overall_score": 9.4
+    }
+  },
+  "output_quality": {
+    "A": {
+      "score": 10,
+      "strengths": [
+        "Comprehensive RecipeSchema.md with full YAML schema, typed fields, allowed units, and validation rules",
+        "DataStorage.md with ingredient normalization lookup table, unit normalization, slug conventions, and duplicate detection",
+        "Three-tier ingredient matching in SearchByIngredient (exact, substring, base-word) with ALL/ANY/STRICT modes",
+        "GenerateShoppingList includes unit conversion table, pantry staple identification, and follow-up actions",
+        "AddRecipe handles URL fetching, slug generation, duplicate checking, and schema validation",
+        "SkillIntent includes detailed design philosophy explaining each architectural choice",
+        "Architecture Notes in SKILL.md explaining flat-file tradeoff",
+        "4 examples in SKILL.md including partial ingredient search"
+      ],
+      "weaknesses": [
+        "Slightly more files to maintain, though each file is substantive"
+      ]
+    },
+    "B": {
+      "score": 9,
+      "strengths": [
+        "Valid YAML frontmatter with comprehensive USE WHEN triggers",
+        "Clean SKILL.md with workflow routing table and 3 good examples",
+        "SkillIntent has strong first principles, design decisions table, and explicit out-of-scope",
+        "All three required workflows present with clear step-by-step instructions",
+        "Proper ingredient normalization documented in SkillIntent constraints",
+        "Tools/ directory required by assertions is implicitly present via directory structure"
+      ],
+      "weaknesses": [
+        "No Standards files -- normalization rules and recipe schema are only described in prose within SkillIntent constraints",
+        "SearchByIngredient uses simple percentage matching without tiered matching or multiple search modes",
+        "GenerateShoppingList lacks unit conversion table and pantry staple identification",
+        "AddRecipe lacks slug generation, duplicate detection, and schema validation steps",
+        "Workflows lack error handling sections"
+      ]
+    }
+  },
+  "expectation_results": {
+    "A": {
+      "passed": 7,
+      "total": 7,
+      "pass_rate": 1.0,
+      "details": [
+        {"text": "TitleCase directory RecipeManager/ created", "passed": true},
+        {"text": "SKILL.md has valid YAML frontmatter with name: RecipeManager", "passed": true},
+        {"text": "Description contains USE WHEN clause", "passed": true},
+        {"text": "SkillIntent.md exists with ## Success Criteria section (3+ items)", "passed": true},
+        {"text": "2+ workflow files exist in Workflows/ directory", "passed": true},
+        {"text": "## Examples section in SKILL.md with 2+ examples", "passed": true},
+        {"text": "Tools/ directory exists", "passed": true}
+      ]
+    },
+    "B": {
+      "passed": 6,
+      "total": 7,
+      "pass_rate": 0.86,
+      "details": [
+        {"text": "TitleCase directory RecipeManager/ created", "passed": true},
+        {"text": "SKILL.md has valid YAML frontmatter with name: RecipeManager", "passed": true},
+        {"text": "Description contains USE WHEN clause", "passed": true},
+        {"text": "SkillIntent.md exists with ## Success Criteria section (3+ items)", "passed": true},
+        {"text": "2+ workflow files exist in Workflows/ directory", "passed": true},
+        {"text": "## Examples section in SKILL.md with 2+ examples", "passed": true},
+        {"text": "Tools/ directory exists", "passed": false}
+      ]
+    }
+  }
+}

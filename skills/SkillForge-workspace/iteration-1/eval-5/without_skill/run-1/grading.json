@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "## Examples section exists in SKILL.md with 2+ examples",
+      "passed": true,
+      "evidence": "Section 'Examples' found"
+    },
+    {
+      "text": "## Success Criteria in SkillIntent.md with 3+ criteria",
+      "passed": true,
+      "evidence": "Section 'Success Criteria' found"
+    },
+    {
+      "text": "Agent read SkillIntent.md before modifying",
+      "passed": true,
+      "evidence": "Transcript Step 3 shows Read of SkillIntent.md (alongside SKILL.md, DoSomething.md, eval_metadata.json). Step 6 shows Edit of SkillIntent.md to add Success Criteria. Read preceded modification."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  }
+}

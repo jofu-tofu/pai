@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "TitleCase directory RecipeManager/ created",
+      "passed": true,
+      "evidence": "Found: RecipeManager"
+    },
+    {
+      "text": "SKILL.md has valid YAML with name: RecipeManager",
+      "passed": true,
+      "evidence": "Valid YAML with name field"
+    },
+    {
+      "text": "Description contains USE WHEN clause",
+      "passed": true,
+      "evidence": "Contains USE WHEN"
+    },
+    {
+      "text": "## Examples in SKILL.md with 2+ examples",
+      "passed": true,
+      "evidence": "Section 'Examples' found"
+    },
+    {
+      "text": "SkillIntent.md exists with ## Success Criteria (3+ items)",
+      "passed": true,
+      "evidence": "SkillIntent.md exists"
+    },
+    {
+      "text": "2+ workflow files in Workflows/ directory",
+      "passed": true,
+      "evidence": "Found 3 workflow files"
+    },
+    {
+      "text": "Tools/ directory exists",
+      "passed": false,
+      "evidence": "Tools/ not found"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 1,
+    "total": 7,
+    "pass_rate": 0.86
+  }
+}

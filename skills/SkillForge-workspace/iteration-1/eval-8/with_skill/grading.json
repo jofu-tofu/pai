@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "Eval queries are specific to TestTarget's domain",
+      "passed": true,
+      "evidence": "eval_set.json contains 20 queries. 10 should-trigger queries all reference TestTarget domain concepts: 'test target', 'do something', 'run task'. 10 should-not-trigger queries cover unrelated domains (unit tests, CI/CD, marketing, CSV charts, recipe skills, markdown formatting, sales targets, test harnesses, spreadsheet reports). Over 80% of queries reference skill-related concepts."
+    },
+    {
+      "text": "Description was not degraded",
+      "passed": true,
+      "evidence": "Output SKILL.md description is identical to the original test-target SKILL.md description. All original trigger keywords are retained: 'test target', 'run test target', 'do something', 'run task', 'execute task', 'process with test target', 'test target task', 'handle this task', 'run the do something workflow', 'use test target'."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1.0
+  }
+}

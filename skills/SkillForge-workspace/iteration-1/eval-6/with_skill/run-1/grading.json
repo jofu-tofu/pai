@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "DoSomething.md no longer exists",
+      "passed": true,
+      "evidence": "DoSomething.md removed"
+    },
+    {
+      "text": "ProcessInput.md exists in Workflows/",
+      "passed": true,
+      "evidence": "ProcessInput.md found"
+    },
+    {
+      "text": "Routing table references ProcessInput not DoSomething",
+      "passed": true,
+      "evidence": "ProcessInput=True, DoSomething=False"
+    },
+    {
+      "text": "Agent ran ValidateSkill.ts after changes",
+      "passed": false,
+      "evidence": "Transcript Step 6 states: 'ValidateSkill.ts could not be run directly because it expects skills under $PAI_DIR/skills/ and the test-target is at a non-standard workspace path.' Manual validation was performed instead, but no Bash call with ValidateSkill.ts appears in the transcript."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  }
+}
