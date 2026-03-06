@@ -34,7 +34,7 @@ Records Science hypothesis verdicts and RedTeam attack outcomes that shaped the 
 
 ## Live Stress Test Results (2026-02-17)
 
-Five scenarios run against the PAI codebase using real parallel haiku agent dispatch. Findings drove 4 patches to skill files.
+Eight scenarios run against the PAI codebase using real parallel haiku agent dispatch. Findings drove 4 patches to skill files.
 
 | Scenario | Outcome | Patch Applied |
 |----------|---------|--------------|

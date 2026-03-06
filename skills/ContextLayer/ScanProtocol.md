@@ -72,7 +72,7 @@ This prevents unbounded agent spawning on large projects (e.g., a project with 3
 | Category | Why |
 |----------|-----|
 | General programming knowledge | Agent already knows it |
-| "Why" explanations | Goes in ADRs, not CLAUDE.md |
+| Architectural "why" explanations | Goes in ADRs, not CLAUDE.md (operational why — e.g., workaround reasons — stays) |
 | Full dependency lists | Too large, too volatile |
 | Version numbers (except Node/Python/Rust runtime) | Change frequently, high rot risk |
 | Content duplicated in README | Agent can read README on demand |

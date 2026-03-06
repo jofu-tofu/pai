@@ -237,7 +237,8 @@ From root-level agent results + cross-subsystem knowledge, synthesize root CLAUD
 false or incomplete, update this file before ending the task. Do not defer.
 
 **Add** an entry only if an agent would fail without knowing it, it is not obvious from
-the code, and applies project-wide (not just one directory).
+the code, and it belongs at this scope (project-wide rule → root CLAUDE.md; WHY decision
+→ inline comment or ADR; inferable from code → nowhere).
 
 **Remove** any entry that fails the falsifiability test: if removing it would not change
 how an agent acts, remove it. If a convention here conflicts with the codebase, the
@@ -250,8 +251,11 @@ or update the relevant tracking document before ending the session. Do not leave
 **Staleness anchor:** This file assumes `[key_entry_point]` exists. If it doesn't, this file
 is stale — update or regenerate before relying on it.
 
-**Trigger Audit or Generate:** rename/move files → Audit; >20% of files changed →
-Generate; 30+ days without touching this file → Audit.
+**Trigger Audit or Generate:**
+- Rename/move files or dirs → Audit
+- >20% of files changed → Generate
+- 30+ days without touching this file → Audit
+- Agent mistake caused by this file → fix immediately, then Audit
 ```
 
 **Apply falsifiability test** (from `ScanProtocol.md`) to every entry before writing.

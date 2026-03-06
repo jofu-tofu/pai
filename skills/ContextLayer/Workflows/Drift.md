@@ -20,6 +20,24 @@ Detects staleness in the CLAUDE.md context layer tree using git history.
 
 ## Workflow Steps
 
+### Step 0 — Detect Scope
+
+Check if the user's request specifies a directory path or named subdirectory.
+
+**Full-tree mode** (default — no scope specified):
+- Drift-check all CLAUDE.md files in the project tree.
+- Continue with Step 1 as written below.
+
+**Targeted mode** (scope specified — e.g., "check drift for src/auth"):
+- Resolve SCOPE_PATH relative to project root.
+- In Step 1: find only CLAUDE.md files within SCOPE_PATH.
+- In Step 2: find missing coverage only within SCOPE_PATH.
+- Steps 3–5 proceed as normal against the scoped set.
+- On completion:
+  `"Targeted drift check of [SCOPE_PATH] complete — N files assessed."`
+
+---
+
 ### Step 1 — Find All CLAUDE.md Files
 
 Find all CLAUDE.md files in the project tree (skip: `node_modules`, `.git`, `dist`, `build`).
