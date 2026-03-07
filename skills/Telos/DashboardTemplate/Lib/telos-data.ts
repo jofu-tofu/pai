@@ -1,7 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
-import { getEnvVar } from '../../../../hooks/lib/platform'
 
 export interface TelosFile {
   name: string
@@ -10,94 +9,101 @@ export interface TelosFile {
   type: 'markdown' | 'csv'
 }
 
-const PAI_DIR = getEnvVar('PAI_DIR') || path.join(os.homedir(), 'pai')
-const TELOS_DIR = path.join(PAI_DIR, 'skills', 'PAI', 'USER', 'TELOS')
+const TELOS_DIR = path.join(os.homedir(), 'Obsidian', 'TELOS')
+const EXCLUDED_DIRS = new Set(['Backups'])
+const PRIORITY_FILES = [
+  'Home.md',
+  'Now.md',
+  'Core/MISSION.md',
+  'Core/BELIEFS.md',
+  'Direction/GOALS.md',
+  'Career/Overview.md',
+  'Reviews/updates.md',
+]
 
-export function getAllTelosData(): TelosFile[] {
+function toForwardSlash(filePath: string): string {
+  return filePath.replace(/\\/g, '/')
+}
+
+function walkTelosDirectory(currentDir: string, relativeDir = ''): TelosFile[] {
   const files: TelosFile[] = []
+  const entries = fs.readdirSync(currentDir, { withFileTypes: true })
 
-  try {
-    // Scan for all .md files in TELOS directory
-    if (fs.existsSync(TELOS_DIR)) {
-      const dirFiles = fs.readdirSync(TELOS_DIR)
+  for (const entry of entries) {
+    if (entry.name.startsWith('.')) continue
 
-      for (const filename of dirFiles) {
-        if (filename.endsWith('.md') && !filename.startsWith('.')) {
-          try {
-            const filePath = path.join(TELOS_DIR, filename)
-            const stats = fs.statSync(filePath)
+    const relativePath = relativeDir ? path.join(relativeDir, entry.name) : entry.name
+    const fullPath = path.join(currentDir, entry.name)
 
-            if (stats.isFile()) {
-              const content = fs.readFileSync(filePath, 'utf-8')
-              files.push({
-                name: filename.replace('.md', ''),
-                filename,
-                content,
-                type: 'markdown',
-              })
-            }
-          } catch (error) {
-            console.error(`Error reading ${filename}:`, error)
-          }
-        }
-      }
-
-      // Also scan for CSV files in data subdirectory
-      const dataDir = path.join(TELOS_DIR, 'data')
-      if (fs.existsSync(dataDir)) {
-        const csvFiles = fs.readdirSync(dataDir)
-
-        for (const filename of csvFiles) {
-          if (filename.endsWith('.csv') && !filename.startsWith('.')) {
-            try {
-              const filePath = path.join(dataDir, filename)
-              const stats = fs.statSync(filePath)
-
-              if (stats.isFile()) {
-                const content = fs.readFileSync(filePath, 'utf-8')
-                files.push({
-                  name: filename.replace('.csv', ''),
-                  filename: path.join('data', filename),
-                  content,
-                  type: 'csv',
-                })
-              }
-            } catch (error) {
-              console.error(`Error reading ${filename}:`, error)
-            }
-          }
-        }
-      }
+    if (entry.isDirectory()) {
+      if (EXCLUDED_DIRS.has(entry.name)) continue
+      files.push(...walkTelosDirectory(fullPath, relativePath))
+      continue
     }
-  } catch (error) {
-    console.error('Error scanning TELOS directory:', error)
+
+    if (!entry.isFile()) continue
+
+    const type = entry.name.endsWith('.md')
+      ? 'markdown'
+      : entry.name.endsWith('.csv')
+        ? 'csv'
+        : null
+
+    if (!type) continue
+
+    try {
+      const filename = toForwardSlash(relativePath)
+      const content = fs.readFileSync(fullPath, 'utf-8')
+      files.push({
+        name: filename.replace(/\.(md|csv)$/i, ''),
+        filename,
+        content,
+        type,
+      })
+    } catch (error) {
+      console.error(`Error reading ${relativePath}:`, error)
+    }
   }
 
-  // Sort files: put core TELOS files first, then alphabetically
-  const coreFiles = ['TELOS', 'MISSION', 'BELIEFS', 'WISDOM', 'GOALS', 'PROJECTS']
-  files.sort((a, b) => {
-    const aIsCore = coreFiles.includes(a.name)
-    const bIsCore = coreFiles.includes(b.name)
-
-    if (aIsCore && !bIsCore) return -1
-    if (!aIsCore && bIsCore) return 1
-    if (aIsCore && bIsCore) {
-      return coreFiles.indexOf(a.name) - coreFiles.indexOf(b.name)
-    }
-    return a.name.localeCompare(b.name)
-  })
-
   return files
+}
+
+export function getAllTelosData(): TelosFile[] {
+  try {
+    if (!fs.existsSync(TELOS_DIR)) {
+      return []
+    }
+
+    const files = walkTelosDirectory(TELOS_DIR)
+
+    files.sort((a, b) => {
+      const aPriority = PRIORITY_FILES.indexOf(a.filename)
+      const bPriority = PRIORITY_FILES.indexOf(b.filename)
+
+      if (aPriority !== -1 || bPriority !== -1) {
+        if (aPriority === -1) return 1
+        if (bPriority === -1) return -1
+        return aPriority - bPriority
+      }
+
+      return a.filename.localeCompare(b.filename)
+    })
+
+    return files
+  } catch (error) {
+    console.error('Error scanning TELOS directory:', error)
+    return []
+  }
 }
 
 export function getTelosContext(): string {
   const files = getAllTelosData()
 
-  let context = "# Personal TELOS (Life Operating System)\n\n"
-  context += "You have access to the complete TELOS context. Use this information to answer questions about life, goals, beliefs, projects, and wisdom.\n\n"
+  let context = '# Personal TELOS (Obsidian vault)\n\n'
+  context += 'You have access to the complete TELOS context from the Obsidian vault. Use this information to answer questions about life direction, goals, beliefs, career strategy, and current priorities.\n\n'
 
   for (const file of files) {
-    context += `\n## ${file.name}\n\n`
+    context += `\n## ${file.filename}\n\n`
     context += file.content
     context += '\n\n---\n\n'
   }

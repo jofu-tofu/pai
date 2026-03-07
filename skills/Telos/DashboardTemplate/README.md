@@ -171,16 +171,17 @@ ANTHROPIC_API_KEY=sk-ant-api03-...
 The template includes a complete file management system for TELOS files (markdown and CSV):
 
 ### File Discovery
-- **Automatic scanning**: The dashboard automatically discovers all `.md` and `.csv` files in the TELOS directory
+- **Automatic scanning**: The dashboard recursively discovers all `.md` and `.csv` files in the Obsidian TELOS directory
 - **Dynamic navigation**: Every file becomes a clickable navigation item in the sidebar
 - **Real-time updates**: File count and list update automatically when new files are uploaded
 
 **Implementation**: `lib/telos-data.ts`
-- `getAllTelosData()` - Scans TELOS directory and returns all files
+- `getAllTelosData()` - Recursively scans the TELOS directory and returns all files
 - `getTelosFileCount()` - Returns total file count
-- `getTelosFileList()` - Returns array of filenames
-- Searches `$PAI_DIR/skills/PAI/USER/TELOS/` for `.md` files
-- Searches `$PAI_DIR/skills/PAI/USER/TELOS/data/` for `.csv` files
+- `getTelosFileList()` - Returns array of relative filenames
+- Searches `C:\Users\fujos\Obsidian\TELOS\` for `.md` and `.csv` files
+- Preserves subfolder paths like `Core/MISSION.md` and `Career/Overview.md`
+- Excludes `Backups/` from the scanned context corpus
 
 ### File Upload
 **Page**: `app/add-file/page.tsx`

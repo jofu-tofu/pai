@@ -8,49 +8,71 @@
  * - Complete version history
  *
  * Usage:
- *   update-telos <file> "<content>" "<change-description>"
+ *   update-telos <relative-path> "<content>" "<change-description>"
  *
  * Example:
- *   update-telos BOOKS.md "- Project Hail Mary by Andy Weir" "Added new favorite book"
- *
- * Files that can be updated:
- * - BELIEFS.md - Core beliefs and world model
- * - BOOKS.md - Favorite books
- * - CHALLENGES.md - Current challenges
- * - FRAMES.md - Mental frames and perspectives
- * - GOALS.md - Life goals
- * - LESSONS.md - Lessons learned
- * - MISSION.md - Life mission
- * - MODELS.md - Mental models
- * - MOVIES.md - Favorite movies
- * - NARRATIVES.md - Personal narratives
- * - PREDICTIONS.md - Predictions about the future
- * - PROBLEMS.md - Problems to solve
- * - PROJECTS.md - Active projects
- * - STRATEGIES.md - Strategies being employed
- * - TELOS.md - Main TELOS document
- * - TRAUMAS.md - Past traumas
- * - WISDOM.md - Accumulated wisdom
- * - WRONG.md - Things I was wrong about
+ *   update-telos Core/BELIEFS.md "## AI Consciousness Timeline\n\nI believe..." "Updated belief about AI consciousness"
  */
 
-import { readFileSync, writeFileSync, copyFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync } from 'fs';
+import { dirname, isAbsolute, join, parse, relative } from 'path';
+import { homedir } from 'os';
 import { getPrincipal } from '../../../hooks/lib/identity';
-import { paiPath } from '../../../hooks/lib/paths';
 
-// TELOS content lives in skills/PAI/USER/TELOS/ (not context/life/telos)
-const TELOS_DIR = paiPath('skills', 'PAI', 'USER', 'TELOS');
+const TELOS_DIR = join(homedir(), 'Obsidian', 'TELOS');
 const BACKUPS_DIR = join(TELOS_DIR, 'Backups');
-const UPDATES_FILE = join(TELOS_DIR, 'updates.md');
+const UPDATES_FILE = join(TELOS_DIR, 'Reviews', 'updates.md');
 
-// Valid TELOS files
-const VALID_FILES = [
-  'BELIEFS.md', 'BOOKS.md', 'CHALLENGES.md', 'FRAMES.md', 'GOALS.md',
-  'LESSONS.md', 'MISSION.md', 'MODELS.md', 'MOVIES.md', 'NARRATIVES.md',
-  'PREDICTIONS.md', 'PROBLEMS.md', 'PROJECTS.md', 'STRATEGIES.md',
-  'TELOS.md', 'TRAUMAS.md', 'WISDOM.md', 'WRONG.md'
-];
+function normalizeTelosPath(filePath: string): string {
+  return filePath.trim().replace(/\\/g, '/');
+}
+
+function validateTelosPath(filePath: string): { valid: boolean; normalized?: string; reason?: string } {
+  const normalized = normalizeTelosPath(filePath);
+
+  if (!normalized) {
+    return { valid: false, reason: 'File path is required' };
+  }
+
+  if (isAbsolute(normalized)) {
+    return { valid: false, reason: 'Use a path relative to the TELOS folder, not an absolute path' };
+  }
+
+  if (!normalized.toLowerCase().endsWith('.md')) {
+    return { valid: false, reason: 'Only markdown notes inside TELOS can be updated' };
+  }
+
+  const segments = normalized.split('/').filter(Boolean);
+  if (segments.length === 0) {
+    return { valid: false, reason: 'File path is empty' };
+  }
+
+  const invalidChars = /[<>:"|?*]/;
+  const reserved = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/;
+
+  for (const segment of segments) {
+    if (segment === '.' || segment === '..') {
+      return { valid: false, reason: 'Path traversal is not allowed' };
+    }
+
+    if (invalidChars.test(segment)) {
+      return { valid: false, reason: 'Path contains invalid characters: < > : " | ? *' };
+    }
+
+    const baseName = segment.replace(/\.[^.]+$/, '').toUpperCase();
+    if (reserved.test(baseName)) {
+      return { valid: false, reason: `"${baseName}" is a reserved filename on Windows` };
+    }
+  }
+
+  const resolvedPath = join(TELOS_DIR, ...segments);
+  const relativeToRoot = relative(TELOS_DIR, resolvedPath);
+  if (relativeToRoot.startsWith('..') || isAbsolute(relativeToRoot)) {
+    return { valid: false, reason: 'File path must stay inside the TELOS folder' };
+  }
+
+  return { valid: true, normalized: segments.join('/') };
+}
 
 /**
  * Get timestamp for backup filenames using Intl API for cross-platform consistency.
@@ -61,7 +83,6 @@ function getPacificTimestamp(): string {
   const principal = getPrincipal();
   const timezone = principal.timezone || 'UTC';
 
-  // Use Intl.DateTimeFormat for consistent cross-platform date formatting
   const formatter = new Intl.DateTimeFormat('en-US', {
     timeZone: timezone,
     year: 'numeric',
@@ -95,7 +116,6 @@ function getPacificDateForLog(): string {
   const principal = getPrincipal();
   const timezone = principal.timezone || 'UTC';
 
-  // Use Intl.DateTimeFormat for consistent cross-platform date formatting
   const formatter = new Intl.DateTimeFormat('en-US', {
     timeZone: timezone,
     year: 'numeric',
@@ -117,7 +137,6 @@ function getPacificDateForLog(): string {
   const minutes = getPart('minute');
   const seconds = getPart('second');
 
-  // Get timezone abbreviation
   const tzAbbr = timezone.includes('America/Los_Angeles') ? 'PT' :
                  timezone.includes('America/New_York') ? 'ET' :
                  timezone.includes('UTC') ? 'UTC' : timezone.split('/').pop() || 'TZ';
@@ -129,101 +148,67 @@ async function main() {
   const args = process.argv.slice(2);
 
   if (args.length < 3) {
-    console.error('❌ Usage: update-telos <file> "<content>" "<change-description>"');
-    console.error('\nExample: update-telos BOOKS.md "- New Book Title" "Added favorite book"');
-    console.error('\nValid files:', VALID_FILES.join(', '));
+    console.error('❌ Usage: update-telos <relative-path> "<content>" "<change-description>"');
+    console.error('\nExample: update-telos Core/BELIEFS.md "## Belief\n\nDetails" "Updated belief"');
     process.exit(1);
   }
 
-  const [filename, content, changeDescription] = args;
+  const [inputPath, content, changeDescription] = args;
 
-  // Validate filename
-  if (!VALID_FILES.includes(filename)) {
-    console.error(`❌ Invalid file: ${filename}`);
-    console.error(`Valid files: ${VALID_FILES.join(', ')}`);
+  const pathCheck = validateTelosPath(inputPath);
+  if (!pathCheck.valid || !pathCheck.normalized) {
+    console.error(`❌ Invalid TELOS file path: ${inputPath}`);
+    console.error(pathCheck.reason);
     process.exit(1);
   }
 
-  const targetFile = join(TELOS_DIR, filename);
+  const relativePath = pathCheck.normalized;
+  const targetFile = join(TELOS_DIR, ...relativePath.split('/'));
 
-  // Check if file exists
   if (!existsSync(targetFile)) {
     console.error(`❌ File does not exist: ${targetFile}`);
     process.exit(1);
   }
 
-  // Step 1: Create timestamped backup
   const timestamp = getPacificTimestamp();
-  const backupFilename = filename.replace('.md', `-${timestamp}.md`);
-  const backupPath = join(BACKUPS_DIR, backupFilename);
+  const parsed = parse(relativePath);
+  const backupRelativePath = join(parsed.dir, `${parsed.name}-${timestamp}${parsed.ext}`).replace(/\\/g, '/');
+  const backupPath = join(BACKUPS_DIR, backupRelativePath);
 
   try {
+    mkdirSync(dirname(backupPath), { recursive: true });
     copyFileSync(targetFile, backupPath);
-    console.log(`✅ Backup created: ${backupFilename}`);
+    console.log(`✅ Backup created: ${backupRelativePath}`);
   } catch (error) {
     console.error(`❌ Failed to create backup: ${error}`);
     process.exit(1);
   }
 
-  // Step 2: Update the target file (append content)
   try {
     const currentContent = readFileSync(targetFile, 'utf-8');
     const updatedContent = currentContent.trimEnd() + '\n' + content + '\n';
     writeFileSync(targetFile, updatedContent, 'utf-8');
-    console.log(`✅ Updated: ${filename}`);
+    console.log(`✅ Updated: ${relativePath}`);
   } catch (error) {
     console.error(`❌ Failed to update file: ${error}`);
     process.exit(1);
   }
 
-  // Step 3: Update updates.md with change log
   try {
+    mkdirSync(dirname(UPDATES_FILE), { recursive: true });
     const logTimestamp = getPacificDateForLog();
-    const logEntry = `
-## ${logTimestamp}
-
-- **File Modified**: ${filename}
-- **Change Type**: Content Addition
-- **Description**: ${changeDescription}
-- **Backup Location**: \`backups/${backupFilename}\`
-
-`;
-
-    const updatesContent = readFileSync(UPDATES_FILE, 'utf-8');
-
-    // Insert the new entry after "## Future Changes" section
-    const futureChangesMarker = '## Future Changes';
-    const insertPosition = updatesContent.indexOf(futureChangesMarker);
-
-    if (insertPosition !== -1) {
-      const beforeMarker = updatesContent.substring(0, insertPosition + futureChangesMarker.length);
-      const afterMarker = updatesContent.substring(insertPosition + futureChangesMarker.length);
-
-      // Find the end of the "Document all changes below..." line
-      // Handle both Unix (LF) and Windows (CRLF) line endings
-      const lfIndex = afterMarker.indexOf('\n');
-      const crlfIndex = afterMarker.indexOf('\r\n');
-      const nextLineBreak = crlfIndex !== -1 && (crlfIndex < lfIndex || lfIndex === -1) ? crlfIndex : lfIndex;
-      const headerSection = afterMarker.substring(0, nextLineBreak + 1);
-      const changesList = afterMarker.substring(nextLineBreak + 1);
-
-      const updatedUpdates = beforeMarker + headerSection + logEntry + changesList;
-      writeFileSync(UPDATES_FILE, updatedUpdates, 'utf-8');
-      console.log(`✅ Change logged in updates.md`);
-    } else {
-      // Fallback: just append
-      const updatedUpdates = updatesContent.trimEnd() + '\n' + logEntry;
-      writeFileSync(UPDATES_FILE, updatedUpdates, 'utf-8');
-      console.log(`✅ Change logged in updates.md (appended)`);
-    }
+    const logEntry = `\n## ${logTimestamp}\n\n- **File Modified**: ${relativePath}\n- **Change Type**: Content Addition\n- **Description**: ${changeDescription}\n- **Backup Location**: \`Backups/${backupRelativePath}\`\n`;
+    const updatesContent = existsSync(UPDATES_FILE) ? readFileSync(UPDATES_FILE, 'utf-8') : '# Updates\n';
+    writeFileSync(UPDATES_FILE, updatesContent.trimEnd() + '\n' + logEntry, 'utf-8');
+    console.log('✅ Change logged in Reviews/updates.md');
   } catch (error) {
     console.error(`❌ Failed to update updates.md: ${error}`);
     process.exit(1);
   }
 
   console.log('\n🎯 TELOS update complete!');
-  console.log(`   File: ${filename}`);
-  console.log(`   Backup: backups/${backupFilename}`);
+  console.log(`   File: ${relativePath}`);
+  console.log(`   Backup: Backups/${backupRelativePath}`);
   console.log(`   Change: ${changeDescription}`);
 }
 

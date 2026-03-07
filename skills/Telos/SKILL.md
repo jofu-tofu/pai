@@ -1,13 +1,13 @@
 ---
 name: Telos
-description: Life OS and project analysis. USE WHEN TELOS, life goals, projects, dependencies, books, movies. SkillSearch('telos') for docs.
+description: Life OS and project analysis with personal TELOS stored in the Obsidian vault. USE WHEN TELOS, life goals, mission, beliefs, current direction, career strategy, projects, dependencies, dashboard, narrative, report. SkillSearch('telos') for docs.
 ---
 
 # Telos
 
 **TELOS** (Telic Evolution and Life Operating System) is a comprehensive context-gathering system with two applications:
 
-1. **Personal TELOS** - {PRINCIPAL.NAME}'s life context system (beliefs, goals, lessons, wisdom) at `$PAI_DIR/skills/PAI/USER/TELOS/`
+1. **Personal TELOS** - {PRINCIPAL.NAME}'s life context system (mission, beliefs, goals, current direction, career synthesis) in the Obsidian vault at `~/Obsidian/TELOS/`
 2. **Project TELOS** - Analysis framework for organizations/projects (relationships, dependencies, goals, progress)
 
 
@@ -21,7 +21,7 @@ Running the **WorkflowName** workflow from the **Telos** skill...
 
 | Workflow | Trigger | File |
 |----------|---------|------|
-| **Update** | "add to TELOS", "update my goals", "add book to TELOS" | `Workflows/Update.md` |
+| **Update** | "add to TELOS", "update my goals", "update my TELOS" | `Workflows/Update.md` |
 | **InterviewExtraction** | "extract content", "extract interviews", "analyze interviews" | `Workflows/InterviewExtraction.md` |
 | **CreateNarrativePoints** | "create narrative", "narrative points", "TELOS report", "n=24" | `Workflows/CreateNarrativePoints.md` |
 | **WriteReport** | "write report", "McKinsey report", "create TELOS report", "professional report" | `Workflows/WriteReport.md` |
@@ -32,11 +32,11 @@ Running the **WorkflowName** workflow from the **Telos** skill...
 
 **Example 1: Update personal TELOS**
 ```
-User: "add Project Hail Mary to my TELOS books"
+User: "update my TELOS goals"
 --> Invokes Update workflow
---> Creates timestamped backup of BOOKS.md
---> Adds book entry with formatted metadata
---> Logs change in updates.md with timestamp
+--> Creates timestamped backup of Direction/GOALS.md
+--> Appends the new goal content to the Obsidian TELOS note
+--> Logs change in Reviews/updates.md with timestamp
 ```
 
 **Example 2: Analyze project with TELOS**
@@ -60,7 +60,7 @@ User: "build a dashboard for TELOSAPP"
 User: "create TELOS narrative for Acme Corp, n=24"
 --> Invokes CreateNarrativePoints workflow
 --> Analyzes TELOS context (situation, problems, recommendations)
---> Returns 24 crisp bullet points (8-12 words each)
+--> Returns a story-driven narrative with evidence, stakes, vision, and close
 --> Output is slide-ready for presentations or customer briefings
 ```
 
@@ -84,7 +84,7 @@ User: "write a TELOS report for Acme Corp"
 
 | User Request | Context | Location |
 |--------------|---------|----------|
-| "my TELOS", "my goals", "my beliefs", "add to TELOS" | Personal TELOS | `$PAI_DIR/skills/PAI/USER/TELOS/` |
+| "my TELOS", "my goals", "my beliefs", "add to TELOS" | Personal TELOS | `~/Obsidian/TELOS/` |
 | "Alma", "TELOSAPP", "analyze [project]", "dashboard for" | Project TELOS | User-specified directory |
 | "analyze ~/path/to/project" | Project TELOS | Specified path |
 
@@ -94,73 +94,71 @@ User: "write a TELOS report for Acme Corp"
 
 ## Location
 
-**CRITICAL PATH:** All personal TELOS files are located at:
+**CRITICAL PATH:** Personal TELOS lives in the Obsidian vault at:
 ```
-$PAI_DIR/skills/PAI/USER/TELOS/
+~/Obsidian/TELOS/
 ```
 
-Personal TELOS lives in the CORE USER directory, NOT directly under the Telos skill directory.
+On this machine, that resolves to:
+```
+C:\Users\fujos\Obsidian\TELOS\
+```
 
 ## Personal TELOS Framework
 
-All files located in `$PAI_DIR/skills/PAI/USER/TELOS/`:
+Current structure inside `~/Obsidian/TELOS/`:
 
-### Core Philosophy
-- **TELOS.md** - Main framework document
-- **MISSION.md** - Life mission statement
-- **BELIEFS.md** - Core beliefs and world model
-- **WISDOM.md** - Accumulated wisdom
+### Orientation
+- **Home.md** - Overview of the TELOS folder and linked strategic notes
+- **Now.md** - Live snapshot of current priorities, constraints, and active decisions
+- **CLAUDE.md** - Routing and quality guidance for the TELOS folder
 
-### Life Data
-- **BOOKS.md** - Favorite books
-- **MOVIES.md** - Favorite movies
-- **LEARNED.md** - Lessons learned over time
-- **WRONG.md** - Things {PRINCIPAL.NAME} was wrong about (growth tracking)
+### Core
+- **Core/MISSION.md** - Life mission statement
+- **Core/BELIEFS.md** - Core beliefs and world model
 
-### Mental Models
-- **FRAMES.md** - Mental frames and perspectives
-- **MODELS.md** - Mental models used for decision-making
-- **NARRATIVES.md** - Personal narratives and self-stories
-- **STRATEGIES.md** - Strategies being employed in life
+### Direction
+- **Direction/GOALS.md** - Near-term, medium-term, and long-term goals
 
-### Goals & Challenges
-- **GOALS.md** - Life goals (short-term and long-term)
-- **PROJECTS.md** - Active projects
-- **PROBLEMS.md** - Problems to solve
-- **CHALLENGES.md** - Current challenges being faced
-- **PREDICTIONS.md** - Predictions about the future
-- **TRAUMAS.md** - Past traumas (for context and healing)
+### Career
+- **Career/Overview.md** - Career synthesis and current positioning
+- **Career/Everything Resume.md** - Broad experience inventory
+- **Career/Target Roles.md** - Roles worth pursuing
+- **Career/Gap Analysis.md** - Capability and evidence gaps
+- **Career/Strategy.md** - Career strategy and directional moves
 
-### Change Tracking
-- **updates.md** - Comprehensive changelog of all TELOS updates
+### Reviews
+- **Reviews/updates.md** - Lightweight changelog of meaningful TELOS changes
+- **Backups/** - Timestamped note backups created by the Update workflow
 
 ## Working with Personal TELOS
 
 ### Read Files
 
 ```bash
-# View specific file
-read $PAI_DIR/skills/PAI/USER/TELOS/GOALS.md
-read $PAI_DIR/skills/PAI/USER/TELOS/BELIEFS.md
+# View specific files
+read ~/Obsidian/TELOS/Direction/GOALS.md
+read ~/Obsidian/TELOS/Core/BELIEFS.md
+read ~/Obsidian/TELOS/Now.md
 
 # View recent updates
-read $PAI_DIR/skills/PAI/USER/TELOS/updates.md
+read ~/Obsidian/TELOS/Reviews/updates.md
 ```
 
 ### Update Personal TELOS
 
-**CRITICAL:** Never manually edit. Use the Update workflow.
+**CRITICAL:** Use the Update workflow with a relative note path inside `~/Obsidian/TELOS/`.
 
 **Workflow:** `Workflows/Update.md`
 
 The workflow provides:
-- Automatic timestamped backups
-- Change logging in updates.md
+- Automatic timestamped backups under `Backups/`
+- Change logging in `Reviews/updates.md`
 - Version history preservation
-- Proper formatting and structure
+- Support for nested note paths inside the TELOS folder
 
-**Valid files for updates:**
-BELIEFS.md, BOOKS.md, CHALLENGES.md, FRAMES.md, GOALS.md, LEARNED.md, MISSION.md, MODELS.md, MOVIES.md, NARRATIVES.md, PREDICTIONS.md, PROBLEMS.md, PROJECTS.md, STRATEGIES.md, TELOS.md, TRAUMAS.md, WISDOM.md, WRONG.md
+**Common note paths for updates:**
+Home.md, Now.md, Core/MISSION.md, Core/BELIEFS.md, Direction/GOALS.md, Career/Overview.md, Career/Everything Resume.md, Career/Target Roles.md, Career/Gap Analysis.md, Career/Strategy.md, Reviews/updates.md
 
 ---
 
@@ -355,7 +353,7 @@ Engineer 10: Integration and testing
 ## Key Principles
 
 1. **Dual Context** - Handles both personal and project TELOS seamlessly
-   - Personal TELOS: `$PAI_DIR/skills/PAI/USER/TELOS/` (in CORE USER directory)
+   - Personal TELOS: `~/Obsidian/TELOS/` (inside the Obsidian vault)
    - Project TELOS: User-specified directories
 2. **Auto-Detection** - Determines context from user question
 3. **Flexible Discovery** - Finds files regardless of structure
@@ -369,4 +367,4 @@ Engineer 10: Integration and testing
 
 **TELOS is {PRINCIPAL.NAME}'s life operating system AND project analysis framework. One skill, two powerful contexts.**
 
-**Remember:** Personal TELOS files live at `$PAI_DIR/skills/PAI/USER/TELOS/` (in the CORE USER directory)
+**Remember:** Personal TELOS files live at `~/Obsidian/TELOS/` inside the Obsidian vault

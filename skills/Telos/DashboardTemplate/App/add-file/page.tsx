@@ -257,7 +257,7 @@ export default function AddFilePage() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Persistent Storage</p>
-                  <p>Files are saved to your TELOS directory ($PAI_DIR/skills/CORE/USER/TELOS/)</p>
+                  <p>Files are saved to your Obsidian TELOS directory (C:\Users\fujos\Obsidian\TELOS\)</p>
                 </div>
               </div>
             </div>

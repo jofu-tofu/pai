@@ -43,16 +43,14 @@ Load context on-demand by reading the file at the path listed. Only load what th
 
 | Topic | Path |
 |-------|------|
-| Telos overview | `PAI/USER/TELOS/README.md` |
-| Mission | `PAI/USER/TELOS/MISSION.md` |
-| Goals | `PAI/USER/TELOS/GOALS.md` |
-| Challenges | `PAI/USER/TELOS/CHALLENGES.md` |
-| Beliefs | `PAI/USER/TELOS/BELIEFS.md` |
-| Predictions | `PAI/USER/TELOS/PREDICTIONS.md` |
-| Wisdom | `PAI/USER/TELOS/WISDOM.md` |
-| Favorite books | `PAI/USER/TELOS/BOOKS.md` |
-| Favorite movies | `PAI/USER/TELOS/MOVIES.md` |
-| Favorite authors | `PAI/USER/TELOS/AUTHORS.md` |
+| Telos overview | `C:\Users\fujos\Obsidian\TELOS\Home.md` |
+| Current snapshot | `C:\Users\fujos\Obsidian\TELOS\Now.md` |
+| Mission | `C:\Users\fujos\Obsidian\TELOS\Core\MISSION.md` |
+| Goals | `C:\Users\fujos\Obsidian\TELOS\Direction\GOALS.md` |
+| Beliefs | `C:\Users\fujos\Obsidian\TELOS\Core\BELIEFS.md` |
+| Career overview | `C:\Users\fujos\Obsidian\TELOS\Career\Overview.md` |
+| Career strategy | `C:\Users\fujos\Obsidian\TELOS\Career\Strategy.md` |
+| Update log | `C:\Users\fujos\Obsidian\TELOS\Reviews\updates.md` |
 
 ## {DAIDENTITY.NAME} (DA Identity)
 

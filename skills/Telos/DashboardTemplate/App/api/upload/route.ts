@@ -2,30 +2,24 @@ import { NextResponse } from "next/server"
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
-import { getEnvVar, isWindows } from '../../../../../hooks/lib/platform'
 
-// Windows filename validation
-// Invalid characters: < > : " / \ | ? *
-// Reserved names: CON, PRN, AUX, NUL, COM1-9, LPT1-9
 function isValidFilename(name: string): { valid: boolean; reason?: string } {
-  // Check for invalid characters (always invalid on Windows, safe to reject everywhere)
-  const invalidChars = /[<>:"/\\|?*]/;
+  const invalidChars = /[<>:"/\\|?*]/
   if (invalidChars.test(name)) {
-    return { valid: false, reason: 'Filename contains invalid characters: < > : " / \\ | ? *' };
+    return { valid: false, reason: 'Filename contains invalid characters: < > : " / \\ | ? *' }
   }
 
-  // Check for Windows reserved names
-  const baseName = name.replace(/\.[^.]+$/, '').toUpperCase();
-  const reserved = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/;
+  const baseName = name.replace(/\.[^.]+$/, '').toUpperCase()
+  const reserved = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/
   if (reserved.test(baseName)) {
-    return { valid: false, reason: `"${baseName}" is a reserved filename on Windows` };
+    return { valid: false, reason: `"${baseName}" is a reserved filename on Windows` }
   }
 
-  return { valid: true };
+  return { valid: true }
 }
 
-const PAI_DIR = getEnvVar('PAI_DIR') || path.join(os.homedir(), 'pai')
-const TELOS_DIR = path.join(PAI_DIR, 'skills', 'PAI', 'USER', 'TELOS')
+const TELOS_DIR = path.join(os.homedir(), 'Obsidian', 'TELOS')
+const UPDATES_FILE = path.join(TELOS_DIR, 'Reviews', 'updates.md')
 
 export async function POST(request: Request) {
   try {
@@ -39,7 +33,6 @@ export async function POST(request: Request) {
       )
     }
 
-    // Validate file type
     const fileName = file.name
     const isMarkdown = fileName.endsWith('.md')
     const isCSV = fileName.endsWith('.csv')
@@ -51,8 +44,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // Validate filename for cross-platform compatibility
-    const filenameCheck = isValidFilename(fileName);
+    const filenameCheck = isValidFilename(fileName)
     if (!filenameCheck.valid) {
       return NextResponse.json(
         { error: filenameCheck.reason },
@@ -60,30 +52,24 @@ export async function POST(request: Request) {
       )
     }
 
-    // Read file content
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    // Ensure TELOS directory exists
     if (!fs.existsSync(TELOS_DIR)) {
       fs.mkdirSync(TELOS_DIR, { recursive: true })
     }
 
-    // Determine save path
     let savePath: string
     if (isCSV) {
-      // CSV files go in data subdirectory
       const csvDir = path.join(TELOS_DIR, 'data')
       if (!fs.existsSync(csvDir)) {
         fs.mkdirSync(csvDir, { recursive: true })
       }
       savePath = path.join(csvDir, fileName)
     } else {
-      // MD files go in root TELOS directory
       savePath = path.join(TELOS_DIR, fileName)
     }
 
-    // Check if file already exists
     if (fs.existsSync(savePath)) {
       return NextResponse.json(
         { error: `File ${fileName} already exists. Please delete the existing file first or rename your file.` },
@@ -91,16 +77,13 @@ export async function POST(request: Request) {
       )
     }
 
-    // Save file
     fs.writeFileSync(savePath, buffer)
 
-    // Log the upload
     const timestamp = new Date().toISOString()
     const logMessage = `\n## ${timestamp}\n\n- **Action:** File uploaded via dashboard\n- **File:** ${fileName}\n- **Type:** ${isCSV ? 'CSV' : 'Markdown'}\n- **Path:** ${savePath}\n`
 
-    const updatesPath = path.join(TELOS_DIR, 'updates.md')
-    if (fs.existsSync(updatesPath)) {
-      fs.appendFileSync(updatesPath, logMessage)
+    if (fs.existsSync(UPDATES_FILE)) {
+      fs.appendFileSync(UPDATES_FILE, logMessage)
     }
 
     return NextResponse.json({

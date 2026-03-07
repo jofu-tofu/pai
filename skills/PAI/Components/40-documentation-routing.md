@@ -42,6 +42,6 @@ Critical PAI documentation organized by domain. Load on-demand based on context.
 | Trigger | Path | Purpose |
 |---------|------|---------|
 | "projects", "my projects", "project paths", "deploy" | `USER/PROJECTS/PROJECTS.md` | Technical project registry—paths, deployment, routing aliases |
-| "Telos", "life goals", "goals", "challenges" | `USER/TELOS/PROJECTS.md` | Life goals, challenges, predictions (Telos Life System) |
+| "Telos", "life goals", "goals", "mission", "beliefs" | `C:\Users\fujos\Obsidian\TELOS\Home.md` | Personal TELOS in the Obsidian vault — mission, beliefs, goals, current direction |
 
 ---

@@ -2,30 +2,49 @@ import { NextResponse } from "next/server"
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
-import { getEnvVar, isWindows } from '../../../../../../hooks/lib/platform'
 
-// Windows filename validation
-// Invalid characters: < > : " / \ | ? *
-// Reserved names: CON, PRN, AUX, NUL, COM1-9, LPT1-9
-function isValidFilename(name: string): { valid: boolean; reason?: string } {
-  // Check for invalid characters (always invalid on Windows, safe to reject everywhere)
-  const invalidChars = /[<>:"/\\|?*]/;
-  if (invalidChars.test(name)) {
-    return { valid: false, reason: 'Filename contains invalid characters: < > : " / \\ | ? *' };
-  }
-
-  // Check for Windows reserved names
-  const baseName = name.replace(/\.[^.]+$/, '').toUpperCase();
-  const reserved = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/;
-  if (reserved.test(baseName)) {
-    return { valid: false, reason: `"${baseName}" is a reserved filename on Windows` };
-  }
-
-  return { valid: true };
+function normalizeTelosPath(filePath: string): string {
+  return filePath.trim().replace(/\\/g, '/')
 }
 
-const PAI_DIR = getEnvVar('PAI_DIR') || path.join(os.homedir(), 'pai')
-const TELOS_DIR = path.join(PAI_DIR, 'skills', 'PAI', 'USER', 'TELOS')
+function isValidTelosRelativePath(filePath: string): { valid: boolean; reason?: string } {
+  const normalized = normalizeTelosPath(filePath)
+  if (!normalized) {
+    return { valid: false, reason: 'Filename is required' }
+  }
+
+  if (path.isAbsolute(normalized)) {
+    return { valid: false, reason: 'Use a path relative to the TELOS folder' }
+  }
+
+  const segments = normalized.split('/').filter(Boolean)
+  if (segments.length === 0) {
+    return { valid: false, reason: 'Filename is empty' }
+  }
+
+  const invalidChars = /[<>:"|?*]/
+  const reserved = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/
+
+  for (const segment of segments) {
+    if (segment === '.' || segment === '..') {
+      return { valid: false, reason: 'Path traversal is not allowed' }
+    }
+
+    if (invalidChars.test(segment)) {
+      return { valid: false, reason: 'Filename contains invalid characters: < > : " | ? *' }
+    }
+
+    const baseName = segment.replace(/\.[^.]+$/, '').toUpperCase()
+    if (reserved.test(baseName)) {
+      return { valid: false, reason: `"${baseName}" is a reserved filename on Windows` }
+    }
+  }
+
+  return { valid: true }
+}
+
+const TELOS_DIR = path.join(os.homedir(), 'Obsidian', 'TELOS')
+const UPDATES_FILE = path.join(TELOS_DIR, 'Reviews', 'updates.md')
 
 export async function POST(request: Request) {
   try {
@@ -38,8 +57,8 @@ export async function POST(request: Request) {
       )
     }
 
-    // Validate filename for cross-platform compatibility
-    const filenameCheck = isValidFilename(filename);
+    const normalizedFilename = normalizeTelosPath(filename)
+    const filenameCheck = isValidTelosRelativePath(normalizedFilename)
     if (!filenameCheck.valid) {
       return NextResponse.json(
         { error: filenameCheck.reason },
@@ -47,40 +66,34 @@ export async function POST(request: Request) {
       )
     }
 
-    // Determine file path
-    const isCSV = filename.endsWith('.csv')
-    let filePath: string
-
-    if (isCSV) {
-      const csvDir = path.join(TELOS_DIR, 'data')
-      filePath = path.join(csvDir, filename)
-    } else {
-      filePath = path.join(TELOS_DIR, filename)
+    const filePath = path.resolve(TELOS_DIR, ...normalizedFilename.split('/'))
+    const relativeToRoot = path.relative(TELOS_DIR, filePath)
+    if (relativeToRoot.startsWith('..') || path.isAbsolute(relativeToRoot)) {
+      return NextResponse.json(
+        { error: 'Filename must stay inside the TELOS folder' },
+        { status: 400 }
+      )
     }
 
-    // Verify file exists before overwriting
     if (!fs.existsSync(filePath)) {
       return NextResponse.json(
-        { error: `File ${filename} does not exist` },
+        { error: `File ${normalizedFilename} does not exist` },
         { status: 404 }
       )
     }
 
-    // Save file
     fs.writeFileSync(filePath, content, 'utf-8')
 
-    // Log the edit
     const timestamp = new Date().toISOString()
-    const logMessage = `\n## ${timestamp}\n\n- **Action:** File edited via dashboard\n- **File:** ${filename}\n`
+    const logMessage = `\n## ${timestamp}\n\n- **Action:** File edited via dashboard\n- **File:** ${normalizedFilename}\n`
 
-    const updatesPath = path.join(TELOS_DIR, 'updates.md')
-    if (fs.existsSync(updatesPath)) {
-      fs.appendFileSync(updatesPath, logMessage)
+    if (fs.existsSync(UPDATES_FILE)) {
+      fs.appendFileSync(UPDATES_FILE, logMessage)
     }
 
     return NextResponse.json({
       success: true,
-      message: `${filename} saved successfully`,
+      message: `${normalizedFilename} saved successfully`,
     })
   } catch (error) {
     console.error("Error saving file:", error)

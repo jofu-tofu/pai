@@ -20,6 +20,14 @@ const staticNavigation = [
   { name: "Add File", href: "/add-file", icon: Upload },
 ]
 
+function filenameToSlug(filename: string) {
+  return filename.replace(/\.(md|csv)$/i, '').replace(/[\\/]/g, '~')
+}
+
+function filenameToDisplayName(filename: string) {
+  return filename.replace(/\.(md|csv)$/i, '')
+}
+
 export function Sidebar() {
   const pathname = usePathname()
   const [fileCount, setFileCount] = useState(0)
@@ -36,9 +44,9 @@ export function Sidebar() {
         // Build file navigation
         const navItems: FileNav[] = data.files.map((filename: string) => {
           const isCSV = filename.endsWith('.csv')
-          const slug = filename.replace('.md', '').replace('.csv', '').replace('data/', '')
+          const slug = filenameToSlug(filename)
           return {
-            name: slug,
+            name: filenameToDisplayName(filename),
             slug,
             href: `/file/${slug}`,
             isCSV
