@@ -130,53 +130,18 @@ For the full philosophy and additional tests, see [Philosophy.md](Workflows/Exca
 
 ---
 
-## Workflows
+## How This Skill Uses Excalidraw
 
-### CreateExcalidrawDiagram
-**Trigger:** "create excalidraw", "draw diagram", "sketch this"
+Excalidraw is a secondary reference inside this skill, not the default path.
 
-Generates Excalidraw diagrams programmatically from descriptions.
+Use Excalidraw when:
+- the user explicitly wants Excalidraw
+- a sketchy, hand-drawn, or intentionally rough visual is the point
+- freeform whiteboarding matters more than text-first maintenance
 
-**Example:**
-```
-User: "Create an architecture diagram for a web app"
-→ Generates: 3-tier architecture (frontend, backend, database)
-→ Saves: Diagrams/Architecture/WebAppArchitecture.excalidraw
-→ Returns: Embed syntax and file path
-```
+Prefer Mermaid, Canvas, MOCs, or Dataview when they capture the same structure with less friction.
 
-See: [Workflows/CreateExcalidrawDiagram.md](Workflows/CreateExcalidrawDiagram.md)
-
-### ExcalidrawToMermaid
-**Trigger:** "convert to mermaid", "make this code-based"
-
-Converts Excalidraw diagrams to Mermaid code for version control.
-
-**Example:**
-```
-User: "Convert SystemArchitecture.excalidraw to Mermaid"
-→ Analyzes: Elements and connections
-→ Generates: Mermaid flowchart syntax
-→ Saves: SystemArchitecture-mermaid.md
-```
-
-See: [Workflows/ExcalidrawToMermaid.md](Workflows/ExcalidrawToMermaid.md)
-
----
-
-## Comprehensive Documentation
-
-For detailed reference, see **[workflows/Excalidraw/Index.md](workflows/Excalidraw/Index.md)**
-
-### Documentation Map
-1. **[Core Concepts](workflows/Excalidraw/CoreConcepts.md)** - Canvas model, file format, element structure
-2. **[Element Types](workflows/Excalidraw/ElementTypes.md)** - All 9 types with properties and examples
-3. **[Styling System](workflows/Excalidraw/StylingSystem.md)** - Colors, strokes, fills, fonts, typography
-4. **[Automate API](workflows/Excalidraw/AutomateAPI.md)** - Complete ExcalidrawAutomate reference
-5. **[Integration Patterns](workflows/Excalidraw/IntegrationPatterns.md)** - Obsidian embedding, linking, frontmatter
-6. **[Advanced Features](workflows/Excalidraw/AdvancedFeatures.md)** - LaTeX, images, libraries, frames, groups
-7. **[Use Case Guide](workflows/Excalidraw/UseCaseGuide.md)** - When/how for different diagram types
-8. **[GitHub Patterns](workflows/Excalidraw/GitHubPatterns.md)** - Implementation patterns from research
+The Obsidian skill now consults this file mainly through `ChooseVisualForm.md` when Excalidraw is the right fit.
 
 ---
 
@@ -208,7 +173,7 @@ ea.clear();
 ea.create("DiagramName", "Diagrams/");
 ```
 
-For full API documentation, see: [workflows/Excalidraw/AutomateAPI.md](workflows/Excalidraw/AutomateAPI.md)
+For deeper API details, use the Excalidraw plugin's own documentation or community references if the user explicitly wants implementation-level help.
 
 ---
 
@@ -257,7 +222,7 @@ The Excalidraw plugin manages its own files - let it handle formatting.
 | **Mind maps** | Radial layout | Central concept + branches |
 | **Technical diagrams** | Solid fills + images | Icons, precise positioning |
 
-For detailed patterns and examples, see: [workflows/Excalidraw/UseCaseGuide.md](workflows/Excalidraw/UseCaseGuide.md)
+Use the table below as the quick pattern guide for when Excalidraw is worth the extra friction.
 
 ---
 
@@ -291,5 +256,5 @@ Excalidraw files are **JSON-based**, making them:
 
 - **Official Excalidraw:** https://excalidraw.com
 - **Obsidian Plugin:** Search "Excalidraw" in Community Plugins
-- **Documentation:** [workflows/Excalidraw/Index.md](workflows/Excalidraw/Index.md) (comprehensive reference)
-- **Workflows:** [Workflows/](Workflows/) (executable diagram generation)
+- **This file:** Use as the built-in quick reference for Excalidraw decisions and file format hints
+- **Workflow surface:** Excalidraw is now an optional branch inside `ChooseVisualForm.md`, not a dedicated primary workflow
