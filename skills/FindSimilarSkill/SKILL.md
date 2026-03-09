@@ -1,6 +1,10 @@
 ---
 name: FindSimilarSkill
 description: Search for existing skills similar to what you want. USE WHEN user wants to find a skill, discover existing skills, search for capabilities, check if a skill exists, find similar tools, look for commands, OR wants to know what skills are available for a specific task.
+compatibility: Designed for Claude Code and Devin (or similar agent products). Benefits from internet access for external skill discovery.
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # FindSimilarSkill

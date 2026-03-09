@@ -1,6 +1,10 @@
 ---
 name: TestDriven
 description: Test-driven development philosophy and smart testing methodology. USE WHEN writing tests OR designing test strategy OR refactoring code with tests OR reviewing test quality OR discussing TDD OR characterization testing OR catching regressions OR tests keep breaking after refactoring OR AI refactored code OR AI generated tests OR testing async code OR testing microservices OR testing LLM output OR mutation testing OR stub vs mock OR contract testing. Contains 10 core principles from authoritative sources for writing tests that survive refactoring.
+compatibility: Designed for Claude Code and Devin (or similar agent products)
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # TestDriven

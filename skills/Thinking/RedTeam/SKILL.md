@@ -2,6 +2,10 @@
 name: RedTeam
 description: Adversarial analysis with 32 agents. USE WHEN red team, attack idea, counterarguments, critique, stress test. SkillSearch('redteam') for docs.
 context: fork
+compatibility: Designed for Claude Code and Devin (or similar agent products)
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 ## Customization

@@ -5,6 +5,10 @@ description: |
 implements: Science
 science_cycle_time: meso
 context: fork
+compatibility: Designed for Claude Code and Devin (or similar agent products). Requires internet access.
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 ## ⚠️ MANDATORY TRIGGER

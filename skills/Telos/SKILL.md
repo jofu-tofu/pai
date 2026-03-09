@@ -1,6 +1,10 @@
 ---
 name: Telos
 description: Life OS and project analysis with personal TELOS stored in the Obsidian vault. USE WHEN TELOS, life goals, mission, beliefs, current direction, career strategy, projects, dependencies, dashboard, narrative, report. SkillSearch('telos') for docs.
+compatibility: Designed for Claude Code and Devin (or similar agent products). Requires access to an Obsidian vault with TELOS data.
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # Telos

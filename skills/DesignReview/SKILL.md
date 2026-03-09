@@ -1,6 +1,10 @@
 ---
 name: DesignReview
 description: Multi-agent design review system with orchestrator-enforced process boundaries. USE WHEN user asks for a design review of a skill or technical design artifact, wants to enumerate structure, requests readability or signal-density improvements, asks for scope and metadata-boundary checks, wants visual-first analysis, or asks for a concise review summary. Runs dimension agents from dimension files and returns a prioritized report.
+compatibility: Designed for Claude Code and Devin (or similar agent products)
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # DesignReview

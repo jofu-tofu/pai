@@ -1,6 +1,10 @@
 ---
 name: System
 description: System maintenance with four core operations - integrity check (find/fix broken references), document session (current transcript), document recent (catch-up since last update), git push (git commit + push). Plus security workflows. USE WHEN integrity check, audit system, document session, document this session, document today, document recent, catch up docs, what's undocumented, git push, commit and push, check for secrets, security scan, privacy check, cross-repo validation, OR asking about past work ("we just worked on", "remember when we").
+compatibility: Designed for Claude Code and Devin (or similar agent products). Requires git.
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 ## Customization

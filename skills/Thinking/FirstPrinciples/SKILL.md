@@ -2,6 +2,10 @@
 name: FirstPrinciples
 description: First principles analysis. USE WHEN first principles, fundamental, root cause, decompose. SkillSearch('firstprinciples') for docs.
 context: fork
+compatibility: Designed for Claude Code and Devin (or similar agent products)
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 ## Customization

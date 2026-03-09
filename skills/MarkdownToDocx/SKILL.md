@@ -1,6 +1,10 @@
 ---
 name: MarkdownToDocx
 description: Convert Markdown content to DOCX with reliable defaults, table-visibility hardening, and automatic open-after-conversion behavior. USE WHEN user wants to convert markdown to docx, md to word, generate a .docx from markdown, batch-convert markdown files, fix docx table visibility, or open the generated docx automatically.
+compatibility: Designed for Claude Code and Devin (or similar agent products). Requires pandoc.
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # MarkdownToDocx

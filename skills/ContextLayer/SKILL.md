@@ -1,6 +1,10 @@
 ---
 name: ContextLayer
 description: Generate and maintain slim, high-signal CLAUDE.md context files for AI agents. USE WHEN the request involves creating, reviewing, correcting, shrinking, or refreshing CLAUDE.md files — whether the user says so explicitly or describes symptoms like "agents are confused", "context is stale", "CLAUDE.md is too big", "just started a new project", "agents keep putting things in the wrong place", "my skill is getting confused about its own structure", "agents don't know about our workaround", "why did we implement it this way is lost", "context hasn't been updated in a while", or "I just added a new module and agents don't know about it". Covers the full lifecycle of agent context files. For README, API docs, or non-CLAUDE.md documentation, handle directly without this skill.
+compatibility: Designed for Claude Code and Devin (or similar agent products)
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # ContextLayer

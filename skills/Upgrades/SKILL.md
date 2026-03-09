@@ -1,6 +1,10 @@
 ---
 name: Upgrades
 description: Track PAI upgrade opportunities. USE WHEN upgrades, improvement tracking. SkillSearch('upgrades') for docs.
+compatibility: Designed for Claude Code and Devin (or similar agent products). Benefits from internet access.
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # Upgrades

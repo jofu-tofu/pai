@@ -1,6 +1,10 @@
 ---
 name: Utilities
 description: Developer utilities and tools — evals, Fabric patterns, browser automation, and meta-prompting. USE WHEN eval, evaluate, test agent, benchmark, verify behavior, regression test, capability test, fabric, fabric pattern, run fabric, update patterns, sync fabric, browser, screenshot, debug web, verify UI, troubleshoot frontend, automate browser, meta-prompting, template generation, prompt optimization, programmatic prompt, render template.
+compatibility: Designed for Claude Code and Devin (or similar agent products)
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # Utilities

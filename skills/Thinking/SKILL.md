@@ -1,6 +1,10 @@
 ---
 name: Thinking
 description: Multi-mode analytical and creative thinking — first principles decomposition, iterative depth analysis, creative brainstorming, multi-agent council debates, adversarial red teaming, and scientific hypothesis testing. USE WHEN first principles, decompose, deconstruct, challenge assumptions, iterative depth, multi-angle, deep exploration, be creative, brainstorm, divergent ideas, council, debate, perspectives, red team, critique, stress test, adversarial, devil's advocate, think about, figure out, experiment, iterate, science, hypothesis.
+compatibility: Designed for Claude Code and Devin (or similar agent products)
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # Thinking

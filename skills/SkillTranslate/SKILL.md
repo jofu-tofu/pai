@@ -1,6 +1,10 @@
 ---
 name: SkillTranslate
 description: Translate skills and workflows between systems (Claude Code, Windsurf, Cursor, etc). USE WHEN translate skill, convert workflow, map to windsurf, cross-platform skill, skill equivalents.
+compatibility: Designed for Claude Code and Devin (or similar agent products)
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # SkillTranslate - Cross-Platform Skill Translation

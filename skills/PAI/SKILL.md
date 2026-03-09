@@ -1,6 +1,10 @@
 ---
 name: PAI
 description: Personal AI Infrastructure core. The authoritative reference for how PAI works.
+compatibility: Designed for Claude Code and Devin (or similar agent products)
+metadata:
+  author: pai
+  version: "1.8.0"
 ---
 <!--
   GENERATED FILE - Do not edit directly

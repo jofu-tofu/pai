@@ -1,6 +1,10 @@
 ---
 name: Obsidian
 description: Obsidian-native capability enhancer for note work. USE WHEN working in an Obsidian vault and the task should leverage wikilinks, backlinks, properties, Dataview, Mermaid, Canvas, templates, or related-note context instead of plain markdown editing. Helps improve notes, gather vault context, build dashboards and MOCs, and choose the right visual form.
+compatibility: Designed for Claude Code and Devin (or similar agent products). Requires access to an Obsidian vault directory.
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # Obsidian

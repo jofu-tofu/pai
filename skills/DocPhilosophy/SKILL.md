@@ -1,6 +1,10 @@
 ---
 name: DocPhilosophy
 description: Philosophical framework for documentation placement decisions. USE WHEN deciding where documentation belongs OR evaluating doc placement strategy OR discussing context rot OR signal-to-noise in docs OR AI context file design OR docs going unread OR codebase vs knowledge base OR doc placement architecture OR ADR placement OR docs-as-code philosophy. Contains 7 principles from authoritative sources for documentation that survives and serves.
+compatibility: Designed for Claude Code and Devin (or similar agent products)
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 # DocPhilosophy

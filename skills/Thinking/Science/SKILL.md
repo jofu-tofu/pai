@@ -1,6 +1,10 @@
 ---
 name: Science
 description: Universal thinking and iteration engine based on the scientific method. USE WHEN user says "think about", "figure out", "try approaches", "experiment with", "test this idea", "iterate on", "improve", "optimize", OR any problem-solving that benefits from structured hypothesis-test-analyze cycles. THE meta-skill that other workflows implement.
+compatibility: Designed for Claude Code and Devin (or similar agent products)
+metadata:
+  author: pai
+  version: "1.0.0"
 ---
 
 ## Customization
