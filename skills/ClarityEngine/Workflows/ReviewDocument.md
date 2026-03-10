@@ -14,18 +14,25 @@
 
 ## Purpose
 
-Run a quality and delivery-readiness audit on a document or presentation. Combines narrative structure checks against Philosophy.md principles with readability scoring (via ReadabilityGate) and format-specific technical checks.
+Run a quality and delivery-readiness audit on a document or presentation. Combines information-order checks against Philosophy.md principles with readability scoring (via ReadabilityGate) and format-specific technical checks.
 
 ## Workflow Steps
 
 ### Step 1: Validate Against Comprehension Principles
 
 Check the document against Philosophy.md's five principles:
-- **Layman First**: Is the opening accessible to non-experts?
-- **Skip-Friendly**: Can any section be read independently?
+- **Layman First**: Does the opening deliver the main point before background?
+- **Skip-Friendly**: Can any section be read independently as a small inverted pyramid?
 - **Clarity Over Brevity**: Are there vague or jargon-laden sections?
-- **Scannable Architecture**: Are sections chunked properly? Visual hierarchy present?
+- **Scannable Architecture**: Is the information order visible through hierarchy, chunking, and visual emphasis?
 - **Evidence Over Assertion**: Are claims specific and traceable?
+
+For partner/customer-facing review artifacts, also check the Audience and Review Addendum:
+- Does the language stay in the reader's world rather than internal taxonomy?
+- Does the artifact follow the reader's judgment path instead of the author's process?
+- When the subject is visible product behavior, do visuals carry the main evidence?
+- Does the closing make the requested confirmation, decision, or feedback explicit?
+- Could lower-priority material be trimmed without losing the core message?
 
 ### Step 2: Run Readability Scoring
 

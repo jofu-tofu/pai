@@ -6,31 +6,43 @@
 
 ---
 
+## Core Frame: The Inverted Pyramid of Information
+
+When clarity matters most, order information by reader value, not by author chronology.
+
+- **Essential point first** — the answer, decision, or why it matters
+- **Supporting detail next** — evidence, explanation, and implications
+- **Background last** — history, edge context, and lower-priority material
+
+Write so the core meaning survives interruption, skimming, or trimming. At document level, lead with the point. At section level, each section should restart a smaller version of the same pattern.
+
+---
+
 ## The Five Principles
 
-### 1. Layman First, Expert Second (Progressive Disclosure)
+### 1. Layman First, Expert Second (Inverted Pyramid + Progressive Disclosure)
 
-**WHY:** Most readers need the conclusion, not the proof. Experts can dig deeper; non-experts cannot dig at all.
+**WHY:** Most readers need the conclusion, not the proof. The inverted pyramid puts the highest-value information first; progressive disclosure lets experts keep going without forcing everyone else to wait.
 
-**WHAT:** Lead with a summary any intelligent non-expert understands. Build depth in 2-3 layers max. Target: 80% of readers get full value from layer 1 alone.
+**WHAT:** Lead with the essential answer any intelligent non-expert can understand. Then layer supporting detail and background in descending order of importance. Target: 80% of readers get full value from layer 1 alone.
 
 **ANTI-PATTERN:** "Expert Gatekeeping" — opening with jargon, acronyms, or domain-specific framing that excludes the primary audience.
 
-**TEST:** Can someone outside the domain read the first paragraph and know what this is about, what was decided, and why it matters?
+**TEST:** Can someone outside the domain stop after the first paragraph and still know what this is about, what was decided, and why it matters?
 
-*Sources: Cognitive Load Theory (Sweller 1988), Progressive Disclosure (Nielsen Norman Group)*
+*Sources: Cognitive Load Theory (Sweller 1988), Progressive Disclosure (Nielsen Norman Group), Inverted Pyramid (journalism)*
 
-### 2. Skip-Friendly by Design (Section Independence)
+### 2. Skip-Friendly by Design (Section-Level Inverted Pyramid)
 
-**WHY:** Readers don't read linearly. They scan, jump, and sample. Content that requires sequential reading punishes real reading behavior.
+**WHY:** Readers don't read linearly. They scan, jump, and sample. Each section should restart a smaller inverted pyramid so the reader can enter anywhere and still get the point.
 
-**WHAT:** Every section works independently. No "as mentioned above." Readers get 70%+ of the message from headings + bold + bullets alone.
+**WHAT:** Begin each section with its takeaway, then add support and detail. No "as mentioned above." Readers should get 70%+ of the message from headings, lead sentences, bold, and bullets alone.
 
 **ANTI-PATTERN:** "Narrative Dependence" — section N requires reading sections 1 through N-1 to be understood.
 
-**TEST:** Pick any section at random. Can you understand its main point without reading anything before it?
+**TEST:** Pick any section at random. Can you understand its main point from the heading and opening sentence without reading anything before it?
 
-*Sources: F-Pattern Reading (Nielsen Norman Group), Information Foraging Theory (Pirolli & Card)*
+*Sources: F-Pattern Reading (Nielsen Norman Group), Information Foraging Theory (Pirolli & Card), Inverted Pyramid (journalism)*
 
 ### 3. Clarity Over Brevity (Prefer Skipping Over Vagueness)
 
@@ -44,17 +56,17 @@
 
 *Sources: Plain Language movement (plainlanguage.gov), Flesch Readability Research*
 
-### 4. Scannable Architecture (Visual-First, Inverted Pyramid, Chunking)
+### 4. Scannable Architecture (Visual Hierarchy + Chunking)
 
-**WHY:** Working memory holds 3-5 chunks. Documents that exceed this per section force re-reading and increase error rates. For technical content, a diagram communicates structure faster and more accurately than prose.
+**WHY:** Working memory holds 3-5 chunks. Documents that exceed this per section force re-reading and increase error rates. Visual hierarchy makes the information order visible before the reader commits to the detail.
 
-**WHAT:** For technical content, diagrams and prose are co-equal — each carries the narrative best suited to its medium. Diagrams convey structure and relationships; prose conveys rationale and nuance. Every major concept should have both a visual element (diagram, table, flow, or comparison grid) and supporting text explanation. Subheadings every 100-150 words. 3-5 groups per heading level. Max 4 heading levels. Alert-Summary-Detail layering. Max 3 type sizes. Every visual element must carry information — remove decoration.
+**WHAT:** Use headings, summaries, bullets, spacing, and visuals to make the inverted pyramid easy to scan. Put the signal before the detail. For technical content, diagrams and prose are co-equal — diagrams convey structure and relationships; prose conveys rationale and nuance. Every major concept should have both a visual element (diagram, table, flow, or comparison grid) and supporting text explanation. Subheadings every 100-150 words. 3-5 groups per heading level. Max 4 heading levels. Max 3 type sizes. Every visual element must carry information — remove decoration.
 
 **ANTI-PATTERN:** "Wall of Text" — dense paragraphs without structural breaks. "Prose-First" — explaining a system architecture in paragraphs when a diagram would communicate the same structure in seconds. Also "Decoration Theater" — visual elements that look professional but encode no information.
 
-**TEST:** (1) Remove all body text, leaving only headings, bold text, and bullet points. Does the document still tell a coherent story? (2) For each major section in technical content, does a visual element exist that conveys the core idea independently of surrounding prose?
+**TEST:** (1) Remove all body text, leaving only headings, bold text, and bullet points. Does the information order still make sense? (2) For each major section in technical content, does a visual element exist that conveys the core idea independently of surrounding prose?
 
-*Sources: Cowan's Working Memory (2001), Tufte's Data-Ink Ratio, Inverted Pyramid (journalism), Mayer's Multimedia Principle*
+*Sources: Cowan's Working Memory (2001), Tufte's Data-Ink Ratio, Mayer's Multimedia Principle*
 
 ### 5. Evidence Over Assertion (Trust Through Specificity)
 
@@ -81,9 +93,8 @@
 
 ### From Principle 2 — Skip-Friendly
 
-- **RC-3:** Subheadings every 100-150 words. Max 4 heading levels (H1-H4).
 - **RC-4:** Section anchors on H2/H3. Sticky ToC for documents exceeding 3 screen-heights.
-- **RC-5:** Leading summary sentence per section. Each section works independently.
+- **RC-5:** Each section begins with its takeaway; support and detail follow. Each section works independently.
 
 ### From Principle 3 — Clarity Over Brevity
 
@@ -92,6 +103,7 @@
 
 ### From Principle 4 — Scannable Architecture
 
+- **RC-3:** Subheadings every 100-150 words. Max 4 heading levels (H1-H4).
 - **RC-8:** Max 3-5 chunks per group. 3-5 groups per heading level (Miller's Law).
 - **RC-9:** Key information carried by headings + bold + bullets (70% comprehension rule).
 - **RC-10:** Max 3 type sizes. No decorative elements that don't encode information.
@@ -126,6 +138,18 @@ When the content type is `codebase-analysis`, apply these principle-mapped exten
 **Skip-Friendly by Design (P2):**
 - Parallel paths shown side-by-side in grid layout, not sequentially
 - Divergence points annotated with the architectural decision causing the split
+
+---
+
+## Audience and Review Addendum
+
+When the artifact is partner/customer-facing or its job is review/decision support, apply these extensions:
+
+- **Reader-World Language:** Use the reader's nouns, not the author's internal taxonomy. Translate internal IDs, routine names, and ticket numbers into audience-safe terms unless the reader explicitly needs them.
+- **Decision-Path Structure:** Review artifacts should apply the inverted pyramid to the reader's judgment path: problem or proposed change first, evidence second, requested feedback or decision last.
+- **Visual Evidence Leads:** When the proof is visible in the product, screenshots or product visuals carry the argument. Prose should frame the evidence, not compete with it.
+- **Subject Over Self-Narration:** Write about the product, workflow, or decision — not about the presentation itself. Avoid copy that explains what the artifact is doing.
+- **Audience Duties at the Edges:** The opening should orient the least-informed intended reader. The closing should make the desired judgment, approval, or feedback explicit.
 
 ---
 

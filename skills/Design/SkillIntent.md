@@ -6,16 +6,18 @@
 
 1. **Problem Before Solution** — Articulate the problem before jumping to solutions. Writing is the thinking tool, not the documentation step.
 2. **Trade-offs Over Choices** — Show what was rejected and why. The "why not" is as important as the "why."
-3. **Density Over Verbosity** — Use the minimum words needed to convey the full meaning. Prose requires justification; tables and lists are the default.
-4. **Scale-Appropriate Ceremony** — Small things should feel lightweight. Default to the lightest appropriate scale.
-5. **Standalone Operation** — This skill operates independently with no coupling to other skills.
+3. **Reader Over Author** — A design document serves the person reading it, not the person writing it. Structure by what the reader needs, not by what the author discovered.
+4. **Density Over Verbosity** — Use the minimum words needed to convey the full meaning. Prose requires justification; tables and lists are the default.
+5. **Scale-Appropriate Ceremony** — Small things should feel lightweight. Default to the lightest appropriate scale.
+6. **Standalone Operation** — This skill operates independently with no coupling to other skills.
 
 ## Problem This Skill Solves
 
-Without this skill, design work suffers from four failure modes:
+Without this skill, design work suffers from five failure modes:
 - **Fuzzy problem definitions** — Teams jump to solutions without articulating what problem they're solving
 - **Invisible trade-offs** — Decisions look arbitrary because rejected alternatives aren't captured
 - **Lost rationale** — Six months later, nobody knows why a decision was made
+- **Author-structured documents** — The document captures everything the author knows but is organized by discovery order, not reader need. Thorough but exhausting. Reviewers disengage before reaching the key decisions.
 - **AI verbosity** — Agent-generated output uses prose where tables work, banned AI vocabulary, and excessive word count, requiring manual cleanup
 
 ## Design Decisions
@@ -41,7 +43,8 @@ Without this skill, design work suffers from four failure modes:
 1. CreateDesign output passes all 4 ValidateOutput checks without manual intervention
 2. Every template section uses the correct format per OutputQuality.md's Section Format Guide
 3. Users do not need to ask "put this in table format" after receiving a design artifact
-4. ReviewDesign catches rendering quality issues as a review dimension
+4. ReviewDesign leads with reader experience before checking content completeness
+5. Design documents have a clear primary audience, and multi-audience documents have explicit stopping points
 
 ## Constraints
 

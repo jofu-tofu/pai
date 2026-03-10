@@ -34,9 +34,9 @@ The primary audience for a design document is the person who wasn't in the room 
 
 ---
 
-## The 8 Cross-Cutting Patterns
+## The 9 Cross-Cutting Patterns
 
-Distilled from 11 design methodologies. Each pattern includes the principle, a grounding quote, and the anti-pattern it prevents.
+Distilled from 12 design methodologies. Each pattern includes the principle, a grounding quote, and the anti-pattern it prevents.
 
 ### Pattern 1: Writing is Thinking, Not Documentation
 
@@ -102,6 +102,18 @@ Don't make one huge document format that covers everything from bug fixes to arc
 
 **Prevents**: Over-engineering small decisions. Friction that discourages documentation entirely.
 
+### Pattern 9: Structure for the Reader, Not the Author
+
+A design document is a communication artifact, not a knowledge dump. The author's job is to organize information by what the reader needs, not by the order the author discovered it. Ask: who will read this, what decision do they need to make, and when should they be allowed to stop reading?
+
+When a document serves multiple audiences — a reviewer who needs to evaluate the approach and an implementer who needs the details — separate them explicitly. Give each audience a clear stopping point. A reviewer forced to wade through implementation details to find the design decisions will disengage before reaching either.
+
+The strongest signal that a document is author-structured rather than reader-structured: it's thorough but exhausting. Everything is there, but nothing is foregrounded. The reader has to do the work of figuring out what matters.
+
+> "The writer does something for the reader that the reader cannot do for himself." — William Zinsser
+
+**Prevents**: Documents that are complete but impenetrable. Reviewer fatigue. Designs where the core idea is buried under implementation specifics.
+
 ---
 
 ## Source Attribution
@@ -119,3 +131,4 @@ Don't make one huge document format that covers everything from bug fixes to arc
 | **Shape Up** (Basecamp / Ryan Singer) | Appetite over estimates; fixed time variable scope; deliberate scope constraints |
 | **Amazon Working Backwards** | 6-pager narrative format; PR-FAQ; writing as thinking; multi-draft iteration |
 | **Design Thinking** (Stanford d.school, NNGroup) | Empathy-first problem framing; POV madlib; diverge-then-converge; human-centered design |
+| **William Zinsser** (On Writing Well) | Reader-first structure; the writer's job is to do work the reader cannot |

@@ -12,11 +12,13 @@
 
 | ID | Principle |
 |----|-----------|
-| P1 | Layman First, Expert Second (Progressive Disclosure) |
-| P2 | Skip-Friendly by Design (Section Independence) |
+| P1 | Layman First, Expert Second (Inverted Pyramid + Progressive Disclosure) |
+| P2 | Skip-Friendly by Design (Section-Level Inverted Pyramid) |
 | P3 | Clarity Over Brevity (Prefer Skipping Over Vagueness) |
-| P4 | Scannable Architecture (Inverted Pyramid + Chunking) |
+| P4 | Scannable Architecture (Visual Hierarchy + Chunking) |
 | P5 | Evidence Over Assertion (Trust Through Specificity) |
+
+The inverted pyramid is the umbrella frame across P1, P2, and P4: P1 orders the document, P2 restarts that order within sections, and P4 makes the order visually scannable.
 
 ## Checkpoints
 
@@ -26,7 +28,7 @@
 | RC-2 | Jargon defined on first use, acronyms expanded | P1 |
 | RC-3 | Subheadings every 100-150 words, max 4 heading levels | P4 |
 | RC-4 | Section anchors on H2/H3, sticky ToC for long docs | P2 |
-| RC-5 | Leading summary per section, sections work independently | P2 |
+| RC-5 | Each section begins with its takeaway; support and detail follow | P2 |
 | RC-6 | No empty/generic headings, every heading describes content | P3 |
 | RC-7 | Specific examples in every major section, uncertainty marked | P3 |
 | RC-8 | 3-5 chunks per group, 3-5 groups per heading level | P4 |
@@ -60,7 +62,7 @@
 | H3 | Maximum Nesting Depth (4 levels) | RC-3 (P4) | Concrete limit preserved |
 | H4 | Descriptive Heading Text | RC-6 (P3) | No empty or generic headings |
 | IA1 | Chunking (Miller's Law) | RC-8 (P4) | 3-5 chunks preserved |
-| IA2 | Progressive Disclosure | RC-5 (P1) | Summary-first preserved |
+| IA2 | Progressive Disclosure | RC-5 (P2) | Section-level lead-first ordering preserved |
 | IA3 | F-Pattern Compatibility | RC-9 (P4) | Key info positioning preserved |
 | IA4 | Visual Hierarchy through Proximity | RC-8 (P4) | Proximity grouping preserved |
 | WS1 | Macro White Space (800px max) | Model knowledge | CSS implementation detail — standard content width |
@@ -79,8 +81,8 @@
 | CL2 | Spatial Contiguity Principle | RC-8 (P4) | Related elements grouped |
 | CL3 | Signaling Principle | RC-9 (P4) | Visual emphasis preserved |
 | CL4 | Data-Ink Ratio (Tufte) | RC-10 (P4) | Maximize information density |
-| CL5 | Visual-First Communication | P4 core tenet | Elevated to principle level: "diagrams carry primary narrative load" is now part of P4 (Scannable Architecture) |
-| CL6 | Escalating Abstraction | RC-5 (P1) | Depth layers preserved |
+| CL5 | Visual-First Communication | P4 core tenet | Elevated to principle level: visual hierarchy now makes information order legible before detail. |
+| CL6 | Escalating Abstraction | RC-5 (P2) | Section-level depth layering preserved |
 | CP1 | Syntax Highlighting | RC-15 (P5) | Code presentation |
 | CP2 | Monospace Font for Code | RC-15 (P5) | Code presentation |
 | CP3 | Code Block Line Length (80ch) | RC-15 (P5) | Code presentation |

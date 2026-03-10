@@ -18,18 +18,20 @@ If this directory exists, load and apply any PREFERENCES.md, configurations, or 
 
 # Design Skill
 
-Writing is thinking, not documentation. A design document is a *thinking tool* that forces clarity before commitment. This skill guides agents through producing designs that make problems clear, trade-offs visible, and decisions recoverable — at any scale from a quick ADR to a full architecture document.
+Writing is thinking, not documentation. A design document is a *thinking tool* that forces clarity before commitment and a *communication artifact* that serves its reader, not its author. This skill guides agents through producing designs that make problems clear, trade-offs visible, and decisions recoverable — at any scale from a quick ADR to a full architecture document.
 
 ## The 4 Pillars
 
-Every great design document achieves these four things. They serve as both the creation guide and the review checklist.
+Every great design document achieves these four things. They serve as both the creation guide and the review lens — but they are a lens, not a checklist.
 
 1. **Force Clarity on the Problem** — Articulate the problem before jumping to solutions. If you can't write a clear problem statement, you don't understand the problem yet.
 2. **Make Trade-offs Visible** — Show what was rejected and why. The "why not" is as important as the "why."
 3. **Create Feedback Loops** — Structured review before commitment catches blind spots and builds shared understanding.
 4. **Serve as Organizational Memory** — Optimize for the person who wasn't in the room, including future you.
 
-See `Principles.md` for the full research-backed framework (8 patterns from 11 methodologies).
+The pillars check *content*. Equally important is *structure*: does the document serve its reader? Is information organized by what the reader needs, not by what the author discovered? When a document serves multiple audiences, are there clear stopping points? See Principles.md, Pattern 9.
+
+See `Principles.md` for the full research-backed framework (9 patterns from 12 methodologies).
 
 ## Scale Selector
 
@@ -45,7 +47,7 @@ Assess scale from context and suggest — but the user can override. When in dou
 
 ## Workflow Routing
 
-Route to the appropriate workflow based on the request.
+When a workflow is matched, **read its file and follow the steps within it.**
 
 **When executing a workflow, output this notification directly:**
 
@@ -53,17 +55,19 @@ Route to the appropriate workflow based on the request.
 Running the **WorkflowName** workflow in the **Design** skill to ACTION...
 ```
 
-  - Create a design document, scope a feature, write a proposal → `Workflows/CreateDesign.md`
-  - Review or critique an existing design → `Workflows/ReviewDesign.md`
-  - Record a decision, write an ADR, capture a decision → `Workflows/RecordDecision.md`
-  - Validate design output quality → `Workflows/ValidateOutput.md`
+| Workflow | Trigger | File |
+|----------|---------|------|
+| **CreateDesign** | "design doc", "scope a feature", "write a proposal" | `Workflows/CreateDesign.md` |
+| **ReviewDesign** | "review this design", "critique", "what's missing" | `Workflows/ReviewDesign.md` |
+| **RecordDecision** | "record a decision", "write an ADR", "capture a decision" | `Workflows/RecordDecision.md` |
+| **ValidateOutput** | "validate design output", "check output quality" | `Workflows/ValidateOutput.md` |
 
 ## Context Files
 
 | File | Purpose |
 |------|---------|
-| `Principles.md` | 8 research-backed content patterns — what to include in designs |
-| `OutputQuality.md` | Format selection, density, anti-AI patterns — how to render output |
+| `Principles.md` | 9 research-backed content patterns — what to include and how to structure designs |
+| `OutputQuality.md` | Format selection, density, macro-structure, anti-AI patterns — how to render output |
 
 ## Examples
 
@@ -103,8 +107,9 @@ What this skill explicitly avoids:
 - **Scope Creep** — The design doc becoming the project. A design should clarify decisions, not replace implementation planning.
 - **Over-Specification** — Boxing in implementers with premature detail. Leave room for implementation judgment.
 - **Missing the "Why Not"** — Designs that show what was chosen but not what was rejected. Alternatives Considered is not optional.
+- **Author-Ordered Structure** — Organizing the document by the order you figured things out, rather than by what the reader needs. The reader shouldn't have to do the work of figuring out what matters.
 - **Verbose Prose Where Tables Work** — Using paragraphs to describe what a table could show in half the space. If the data has items x attributes, use a table.
 
 ---
 
-**Attribution**: Methodology synthesized from Google Design Docs, Amazon Working Backwards, Shape Up, ADRs (Nygard), Rust RFCs, Stripe writing culture, Phil Calcado's Structured RFC, Squarespace "Yes, if", Klaviyo "Always Write Something", Design Thinking (Stanford d.school, NNGroup), and PRD best practices (Atlassian, Product School).
+**Attribution**: Methodology synthesized from Google Design Docs, Amazon Working Backwards, Shape Up, ADRs (Nygard), Rust RFCs, Stripe writing culture, Phil Calcado's Structured RFC, Squarespace "Yes, if", Klaviyo "Always Write Something", Design Thinking (Stanford d.school, NNGroup), PRD best practices (Atlassian, Product School), and Zinsser (On Writing Well).

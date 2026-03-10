@@ -1,6 +1,6 @@
 # ReviewDesign Workflow
 
-**Purpose**: Evaluate an existing design document against the 4 Pillars of great design. Produce structured, constructive feedback using the "Yes, if" framing.
+**Purpose**: Evaluate an existing design document — first as a reader, then for content completeness. The best review feedback comes from reading as the audience would, not from evaluating against a grid.
 
 **When to Use**:
 - "Review this design", "critique", "what's missing"
@@ -9,114 +9,100 @@
 
 ## Reference Material
 
-- **Output Quality:** `../OutputQuality.md` — Format selection, density, anti-AI patterns.
-- **Design Principles:** `../Principles.md` — 8 research-backed content patterns.
+- **Output Quality:** `../OutputQuality.md` — Format selection, density, macro-structure.
+- **Design Principles:** `../Principles.md` — 9 research-backed content patterns.
 
 ---
 
 ## Process
 
-### Step 1: Read the Design Document
+### Step 1: Read as the Intended Audience
 
-Read the full document. Understand it on its own terms before evaluating. Note the scale (Quick/Standard/Full) — calibrate expectations accordingly.
+Read the full document, but read it as the person who will actually receive it — not as an evaluator. Note the scale (Quick/Standard/Full) and calibrate expectations accordingly.
 
-### Step 2: Evaluate Against the 4 Pillars
+While reading, pay attention to your own experience:
+- At what point did you understand the core idea?
+- Where did your attention drift?
+- What questions came up that the document didn't answer?
+- Was there a natural stopping point, or did you have to read everything to get the picture?
 
-For each pillar, assess the document and note gaps:
+### Step 2: Identify the Audience and Assess Structure
 
-#### Pillar 1: Problem Clarity
-- Is the problem stated clearly without jumping to the solution?
-- Do we know WHO experiences this problem?
-- Is there a current-state description — what exists today?
-- Would a stranger understand what problem this solves?
+Before checking content, ask the structural question: **does this document serve the person reading it?**
 
-#### Pillar 2: Trade-off Visibility
-- Are alternatives listed — including "do nothing"?
-- For each rejected alternative, do we know WHY it was rejected?
-- Are non-goals stated — things deliberately excluded?
-- Are the costs of the chosen approach acknowledged, not just the benefits?
+- **Who is the primary reader?** A decision-maker, a peer reviewer, an implementer, a future maintainer?
+- **What does that reader need to decide or understand?** Sign off on an approach? Understand trade-offs? Know where to start coding?
+- **Does the document structure match that need?** Is the most important information early? Can the reader stop at a reasonable point and still have what they need?
+- **If the document serves multiple audiences**, are they separated with clear boundaries? A reviewer shouldn't have to read implementation details. An implementer shouldn't have to re-derive the design from scattered hints.
 
-#### Pillar 3: Feedback Loop
-- Has this been reviewed, or is it a first draft?
-- Are there open questions that need answers?
-- Is decision authority clear — who decides?
-- Is there a path to resolution for outstanding concerns?
+The strongest signal of an author-structured document: it's thorough but exhausting. Everything is there, nothing is foregrounded.
 
-#### Pillar 4: Organizational Memory
-- Would a new team member understand WHY these decisions were made?
-- Is context captured — the forces at play, not just the conclusion?
-- Are key decisions logged with rationale and date?
-- Will this document still make sense in 6 months?
+### Step 3: Check Content Against the 4 Pillars
+
+Now evaluate content completeness. Use the pillars as a lens, not a checklist — not every pillar demands a section, and a document can satisfy a pillar without naming it.
+
+**Problem Clarity** — Is the problem stated without jumping to the solution? Would someone outside the team understand what this solves?
+
+**Trade-off Visibility** — Are alternatives shown, including "do nothing"? For each rejected alternative, do we know why? Are costs of the chosen approach acknowledged?
+
+**Feedback Loop** — Are there open questions that need answers? Is decision authority clear?
+
+**Organizational Memory** — Would a new team member understand why these decisions were made? Will this still make sense in 6 months?
 
 #### Rendering Quality (via OutputQuality.md)
 
 Read `../OutputQuality.md` and evaluate:
 - Does each section use the correct format for its data shape?
-- Is the document dense? Can any paragraph be compressed to a sentence?
+- Is there unnecessary density? Can paragraphs be compressed?
 - Are there AI writing patterns? (banned vocabulary, structural patterns)
 - Do headers tell the story by themselves? (layer-cake test)
+- Is the macro-structure right? (narrative lead, audience separation, stopping points)
 
-### Step 3: Frame Feedback as "Yes, if..."
+### Step 4: Produce Feedback
 
-For each identified gap, reframe as a constructive contribution rather than a blocker:
+Lead with the reader-experience finding — that's what makes the document better to receive, not just more complete. Use "Yes, if" framing for gaps.
 
-**Instead of**: "This design doesn't consider scalability."
-**Use**: "Yes, if we add a section on how this scales beyond 10k users."
-
-**Instead of**: "The alternatives section is weak."
-**Use**: "Yes, if we document why we chose X over Y — specifically the trade-off on [concern]."
-
-**Instead of**: "Who decided this?"
-**Use**: "Yes, if we clarify decision authority — who has final say on the API contract?"
-
-The "Yes, if" frame assumes the design is moving forward and asks what it needs to be ready. This removes blocking dynamics and makes review collaborative.
-
-### Step 4: Produce Structured Feedback
-
-**Output using this format:**
+**Output format:**
 
 ```markdown
 ## Design Review: [Design Title]
 
 **Reviewed by**: [name/agent]  |  **Date**: [date]
 
-### Summary Assessment
-[1-2 sentences: overall impression and readiness level]
+### Reader Experience
+[2-3 sentences: How does this document read? Does the structure serve the audience? Where does attention drift? What's the core idea, and how quickly does the reader reach it?]
 
-### Pillar Assessment
+### Content Assessment
 
-| Pillar | Status | Key Gap |
-|--------|--------|---------|
-| Problem Clarity | Strong / Adequate / Needs Work | [Brief note] |
-| Trade-off Visibility | Strong / Adequate / Needs Work | [Brief note] |
-| Feedback Loop | Strong / Adequate / Needs Work | [Brief note] |
-| Organizational Memory | Strong / Adequate / Needs Work | [Brief note] |
-| Rendering Quality | Strong / Adequate / Needs Work | [Brief note] |
+| Pillar | Status | Note |
+|--------|--------|------|
+| Problem Clarity | Strong / Adequate / Gaps | [Brief note] |
+| Trade-off Visibility | Strong / Adequate / Gaps | [Brief note] |
+| Feedback Loop | Strong / Adequate / Gaps | [Brief note] |
+| Organizational Memory | Strong / Adequate / Gaps | [Brief note] |
 
 ### Feedback (Yes, if...)
 
-1. **Yes, if** [condition 1] — [why this matters]
-2. **Yes, if** [condition 2] — [why this matters]
-3. **Yes, if** [condition 3] — [why this matters]
+1. **Yes, if** [condition] — [why this matters]
+2. **Yes, if** [condition] — [why this matters]
 
 ### Strengths
 - [What the design does well — reinforce good patterns]
-
-### Questions for the Author
-- [Clarifying questions that would strengthen the design]
 ```
+
+The "Yes, if" frame assumes the design is moving forward and asks what it needs to be ready. This removes blocking dynamics and makes review collaborative.
 
 ---
 
 ## Calibration by Scale
 
-- **Quick (ADR)**: Evaluate only Context and Alternatives. Don't penalize for missing sections that don't apply.
-- **Standard**: All 4 pillars, but expectations are moderate. A Standard design doesn't need a review process section.
-- **Full**: Comprehensive evaluation against all 4 pillars. Expect thorough alternatives, clear authority, and a review plan.
+- **Quick (ADR)**: Focus on reader experience and alternatives. Don't penalize for missing sections.
+- **Standard**: Reader experience + all 4 pillars at moderate expectations. A Standard design doesn't need a review process section.
+- **Full**: Reader experience + all 4 pillars at full depth. Expect thorough alternatives, clear authority, and a review plan.
 
 ---
 
 ## Integration Notes
 
-- **Load `Principles.md`** when you need the 8 patterns for deeper grounding during evaluation
+- **Load `Principles.md`** when you need the 9 patterns for deeper grounding during evaluation — especially Pattern 9 (Structure for the Reader) for structural feedback
 - After review, the author may use `CreateDesign` to revise, or `RecordDecision` to capture individual decisions surfaced during review

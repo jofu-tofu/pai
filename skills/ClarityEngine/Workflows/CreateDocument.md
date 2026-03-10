@@ -4,7 +4,7 @@
 
 ## Scope
 
-**Best fit for:** New documents or presentations where content strategy, format selection, and narrative structure are all needed. Handles all creation paths through a unified pipeline.
+**Best fit for:** New documents or presentations where content strategy, format selection, and information ordering are all needed. Handles all creation paths through a unified pipeline.
 **Route to:** `RepurposeDocument` for converting an existing document between formats. `ReviewDocument` for quality-checking an existing document. For graphic design services, proprietary vendor templates, or deep background research, use dedicated skills instead.
 
 ## Reference Material
@@ -24,7 +24,9 @@ Create a document or presentation from idea to draft by building a philosophy-dr
 Collect or infer:
 - **Topic**: what is this document about
 - **Audience**: who will read it (role, expertise level)
+- **Audience exposure**: `internal`, `cross-functional`, `partner`, or `customer` (default: infer from audience and venue)
 - **Outcome**: what decision or understanding should the reader have after
+- **Artifact intent**: `inform`, `explain`, `review`, or `decide` (default: infer from the user ask)
 - **Depth**: `overview`, `standard`, or `deep-dive` (default: `standard`)
 - **Format preference**: `html`, `ppt`, or `auto` (default: `auto`)
 
@@ -44,7 +46,7 @@ If required inputs are missing, ask concise questions before proceeding.
 
 ### Step 3: Load Philosophy
 
-Read `../Philosophy.md`. Apply the five comprehension principles to all subsequent content decisions. If content type is `codebase-analysis`, also load the Codebase Analysis Addendum from Philosophy.md.
+Read `../Philosophy.md`. Apply the five comprehension principles to all subsequent content decisions. If `audience_exposure` is `partner` or `customer`, or `artifact_intent` is `review` or `decide`, also apply the Audience and Review Addendum from Philosophy.md. If content type is `codebase-analysis`, also load the Codebase Analysis Addendum from Philosophy.md.
 
 ### Step 4: Build Document Brief
 
@@ -54,13 +56,17 @@ Create a format-neutral brief:
 |-------|----------|-------------|
 | `topic` | yes | What is this document about |
 | `audience` | yes | Who will read it (role, expertise level) |
+| `audience_exposure` | yes | One of: `internal`, `cross-functional`, `partner`, `customer` |
 | `outcome` | yes | What decision or understanding should the reader have after |
+| `artifact_intent` | yes | One of: `inform`, `explain`, `review`, `decide` |
 | `content_type` | yes | One of: `general`, `codebase-analysis`, `technical-writeup` |
 | `key_takeaway` | yes | The single most important thing the reader should remember |
-| `narrative_arc` | yes | Ordered list of sections with one-line summaries |
+| `information_order` | yes | Ordered list of sections in descending reader value with one-line summaries |
 | `evidence_needs` | no | What data, code, or sources need to be gathered |
 | `format` | no | If user specified a format, record it here; otherwise blank |
 | `depth` | no | `overview`, `standard`, or `deep-dive` (default: `standard`) |
+
+For review/decision artifacts, default the `information_order` to the inverted pyramid: lead with the point, follow with evidence, and push background later.
 
 ### Step 5: Run Research When Needed
 

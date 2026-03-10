@@ -58,13 +58,45 @@ Write half as much. Then cut again.
 
 - **Eliminate Non-Data-Ink** — Remove hedging ("it's worth noting that"), throat-clearing ("before we dive in"), meta-commentary ("as mentioned above"), and filler transitions ("with that said"). These add tokens without adding information.
 
+- **Name Your Rules** — When a document introduces behavioral rules, give each one a short name ("Drop rule", "Merge rule"). Named rules can be referenced in tables, edge cases, and discussions without restating the definition. Unnamed rules force readers to re-derive meaning from context every time.
+
+- **One Concept, One Name** — If two terms describe the same concept, pick one and drop the other. Competing vocabulary (e.g., a boolean `isActive` alongside a `status` enum that already encodes activeness) creates the illusion of two distinct ideas and forces readers to reconcile them. Derived aliases don't add information — they add confusion.
+
 ---
 
-## 3. Anti-AI Writing Patterns
+## 3. Macro-Structure
+
+Format selection (section 1) and density (section 2) operate at the section and sentence level. Macro-structure operates at the document level — how information flows from start to finish.
+
+- **Lead with narrative** — Before any tables or details, give the reader 3-5 sentences that tell the whole story. A reader who stops after this paragraph should understand the approach, the key trade-off, and why it's safe.
+
+- **Organize by reader need, not by author discovery** — The order you figured things out is rarely the order someone else needs to receive them. Put the "what and why" before the "how." Put decisions before mechanisms.
+
+- **Create stopping points** — If a document serves multiple audiences, use an explicit boundary (a horizontal rule, a heading like "Implementation Reference") so each reader knows where they can stop. A reviewer shouldn't have to read implementation details to evaluate the design.
+
+- **Trust your structure** — If the heading communicates the boundary, don't also narrate it. "Reviewers can stop here" above an "Implementation Reference" section says the same thing twice. Let section titles do their job.
+
+- **Reduce duplication across sections** — When the same fact appears in a summary, a detail section, and an impact table, it creates maintenance burden and gives the reader a sense of repetition without progress. State facts once in their canonical section. Summaries reference; they don't restate.
+
+---
+
+## 4. Vocabulary Clarity
+
+### Jargon Check
+
+Prefer plain terms over specialized jargon when the simpler word conveys the same meaning. If the author has to pause and recall what a term means, readers will too. Test: could you explain this to a teammate outside your sub-domain without defining the term first? If not, use the simpler word.
+
+| Jargon | Plainer Alternative |
+|--------|-------------------|
+| sentinel value | marker, reserved value |
+| idempotent | safe to repeat, re-runnable |
+| reify | make concrete, materialize |
+
+This is not a ban on technical terms — precision matters. Use domain terms when they carry meaning that plain words don't. The test is whether the jargon adds precision or just adds distance between the reader and the idea.
+
+### Anti-AI Vocabulary
 
 AI-generated text has recognizable tells. Eliminate them.
-
-### Banned Vocabulary
 
 | Remove | Use Instead |
 |--------|-------------|
@@ -101,7 +133,7 @@ If it sounds like a press release, rewrite it. Design documents inform decisions
 
 ---
 
-## Override Policy
+## 5. Override Policy
 
 Format and banned-term rules are defaults, not absolutes. An agent may deviate with a brief inline justification when the data shape genuinely doesn't fit the default format. The justification must reference data shape, not preference.
 

@@ -61,13 +61,14 @@ User: "Create an html document analyzing this codebase's architecture"
 -> Auto-chains ReadabilityGate with general + codebase-analysis checkpoints
 ```
 
-**Example 2: Professional board deck**
+**Example 2: Customer-facing review deck**
 ```
-User: "Create a powerpoint deck for executive review"
+User: "Create a customer-facing powerpoint to review this workflow change"
 -> Invokes CreateDocument workflow
--> Builds Document Brief (format-neutral, philosophy-driven)
--> Selects PPT format via FormatAdapters
--> Returns professional PPTX with speaker notes
+-> Builds Document Brief with `audience_exposure=customer` and `artifact_intent=review`
+-> Applies the Audience and Review Addendum from Philosophy.md
+-> Uses inverted-pyramid ordering, plain-language labels, screenshot-led evidence, and a clear confirmation ask
+-> Returns customer-ready PPTX with speaker notes
 ```
 
 **Example 3: Readability check**

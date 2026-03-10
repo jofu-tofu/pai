@@ -10,7 +10,7 @@
 ## Reference Material
 
 - **Output Quality:** `../OutputQuality.md` — Format selection, density, anti-AI patterns. **Read before producing any output in Step 4.**
-- **Design Principles:** `../Principles.md` — 8 research-backed content patterns.
+- **Design Principles:** `../Principles.md` — 9 research-backed content patterns.
 
 ---
 
@@ -45,6 +45,9 @@ The most important phase. Resist the urge to jump to solutions. The goal is to a
 3. **What's the current state?** What exists today? What happens if we do nothing?
 4. **What's the appetite?** How much time/effort do we WANT to spend? (This is a constraint, not an estimate.)
 5. **Who decides?** Who has final decision authority? Who needs to be consulted?
+6. **Who will read this document?** A reviewer signing off, a peer giving feedback, an implementer, a future maintainer? If multiple audiences, what does each need?
+
+The answer to question 6 shapes *how* the document is structured — not just what goes in it. A document for a reviewer should lead with the approach and trade-offs. A document for an implementer should lead with the technical details. A document for both needs explicit boundaries so each reader knows where to stop. (See Principles.md, Pattern 9.)
 
 **Synthesize into a Problem Statement** using the Design Thinking POV format:
 

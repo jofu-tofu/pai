@@ -102,10 +102,17 @@ Mermaid 11.12.3 parser: avoid `$` in labels, escaped `\n` in messages, and punct
 ### Slide Budget
 
 Define before rendering:
-- Slide list and narrative intent per slide
+- Slide list and information intent per slide
 - Per-slide content limits
 - Visual hierarchy and chart strategy
 - Speaker notes requirements
+
+### Audience-Relative PPT Rendering
+
+- Match the deck's language to the reader's world. For partner/customer audiences, translate internal taxonomy into audience-safe terms.
+- Apply inverted-pyramid ordering when clarity matters most: lead with the point or change, follow with evidence, and push background or appendix material later. For review decks, that usually means problem/change first, evidence second, decision or feedback ask last.
+- When product behavior is the proof, screenshots are primary evidence. Use prose to frame the visual, not to narrate what the screenshot already shows.
+- Keep main slides lighter than speaker notes or appendix. If the reader can infer the point from the visual, do not repeat it at length on the slide.
 
 ### Build Issue Fallback
 

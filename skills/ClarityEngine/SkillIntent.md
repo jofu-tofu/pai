@@ -8,10 +8,11 @@
 ## First Principles
 
 1. **Comprehension Over Production**: AI output is cheap; human review time is the bottleneck. Optimize for the reader, not the writer.
-2. **Philosophy Before Format**: The five comprehension principles drive all output; format (HTML, PPT) is a late rendering choice.
-3. **Clarity Over Brevity**: Prefer omitting sections over writing vague content. Every sentence must add specific information.
-4. **Skip-Friendly by Design**: Every section works independently. No sequential dependencies between sections.
-5. **Extensible Adapters**: New formats add rendering instructions to FormatAdapters.md. They never add new philosophy.
+2. **Inverted Pyramid of Information**: Order content by reader value, not author chronology — point first, support second, background last.
+3. **Philosophy Before Format**: The comprehension principles drive all output; format (HTML, PPT) is a late rendering choice.
+4. **Clarity Over Brevity**: Prefer omitting sections over writing vague content. Every sentence must add specific information.
+5. **Section-Level Restartability**: Each section should restart a smaller version of the same information order so readers can enter anywhere without getting lost.
+6. **Extensible Adapters**: New formats add rendering instructions to FormatAdapters.md. They never add new philosophy.
 
 ---
 
@@ -28,6 +29,7 @@ Additionally, Philosophy.md serves as a passive shared resource — any PAI skil
 | Decision | Chosen Approach | Alternatives Rejected | Why |
 |---|---|---|---|
 | Architecture axis | Philosophy-first (principles drive output) | Format-first (HTML vs PPT as primary axis) | Format is a rendering choice, not a design driver. Philosophy-first ensures consistent comprehension quality across formats. |
+| Information ordering | Inverted pyramid as the umbrella frame | Narrative-first sequencing | Readers need the main point first. Supporting detail and background should arrive in descending reader value, not author chronology. |
 | Workflow structure | Unified CreateDocument with late format selection | Three separate creation workflows (CreatePresentation, CreateHtml, CreatePpt) | One workflow with format as a late decision matches "Philosophy Before Format." |
 | Rules handling | 54 rules distilled to 15 principle-mapped checkpoints | Keep rules as appendix; Remove entirely | Appendix creates two sources of truth. Removing loses testability. Distillation preserves testability under philosophical framing. |
 | Comprehension layer scope | Passive shared resource (Philosophy.md) | Active convention with enforced Read instruction | Passive avoids coupling. Skills discover and opt in voluntarily. Escalation path exists if passive proves insufficient. |

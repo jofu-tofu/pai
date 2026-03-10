@@ -6,7 +6,7 @@
 
 **Best fit for:** Running a readability and quality audit on a generated document or presentation, returning an advisory PASS/FAIL verdict with severity-ranked findings.
 **Auto-chained by:** CreateDocument, RepurposeDocument.
-**Route to:** `ReviewDocument` for a full narrative + readability + format-specific audit. This workflow focuses on Readability Contract checkpoints only.
+**Route to:** `ReviewDocument` for a full information-order + readability + format-specific audit. This workflow focuses on Readability Contract checkpoints only.
 
 ## Reference Material
 

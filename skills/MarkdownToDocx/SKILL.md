@@ -1,6 +1,6 @@
 ---
 name: MarkdownToDocx
-description: Convert Markdown content to DOCX with reliable defaults, table-visibility hardening, and automatic open-after-conversion behavior. USE WHEN user wants to convert markdown to docx, md to word, generate a .docx from markdown, batch-convert markdown files, fix docx table visibility, or open the generated docx automatically.
+description: Convert Markdown content to DOCX with reliable defaults, Mermaid diagram rendering, table-visibility hardening, and automatic open-after-conversion behavior. USE WHEN user wants to convert markdown to docx, md to word, generate a .docx from markdown, batch-convert markdown files, fix docx table visibility, or open the generated docx automatically.
 compatibility: Designed for Claude Code and Devin (or similar agent products). Requires pandoc.
 metadata:
   author: pai
@@ -9,7 +9,7 @@ metadata:
 
 # MarkdownToDocx
 
-Convert Markdown documents into Word `.docx` output using `pandoc`, then enforce visible table formatting and open outputs for immediate review.
+Convert Markdown documents into Word `.docx` output using `pandoc`, with automatic Mermaid diagram rendering to images, visible table formatting, and auto-open for immediate review.
 
 ## Workflow Routing
 
@@ -25,7 +25,8 @@ When a workflow is matched, **read its file and follow the steps within it.**
 ```
 User: "Convert notes.md to docx."
 -> Invokes ConvertMarkdownToDocx workflow
--> Runs pandoc conversion command with explicit output path
+-> Detects mermaid blocks, renders them to PNG via Playwright
+-> Runs pandoc with image references for rendered diagrams
 -> Applies table visibility post-processing on the generated .docx
 -> Opens the generated .docx and returns verification status
 ```
