@@ -93,3 +93,9 @@ All tests pass against existing code.
 ## Output
 
 A runnable test file in the project's test framework that serves as a behavioral contract for the existing code. This is the safety net for refactoring.
+
+## What Comes After Green
+
+The Green workflow ends at passing tests. The common next step is refactoring — and a powerful refactoring pattern for testability is **isolating side effects**: extracting pure decision logic out of functions that mix logic with I/O. When core logic is pure (data in, result out), future tests for that logic need no mocks and are trivially fast and reliable. The Green characterization tests protect you while you make that separation.
+
+See: `TestDriven/Rules/SideEffectIsolation.md` for the Functional Core / Imperative Shell pattern.

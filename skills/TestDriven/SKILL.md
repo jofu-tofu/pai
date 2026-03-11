@@ -1,6 +1,6 @@
 ---
 name: TestDriven
-description: Test-driven development philosophy and smart testing methodology. USE WHEN writing tests OR designing test strategy OR refactoring code with tests OR reviewing test quality OR discussing TDD OR characterization testing OR catching regressions OR tests keep breaking after refactoring OR AI refactored code OR AI generated tests OR testing async code OR testing microservices OR testing LLM output OR mutation testing OR stub vs mock OR contract testing. Contains 10 core principles from authoritative sources for writing tests that survive refactoring.
+description: Test-driven development philosophy and smart testing methodology. USE WHEN writing tests OR designing test strategy OR refactoring code with tests OR reviewing test quality OR discussing TDD OR characterization testing OR catching regressions OR tests keep breaking after refactoring OR AI refactored code OR AI generated tests OR testing async code OR testing microservices OR testing LLM output OR mutation testing OR stub vs mock OR contract testing OR too many mocks OR isolate side effects OR code hard to test OR functional core imperative shell. Contains 11 core principles from authoritative sources for writing tests that survive refactoring.
 compatibility: Designed for Claude Code and Devin (or similar agent products)
 metadata:
   author: pai
@@ -9,13 +9,15 @@ metadata:
 
 # TestDriven
 
-10 core principles from authoritative sources for writing tests that **survive refactoring and catch real regressions**.
+11 core principles from authoritative sources for writing tests that **survive refactoring and catch real regressions**.
 
 **Core insight:** If you have to change your tests to make them pass after a legitimate refactoring, your tests are testing the wrong thing.
 
 ## Skill Type: Reference + Workflow
 
 This skill provides **principles for test quality** plus **four actionable workflows** for common testing scenarios.
+
+**Core principle:** Code that is hard to test is poorly designed. Separate pure logic from side effects, and testing becomes trivial.
 
 ---
 
@@ -52,6 +54,7 @@ When a workflow is matched, **read its file and follow the steps within it.**
 | 8 | **Mutation Testing** | Richard Lipton (1971) / PiTest / Stryker | If I break this line, does a test fail? |
 | 9 | **Property-Based Testing** | John Hughes, QuickCheck (1999) | What must be true for ALL valid inputs, not just examples I thought of? |
 | 10 | **Test Data Builders** | Nat Pryce / GOOS (2009) | Do my tests only override what matters for each specific case? |
+| 11 | **Side-Effect Isolation** | Gary Bernhardt (2012) / Michael Feathers (2004) / Robert C. Martin (2017) | Could I test this function's logic without any mocks? |
 
 ---
 
@@ -72,12 +75,16 @@ Is this legacy/unfamiliar code?
                 ├─ YES → Behavior Over Implementation (Rules/BehaviorOverImplementation.md)
                 │        Tests are coupled to implementation
                 │
-                └─ NO → Is test suite slow/flaky?
-                        ├─ YES → Test Pyramid (Rules/TestPyramid.md)
-                        │        Likely ice cream cone anti-pattern
+                └─ NO → Do tests require many mocks?
+                        ├─ YES → Side-Effect Isolation (Rules/SideEffectIsolation.md)
+                        │        Code mixes logic with side effects
                         │
-                        └─ NO → FIRST (Rules/FIRST.md)
-                                Evaluate individual test quality
+                        └─ NO → Is test suite slow/flaky?
+                                ├─ YES → Test Pyramid (Rules/TestPyramid.md)
+                                │        Likely ice cream cone anti-pattern
+                                │
+                                └─ NO → FIRST (Rules/FIRST.md)
+                                        Evaluate individual test quality
 ```
 
 ---
@@ -186,6 +193,7 @@ Each principle file in `Rules/` includes:
 | `Rules/MutationTesting.md` | Does your test suite catch bugs? | Evaluating test suite quality |
 | `Rules/PropertyBasedTesting.md` | Properties that hold for all inputs | Testing algorithms and pure functions |
 | `Rules/TestDataBuilders.md` | Resilient test setup patterns | Reducing test maintenance cost |
+| `Rules/SideEffectIsolation.md` | Separate pure logic from side effects | Tests require too many mocks |
 | `Rules/AntiPatterns.md` | 7 common testing anti-patterns | Diagnosing test quality problems |
 
 ---
@@ -221,4 +229,6 @@ TestDriven provides testing philosophy that complements language-specific coding
 | QuickCheck | John Hughes | 1999 | Property-based testing |
 | Growing Object-Oriented Software (GOOS) | Pryce & Freeman | 2009 | Test Data Builders, mock design |
 | Consumer-Driven Contracts | Ian Robinson / Martin Fowler | 2011 | Contract testing approach |
+| Boundaries | Gary Bernhardt | 2012 | Functional Core, Imperative Shell |
+| Clean Architecture | Robert C. Martin | 2017 | Dependency rule, side effects at edges |
 | Fault Diagnosis of Computer Programs | Richard Lipton | 1971 | Mutation testing theory |

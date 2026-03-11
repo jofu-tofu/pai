@@ -133,3 +133,38 @@ When behavior depends on time, randomness, I/O, or external state:
 1. Does this test call through the public API, or does it reach into internals?
 2. If I rewrote the implementation from scratch, would this test still pass?
 3. Does the test name describe behavior a user would recognize?
+
+---
+
+## Design Signal: When Testing Is Hard
+
+If testing a function requires elaborate mock setups, the problem is usually the code, not the test. Functions that mix decisions with side effects force you to mock everything just to reach the logic.
+
+**The pattern:** Extract decisions into pure functions (data in, result out, no I/O). Pure functions have clear IO contracts by definition — they are trivially testable without any mocks.
+
+```pseudocode
+// HARD TO TEST: logic tangled with I/O
+function process_refund(order_id):
+    order = db.get(order_id)                    // side effect
+    if order.total > 50 and order.age_days < 30:  // decision
+        refund = order.total * 0.9                // decision
+    else:
+        refund = 0                                // decision
+    db.save_refund(order_id, refund)             // side effect
+    return refund
+
+// EASY TO TEST: decision extracted as pure function
+function calculate_refund(total, age_days, threshold=50, window=30, rate=0.9):
+    if total > threshold and age_days < window:
+        return total * rate
+    return 0
+
+// Tests are trivial — no mocks, no setup
+test "full refund for recent high-value order":
+    assert calculate_refund(100, 5) == 90
+
+test "no refund for old order":
+    assert calculate_refund(100, 60) == 0
+```
+
+When you encounter a function that is hard to test against its IO contract, ask: "What decision is this function making, and can I extract that decision as a pure function?"

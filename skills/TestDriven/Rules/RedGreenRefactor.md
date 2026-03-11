@@ -125,6 +125,11 @@ function calculate_discount(order):
     return order.total * (base_discount + premium_bonus)
 ```
 
+**Key refactoring goals:**
+- **Isolate side effects.** Push I/O to the edges and keep core logic as pure functions. If a function both decides and does, extract the decision into a pure function that takes data and returns a result. The shell coordinates I/O; the core computes. Pure functions are trivially testable — no mocks needed. (See `Rules/SideEffectIsolation.md`)
+- **Remove duplication.** Extract shared logic, apply DRY within the tested unit.
+- **Clarify intent.** Rename, restructure, simplify — guided by the tests you just wrote.
+
 ---
 
 ## The Goal: Clean Code That Works

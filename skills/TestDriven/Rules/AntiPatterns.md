@@ -113,6 +113,8 @@ See also: `Workflows/AsyncTesting.md` — async Liar tests
 
 **Problem:** Tests pass even when the real integration is broken. Mocks lie (see: Don't Mock What You Don't Own below). Tests are coupled to implementation details, not behavior.
 
+**Root cause:** The code under test mixes business logic with side effects. When logic and I/O live in the same function, the only way to test the logic is to mock all the I/O — producing tests that verify wiring instead of behavior.
+
 ```pseudocode
 // BAD: Testing the wiring, not the behavior
 function test_create_user():
@@ -140,6 +142,9 @@ function test_create_user_sends_welcome_email():
     assert fake_email.last_recipient() == "alice@example.com"
 ```
 
+**Fix:** If you need 3+ mocks to test one function, the function is doing too much. Extract the decision logic into a pure function (inputs in, result out, no I/O). Test the pure function without mocks. Integration-test the thin shell that coordinates I/O.
+
+See: `Rules/SideEffectIsolation.md` — the structural fix for over-mocking
 See: `Rules/BehaviorOverImplementation.md` (Mock at Boundaries section)
 
 ---
