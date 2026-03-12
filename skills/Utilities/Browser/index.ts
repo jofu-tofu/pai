@@ -97,14 +97,23 @@ export class PlaywrightBrowser {
   async launch(options?: LaunchOptions): Promise<void> {
     const browserType = options?.browser || 'chromium'
     const launcher = browserType === 'firefox' ? firefox : browserType === 'webkit' ? webkit : chromium
+    const isHeaded = !(options?.headless ?? false)
+    const viewport = options?.viewport || { width: 1280, height: 720 }
+
+    // In headed mode, size the browser window to fit the viewport.
+    // Extra height accounts for Chromium toolbar/tab bar (~150px).
+    const chromiumWindowArgs = isHeaded && browserType === 'chromium'
+      ? [`--window-size=${viewport.width},${viewport.height + 150}`]
+      : []
 
     this.browser = await launcher.launch({
       headless: options?.headless ?? false,
+      ...(chromiumWindowArgs.length ? { args: chromiumWindowArgs } : {}),
       ...(options?.executablePath ? { executablePath: options.executablePath } : {})
     })
 
     this.context = await this.browser.newContext({
-      viewport: options?.viewport || { width: 1280, height: 720 },
+      viewport,
       userAgent: options?.userAgent
     })
 
