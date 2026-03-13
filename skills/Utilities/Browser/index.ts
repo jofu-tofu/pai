@@ -24,6 +24,9 @@ export interface LaunchOptions {
   executablePath?: string
 }
 
+/** Measured delta between OS window size and CSS viewport (browser chrome). */
+interface ChromeOffset { dx: number; dy: number }
+
 export interface NavigateOptions {
   timeout?: number
   waitUntil?: 'load' | 'domcontentloaded' | 'networkidle' | 'commit'
@@ -90,6 +93,9 @@ export class PlaywrightBrowser {
   private pendingDialog: DialogInfo | null = null
   private autoHandleDialogs: boolean = false
   private dialogResponse: string | boolean = true
+  /** Measured browser-chrome offset (toolbar, borders) for headed mode. */
+  private chromeOffset: ChromeOffset | null = null
+  private isHeadedMode: boolean = false
 
   /**
    * Launch browser instance
@@ -99,16 +105,10 @@ export class PlaywrightBrowser {
     const launcher = browserType === 'firefox' ? firefox : browserType === 'webkit' ? webkit : chromium
     const isHeaded = !(options?.headless ?? false)
     const viewport = options?.viewport || { width: 1280, height: 720 }
-
-    // In headed mode, size the browser window to fit the viewport.
-    // Extra height accounts for Chromium toolbar/tab bar (~150px).
-    const chromiumWindowArgs = isHeaded && browserType === 'chromium'
-      ? [`--window-size=${viewport.width},${viewport.height + 150}`]
-      : []
+    this.isHeadedMode = isHeaded
 
     this.browser = await launcher.launch({
       headless: options?.headless ?? false,
-      ...(chromiumWindowArgs.length ? { args: chromiumWindowArgs } : {}),
       ...(options?.executablePath ? { executablePath: options.executablePath } : {})
     })
 
@@ -119,8 +119,74 @@ export class PlaywrightBrowser {
 
     this.page = await this.context.newPage()
 
+    // In headed mode, dynamically measure the browser chrome (toolbar,
+    // borders) and resize the OS window so the content area exactly matches
+    // the requested viewport.
+    if (isHeaded) {
+      await this.fitWindowToViewport(viewport.width, viewport.height)
+    }
+
     // Attach all event listeners
     this.attachPageListeners(this.page)
+  }
+
+  /**
+   * Measure browser chrome and resize OS window so content area = viewport.
+   *
+   * Uses CDP (Chrome DevTools Protocol) when available (Chromium) to query
+   * the actual outer/inner window dimensions and calculate the exact offset,
+   * then resizes the window accordingly.  Falls back gracefully for
+   * non-Chromium browsers.
+   */
+  private async fitWindowToViewport(vpWidth: number, vpHeight: number): Promise<void> {
+    const page = this.page
+    if (!page) return
+
+    try {
+      // Measure innerWidth/innerHeight vs outerWidth/outerHeight via JS.
+      // The difference is the browser chrome (toolbar, borders, etc.).
+      const metrics = await page.evaluate(() => ({
+        innerW: window.innerWidth,
+        innerH: window.innerHeight,
+        outerW: window.outerWidth,
+        outerH: window.outerHeight,
+      }))
+
+      const dx = metrics.outerW - metrics.innerW
+      const dy = metrics.outerH - metrics.innerH
+      this.chromeOffset = { dx, dy }
+
+      // Use CDP to resize window precisely (Chromium only).
+      const cdp = await this.getCDPSession()
+      if (cdp) {
+        // Get the current window bounds to preserve position.
+        const { windowId } = await cdp.send('Browser.getWindowForTarget') as { windowId: number }
+        await cdp.send('Browser.setWindowBounds', {
+          windowId,
+          bounds: {
+            width: vpWidth + dx,
+            height: vpHeight + dy,
+          }
+        })
+      }
+    } catch {
+      // Non-Chromium or CDP unavailable — ignore; viewport is still correct.
+    }
+  }
+
+  /**
+   * Get a Chrome DevTools Protocol session (Chromium only).
+   * Returns null for Firefox / WebKit.
+   */
+  private async getCDPSession() {
+    try {
+      const ctx = this.context
+      if (!ctx) return null
+      // newCDPSession is only available on Chromium contexts
+      return await (ctx as any).newCDPSession(this.page)
+    } catch {
+      return null
+    }
   }
 
   /**
@@ -444,11 +510,16 @@ export class PlaywrightBrowser {
   // ============================================
 
   /**
-   * Resize viewport
+   * Resize viewport (and OS window in headed mode)
    */
   async resize(width: number, height: number): Promise<void> {
     const page = this.ensurePage()
     await page.setViewportSize({ width, height })
+
+    // Keep OS window in sync so content isn't clipped.
+    if (this.isHeadedMode) {
+      await this.fitWindowToViewport(width, height)
+    }
   }
 
   /**
