@@ -37,10 +37,15 @@ import { writeFileCompat, fileExists, removeFile, serve, isWSL, findWindowsChrom
 const CONFIG = {
   port: parseInt(process.env.BROWSER_PORT || '9222'),
   headless: process.env.BROWSER_HEADLESS === 'true',  // false by default (visible)
-  viewport: {
-    width: parseInt(process.env.BROWSER_WIDTH || '1920'),
-    height: parseInt(process.env.BROWSER_HEIGHT || '1080')
-  },
+  // viewport: null means "match actual window size" — no viewport override.
+  // This prevents the viewport from exceeding the OS window, which would clip
+  // content and break scrolling (especially when the app uses overflow:clip on body).
+  viewport: (process.env.BROWSER_WIDTH && process.env.BROWSER_HEIGHT)
+    ? {
+        width: parseInt(process.env.BROWSER_WIDTH),
+        height: parseInt(process.env.BROWSER_HEIGHT)
+      }
+    : null as { width: number; height: number } | null,
   stateFile: join(tmpdir(), 'browser-session.json'),
   idleTimeout: 30 * 60 * 1000 // 30 minutes
 }
@@ -136,7 +141,7 @@ const executablePath = process.env.BROWSER_EXECUTABLE || undefined
 console.log('Starting browser session...')
 console.log(`  Port: ${CONFIG.port}`)
 console.log(`  Headless: ${CONFIG.headless}`)
-console.log(`  Viewport: ${CONFIG.viewport.width}x${CONFIG.viewport.height}`)
+console.log(`  Viewport: ${CONFIG.viewport ? `${CONFIG.viewport.width}x${CONFIG.viewport.height}` : 'auto (matches window)'}`)
 console.log(`  Idle timeout: ${CONFIG.idleTimeout / 60000} minutes`)
 if (executablePath) console.log(`  Executable: ${executablePath}`)
 if (isWSL) console.log(`  WSL detected: using Linux Chromium (Windows Chrome requires mirrored networking)`)

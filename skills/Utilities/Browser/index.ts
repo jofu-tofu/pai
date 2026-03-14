@@ -19,7 +19,7 @@ export type BrowserType = 'chromium' | 'firefox' | 'webkit'
 export interface LaunchOptions {
   browser?: BrowserType
   headless?: boolean
-  viewport?: { width: number; height: number }
+  viewport?: { width: number; height: number } | null
   userAgent?: string
   executablePath?: string
 }
@@ -97,15 +97,22 @@ export class PlaywrightBrowser {
   async launch(options?: LaunchOptions): Promise<void> {
     const browserType = options?.browser || 'chromium'
     const launcher = browserType === 'firefox' ? firefox : browserType === 'webkit' ? webkit : chromium
-    const viewport = options?.viewport || { width: 1280, height: 720 }
+    // viewport: null means "use actual window size" (no viewport override).
+    // undefined means "use Playwright default (1280x720)".
+    const viewport = options?.viewport === null
+      ? null
+      : (options?.viewport || { width: 1280, height: 720 })
 
     this.browser = await launcher.launch({
       headless: options?.headless ?? false,
-      ...(options?.executablePath ? { executablePath: options.executablePath } : {})
+      ...(options?.executablePath ? { executablePath: options.executablePath } : {}),
+      // Request a large window; the OS will constrain to what fits on screen.
+      ...(viewport === null ? { args: ['--window-size=1920,1080'] } : {})
     })
 
-    // Playwright >= 1.53 correctly sizes the OS window to fit the viewport
-    // in headed mode (PR #36133).  Just pass the desired viewport directly.
+    // When viewport is null, Playwright disables consistent viewport emulation
+    // and the page uses the actual window content area. This means the user can
+    // scroll normally and the viewport never exceeds the visible window.
     this.context = await this.browser.newContext({
       viewport,
       userAgent: options?.userAgent

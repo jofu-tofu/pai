@@ -350,10 +350,10 @@ async function debugUrl(url: string): Promise<void> {
   // Navigate
   await sessionCommand('navigate', { url })
 
-  // Take screenshot - use cross-platform temp path
+  // Take screenshot (fullPage captures content below the fold)
   const timestamp = Date.now()
   const screenshotPath = join(tmpdir(), `browse-${timestamp}.png`)
-  await sessionCommand('screenshot', { path: screenshotPath })
+  await sessionCommand('screenshot', { path: screenshotPath, fullPage: true })
 
   // Get diagnostics and accessibility tree in parallel
   const [diag, a11yData] = await Promise.all([
