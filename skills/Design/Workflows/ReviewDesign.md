@@ -58,9 +58,37 @@ Read `../OutputQuality.md` and evaluate:
 - Do headers tell the story by themselves? (layer-cake test)
 - Is the macro-structure right? (narrative lead, audience separation, stopping points)
 
+#### Self-Claim Verification
+
+Extract what the design says about itself — its declared scope, self-imposed constraints, stated policies, and exclusions. Then check follow-through. A violation of a self-claim is a stronger finding than a missing best practice. If the design says "We will not support X" but the approach section includes X, that's a contradiction worth flagging.
+
+#### Claim Credibility Check
+
+Categorize each significant claim by strength and check evidence expectations:
+
+| Claim Type | Example | Expected Evidence |
+|-----------|---------|-------------------|
+| **Planning intent** | "We plan to migrate to X" | Rationale sufficient — no artifact needed |
+| **Design-level rule** | "All API endpoints require auth" | Referenced in approach section or constraints |
+| **Implemented-state assertion** | "The service handles 10K req/s" | Must trace to a benchmark, test, or measured data |
+
+Flag any implemented-state assertion that lacks traceable evidence. Planning intent with only rationale is fine.
+
+#### Visual Assessment
+
+For structural content (system boundaries, data flows, component relationships, state machines), check: would a diagram communicate this faster than prose? If yes and no diagram exists, note it as a gap. If a diagram exists, check that labels reference real identifiers, not abstractions like "Data Layer."
+
+#### Link Hygiene
+
+For any external references (URLs, doc links, ADR references):
+- Does the link have a purpose label? ("See RFC-42 for the auth decision" not just "See RFC-42")
+- Is the critical information from the link summarized in-doc? A reader shouldn't need to open an external link to understand the design.
+
 ### Step 4: Produce Feedback
 
 Lead with the reader-experience finding — that's what makes the document better to receive, not just more complete. Use "Yes, if" framing for gaps.
+
+**Before writing feedback, verify your own findings:** For each finding that references a specific file, section, or claim — confirm it actually exists in the document. Do not produce findings based on sections you assumed were there. This prevents hallucinated review feedback.
 
 **Output format:**
 
@@ -80,6 +108,13 @@ Lead with the reader-experience finding — that's what makes the document bette
 | Trade-off Visibility | Strong / Adequate / Gaps | [Brief note] |
 | Feedback Loop | Strong / Adequate / Gaps | [Brief note] |
 | Organizational Memory | Strong / Adequate / Gaps | [Brief note] |
+
+| Check | Status | Note |
+|-------|--------|------|
+| Self-Claim Follow-Through | OK / Contradictions | [Brief note] |
+| Claim Credibility | OK / Unsubstantiated | [Brief note] |
+| Visual Coverage | OK / Gaps | [Brief note] |
+| Link Hygiene | OK / Issues | [Brief note] |
 
 ### Feedback (Yes, if...)
 

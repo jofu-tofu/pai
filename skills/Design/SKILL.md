@@ -109,6 +109,10 @@ What this skill explicitly avoids:
 - **Missing the "Why Not"** — Designs that show what was chosen but not what was rejected. Alternatives Considered is not optional.
 - **Author-Ordered Structure** — Organizing the document by the order you figured things out, rather than by what the reader needs. The reader shouldn't have to do the work of figuring out what matters.
 - **Verbose Prose Where Tables Work** — Using paragraphs to describe what a table could show in half the space. If the data has items x attributes, use a table.
+- **Unfalsifiable Claims** — Sentences that cannot be wrong carry zero information. "This approach has several advantages" is true of every approach ever proposed. State the specific advantage with a number, or delete the sentence.
+- **Setup Paragraphs** — Opening a section by restating the heading in prose form. "In this section, we will discuss the security implications of..." → delete and start with the actual security finding.
+- **Circular Elaboration** — Saying the same thing multiple times in different words across a section. Each sentence sounds fine alone; together they make no progress. Keep the best phrasing, delete the rest.
+- **Completeness Over Signal** — Including information because it might be relevant rather than because the reader needs it. If four of five points are obvious, include only the one that isn't. Missing information is recoverable; wasted attention is not.
 
 ---
 

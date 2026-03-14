@@ -10,7 +10,7 @@
 
 ## Reference Material
 
-- `../Philosophy.md` — Readability Contract checkpoints (RC-1 through RC-15)
+- `../Philosophy.md` — Readability Contract checkpoints (RC-1 through RC-20)
 
 ## Purpose
 
@@ -37,6 +37,7 @@ All callers pass this stable interface:
   - **Blocker** — accessibility violations, missing document structure
   - **Major** — readability degradation, comprehension barriers
   - **Polish** — improvements that enhance but do not degrade
+- Note: Principle 6 (Density Over Completeness) checkpoints RC-16 through RC-20 are **Major** severity — they represent comprehension barriers caused by noise, not missing information.
 - Overall verdict: **FAIL** if any Blocker exists; **PASS** otherwise
 - Per-principle summary: `{principle}: {passed}/{total} checkpoints`
 
@@ -57,7 +58,7 @@ Accept the input interface contract fields:
 
 ### Step 2: Load Readability Contract
 
-Read `../Philosophy.md` and extract the Readability Contract (RC-1 through RC-15).
+Read `../Philosophy.md` and extract the Readability Contract (RC-1 through RC-20).
 
 If `content_type` is `codebase-analysis`, also load the Codebase Analysis Addendum from Philosophy.md.
 
@@ -72,6 +73,16 @@ For each applicable checkpoint:
 Interpret checkpoints contextually per format:
 - HTML: CSS properties and DOM structure apply directly
 - PPT: Map checkpoints to equivalent slide formatting properties (font size, contrast, spacing)
+
+#### Density Checkpoints (RC-16 through RC-20)
+
+These checkpoints specifically target AI-generated noise — content that sounds reasonable but adds no information:
+
+- **RC-16 (Falsifiability):** For each claim, ask: could this be wrong? Sentences that are true regardless of context carry zero information. Score FAIL if unfalsifiable sentences found.
+- **RC-17 (Prediction):** For each section's opening sentence, ask: is this predictable from the heading? Headings that merely get restated in prose are wasted space. Score FAIL if predictable openers found.
+- **RC-18 (State Once):** Scan for facts repeated across sections. Each fact belongs in one canonical section. Score FAIL if duplicates found.
+- **RC-19 (Hard Limits):** Check sentence length ≤ 25 words, paragraphs ≤ 6 sentences, lists ≤ 7 items. Score FAIL if any violation.
+- **RC-20 (Meta-Commentary):** Scan for banned phrases: "This section covers...", "As discussed above...", "It's worth noting that...", "Let's explore...", "Moving on to...", and similar. Score FAIL if found.
 
 ### Step 4: Classify and Rank Findings
 
@@ -90,3 +101,4 @@ Deliver:
 - **Severity-Ranked Findings:** Blockers first, then Major, then Polish
 - **Top 3 Actionable Fixes:** The three highest-impact changes to improve comprehension
 - **Checkpoint Coverage:** Total checkpoints checked vs. total applicable
+- **Density Score:** Number of sentences passing all Signal Tests / total sentences (target: ≥ 0.90)

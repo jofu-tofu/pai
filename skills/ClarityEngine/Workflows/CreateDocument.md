@@ -29,6 +29,7 @@ Collect or infer:
 - **Artifact intent**: `inform`, `explain`, `review`, or `decide` (default: infer from the user ask)
 - **Depth**: `overview`, `standard`, or `deep-dive` (default: `standard`)
 - **Format preference**: `html`, `ppt`, or `auto` (default: `auto`)
+- **Density preference**: `tight` or `standard` (default: `tight` — prefer shorter output with reader follow-up over comprehensive output with noise)
 
 If required inputs are missing, ask concise questions before proceeding.
 
@@ -65,6 +66,7 @@ Create a format-neutral brief:
 | `evidence_needs` | no | What data, code, or sources need to be gathered |
 | `format` | no | If user specified a format, record it here; otherwise blank |
 | `depth` | no | `overview`, `standard`, or `deep-dive` (default: `standard`) |
+| `word_budget` | no | Total target word count: `overview`=300-600, `standard`=600-1500, `deep-dive`=1500-3000 |
 
 For review/decision artifacts, default the `information_order` to the inverted pyramid: lead with the point, follow with evidence, and push background later.
 
@@ -86,6 +88,24 @@ Read `../FormatAdapters.md` and apply Format Selection Logic:
 Follow the appropriate adapter section in `../FormatAdapters.md`:
 - **HTML**: Generate semantic HTML with CDN tooling, apply CSS targets, build document structure, open in browser
 - **PPT**: Select build path (Marp/PptxGenJS/python-pptx), define slide contract, generate PPTX
+
+### Step 7.5: Compression Pass
+
+Before the ReadabilityGate, run a structured compression pass on the rendered content. This step catches AI-generated noise that sounds reasonable but adds no information.
+
+**The governing principle: Human time > AI output.** Missing information is recoverable (the reader asks). Wasted attention is not. Optimize for the reader's time, not completeness.
+
+Run the four compression levels in order:
+
+1. **Lexical:** Replace wordy phrases ("in order to" → "to", "due to the fact that" → "because"). Remove banned adverbs (quite, very, really, simply, basically) and meta-commentary ("This section covers...", "As discussed above...").
+2. **Sentential:** Delete sentences that fail Signal Tests:
+   - **Falsifiability:** Could this sentence be wrong? If not, it carries no information — delete.
+   - **One New Fact:** Does this sentence add something no previous sentence said? If not — delete.
+   - **Prediction:** Could a reader predict this sentence from the heading alone? If yes — delete.
+3. **Structural:** Remove sections that exist because the template included them, not because content demands them. If a section could be swapped into a different document without anyone noticing, it's generic noise.
+4. **Conceptual:** Collapse repeated case descriptions into pattern + table. Replace prose with tables where data has items × attributes.
+
+After compression, verify: is the document at least 30% shorter than the pre-compression draft? If not, compress again. The first draft is almost always too long.
 
 ### Step 8: Auto-Chain ReadabilityGate
 

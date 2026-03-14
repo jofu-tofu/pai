@@ -1,6 +1,10 @@
 # Comprehension Principles
 
-> PAI's universal clarity layer. AI output is cheap; human comprehension is the bottleneck.
+> **The Governing Principle: Human Time > AI Output.**
+> AI output is cheap. Human attention is expensive and non-renewable. Every word costs the reader time.
+> Missing information is recoverable — the reader asks a follow-up. Wasted attention is not.
+> Optimize for the reader's time, not for completeness. When density and completeness conflict, density wins.
+>
 > This file is a self-contained reference. Any agent producing human-facing output can read
 > and apply these principles without invoking ClarityEngine workflows.
 
@@ -80,6 +84,18 @@ Write so the core meaning survives interruption, skimming, or trimming. At docum
 
 *Sources: AI Content Trust Research (CHI 2024), PNAS 2023, C4 Model Notation*
 
+### 6. Density Over Completeness (Human Time is the Bottleneck)
+
+**WHY:** AI generates text cheaply. Readers process it expensively. Every unnecessary sentence taxes human attention that could go toward understanding, deciding, or acting. Missing a fact is recoverable — the reader asks. Reading noise is not recoverable — the attention is spent.
+
+**WHAT:** Include only information the reader needs to understand, decide, or act. If five points exist but four are obvious, include only the one that matters. Apply the Signal Tests: every sentence must be falsifiable (could be wrong), novel (adds a fact the reader didn't have), and unpredictable (not derivable from the heading alone). Run the Compression Protocol after drafting: lexical → sentential → structural → conceptual.
+
+**ANTI-PATTERN:** "Completeness Theater" — including information because it might be relevant, producing a thorough document that exhausts the reader before reaching the content that matters. Also: "Circular Elaboration" — restating the same point in different words across paragraphs, where each sentence sounds fine but the section makes no progress.
+
+**TEST:** Delete every third sentence. Did the document lose meaning? If not, those sentences were noise. Could the document be 50% shorter and still support the same decisions? If yes, compress it.
+
+*Sources: Orwell Rule 3, Paul Graham (importance × novelty × correctness × strength), Nassim Taleb (via negativa / falsifiability), John Carroll (Minimalism — users perform equally with 25-50% of content), NNGroup (+124% usability from concise + scannable + objective writing)*
+
 ---
 
 ## The Readability Contract
@@ -115,6 +131,14 @@ Write so the core meaning survives interruption, skimming, or trimming. At docum
 - **RC-13:** Claims traceable to source. Data flows labeled with actual types.
 - **RC-14:** WCAG AA contrast (4.5:1 normal, 3:1 large). Colorblind-safe palettes. Consistent color semantics.
 - **RC-15:** Code blocks: syntax highlighting, monospace font, no horizontal scroll, distinct background.
+
+### From Principle 6 — Density Over Completeness
+
+- **RC-16:** Every sentence passes the Falsifiability Gate — it makes a claim that could be wrong. Sentences true regardless of context ("Security is important") are deleted.
+- **RC-17:** No sentence is predictable from its heading alone. "Security Considerations: Security is an important consideration" fails. Specific findings pass.
+- **RC-18:** No fact appears in more than one section. Summaries reference; they don't restate (State Once Rule).
+- **RC-19:** Sentences ≤ 25 words. Paragraphs ≤ 6 sentences. Lists ≤ 7 items. (Hard Limits from ASD-STE100.)
+- **RC-20:** No banned meta-commentary ("This section covers...", "As discussed above...", "It's worth noting that..."). These comment on the document instead of conveying information.
 
 ---
 
@@ -155,6 +179,6 @@ When the artifact is partner/customer-facing or its job is review/decision suppo
 
 ## How to Use This File
 
-Read these principles before producing any document intended for human review. Apply the Readability Contract checkpoints as a quality gate. The principles are stable; the checkpoints may evolve as new evidence emerges.
+Read these principles before producing any document intended for human review. Apply the Readability Contract checkpoints as a quality gate. The principles are stable; the checkpoints evolve as new evidence emerges. Principle 6 (Density Over Completeness) governs all others — when a rule from P1-P5 conflicts with density, density wins.
 
 This file has no dependencies on other ClarityEngine files. It is designed to be read and applied in isolation.

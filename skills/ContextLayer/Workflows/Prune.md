@@ -44,17 +44,22 @@ Find all CLAUDE.md files in the project tree.
 **Targeted mode:** find only CLAUDE.md files within SCOPE_PATH.
 **Do not read any other files.** Prune operates on CLAUDE.md content only.
 
-### Step 2 — Apply Falsifiability Test to Every Entry
+### Step 2 — Apply Signal Tests to Every Entry
 
-For each CLAUDE.md file, examine each entry individually:
+For each CLAUDE.md file, examine each entry against the full Signal Tests battery from `BudgetModel.md`:
 
-**Primary falsifiability test:**
-> "If I removed this line, would an agent working in this project behave differently?"
+| Test | Question | Fails → mark for removal |
+|------|----------|---------|
+| **Falsifiability** | If removed, would agent behavior degrade? | Remove |
+| **Prediction** | Would an agent infer this from the code alone? | Remove |
+| **One New Fact** | Does this duplicate another bullet in this file? | Keep more specific, remove other |
+| **State Once** | Does this appear in both root and subdirectory CLAUDE.md? | Keep in more specific file only |
+| **Project-Specificity** | Is this true of most projects, or just this one? | If most → remove |
 
 **Secondary test (for infrequent-but-critical conventions):**
 > "Even if an agent usually gets this right, would removing this cause wrong behavior 10% of the time in this specific project?"
 
-If the answer to BOTH is NO → mark for removal.
+If the answer to the secondary test is YES → keep it regardless of primary test results.
 
 ### Step 2.5 — Protected Section Check
 
@@ -68,20 +73,23 @@ If a section or line is protected, skip it entirely. Do not apply the falsifiabi
 
 ---
 
-### Step 3 — Apply Redundancy and Quality Checks
+### Step 3 — Apply Format and Quality Checks
 
-Mark for removal any entry that:
+Mark for removal or rewrite any entry that:
 
-| Pattern | Example | Reason |
+| Pattern | Example | Action |
 |---------|---------|--------|
-| General programming knowledge | "Use meaningful variable names" | Agent already knows this |
-| General best practices | "Don't commit secrets to git" | Not project-specific |
-| Prose paragraphs | Any multi-sentence explanatory block | Converts to bullet or removes |
-| "See also" references | "See: docs/architecture.md" | Agent won't follow them |
+| General programming knowledge | "Use meaningful variable names" | Remove — agent already knows |
+| General best practices | "Don't commit secrets to git" | Remove — not project-specific |
+| Prose paragraphs | Any multi-sentence explanatory block | Convert to bullet or remove |
+| "See also" references | "See: docs/architecture.md" | Remove — agent won't follow |
 | Duplicate instructions | Same convention stated twice | Keep most specific version |
-| Outdated version numbers | "React 17" when it's clearly 18+ | High rot risk, agent infers from code |
+| Outdated version numbers | "React 17" when it's clearly 18+ | Remove — high rot risk |
 | Empty sections | Section headers with no content | Remove the header too |
-| "This project uses X" statements | "This project uses TypeScript" | Agent infers from .ts files |
+| "This project uses X" statements | "This project uses TypeScript" | Remove — agent infers from .ts files |
+| Bullets over 15 words | Long, wordy convention descriptions | Rewrite to ≤15 words, active imperative |
+| Hedging language | "Consider using...", "It's recommended..." | Rewrite as direct statement or remove |
+| Unfalsifiable claims | "Good error handling is important" | Remove — true of every project |
 
 **Keep even if they feel obvious:**
 - Project-specific commands (even if seemingly standard)

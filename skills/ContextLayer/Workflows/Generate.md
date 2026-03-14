@@ -306,12 +306,25 @@ This file is intentionally slim. [... same template as root, from PruningInstruc
 **Budget check:** Each subdir CLAUDE.md targets 200–500 tokens.
 Skip sections with no content — do not include empty tables.
 
-### Step 5 — Apply Falsifiability Filter
+### Step 5 — Apply Signal Tests Filter
 
-Before writing any file, for each entry:
-1. Apply primary test: "If removed, would agent behavior degrade in a way I'd notice?"
-2. Apply secondary test: "Would removing this cause wrong behavior even 10% of the time in this project?"
-3. Remove entries that fail both tests
+Before writing any file, run every entry through the full Signal Tests battery from `BudgetModel.md`:
+
+| Test | Question | Fails → remove |
+|------|----------|----------------|
+| **Falsifiability** | If removed, would agent behavior degrade? | Remove |
+| **Prediction** | Would an agent infer this from the code alone? | Remove |
+| **One New Fact** | Does this duplicate another entry in this file? | Keep more specific, remove other |
+| **State Once** | Does this appear in both root and subdirectory files? | Keep in more specific file only |
+| **Project-Specificity** | Is this true of most projects? | If most → remove |
+
+Additionally, enforce entry format constraints from `BudgetModel.md`:
+- Rewrite bullets exceeding 15 words to ≤15 words, active imperative voice
+- Convert any prose paragraphs to bullets or tables
+- Remove hedging language ("Consider using...", "It's recommended...")
+
+**Secondary test (Science H5 amendment):** "Even if an agent usually gets this right, would removing it cause wrong behavior in this specific project even 10% of the time?"
+- If YES → keep it (captures infrequent-but-critical conventions)
 
 ### Step 6 — Write All Files
 

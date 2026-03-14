@@ -55,6 +55,8 @@ The answer to question 6 shapes *how* the document is structured — not just wh
 
 This single sentence should pass the "would a stranger understand this?" test.
 
+**One-Sentence Mission Test**: The entire design's purpose must fit in this single POV sentence. If it can't, the scope is too broad — consider splitting into multiple designs or reducing to Quick scale.
+
 **Output**: Problem statement + context summary
 
 ---
@@ -97,6 +99,25 @@ Synthesize the exploration into a concrete design. This is where the actual arti
 
 **Before writing, read `../OutputQuality.md` and apply its Section Format Guide.** Default to maximum density — tables and bullets unless content has genuine causality requiring prose. Every format choice must match the data shape.
 
+**Word Budgets**: Apply these constraints to prevent open-ended generation. Budgets are ceilings, not targets — shorter is better.
+
+| Section | Budget (Standard) | Budget (Full) |
+|---------|-------------------|---------------|
+| Problem | 30–75 words | 50–150 words |
+| Current State | 50–100 words | 75–200 words |
+| Appetite | 1 sentence | 1–2 sentences |
+| Goals | 3–7 bullets, ≤15 words each | 5–10 bullets, ≤15 words each |
+| Non-Goals | 2–5 bullets, ≤15 words each | 3–7 bullets, ≤15 words each |
+| Approach | 100–300 words | 300–600 words |
+| Alternatives Considered | Table, ≤2 sentences per cell | Table, ≤2 sentences per cell |
+| Risks & Rabbit Holes | 3–7 bullets, ≤20 words each | 5–10 bullets, ≤20 words each |
+| User Impact | 30–75 words | 50–150 words |
+| Open Questions | 3–7 items | 5–10 items |
+| Decision Log | Table rows as needed | Table rows as needed |
+| **Total document** | **500–1000 words** | **1000–2500 words** |
+
+Exceeding a section budget requires justification tied to content complexity, not thoroughness.
+
 ---
 
 ### Step 4.5: Validate Output Quality
@@ -106,6 +127,8 @@ Auto-chain the `ValidateOutput` workflow:
 - `scale`: the assessed scale from Step 1
 
 Fix any FAIL results before delivery.
+
+The validation now includes Compression and Coherence checks. Compression failures (unfalsifiable sentences, predictable-from-heading sentences, duplicate facts) must be fixed before delivery — they are the most common source of AI-generated bloat.
 
 ---
 
@@ -183,13 +206,13 @@ The artifact this workflow produces. For Standard scale, use sections flexibly �
 - Skip Step 5 (Review) unless the user requests it
 - Use the template flexibly — empty sections should be omitted, not left blank
 - Appetite and Decision Log are still important even at this scale
-- Aim for 1-3 pages total
+- Aim for 500-1000 words total (see word budgets in Step 4)
 
 ### Full Scale
 - All 5 steps including structured review
 - Template used comprehensively
 - Consider producing individual ADRs (via `RecordDecision`) for key decisions within the design
-- No length limit, but respect the reader's time — be thorough, not verbose
+- Aim for 1000-2500 words total (see word budgets in Step 4). The constraint forces prioritization — the reader's time is the scarce resource, not your output capacity.
 
 ---
 
