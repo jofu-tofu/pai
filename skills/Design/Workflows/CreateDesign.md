@@ -84,20 +84,11 @@ Generate and evaluate alternatives. The goal is NOT to find the right answer —
 
 Synthesize the exploration into a concrete design. This is where the actual artifact takes shape.
 
-**Produce:**
-- **Goals** — bullet list, specific, measurable where possible
-- **Non-goals** — "Things we COULD do but are deliberately NOT doing" with brief rationale
-- **Scope boundary** — what's in, what's out, what's deferred to later
-- **User impact** — what changes for end users, if anything
-- **Technical approach** — the actual design (level of detail appropriate to scale)
-- **Alternatives considered** — the matrix from Step 3, refined
-- **Risks and rabbit holes** — known risks, complexity traps, areas to timebox
-- **Open questions** — unresolved items that need answers before or during implementation
-- **Decision log** — key decisions made during the design process with rationale
+**Before writing, read `../OutputQuality.md`** — especially the Section Selection table (section 3) and the Section Format Defaults (section 1).
 
-**Output**: The design document using the template below.
+**Select sections dynamically.** Do not produce all template sections and compress — select which sections to include based on the Section Selection table in OutputQuality.md. For each "Could" section, evaluate: does this section carry specific, non-obvious information for *this particular design*? If not, omit it entirely. Empty or generic sections are worse than absent ones.
 
-**Before writing, read `../OutputQuality.md` and apply its Section Format Guide.** Default to maximum density — tables and bullets unless content has genuine causality requiring prose. Every format choice must match the data shape.
+**Output**: The design document using the template below, with only the selected sections.
 
 **Word Budgets**: Apply these constraints to prevent open-ended generation. Budgets are ceilings, not targets — shorter is better.
 
@@ -150,7 +141,7 @@ Structure feedback using the "Yes, if" framing — objections are constructive c
 
 ## Output Template
 
-The artifact this workflow produces. For Standard scale, use sections flexibly — skip what isn't relevant. The template is a guide, not a checklist.
+The artifact this workflow produces. **Include only sections selected per OutputQuality.md section 3.** Skip sections that aren't relevant — the template is a menu, not a checklist.
 
 ```markdown
 # Design: [Title]
@@ -204,7 +195,7 @@ The artifact this workflow produces. For Standard scale, use sections flexibly �
 
 ### Standard Scale
 - Skip Step 5 (Review) unless the user requests it
-- Use the template flexibly — empty sections should be omitted, not left blank
+- Use the template flexibly — include only sections that pass the Section Selection table
 - Appetite and Decision Log are still important even at this scale
 - Aim for 500-1000 words total (see word budgets in Step 4)
 

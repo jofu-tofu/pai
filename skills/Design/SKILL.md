@@ -5,7 +5,7 @@ context: fork
 compatibility: Designed for Claude Code and Devin (or similar agent products)
 metadata:
   author: pai
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 
 ## Customization

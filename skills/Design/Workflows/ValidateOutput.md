@@ -27,14 +27,15 @@ Read `../OutputQuality.md`. Internalize format selection, density principles, an
 
 ### Step 2: Run Checks
 
-Six binary checks. Each check produces PASS or FAIL.
+Seven binary checks. Each check produces PASS or FAIL.
 
 | Check | What It Tests | PASS Criteria |
 |-------|--------------|---------------|
+| **Section-Relevance** | Every section carries specific, non-obvious information | No section could be swapped into a different design doc without anyone noticing. No "Could" section (per OutputQuality.md §3) is present without specific content. |
 | **Layer-Cake** | Headers tell a coherent story alone | Headers form a standalone narrative (not generic labels like "Overview" or "Details") |
-| **Format-Shape** | Each section uses correct format per OutputQuality.md | Every section matches its data shape per the Section Format Guide |
+| **Format-Shape** | Each section uses correct format per OutputQuality.md | Every section matches its data shape per the Section Format Defaults |
 | **Density** | No paragraph compressible without meaning loss | No hedging, throat-clearing, or compressible paragraphs found |
-| **AI-ism** | No banned vocabulary or structural patterns | Zero banned terms or patterns from the Anti-AI Writing Patterns section |
+| **AI-ism** | No banned vocabulary or structural patterns | Zero banned terms or patterns from the Banned Vocabulary section |
 | **Compression** | No sentence fails the Signal Tests (falsifiability, one-new-fact, prediction, state-once) | Zero sentences that are unfalsifiable, predictable from heading, or duplicate |
 | **Coherence** | Adjacent paragraphs have logical flow | Every paragraph pair can accept 'because', 'therefore', 'however', or 'for example' between them |
 
@@ -43,10 +44,10 @@ Six binary checks. Each check produces PASS or FAIL.
 | Scale | Checks Applied | Enforcement |
 |-------|---------------|-------------|
 | **Quick** (ADR) | Format-Shape, Density, AI-ism, Compression (4 checks) | Fix before delivery |
-| **Standard** | All 6 checks | Fix before delivery |
-| **Full** | All 6 checks | Fix before delivery; higher scrutiny |
+| **Standard** | All 7 checks | Fix before delivery |
+| **Full** | All 7 checks | Fix before delivery; higher scrutiny |
 
-For Quick scale, skip the Layer-Cake and Coherence checks entirely.
+For Quick scale, skip the Section-Relevance, Layer-Cake, and Coherence checks entirely.
 
 ### Step 4: Fix Failures
 
@@ -76,6 +77,7 @@ After the design artifact, append this summary:
 ### Self-Check Summary
 | Check | Result | Notes |
 |-------|--------|-------|
+| Section-Relevance | PASS/FAIL | [generic section found + removed, or "—"] |
 | Layer-Cake | PASS/FAIL | [brief finding or "—"] |
 | Format-Shape | PASS/FAIL | [section name + issue, or "—"] |
 | Density | PASS/FAIL | [paragraph cited + fix applied, or "—"] |
@@ -84,7 +86,7 @@ After the design artifact, append this summary:
 | Coherence | PASS/FAIL | [paragraph pair fixed + connective added, or "—"] |
 ```
 
-For Quick scale, omit the Layer-Cake and Coherence rows.
+For Quick scale, omit the Section-Relevance, Layer-Cake, and Coherence rows.
 
 ---
 

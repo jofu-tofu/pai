@@ -29,7 +29,9 @@ Without this skill, design work suffers from five failure modes:
 | Template format hints | Reference file with hardened load wording | Inline HTML comments per section | Avoids duplication since ReviewDesign also needs the rules |
 | Density stance | Strong density-first (prose requires justification) | Balanced or light touch | Verbose prose is the #1 iteration trigger from user feedback |
 | Self-validation | Shared `ValidateOutput.md` mini-workflow | Step within CreateDesign only | Reusable across CreateDesign, RecordDecision, ReviewDesign |
-| Content boundary | Principles.md = what to include; OutputQuality.md = how to render | Single merged file | Keeps existing Principles.md scope clean, avoids double-duty |
+| Content boundary | Principles.md = what to include + why; OutputQuality.md = how to render | Single merged file | Keeps Principles as philosophy, OutputQuality as compact rules |
+| Section selection | MoSCoW per scope (Must/Should/Could) in OutputQuality.md | All sections always included | Irrelevant sections actively harm comprehension (expertise reversal effect) |
+| Rules format | One-liner rules, philosophy in Principles.md | Verbose rules with inline rationale | Structural constraints beat behavioral instructions for LLMs |
 
 ## Explicit Out-of-Scope
 
@@ -40,15 +42,16 @@ Without this skill, design work suffers from five failure modes:
 
 ## Success Criteria
 
-1. CreateDesign output passes all 4 ValidateOutput checks without manual intervention
-2. Every template section uses the correct format per OutputQuality.md's Section Format Guide
+1. CreateDesign output passes all 7 ValidateOutput checks without manual intervention
+2. Every template section uses the correct format per OutputQuality.md's Section Format Defaults
 3. Users do not need to ask "put this in table format" after receiving a design artifact
-4. ReviewDesign leads with reader experience before checking content completeness
-5. Design documents have a clear primary audience, and multi-audience documents have explicit stopping points
+4. Only sections relevant to the specific design are included — no generic filler
+5. ReviewDesign leads with reader experience before checking content completeness
+6. Design documents have a clear primary audience, and multi-audience documents have explicit stopping points
 
 ## Constraints
 
 - `OutputQuality.md` is standalone — no references to ClarityEngine files
 - `ValidateOutput.md` is advisory and fix-before-delivery — not a blocking gate
-- `Principles.md` covers content (what to include); `OutputQuality.md` covers rendering (how to format) — no overlap
-- The output template is a guide, not a checklist — empty sections are omitted, not left blank
+- `Principles.md` covers content (what to include) and philosophy (why the rules exist); `OutputQuality.md` covers rendering (how to format) — no overlap
+- The output template is a menu, not a checklist — sections are selected by relevance, not included by default
