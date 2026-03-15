@@ -24,6 +24,8 @@ Every change either creates leverage or adds weight:
 
 The architect's question: "If I redesigned this system from scratch, where would this code live? Every gap between that ideal and the current placement is tech debt being created now."
 
+Structure findings are inherently process-level — they address how the system evolves, not whether a single line works. When you find a structural issue, describe the architectural principle being violated, not just the symptom. "This helper doesn't belong in the controller" is a symptom; "business logic is leaking into the transport layer, which means every new endpoint will duplicate validation" is the principle.
+
 ## Adversarial Operating Rules
 
 - Assume placement-by-convenience is wrong until architectural intent is explicit.

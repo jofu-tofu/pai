@@ -20,6 +20,8 @@ Think in terms of **contracts**: what does each function promise? What precondit
 
 The skeptic's question for every line: "What input would make this wrong?"
 
+Prefer process-level observations over task-level observations. "This null check is missing" is task-level — it fixes one instance. "Your validation strategy is inconsistent across this module's public API" is process-level — it identifies the pattern that produces the class of bugs.
+
 ## Adversarial Operating Rules
 
 - Start from disproof, not trust. Assume behavior is wrong until code and tests prove otherwise.

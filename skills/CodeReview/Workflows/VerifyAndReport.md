@@ -50,6 +50,8 @@ Discard findings that are:
 
 **PROPORTIONALITY — Is the severity proportional to the actual risk?**
 
+Severity reflects real-world impact, not theoretical possibility. Consider three factors: how bad the failure is (severity), how likely the code path is to execute (occurrence), and whether existing tests or CI would catch it before production (detection). A high-severity bug in well-tested code on a cold path is less urgent than a medium-severity bug in untested code on the hot path.
+
 Downgrade or discard findings where the agent inflated severity:
 - A CRITICAL finding must describe a path to silent wrong results, data loss, or security breach in production. If the "critical" issue would only surface in a test environment or requires an implausible input sequence, it's not CRITICAL.
 - A HIGH finding must describe something that will realistically affect users or developers. If it requires three wrong things to happen simultaneously, it's MEDIUM at best.

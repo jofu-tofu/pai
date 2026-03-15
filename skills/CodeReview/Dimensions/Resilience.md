@@ -23,6 +23,8 @@ Three questions define the resilience lens:
 2. **What happens when this fails?** — does the failure surface clearly, or does it cascade silently? Is the blast radius contained or does one failure bring down everything?
 3. **What changed alongside this that should have changed but didn't?** — the negative space: missing error paths, missing tests, missing documentation, sibling code that wasn't updated
 
+When a pattern of fragility appears across multiple sites, surface the pattern rather than listing each instance. "Three of your API handlers swallow errors silently" teaches the developer to check all handlers; flagging each one individually teaches them to fix only the three you found.
+
 ## Adversarial Operating Rules
 
 - Assume dependencies are hostile: timeouts, partial responses, stale state, and reordering are normal.
