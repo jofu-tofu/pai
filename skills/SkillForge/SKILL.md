@@ -1,6 +1,6 @@
 ---
 name: SkillForge
-description: Create, modify, test, and maintain skills. MANDATORY for ALL skill modifications — direct Edit bypasses quality gates. USE WHEN create skill OR new skill OR update skill OR edit skill OR improve skill OR change skill OR tweak skill OR adjust skill OR add workflow OR remove workflow OR modify skill OR refactor skill OR fix skill structure OR test skill OR try skill OR does this skill work OR run skill test OR evaluate skill OR run evals OR optimize description OR fix triggering OR skill not triggering OR retrospective OR run retrospective OR skill retrospective OR analyze skill OR audit skill OR comprehensive skill check OR what's wrong with this skill OR diagnose skill OR review skill.
+description: Create, modify, test, and maintain skills. MANDATORY for ALL skill modifications — direct Edit bypasses quality gates. USE WHEN create skill OR new skill OR update skill OR edit skill OR improve skill OR change skill OR tweak skill OR adjust skill OR add workflow OR remove workflow OR modify skill OR refactor skill OR fix skill structure OR test skill OR try skill OR does this skill work OR run skill test OR evaluate skill OR run evals OR optimize description OR fix triggering OR skill not triggering OR retrospective OR run retrospective OR skill retrospective OR analyze skill OR audit skill OR comprehensive skill check OR what's wrong with this skill OR diagnose skill OR review skill OR incorporate research OR add research OR integrate finding OR add evidence OR update principles.
 compatibility: Designed for Claude Code and Devin (or similar agent products)
 metadata:
   author: pai
@@ -28,7 +28,7 @@ Running the **[WorkflowName]** workflow from the **SkillForge** skill...
 | Workflow | Trigger | File |
 |----------|---------|------|
 | **CreateSkill** | "create a new skill", "new skill", "build a skill", "make a skill" | `Workflows/CreateSkill.md` |
-| **UpdateSkill** | "update skill", "modify skill", "change skill", "refactor skill", "add workflow", "remove workflow", "edit skill", "tweak skill", "adjust skill", "create skill intent" | `Workflows/UpdateSkill.md` |
+| **UpdateSkill** | "update skill", "modify skill", "change skill", "refactor skill", "add workflow", "remove workflow", "edit skill", "tweak skill", "adjust skill", "create skill intent", "incorporate research", "add research", "integrate finding", "update principles" | `Workflows/UpdateSkill.md` |
 | **ReviewSkill** | "review skill", "audit skill", "retrospective on skill", "what's wrong with this skill", "skill health check", "diagnose and fix skill" | `Workflows/ReviewSkill.md` |
 | **TestSkill** | "test skill", "try skill", "does this skill work", "run skill test", "evaluate skill", "run evals" | `Workflows/TestSkill.md` |
 | **OptimizeDescription** | "optimize description", "fix triggering", "skill not triggering", "improve triggers" | `Workflows/OptimizeDescription.md` |

@@ -118,7 +118,7 @@ SkillName/                    # TitleCase directory name
 ├── SkillIntent.md            # Design intent document (see below)
 ├── Standards/                # Purpose-named context sub-folder (TitleCase)
 │   ├── SpecFile.md           # Canonical specs, standards, frameworks
-│   └── RulesFile.md
+│   └── Philosophy.md         # Research-backed principles (see Knowledge Patterns)
 ├── Tools/                    # CLI tools (ALWAYS present, even if empty)
 │   └── ToolName.ts           # TypeScript CLI tool (TitleCase)
 └── Workflows/                # Execution workflows (TitleCase)
@@ -135,6 +135,17 @@ SkillName/                    # TitleCase directory name
 - Any other TitleCase sub-folder name is allowed — names should describe the folder's purpose
 - `Tools/` directory MUST always be present (create empty if no tools yet)
 - Maximum directory depth: 3 levels from skill root (`SkillName/Category/SubFolder/file.md`)
+
+### Knowledge Patterns
+
+Skills that encode research-backed knowledge use one of two patterns. See `KnowledgeIntegration.md` for the full philosophy; summary below.
+
+| Pattern | Structure | When to Use |
+|---------|-----------|-------------|
+| **Philosophical Integration** (default) | `Standards/Philosophy.md` or `Standards/Principles.md` — interconnected principles with WHY/WHAT/ANTI-PATTERN/TEST | Judgment, design, quality, methodology — when understanding WHY matters more than checking a list |
+| **Discrete Rules** | `Rules/` folder, one file per rule, index table in SKILL.md | Mechanical, checkable standards — when each rule applies independently with clear pass/fail |
+
+Default to philosophical integration. New research should be integrated into existing principles rather than appended as new rules.
 
 ---
 

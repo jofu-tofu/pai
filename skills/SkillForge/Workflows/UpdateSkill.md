@@ -1,11 +1,12 @@
 # UpdateSkill Workflow
 
-> **Trigger:** "update skill", "modify skill", "change skill", "edit skill", "refactor skill", "restructure skill", "add workflow", "remove workflow", "tweak skill", "adjust skill", "rename workflow", "create workflow", "major skill update", "canonicalize skill", "fix skill structure"
+> **Trigger:** "update skill", "modify skill", "change skill", "edit skill", "refactor skill", "restructure skill", "add workflow", "remove workflow", "tweak skill", "adjust skill", "rename workflow", "create workflow", "major skill update", "canonicalize skill", "fix skill structure", "incorporate research", "add research", "integrate finding", "add evidence", "update principles"
 
 ## Reference Material
 
 - **Prompting Standards:** `../Standards/PromptingStandards.md` — Prompt engineering reference. Read first.
 - **Skill System Spec:** `../Standards/SkillSystem.md` — Structure, naming, and validation rules
+- **Knowledge Integration:** `../Standards/KnowledgeIntegration.md` — How to incorporate research into skills (philosophical integration vs discrete rules)
 - **Target skill's SkillIntent.md** (if present) — Read before modifying to ensure changes don't contradict original purpose.
 
 ## Purpose
@@ -27,6 +28,7 @@ Apply changes to an existing skill — from small content edits to full structur
 | "Refactor skill", "restructure", "reorganize", "major update" | **Full** — multi-file restructuring | Jump to **Full Refactor** |
 | "Canonicalize skill", "fix skill structure", "convert skill format" | **Canonicalize** — format conversion | Jump to **Full Refactor** with canonicalization focus |
 | "Create skill intent", "add skill intent", "generate SkillIntent" | **Intent** — generate SkillIntent.md | Jump to **Generate SkillIntent** |
+| "Incorporate research", "add research", "integrate finding", "add evidence", "update principles" | **Research** — integrate new knowledge into skill philosophy | Jump to **Incorporate Research** |
 
 ---
 
@@ -182,6 +184,69 @@ Execute in dependency order:
 ### Step 6: Validate and Report
 
 Run `ValidateSkill.ts` on the target skill. Fix any failures. Report before/after state, all changes made, and validation results.
+
+---
+
+## Incorporate Research
+
+For integrating new research, evidence, or findings into a skill's knowledge base. Read `../Standards/KnowledgeIntegration.md` before proceeding — it defines the philosophical integration approach and when to use discrete rules instead.
+
+### Step 1: Read the Skill's Knowledge Layer
+
+Identify the target skill's current knowledge pattern:
+
+| Pattern | Look For |
+|---------|----------|
+| **Philosophical** | `Philosophy.md`, `Principles.md`, or similar — interconnected principles with WHY/WHAT/ANTI-PATTERN |
+| **Discrete Rules** | `Rules/` folder with individual rule files |
+| **None yet** | No research-backed content — this is the first knowledge being added |
+
+Read the existing knowledge files. Understand the current principles or rules.
+
+### Step 2: Extract the Actionable Insight
+
+Ask the user (or extract from provided research):
+1. What's the finding?
+2. What behavior should change because of it?
+3. What's the source?
+
+If the finding doesn't change behavior, it doesn't belong in the skill. Report this to the user.
+
+### Step 3: Find the Home
+
+Map the insight against existing principles/rules:
+
+- **Strengthens** an existing principle → Update the WHY or add the source
+- **Extends** an existing principle → Add a new anti-pattern, test, or application
+- **Challenges** an existing principle → Rewrite the principle
+- **Genuinely new** → Only if it can't be explained as a special case of any existing principle
+
+Present the mapping to the user before making changes.
+
+### Step 4: Integrate
+
+**For skills with philosophical integration (Philosophy.md / Principles.md):**
+- Weave the insight into the identified principle
+- Keep each principle concise (WHY + WHAT + ANTI-PATTERN + TEST + sources)
+- Add source citation inline with the principle
+- If creating a new principle, follow the anatomy in KnowledgeIntegration.md
+
+**For skills with discrete rules (Rules/):**
+- Consider whether the skill would benefit from migrating to philosophical integration (discuss with user)
+- If keeping discrete rules: update the relevant rule file, or create a new one following the skill's existing rule structure
+- Update the SKILL.md rule index if applicable
+
+**For skills with no knowledge layer yet:**
+- Default to philosophical integration unless the skill's purpose is checklist-style verification
+- Create a `Philosophy.md` or `Principles.md` in the skill's Standards/ directory
+- Structure with the anatomy from KnowledgeIntegration.md (Name, WHY, WHAT, ANTI-PATTERN, TEST, Sources)
+
+### Step 5: Validate
+
+1. Run the litmus test: "If the agent understood WHY, would it do the right thing without a specific rule?" — if yes, philosophical integration succeeded
+2. Check that no principle grew beyond 5-6 sentences (split if needed)
+3. Verify source attribution is inline with the claim
+4. Run `ValidateSkill.ts` on the target skill
 
 ---
 
