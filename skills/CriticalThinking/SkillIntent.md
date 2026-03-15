@@ -83,3 +83,11 @@ From the output perspective:
 - All 5 lenses are agent-chosen with orthogonality constraints
 - Non-adjacency test for domains; orthogonality test for epistemic lenses
 - One reframe agent handles all 5 (needs context of previous choices to judge distance)
+
+### 2025-03-14 — First Test Run & Retrospective (v1.3)
+- Tested with: "In a world where AI agents remove bottlenecks, what is the new way to stand out as an exceptional person?"
+- Solve workflow redesigned: replaced single prescribed solution with 2-3 approaches + trade-offs. Synthesis agent picks winners, not solvers.
+- Added Trade-Off Landscape section to Synthesize workflow — integrates convergent, contradictory, and complementary trade-offs across all five lenses
+- Decompose output was too verbose (~80-100 lines per perspective). Tightened to target 40-60 lines: compact component format (1 line each), merged Relationships + Leverage Points, explicit concision constraint.
+- Background subagents couldn't write files (permission auto-denied). Workaround: foreground subagents for write-heavy waves. Design note: orchestrator should create files, agents should only append.
+- Output quality was strong — five genuinely orthogonal perspectives, real convergences, actionable trade-off landscape. The pipeline earns its keep on complex, ambiguous questions.
