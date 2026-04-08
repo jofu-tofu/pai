@@ -32,7 +32,7 @@ async function main() {
 
   try {
     console.log('1. Launching browser...')
-    await browser.launch({ headless: false })
+    await browser.launch()
 
     console.log(`2. Navigating to ${url}...`)
     const startTime = Date.now()
