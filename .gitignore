@@ -65,7 +65,8 @@ MEMORY/**/*
 skills/skill-index.json
 
 # Local Epic-specific skills (development only, not committed)
-skills/epic-*/
+# Matches kebab-case (epic-wiki) and TitleCase (EpicSuReview) names.
+skills/[Ee]pic*/
 
 # System skills (Codex-installed, not committed)
 skills/.system/
