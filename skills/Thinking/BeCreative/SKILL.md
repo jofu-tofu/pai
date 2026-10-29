@@ -1,110 +1,75 @@
 ---
 name: BeCreative
-description: Extended thinking mode. USE WHEN be creative, deep thinking, deep thinking, extended reasoning. SkillSearch('becreative') for docs.
-compatibility: Designed for Claude Code and Devin (or similar agent products)
+evals:
+  manual:
+    reason: "idea novelty and usefulness are specific to the supplied creative brief and require a reviewer judgment"
+    falsifier: "the reviewer finds the candidates materially repetitive, off-brief, or unable to support the requested choice"
 metadata:
-  author: pai
-  version: "1.0.0"
+  short-description: "Brainstorm diverse ideas in one pass, or expand seed corpora into synthetic examples and test sets. Multi-round evolution is HillClimb Ideate."
+version: 1.3.1
+description: "Single-pass divergent ideation via Verbalized Sampling: surfaces the strongest of several diverse candidates, or expands a seed corpus into an eval dataset. USE WHEN be creative, brainstorm, divergent ideas, creative solutions, maximum creativity, tree of thoughts, radically different, name this, creative angle, technical creativity, novel ideas, expand this corpus, synthetic data, generate diverse examples, create test set. NOT FOR evolving ideas over several rounds, multi-cycle ideation, breakthrough ideas, ideate or id8 (HillClimb Ideate), new causal explanations of a phenomenon (Novelty), or adversarial critique (RedTeam)."
 ---
 
-## Customization
+# BeCreative
 
-**Before executing, check for user customizations at:**
-`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/BeCreative/`
+Ask a model for "a creative idea" and you get the most probable one: the safe, already-seen answer. This skill pushes past that. Single-pass intents use Verbalized Sampling (generate several low-probability candidates, surface the strongest; see `ResearchFoundation.md`). SyntheticDataExpansion grows a small seed set into a diverse corpus. Ideas evolved over several rounds (a population of proposers, recombination with lineage, measured or cross-vendor fitness) are HillClimb's Ideate intent (`skills/HillClimb/Intents/Ideate.md`).
 
-If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
+## Ideal State
 
+- Each run surfaces several genuinely distinct candidates, compared against each other rather than by self-reported probability, and names the strongest for the brief.
+- The candidates differ in kind (different assumptions, framings, formats or domains), never one idea in five outfits.
+- When diversity is load-bearing, candidates are generated or judged across a second vendor, the lane chosen by whether the brief is taste-judged (Anthropic) or correctness-judged (OpenAI).
+- SyntheticDataExpansion returns a corpus measurably more diverse than its seed set: a higher diversity index from `Tools/Diversity.ts index` than the seed.
+- A request to evolve ideas over several rounds reaches HillClimb Ideate, never a single pass here.
 
-# BeCreative Skill
+## Intent Routing
 
-Enhance AI creativity using deep thinking + Verbalized Sampling. Combines research-backed techniques (Zhang et al., 2024) for 1.6-2.1x diversity increase and extended thinking for quality.
+| Intent | Trigger | File |
+|----------|---------|------|
+| StandardCreativity | "be creative", "think creatively", default creative tasks | `Intents/StandardCreativity.md` |
+| MaximumCreativity | "maximum creativity", "most creative", "radically different" | `Intents/MaximumCreativity.md` |
+| IdeaGeneration | "brainstorm", "ideas for", "solve this problem" | `Intents/IdeaGeneration.md` |
+| TreeOfThoughts | "complex problem", "multi-factor", "explore paths" | `Intents/TreeOfThoughts.md` |
+| DomainSpecific | "artistic", "business innovation", domain-specific | `Intents/DomainSpecific.md` |
+| TechnicalCreativity | "technical creativity", algorithm or architecture ideas | `Intents/TechnicalCreativity.md` |
+| SyntheticDataExpansion | "expand corpus", "synthetic data", "generate diverse examples", "create test set from these" | `Intents/SyntheticDataExpansion.md` |
 
----
+"ideate", "id8", "evolve ideas", "breakthrough ideas", "multi-cycle ideation" and any request for several rounds route to HillClimb Ideate (`skills/HillClimb/Intents/Ideate.md`).
 
+| File | Read when |
+|------|-----------|
+| `ResearchFoundation.md` | the Verbalized Sampling evidence base behind the single-pass intents |
+| `Setup.md` | first-time setup: the OpenAI login TechnicalCreativity's second vendor needs, and a read-only check |
 
-## Workflow Routing
+## Data & Config
 
-Route to the appropriate workflow based on the request.
+User customizations, when present, live at `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/BeCreative/` (configRoot is `$CLAUDE_CONFIG_DIR` when set, else `~/.claude`). Any PREFERENCES.md, configurations, or resources there override the defaults; when the directory does not exist, proceed with skill defaults.
 
-**When executing a workflow, output this notification:**
-```
-Running the **WorkflowName** workflow in the **BeCreative** skill to ACTION...
-```
+First-time setup for the TechnicalCreativity vendor split is in [Setup.md](Setup.md).
 
-| Workflow | Triggers | Description |
-|----------|----------|-------------|
-| `Workflows/StandardCreativity.md` | "be creative", "think creatively", default creative tasks | Standard deep thinking + VS for quality creative work |
-| `Workflows/MaximumCreativity.md` | "maximum creativity", "most creative", "radically different" | Push boundaries, avoid all cliches, unconventional |
-| `Workflows/IdeaGeneration.md` | "brainstorm", "ideas for", "solve this problem" | Problem-solving and innovation focus |
-| `Workflows/TreeOfThoughts.md` | "complex problem", "multi-factor", "explore paths" | Branching exploration for complex challenges |
-| `Workflows/DomainSpecific.md` | "artistic", "business innovation", domain-specific | Domain-tailored creativity templates |
-| `Workflows/TechnicalCreativityGemini3.md` | "technical creativity", "algorithm", "architecture" | Engineering creativity via Gemini 3 Pro |
+## Gotchas
 
----
-
-## Quick Reference
-
-**Core technique:** Generate 5 diverse options (p<0.10 each) internally, output single best response.
-
-**Default approach:** For most creative requests, apply StandardCreativity workflow.
-
-**For artistic/narrative creativity:** Apply workflow directly (no delegation needed).
-
-**For technical creativity:** Use TechnicalCreativityGemini3 workflow.
-
----
-
-## Resource Index
-
-| Resource | Description |
-|----------|-------------|
-| `ResearchFoundation.md` | Research backing, why it works, activation triggers |
-| `Principles.md` | Core philosophy and best practices |
-| `Templates.md` | Quick reference templates for all modes |
-| `Examples.md` | Practical examples with expected outputs |
-| `Assets/creative-writing-template.md` | Creative writing specific template |
-| `Assets/idea-generation-template.md` | Brainstorming template |
-
----
-
-## Integration with Other Skills
-
-**Works well with:**
-- **XPost** / **LinkedInPost** - Generate creative social media content
-- **Blogging** - Creative blog post ideas and narrative approaches
-- **Development** - Creative technical solutions
-- **Art** - Diverse image prompt ideas and creative directions
-- **Business** - Creative offer frameworks and business models
-- **Research** - Creative research angles and synthesis approaches
-
----
+- **Verbalized Sampling adds nothing on tasks with one correct answer.** Use it where many answers are valid. A hill climb has one metric but many valid changes, so VS applies to its proposals (HillClimb Ideate), never to its keep decision (2026-10-11 analysis).
+- **The model's self-reported probabilities are not evidence of novelty.** Compare the candidates to each other.
+- **A single model's "diverse" set shares that model's defaults.** When diversity really matters (TechnicalCreativity, and HillClimb Ideate's rosters), generate or judge on a second vendor through `LIFEOS/TOOLS/Inference.ts --vendor`.
+- **Taste-judged briefs (voice, naming, visual concepts) belong on the Anthropic lanes; correctness-judged ones (algorithms, architectures) on the OpenAI lanes.** Pick the `--vendor` accordingly when an intent calls a model directly.
 
 ## Examples
 
-**Example 1: Creative blog angle**
 ```
-User: "think outside the box for this AI ethics post"
--> Applies StandardCreativity workflow
--> Generates 5 diverse angles internally (p<0.10 each)
--> Returns most innovative framing approach
+User: "Brainstorm products we could build from a patent portfolio"
+→ IdeaGeneration
+→ The most breakthrough of five approaches that rest on different assumptions, with why it beats the conventional answer
 ```
 
-**Example 2: Product naming brainstorm**
 ```
-User: "be creative - need names for this security tool"
--> Applies MaximumCreativity workflow
--> Explores unusual metaphors, domains, wordplay
--> Presents best option with reasoning
+User: "Divergent scene concepts for a blog header illustration"
+→ DomainSpecific
+→ A scene concept that breaks a real editorial-illustration convention, chosen on that domain's criteria and justified against them
 ```
 
-**Example 3: Technical creativity**
 ```
-User: "deep thinking this architecture problem"
--> Invokes TechnicalCreativityGemini3 workflow
--> Uses Gemini 3 Pro for mathematical/algorithmic creativity
--> Returns novel technical solution
+User: "Evolve ideas for a new featured content collection over a few rounds"
+→ HillClimb Ideate (not this skill)
+→ Generations from a code-drawn roster across bands and vendors, judge-scored with spread since there is no metric, the stopping condition named, each generation persisted
 ```
-
----
-
-**Research-backed creative enhancement: 1.6-2.1x diversity, 25.7% quality improvement.**

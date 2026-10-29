@@ -1,6 +1,6 @@
 # The 8 Lenses of Iterative Depth
 
-Each lens is a structured perspective that forces exploration of a problem from a fundamentally different angle. They are ordered from most concrete to most abstract, and from most commonly useful to most specialized.
+Each lens forces exploration of a problem from a fundamentally different angle. They are ordered from most concrete to most abstract, and from most commonly useful to most specialized, so a short run reaching for the earlier ones covers the most universally useful ground. Pick whatever the problem calls for, in any order.
 
 ---
 
@@ -18,7 +18,7 @@ Each lens is a structured perspective that forces exploration of a problem from 
 **Grounded in:** Viewpoint-Oriented RE (Finkelstein & Nuseibeh), Triangulation (Denzin)
 **Focus:** Identify every stakeholder beyond the requester. End users, maintainers, administrators, downstream systems, future developers. What does each need that wasn't stated?
 **ISC Output:** Criteria for stakeholder needs not in the original request.
-**Example prompt variation:** "Identify every stakeholder affected by this work. For each, what requirement would THEY add that the requester didn't mention?"
+**Example prompt variation:** "Identify every stakeholder affected by this work. For each, what requirement would they add that the requester didn't mention?"
 
 ---
 
@@ -26,7 +26,7 @@ Each lens is a structured perspective that forces exploration of a problem from 
 **Question:** "What could fail? What would an adversary exploit? What are the edge cases?"
 **Grounded in:** Misuse Cases (Sindre & Opdahl), Pre-Mortem (Klein), STRIDE Threat Modeling
 **Focus:** Assume the solution exists. Now break it. Error states, race conditions, security holes, data corruption, user confusion, performance under load. Every way this could go wrong.
-**ISC Output:** Anti-criteria (what must NOT happen) and defensive criteria.
+**ISC Output:** Anti-criteria (what must not happen) and defensive criteria.
 **Example prompt variation:** "This solution ships tomorrow. List every way it fails in the first week. Be adversarial."
 
 ---
@@ -41,7 +41,7 @@ Each lens is a structured perspective that forces exploration of a problem from 
 ---
 
 ## Lens 5: EXPERIENTIAL (How Should It Feel?)
-**Question:** "When this works perfectly, how does the user FEEL? What's the experience?"
+**Question:** "When this works perfectly, how does the user feel? What's the experience?"
 **Grounded in:** Appreciative Inquiry (Cooperrider), de Bono Red Hat (emotions)
 **Focus:** Beyond functional correctness — the qualitative experience. Speed, elegance, surprise, delight, confidence, trust. What's the difference between "works" and "works beautifully"?
 **ISC Output:** Quality-of-experience criteria that elevate from functional to euphoric.
@@ -72,33 +72,4 @@ Each lens is a structured perspective that forces exploration of a problem from 
 **Grounded in:** Hermeneutic Circle (Gadamer), Double-Loop Learning (Argyris), Soft Systems Methodology (Checkland)
 **Focus:** Step outside the problem entirely. Is the request a symptom of a deeper issue? Is there a reframing that dissolves the problem instead of solving it? Would a different question yield a better outcome?
 **ISC Output:** Criteria that reframe or expand the problem definition itself.
-**Example prompt variation:** "Forget the specific request. What is the UNDERLYING need? Is there a reframing that produces a better outcome than what was asked for?"
-
----
-
-## SLA-Based Lens Selection
-
-| SLA | Lenses Used | Which Ones | Time Budget |
-|-----|-------------|------------|-------------|
-| **Instant** | 0 | Skip IterativeDepth entirely | 0s |
-| **Fast** | 2 | Literal + Failure | <30s |
-| **Standard** | 4 | Literal + Stakeholder + Failure + Experiential | <2min |
-| **Deep** | 8 | All 8 lenses | <5min |
-
-At **Fast** SLA, the two most commonly productive lenses (surface requirements + what goes wrong) run as brief internal thought exercises — not spawned agents.
-
-At **Standard**, 4 lenses run. These can be parallelized as 2 pairs of background agents.
-
-At **Deep**, all 8 lenses run. These can be parallelized as 4 pairs or 8 individual agents for maximum coverage.
-
----
-
-## Lens Selection for Custom Depth
-
-When invoked with a specific count (e.g., "do 3 passes"), select lenses in order from Lens 1 through Lens N. The ordering is designed so that earlier lenses are more universally applicable.
-
-For specialized domains, the Algorithm can override lens selection:
-- **Security-focused task:** Prioritize Failure, Stakeholder, Temporal
-- **UX-focused task:** Prioritize Experiential, Stakeholder, Literal
-- **Architecture task:** Prioritize Temporal, Constraint Inversion, Analogical
-- **Ambiguous request:** Prioritize Meta, Stakeholder, Literal
+**Example prompt variation:** "Forget the specific request. What is the underlying need? Is there a reframing that produces a better outcome than what was asked for?"

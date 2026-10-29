@@ -1,13 +1,13 @@
 # TELOS Dashboard Template
 
-A reusable Next.js dashboard template with Tokyo Night Day theme, shadcn/ui components, and built-in AI chat functionality powered by Claude Haiku 4.5.
+A reusable Next.js dashboard template with Tokyo Night Day theme, shadcn/ui components, and built-in AI chat that runs through your local LifeOS install.
 
 ## Features
 
 - **Modern Stack**: Next.js 15, React 19, TypeScript, Tailwind CSS 4
 - **Beautiful Design**: Tokyo Night Day theme with professional gradients
 - **Pre-built Components**: shadcn/ui Card, Badge, Button, Progress, Table components
-- **AI Chat**: Built-in Ask page with Claude Haiku 4.5 integration
+- **AI Chat**: Built-in Ask page that runs through the local LifeOS inference tool
 - **Dynamic File System**: Automatic file discovery, navigation, and editing
 - **File Upload**: Drag-and-drop interface for uploading .md and .csv files
 - **File Editing**: In-browser editing with save functionality
@@ -17,7 +17,7 @@ A reusable Next.js dashboard template with Tokyo Night Day theme, shadcn/ui comp
 ## Pages Included
 
 1. **Overview** (`/`) - Dashboard overview with hero section, metrics grid, and summary
-2. **Ask** (`/ask`) - AI chatbot powered by Claude Haiku 4.5 with full TELOS context
+2. **Ask** (`/ask`) - AI chatbot with full TELOS context, run through the local LifeOS inference tool
 3. **Add File** (`/add-file`) - Drag-and-drop file upload interface for .md and .csv files
 4. **File Viewer** (`/file/[slug]`) - Dynamic file viewer with edit capabilities for all TELOS files
 5. **Projects** (`/projects`) - Project tracking with budget, progress, and status (template example)
@@ -30,7 +30,7 @@ A reusable Next.js dashboard template with Tokyo Night Day theme, shadcn/ui comp
 ### 1. Copy the Template
 
 ```bash
-cp -r $PAI_DIR/skills/Telos/DashboardTemplate /path/to/your/project
+cp -r ~/.claude/skills/Telos/DashboardTemplate /path/to/your/project
 cd /path/to/your/project
 ```
 
@@ -48,18 +48,11 @@ bun add @radix-ui/react-slot
 
 ### 3. Configure Environment
 
-Copy `.env.example` to `.env` and add your Anthropic API key:
+No API key is needed. The Ask panel runs your question through LifeOS's `LIFEOS/TOOLS/Inference.ts` on this machine, which uses the Claude login you already have. `.env.example` is kept for your own additions; copying it to `.env` is optional:
 
 ```bash
 cp .env.example .env
 ```
-
-Edit `.env`:
-```
-ANTHROPIC_API_KEY=your_api_key_here
-```
-
-**Note**: The template includes a pre-configured `.env` file with a working API key for testing. Replace it with your own key for production use.
 
 ### 4. Customize Your Dashboard
 
@@ -149,7 +142,7 @@ Colors are defined in:
 
 ## AI Chat Integration
 
-The Ask page uses Claude Haiku 4.5 via Anthropic API:
+The Ask page runs your question through the local LifeOS inference tool:
 
 **Frontend**: `app/ask/page.tsx`
 - React state management for messages
@@ -158,30 +151,27 @@ The Ask page uses Claude Haiku 4.5 via Anthropic API:
 
 **Backend**: `app/api/chat/route.ts`
 - Next.js API route
-- Calls Anthropic Messages API
+- Runs `LIFEOS/TOOLS/Inference.ts` (the medium level) with your TELOS as context
 - Handles errors gracefully
 
-**Environment Variable Required**:
-```
-ANTHROPIC_API_KEY=sk-ant-api03-...
-```
+No environment variable is required. The route needs a local LifeOS install, so Ask works when the dashboard runs on your own machine.
 
 ## Dynamic File System
 
 The template includes a complete file management system for TELOS files (markdown and CSV):
 
 ### File Discovery
-- **Automatic scanning**: The dashboard recursively discovers all `.md` and `.csv` files in the Obsidian TELOS directory
+- **Automatic scanning**: The dashboard automatically discovers all `.md` and `.csv` files in the TELOS directory
 - **Dynamic navigation**: Every file becomes a clickable navigation item in the sidebar
 - **Real-time updates**: File count and list update automatically when new files are uploaded
 
 **Implementation**: `lib/telos-data.ts`
-- `getAllTelosData()` - Recursively scans the TELOS directory and returns all files
+- `getAllTelosData()` - Scans TELOS directory and returns all files
 - `getTelosFileCount()` - Returns total file count
-- `getTelosFileList()` - Returns array of relative filenames
-- Searches `C:\Users\fujos\Obsidian\TELOS\` for `.md` and `.csv` files
-- Preserves subfolder paths like `Core/MISSION.md` and `Career/Overview.md`
-- Excludes `Backups/` from the scanned context corpus
+- `getTelosFileList()` - Returns array of filenames
+- Resolves the TELOS directory as `<configRoot>/LIFEOS/USER/TELOS/` (`configRoot` is `$CLAUDE_CONFIG_DIR`, else `~/.claude`; `$LIFEOS_USER_DIR` replaces `<configRoot>/LIFEOS/USER` when set)
+- Searches that directory for `.md` files
+- Searches its optional `data/` subfolder for `.csv` files; the folder need not exist, and the first CSV upload creates it
 
 ### File Upload
 **Page**: `app/add-file/page.tsx`
@@ -207,7 +197,7 @@ The template includes a complete file management system for TELOS files (markdow
 
 **API Endpoints**:
 - `app/api/file/get/route.ts` - Fetches individual file content
-- `app/api/file/save/route.ts` - Saves edited content back to disk
+- `app/api/file/save/route.ts` - Saves edited content back to disk under the shared TELOS lock, after a `Backups/<name>.dashboard-<stamp>` copy; refuses an edit inside an AUTOMATED region
 
 **Features**:
 - Toggle between view and edit modes
@@ -400,10 +390,7 @@ This template works with any Next.js hosting platform:
 - **Netlify**: Connect to Git repo
 - **Docker**: Use standard Next.js Dockerfile
 
-**Remember to set environment variables** in your hosting platform:
-```
-ANTHROPIC_API_KEY=your_key_here
-```
+A hosted copy has no LifeOS install behind it, so the Ask panel does not work there; the file views do. Keep Ask on your local run.
 
 ## Tech Stack
 
@@ -413,7 +400,7 @@ ANTHROPIC_API_KEY=your_key_here
 - **Styling**: Tailwind CSS 4.1
 - **UI Components**: shadcn/ui (custom implementation)
 - **Icons**: Lucide React
-- **AI**: Claude Haiku 4.5 (Anthropic API)
+- **AI**: LifeOS `Inference.ts` (medium level, your own Claude login)
 - **Package Manager**: Bun (also works with npm/yarn/pnpm)
 
 ## License

@@ -1,374 +1,104 @@
 ---
 name: Telos
-description: Life OS and project analysis with personal TELOS stored in the Obsidian vault. USE WHEN TELOS, life goals, mission, beliefs, current direction, career strategy, projects, dependencies, dashboard, narrative, report. SkillSearch('telos') for docs.
-compatibility: Designed for Claude Code and Devin (or similar agent products). Requires access to an Obsidian vault with TELOS data.
+evals:
+  manual:
+    reason: "whether a personal goal, belief, or strategy update is right needs the principal's approval against their intended state; the tool's write contract is the deterministic test above"
+    falsifier: "the principal rejects an update as inaccurate, unauthorized, or inconsistent with the intended goals"
 metadata:
-  author: pai
-  version: "1.0.0"
+  short-description: "Read or update personal TELOS goals, beliefs, and strategies; analyze project dependencies and alignment. Use Interview for conversational state refresh."
+version: 1.1.3
+description: Personal TELOS reads and updates goals, beliefs, narratives, and strategies with timestamped backups; Project TELOS analyzes .md/.csv directories for dependencies, bottlenecks, and alignment. USE WHEN Telos, life goals, projects, dependencies, update TELOS, narrative points, McKinsey report, dashboard, what am I wrong about, life frames, mental models. NOT FOR conversational constitutional review (Interview).
 ---
 
 # Telos
 
-**TELOS** (Telic Evolution and Life Operating System) is a comprehensive context-gathering system with two applications:
+**Contents:** Ideal State · Intent Routing · Data & Config · Project TELOS Analysis · Building Dashboards · Gotchas · Examples
 
-1. **Personal TELOS** - {PRINCIPAL.NAME}'s life context system (mission, beliefs, goals, current direction, career synthesis) in the Obsidian vault at `~/Obsidian/TELOS/`
-2. **Project TELOS** - Analysis framework for organizations/projects (relationships, dependencies, goals, progress)
+Reads and changes the principal's personal TELOS (life goals, ideal and current state, beliefs, strategies, wisdom, lessons, wrong-beliefs and the rest) at `~/.claude/LIFEOS/USER/TELOS/`, every change made through the Update intent's tool with a timestamped backup and a changelog line, because a hand edit can lose history or break the structure other tools parse. **TELOS** (Telic Evolution and Life Operating System) is the context-gathering system behind it. The same skill also runs Project TELOS: it reads a directory of .md/.csv files for dependency chains (PROBLEMS→GOALS→STRATEGIES→PROJECTS), bottlenecks, alignment and progress, and renders the analysis as a McKinsey-style report, n=24 narrative points, or a Next.js dashboard built by parallel engineers.
 
+## Ideal State
 
-## Workflow Routing
+- Personal TELOS changes only through the Update intent's tool: each change lands in the right file (and section, on a section-structured TELOS.md) with existing content preserved, a timestamped backup taken first, and a line in the changelog. The one other writer, the dashboard template's file save, keeps the same guarantees: it holds the shared TELOS lock, copies the file to `Backups/<name>.dashboard-<stamp>` first, logs the change, and refuses any edit inside an AUTOMATED region.
+- Advice and analysis rest on the TELOS or project files as they are now, read in this run, and every claim traces to a file; nothing comes from cached knowledge.
+- A project analysis surfaces the dependency chains PROBLEMS→GOALS→STRATEGIES→PROJECTS, the bottlenecks, alignment with stated objectives, progress and risk areas, delivered in the format asked for: report, narrative, dashboard, JSON or executive summary.
+- Personal TELOS never leaves the private tree: it is never included in public repos, skills, or outputs. Project material may be sensitive, so it is shared outward only with the principal's yes, sensitive details are redacted in examples, and individual names are reduced to roles in anything board-facing.
 
-**When executing a workflow, output this notification directly:**
+## Intent Routing
 
-```
-Running the **WorkflowName** workflow from the **Telos** skill...
-```
-
-| Workflow | Trigger | File |
+| Intent | Trigger | File |
 |----------|---------|------|
-| **Update** | "add to TELOS", "update my goals", "update my TELOS" | `Workflows/Update.md` |
-| **InterviewExtraction** | "extract content", "extract interviews", "analyze interviews" | `Workflows/InterviewExtraction.md` |
-| **CreateNarrativePoints** | "create narrative", "narrative points", "TELOS report", "n=24" | `Workflows/CreateNarrativePoints.md` |
-| **WriteReport** | "write report", "McKinsey report", "create TELOS report", "professional report" | `Workflows/WriteReport.md` |
+| **Update** | "add to TELOS", "add to ideal state", "update my goals", "add book to TELOS" | `Intents/Update.md` |
+| **InterviewExtraction** | "extract content", "extract telos content", "extract interviews", "analyze interviews" | `Intents/InterviewExtraction.md` |
+| **CreateNarrativePoints** | "create narrative", "narrative points", "TELOS report", "n=24" | `Intents/CreateNarrativePoints.md` |
+| **WriteReport** | "write report", "McKinsey report", "create TELOS report", "professional report" | `Intents/WriteReport.md` |
 
-**Note:** For general project analysis, dashboards, dependency mapping, and executive summaries, the skill handles these directly without a separate workflow file.
+General project analysis, dashboards, dependency mapping and executive summaries have no intent file; the skill handles them directly (§ Project TELOS Analysis, § Building Dashboards).
+
+| User Request | Context | Location |
+|--------------|---------|----------|
+| "my TELOS", "my goals", "my beliefs", "add to TELOS" | Personal TELOS | `~/.claude/LIFEOS/USER/TELOS/` |
+| "analyze [project]", "dashboard for" | Project TELOS | User-specified directory |
+| "analyze ~/path/to/project" | Project TELOS | Specified path |
+
+| File | Read when |
+|------|-----------|
+| `DashboardTemplate/` | building a project dashboard: the shipped Next.js scaffold, with copy-and-run steps in its README |
+| `ReportTemplate/` | WriteReport copies it as the report app (components, styles, placeholder `lib/report-data.ts`) |
+| `Setup.md` | first-time setup: the TELOS files, and the optional report theme (`ReportTheme.ts`, `Fonts/`) |
+
+## Data & Config
+
+All personal TELOS files live at `~/.claude/LIFEOS/USER/TELOS/`, in the USER tree, not under the Telos skill directory. `updates.md` is the changelog of every TELOS update and `Backups/` holds the timestamped backups. The optional report theme (`ReportTheme.ts`, `Fonts/`, `PREFERENCES.md` § Report design) lives at `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/Telos/`. Setup: [Setup.md](Setup.md).
+
+An install that keeps TELOS unified holds the categories as H2 sections of `TELOS.md`, including the Ideal State and Current State sections, and its updates target `TELOS.md` with `--section`. The machine-owned AUTOMATED regions inside the Current State and Ideal State sections change only through `--region current|ideal` (Update.md § Tool contract). An install may also keep per-domain `IDEAL_STATE/` and `CURRENT_STATE/` directories beside it; the Update tool cannot write those (Update.md § Gotchas).
+
+The split-file taxonomy below is the canonical file list, and the Update tool's `VALID_FILES` validates file names against it. A fresh install's starter scaffold ships a subset, and the tool creates a valid file on first write.
+
+| Group | Files |
+|-------|-------|
+| Core philosophy | **TELOS.md** (main framework document), **MISSION.md**, **BELIEFS.md** (core beliefs and world model), **WISDOM.md** |
+| Life data | **BOOKS.md**, **MOVIES.md**, **LESSONS.md**, **WRONG.md** (things the principal was wrong about, for growth tracking) |
+| Mental models | **FRAMES.md**, **MODELS.md** (decision-making models), **NARRATIVES.md** (self-stories), **STRATEGIES.md** |
+| Goals and challenges | **GOALS.md** (short- and long-term), **PROJECTS.md**, **PROBLEMS.md**, **CHALLENGES.md**, **PREDICTIONS.md**, **TRAUMAS.md** (past traumas, for context and healing) |
+| Change tracking | **updates.md** |
+
+## Project TELOS Analysis
+
+Point the skill at a project directory (named project, explicit path, or common location). The analysis covers every `.md`/`.csv` file in the target tree (e.g. `~/Projects/<your-org-tree>`), with no required structure and no fixed file list:
+
+```bash
+find $TARGET_DIR -type f \( -name "*.md" -o -name "*.csv" \)
+```
+
+Deliver in whatever format was asked: markdown report (Mermaid diagrams), interactive web dashboard, JSON export, or executive summary.
+
+## Building Dashboards
+
+The deliverable is an interactive Next.js dashboard that renders the analysis with dependency graphs (Mermaid or D3.js), sortable and filterable progress tables, metrics cards (KPIs, stats), timeline visualizations and relationship networks. **Start from the shipped scaffold at `DashboardTemplate/`** (working Next.js app: file browser, markdown/CSV rendering, dependency views — see its README for the copy-and-run steps) rather than from scratch, then adapt pages to the analysis. Its stack (Next.js 15, TypeScript, shadcn/ui, Tailwind CSS) and its Tokyo Night Day design tokens in `DashboardTemplate/app/globals.css` are the dashboard's. Fan the build out across parallel agents wherever the work splits cleanly: data-parsing lib, shared components, per-page views, theme, integration. (Template wired per public issue #1555, @tzioup.)
+
+## Gotchas
+
+- **Project dashboards pull from multiple sources.** Verify data freshness before presenting.
 
 ## Examples
 
-**Example 1: Update personal TELOS**
+**Example 1: Change the ideal state**
 ```
-User: "update my TELOS goals"
---> Invokes Update workflow
---> Creates timestamped backup of Direction/GOALS.md
---> Appends the new goal content to the Obsidian TELOS note
---> Logs change in Reviews/updates.md with timestamp
+User: "add to ideal state: publish one book a year"
+--> Update intent
+--> The entry sits under its heading in TELOS.md's Ideal State section (written with --section), a backup is in Backups/, and updates.md logs the change
 ```
 
 **Example 2: Analyze project with TELOS**
 ```
 User: "analyze ~/Projects/MyApp with TELOS"
---> Scans all .md and .csv files in directory
---> Extracts entities, relationships, dependencies
---> Returns analysis with dependency chains and progress metrics
+--> Project TELOS analysis over every .md and .csv file in the tree
+--> Dependency chains, bottlenecks, alignment and progress metrics, each traced to its file
 ```
 
-**Example 3: Build project dashboard**
+**Example 3: Board report from an assessment**
 ```
-User: "build a dashboard for TELOSAPP"
---> Launches up to 10 parallel engineers
---> Creates Next.js dashboard with shadcn/ui + Aceternity
---> Returns interactive dashboard with dependency graphs, metrics cards, progress tables
+User: "create a TELOS report for Acme Corp"
+--> WriteReport intent
+--> A running Next.js report app in the output directory, nine sections, role-based sources, print-ready
 ```
-
-**Example 4: Generate narrative points**
-```
-User: "create TELOS narrative for Acme Corp, n=24"
---> Invokes CreateNarrativePoints workflow
---> Analyzes TELOS context (situation, problems, recommendations)
---> Returns a story-driven narrative with evidence, stakes, vision, and close
---> Output is slide-ready for presentations or customer briefings
-```
-
-**Example 5: Generate McKinsey-style report**
-```
-User: "write a TELOS report for Acme Corp"
---> Invokes WriteReport workflow
---> First runs CreateNarrativePoints to generate story content
---> Maps narrative to McKinsey report structure
---> Generates web-based report with professional styling
---> Output at {project_dir}/report - run `bun dev` to view
---> White background, subtle Tokyo Night Storm accents
---> Includes: cover page, executive summary, findings, recommendations, roadmap
-```
-
----
-
-## Context Detection
-
-**How {DAIDENTITY.NAME} determines which TELOS context:**
-
-| User Request | Context | Location |
-|--------------|---------|----------|
-| "my TELOS", "my goals", "my beliefs", "add to TELOS" | Personal TELOS | `~/Obsidian/TELOS/` |
-| "Alma", "TELOSAPP", "analyze [project]", "dashboard for" | Project TELOS | User-specified directory |
-| "analyze ~/path/to/project" | Project TELOS | Specified path |
-
----
-
-# Part 1: Personal TELOS ({PRINCIPAL.NAME}'s Life)
-
-## Location
-
-**CRITICAL PATH:** Personal TELOS lives in the Obsidian vault at:
-```
-~/Obsidian/TELOS/
-```
-
-On this machine, that resolves to:
-```
-C:\Users\fujos\Obsidian\TELOS\
-```
-
-## Personal TELOS Framework
-
-Current structure inside `~/Obsidian/TELOS/`:
-
-### Orientation
-- **Home.md** - Overview of the TELOS folder and linked strategic notes
-- **Now.md** - Live snapshot of current priorities, constraints, and active decisions
-- **CLAUDE.md** - Routing and quality guidance for the TELOS folder
-
-### Core
-- **Core/MISSION.md** - Life mission statement
-- **Core/BELIEFS.md** - Core beliefs and world model
-
-### Direction
-- **Direction/GOALS.md** - Near-term, medium-term, and long-term goals
-
-### Career
-- **Career/Overview.md** - Career synthesis and current positioning
-- **Career/Everything Resume.md** - Broad experience inventory
-- **Career/Target Roles.md** - Roles worth pursuing
-- **Career/Gap Analysis.md** - Capability and evidence gaps
-- **Career/Strategy.md** - Career strategy and directional moves
-
-### Reviews
-- **Reviews/updates.md** - Lightweight changelog of meaningful TELOS changes
-- **Backups/** - Timestamped note backups created by the Update workflow
-
-## Working with Personal TELOS
-
-### Read Files
-
-```bash
-# View specific files
-read ~/Obsidian/TELOS/Direction/GOALS.md
-read ~/Obsidian/TELOS/Core/BELIEFS.md
-read ~/Obsidian/TELOS/Now.md
-
-# View recent updates
-read ~/Obsidian/TELOS/Reviews/updates.md
-```
-
-### Update Personal TELOS
-
-**CRITICAL:** Use the Update workflow with a relative note path inside `~/Obsidian/TELOS/`.
-
-**Workflow:** `Workflows/Update.md`
-
-The workflow provides:
-- Automatic timestamped backups under `Backups/`
-- Change logging in `Reviews/updates.md`
-- Version history preservation
-- Support for nested note paths inside the TELOS folder
-
-**Common note paths for updates:**
-Home.md, Now.md, Core/MISSION.md, Core/BELIEFS.md, Direction/GOALS.md, Career/Overview.md, Career/Everything Resume.md, Career/Target Roles.md, Career/Gap Analysis.md, Career/Strategy.md, Reviews/updates.md
-
----
-
-# Part 2: Project TELOS (Organizational Analysis)
-
-## Capabilities
-
-For any project directory, TELOS provides:
-
-1. **Relationship Discovery** - Find how files/entities connect
-2. **Dependency Mapping** - Identify what depends on what
-3. **Goal Extraction** - Discover stated and implied objectives
-4. **Progress Analysis** - Track advancement and metrics
-5. **Narrative Generation** - Create executive summaries
-6. **Visual Dashboards** - Build beautiful UIs with data
-
-## Target Directory Detection
-
-**Flexible file discovery - no required structure:**
-
-```bash
-# User specifies directory
-"Analyze ~/Cloud/Projects/TELOSAPP"
---> {DAIDENTITY.NAME} scans for .md and .csv files anywhere in tree
-
-# {DAIDENTITY.NAME} automatically finds all .md and .csv files regardless of structure
-```
-
-## Analysis Workflow
-
-### Step 1: Identify Target
-
-**Auto-detection:**
-- User mentions project name (TELOSAPP, Alma, etc.)
-- User provides path explicitly
-- {DAIDENTITY.NAME} looks for common project locations
-
-### Step 2: Scan Files
-
-Discover all markdown and CSV files:
-```bash
-find $TARGET_DIR -type f \( -name "*.md" -o -name "*.csv" \)
-```
-
-Index:
-- Markdown structure (headings, sections, links)
-- CSV schema (columns, data types)
-- Cross-references and mentions
-- Entities (people, teams, projects, problems)
-
-### Step 3: Relationship Analysis
-
-Build relationship graph:
-1. **Entity Extraction** - Identify unique entities
-2. **Connection Discovery** - Find explicit/implicit links
-3. **Dependency Mapping** - Trace dependencies
-4. **Network Construction** - Build directed graph
-
-### Step 4: Generate Insights
-
-Produce analytics:
-- **Dependency Chains**: PROBLEMS --> GOALS --> STRATEGIES --> PROJECTS
-- **Bottlenecks**: What blocks progress?
-- **Goal Alignment**: Projects aligned with objectives?
-- **Progress Metrics**: Completion percentages
-- **Risk Areas**: Overdue items, blocked work
-
-### Step 5: Create Outputs
-
-**Output Formats:**
-
-1. **Markdown Report** - Static analysis with Mermaid diagrams
-2. **Web Dashboard** - Interactive app with shadcn/ui + Aceternity
-3. **JSON Export** - Structured data
-4. **Executive Summary** - Narrative overview
-5. **Custom Format** - As requested
-
-## Building Dashboards
-
-### Parallel Engineer Strategy
-
-**CRITICAL: When building UIs, use up to 16 parallel engineers.**
-
-**Launch Strategy:**
-Use single message with 10 Task calls in parallel:
-
-```
-Engineer 1: Project structure + layout + navigation
-Engineer 2: Overview page with metrics cards
-Engineer 3: Projects page with progress tracking
-Engineer 4: Teams page with performance tables
-Engineer 5: Vulnerabilities/issues page
-Engineer 6: Progress timeline visualization
-Engineer 7: Data parsing library (MD/CSV)
-Engineer 8: Shared components (cards, badges, tables)
-Engineer 9: Design polish and theme
-Engineer 10: Integration and testing
-```
-
-### Dashboard Requirements
-
-**Tech Stack:**
-- Next.js 14 + TypeScript
-- shadcn/ui for UI components
-- Aceternity UI for layouts
-- Tailwind CSS
-- Tokyo Night Day theme (professional light)
-
-**Features:**
-- Dependency graphs (Mermaid or D3.js)
-- Progress tables (sortable, filterable)
-- Metrics cards (KPIs, stats)
-- Timeline visualizations
-- Relationship networks
-
-**Design:**
-```css
---background: #ffffff
---foreground: #1a1b26
---primary: #2e7de9
---accent: #9854f1
---destructive: #f52a65
---success: #33b579
---warning: #f0a020
-```
-
-## Common TELOS Files
-
-**Standard Project TELOS Structure** (auto-detected):
-
-### Context Files
-- **OVERVIEW.md** - Project overview
-- **COMPANY.md** - Organization context
-- **PROBLEMS.md** - Issues to solve
-- **GOALS.md** - Objectives
-- **MISSION.md** - Mission statement
-- **STRATEGIES.md** - Strategic approaches
-- **PROJECTS.md** - Active initiatives
-
-### Operational Files
-- **EMPLOYEES.md** - Team members
-- **ENGINEERING_TEAMS.md** - Team structure
-- **BUDGET.md** - Financial tracking
-- **KPI_TRACKING.md** - Metrics
-- **APPLICATIONS.md** - App inventory
-- **TOOLS.md** - Tooling
-- **VENDORS.md** - Third parties
-
-### Security Files
-- **VULNERABILITIES.md** - Security issues
-- **SECURITY_POSTURE.md** - Security state
-- **THREAT_MODEL.md** - Threats
-
-### Data Files (CSV)
-- **data/VULNERABILITIES.csv** - Vuln tracking
-- **data/INCIDENTS.csv** - Incident log
-- **data/VENDORS.csv** - Vendor data
-
-**Note:** Files are optional. TELOS adapts to whatever exists.
-
-## Visualization Types
-
-**Available Visualizations:**
-
-- **Dependency Graphs** - Mermaid or D3.js network
-- **Progress Tables** - shadcn/ui tables with filters
-- **Metrics Cards** - Aceternity card layouts
-- **Timeline Charts** - Progress over time
-- **Status Dashboards** - KPI overviews
-- **Relationship Networks** - Force-directed graphs
-- **Bar Charts** - Recharts for comparisons
-- **Line Charts** - Trend analysis
-
----
-
-## Security & Privacy
-
-**Personal TELOS:**
-- NEVER commit to public repos
-- NEVER share publicly
-- Always backup before changes
-- Use Update workflow only
-
-**Project TELOS:**
-- May contain sensitive data
-- Ask before sharing externally
-- Redact sensitive info in examples
-- Follow PAI security protocols
-
----
-
-## Key Principles
-
-1. **Dual Context** - Handles both personal and project TELOS seamlessly
-   - Personal TELOS: `~/Obsidian/TELOS/` (inside the Obsidian vault)
-   - Project TELOS: User-specified directories
-2. **Auto-Detection** - Determines context from user question
-3. **Flexible Discovery** - Finds files regardless of structure
-4. **TELOS Methodology** - Applies relationships, dependencies, goals, narratives
-5. **Parallel Execution** - Up to 10 engineers for dashboard builds
-6. **Visual Excellence** - Beautiful outputs with shadcn/ui + Aceternity
-7. **Privacy-Aware** - Respects sensitive data
-8. **Integrated** - Works with development, research, and other skills
-
----
-
-**TELOS is {PRINCIPAL.NAME}'s life operating system AND project analysis framework. One skill, two powerful contexts.**
-
-**Remember:** Personal TELOS files live at `~/Obsidian/TELOS/` inside the Obsidian vault

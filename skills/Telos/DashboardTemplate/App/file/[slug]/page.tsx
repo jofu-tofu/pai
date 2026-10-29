@@ -7,14 +7,6 @@ import { Button } from "@/components/ui/button"
 import { FileText, Table as TableIcon, Edit2, Save, X } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 
-function filenameToSlug(filename: string) {
-  return filename.replace(/\.(md|csv)$/i, '').replace(/[\\/]/g, '~')
-}
-
-function filenameToDisplayName(filename: string) {
-  return filename.replace(/\.(md|csv)$/i, '')
-}
-
 export default function FilePage() {
   const params = useParams()
   const slug = params.slug as string
@@ -30,7 +22,10 @@ export default function FilePage() {
     fetch('/api/files/count')
       .then(res => res.json())
       .then(data => {
-        const matchingFile = data.files.find((f: string) => filenameToSlug(f) === slug)
+        const matchingFile = data.files.find((f: string) => {
+          const fileSlug = f.replace('.md', '').replace('.csv', '').replace('data/', '')
+          return fileSlug === slug
+        })
 
         if (matchingFile) {
           // Fetch the actual file content
@@ -38,7 +33,7 @@ export default function FilePage() {
             .then(res => res.json())
             .then(fileData => {
               setFile({
-                name: filenameToDisplayName(matchingFile),
+                name: slug,
                 filename: matchingFile,
                 content: fileData.content,
                 type: matchingFile.endsWith('.csv') ? 'csv' : 'markdown'
@@ -181,11 +176,12 @@ export default function FilePage() {
 }
 
 function CSVTable({ content }: { content: string }) {
-  // Use CRLF-safe split for cross-platform compatibility
-  const lines = content.trim().split(/\r?\n/)
+  const lines = content.trim().split('\n')
   if (lines.length === 0) return <p className="text-gray-500">Empty file</p>
 
-  const headers = lines[0].split(',').map(h => h.trim())
+  // noUncheckedIndexedAccess: the length guard above doesn't narrow lines[0]
+  // (public issue #1556, @tzioup)
+  const headers = (lines[0] ?? '').split(',').map(h => h.trim())
   const rows = lines.slice(1).map(line => line.split(',').map(cell => cell.trim()))
 
   return (

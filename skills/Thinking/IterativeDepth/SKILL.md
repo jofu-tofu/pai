@@ -1,44 +1,54 @@
 ---
 name: IterativeDepth
-description: Multi-angle iterative exploration for deeper ISC extraction. USE WHEN iterative depth, deep exploration, multi-angle analysis, explore deeper, multiple perspectives on problem, examine from angles, OR when the Algorithm's OBSERVE phase needs enhanced ISC extraction.
-compatibility: Designed for Claude Code and Devin (or similar agent products)
+evals:
+  manual:
+    reason: "the usefulness of successive analytical lenses depends on whether they reveal real requirements for the supplied problem"
+    falsifier: "the reviewer finds the passes repeat one lens, miss a material edge case, or produce unsupported criteria"
 metadata:
-  author: pai
-  version: "1.0.0"
+  short-description: "Explore a problem through multiple analytical lenses to uncover requirements and edge cases. Use ApertureOscillation for tactical/strategic zoom."
+version: 1.2.1
+description: "Structured multi-angle exploration running 2-8 sequential passes over the same problem, each through a different scientific lens, to surface hidden requirements and edge cases invisible from one angle; each pass yields new ISC criteria. USE WHEN iterative depth, explore deeper, multi-angle analysis, surface hidden requirements, blind spot check, what am I missing. NOT FOR scope/zoom analysis (use ApertureOscillation)."
 ---
-
-## Customization
-
-**Before executing, check for user customizations at:**
-`~/.claude/skills/PAI/USER/SKILLCUSTOMIZATIONS/IterativeDepth/`
-
-If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
-
 
 # IterativeDepth
 
-**Structured multi-angle exploration of the same problem to extract deeper understanding and richer ISC criteria.**
+IterativeDepth examines one problem through several structurally different lenses (literal, stakeholder, failure, temporal and more) and merges what each angle surfaces into ISC criteria a single pass misses. The method rests on 20 established techniques across cognitive science, AI/ML, requirements engineering and design thinking (`ScientificFoundation.md`).
 
-Grounded in 20 established scientific techniques across cognitive science (Hermeneutic Circle, Triangulation), AI/ML (Self-Consistency, Ensemble Methods), requirements engineering (Viewpoint-Oriented RE), and design thinking (Six Thinking Hats, Causal Layered Analysis).
+## Ideal State
 
-## Core Concept
+- A run returns ISC criteria and anti-criteria that a single pass over the same problem would have missed, each one binary-testable and deduplicated across lenses.
+- The lenses fit the problem (a security problem leans on the failure and adversary angles, a UX problem on the experiential one). A run uses between two and eight passes and ends once a pass only repeats earlier findings, usually by about the fifth.
+- The result names the lenses used and the cross-angle finding that only appeared because two lenses collided.
 
-Instead of analyzing a problem once, run 2-8 structured passes through the same problem, each from a systematically different **lens**. Each pass surfaces requirements, edge cases, and criteria invisible from other angles. The combination yields ISC criteria that no single-pass analysis could produce.
+## Intent Routing
 
-## Workflow Routing
+| Intent | Trigger | File |
+|--------|---------|------|
+| **Explore** | "iterative depth", "explore deeper", "multi-angle" | `Intents/Explore.md` |
 
-| Trigger | Workflow |
-|---------|----------|
-| "iterative depth", "explore deeper", "multi-angle" | `Workflows/Explore.md` |
-| "quick depth", "fast angles" | `Workflows/Explore.md` (Fast mode: 2 lenses) |
+| File | Read when |
+|------|-----------|
+| `TheLenses.md` | choosing lenses: the catalog of eight exploration angles, concrete to abstract, each with its question, grounding and example prompt |
+| `ScientificFoundation.md` | justifying the method or explaining why multi-lens passes work: the 20 techniques it rests on and how it differs from CS iterative deepening |
 
-## Quick Reference
+## Data & Config
 
-- **8 Lenses** available, scaled by SLA (2-8)
-- **Each lens** is a structurally different exploration angle
-- **Output** is new/refined ISC criteria per pass
-- **Integration** point: Algorithm OBSERVE phase
+User customizations live at `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/IterativeDepth/` (`configRoot` is `$CLAUDE_CONFIG_DIR` when set, else `~/.claude`). When that directory exists, its PREFERENCES.md, configurations and resources override the defaults; when it is absent, the defaults stand.
 
-**Full Documentation:**
-- Scientific grounding: `ScientificFoundation.md`
-- Lens definitions: `TheLenses.md`
+## Gotchas
+
+None reproduced yet.
+
+## Examples
+
+```
+User: "Inline, no agents: 3 quick passes over the issue-security route design (private vs public)"
+→ Explore intent
+→ Three lenses run inline; new criteria and anti-criteria for each route outcome, with the cross-angle finding
+```
+
+```
+User: "What am I missing in this ISA coordination design?"
+→ Explore intent
+→ Criteria and anti-criteria the design lacked and existing criteria refined, with the lenses named, returned to the user
+```

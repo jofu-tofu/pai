@@ -1,151 +1,55 @@
 ---
 name: Science
-description: Universal thinking and iteration engine based on the scientific method. USE WHEN user says "think about", "figure out", "try approaches", "experiment with", "test this idea", "iterate on", "improve", "optimize", OR any problem-solving that benefits from structured hypothesis-test-analyze cycles. THE meta-skill that other workflows implement.
-compatibility: Designed for Claude Code and Devin (or similar agent products)
+evals:
+  manual:
+    reason: "diagnoses and investigations require judgment that their hypotheses distinguish plausible explanations for the supplied problem"
+    falsifier: "the reviewer finds no proposed observation could falsify a hypothesis or the evidence gathered cannot discriminate among alternatives"
 metadata:
-  author: pai
-  version: "1.0.0"
+  short-description: "Diagnose or investigate a problem with a locked goal, plural falsifiable hypotheses and discriminating evidence; measured improvement goes to HillClimb."
+version: 1.2.1
+description: "The scientific method for understanding a problem: a goal locked before evidence, plural falsifiable hypotheses, and the cheapest evidence that tells them apart, from a timeboxed debug to a research-grade investigation. USE WHEN think about, figure out, diagnose, investigate, why is this happening, science, quick diagnosis, structured investigation, define the goal, what are we trying to achieve, research-grade investigation. NOT FOR multi-angle lens passes (IterativeDepth) or measured improvement of a target (HillClimb)."
 ---
 
-## Customization
+# Science
 
-**Before executing, check for user customizations at:**
-`~/.claude/skills/PAI/USER/SKILLCUSTOMIZATIONS/Science/`
+Applies the scientific method to understanding a problem: a checkable goal fixed before evidence, competing falsifiable hypotheses, the evidence that tells them apart, and a decision on what to do next. DefineGoal frames the problem, QuickDiagnosis handles timeboxed debugging, and StructuredInvestigation runs the whole loop at working grade or research grade. Improving a target by measured experiment (hypotheses for a change, experiment design, reading results, iterating) is HillClimb's job, and `skills/HillClimb/References/Experiments.md` describes a well-framed experiment; a climb that stalls on a wrong frame comes back here. Use IterativeDepth for multi-lens exploration.
 
-If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
+## Ideal State
 
-# Science - The Universal Algorithm
+- Every investigation ties a goal locked before evidence collection to competing falsifiable hypotheses, and every verdict traces to evidence against those precommitted criteria.
+- Rigor matches the stakes: a quick diagnosis stays timeboxed, a complex problem leaves an auditable record, and a research-grade question gets pre-registration and independent review.
+- Goal achievement and hypothesis support are judged separately, null and inconclusive results stay visible, and every investigation ends in an explicit next action or stopping decision.
+- A question that turns into "make this measured number better" leaves Science for HillClimb with its goal and hypotheses attached.
 
-**The scientific method applied to everything. The meta-skill that governs all other skills.**
+## Intent Routing
 
-## The Universal Cycle
+| Intent | Trigger | File |
+|----------|---------|------|
+| **DefineGoal** | "define the goal", "what are we trying to achieve" | `Intents/DefineGoal.md` |
+| **QuickDiagnosis** | Quick debugging (15-min rule); not for an obvious five-minute fix or creative/generative work, which need no ceremony | `Intents/QuickDiagnosis.md` |
+| **StructuredInvestigation** | "investigate", complex or research-grade investigation | `Intents/StructuredInvestigation.md` |
 
-```
-GOAL -----> What does success look like?
-   |
-OBSERVE --> What is the current state?
-   |
-HYPOTHESIZE -> What might work? (Generate MULTIPLE)
-   |
-EXPERIMENT -> Design and run the test
-   |
-MEASURE --> What happened? (Data collection)
-   |
-ANALYZE --> How does it compare to the goal?
-   |
-ITERATE --> Adjust hypothesis and repeat
-   |
-   +------> Back to HYPOTHESIZE
-```
+Experiment requests ("what might work", "how do we test", "iterate", "analyze the results", "optimize") on a target with a measurement go to HillClimb (`skills/HillClimb/SKILL.md`).
 
-**The goal is CRITICAL.** Without clear success criteria, you cannot judge results.
+| File | Read when |
+|------|-----------|
+| `Methodology.md` | running or measuring an investigation: execution invariants and tool routing |
+| `Protocol.md` | handing work to a specialist skill, sizing formality by scale, or receiving a stalled climb; also the contract a skill follows when its body says it implements the Science protocol |
+| `Templates.md` | a record's status values or its compact form |
+| `Examples.md` | interpreting improvement when the goal is still unmet, or an aggregate score against failed criteria |
 
----
+## Data & Config
 
+User customizations live at `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/Science/` (`configRoot` is `$CLAUDE_CONFIG_DIR` when set, else `~/.claude`). When that directory exists, its PREFERENCES.md, configurations and resources override the defaults here; when it is absent, the defaults stand.
 
-## Workflow Routing
+## Gotchas
 
-**Output when executing:** `Running the **WorkflowName** workflow in the **Science** skill to ACTION...`
+_No gotchas documented yet. Add failures here as they're discovered._
 
-### Core Workflows
+## Examples
 
-| Trigger | Workflow |
-|---------|----------|
-| "define the goal", "what are we trying to achieve" | `Workflows/DefineGoal.md` |
-| "what might work", "ideas", "hypotheses" | `Workflows/GenerateHypotheses.md` |
-| "how do we test", "experiment design" | `Workflows/DesignExperiment.md` |
-| "what happened", "measure", "results" | `Workflows/MeasureResults.md` |
-| "analyze", "compare to goal" | `Workflows/AnalyzeResults.md` |
-| "iterate", "try again", "next cycle" | `Workflows/Iterate.md` |
-| Full structured cycle | `Workflows/FullCycle.md` |
+- "Why is this test flaky?" → QuickDiagnosis: a one-sentence GOAL, H1-H3 with falsifiers, the cheapest discriminating test first.
 
-### Diagnostic Workflows
+- "What might work to cut churn?" → HillClimb: churn is a measured product number, so it is a metric climb with its hypotheses, experiments and keeps in the climb ledger.
 
-| Trigger | Workflow |
-|---------|----------|
-| Quick debugging (15-min rule) | `Workflows/QuickDiagnosis.md` |
-| Complex investigation | `Workflows/StructuredInvestigation.md` |
-
----
-
-## Resource Index
-
-| Resource | Description |
-|----------|-------------|
-| `METHODOLOGY.md` | Deep dive into each phase |
-| `Protocol.md` | How skills implement Science |
-| `Templates.md` | Goal, Hypothesis, Experiment, Results templates |
-| `Examples.md` | Worked examples across scales |
-
----
-
-## Domain Applications
-
-| Domain | Manifestation | Related Skill |
-|--------|---------------|---------------|
-| **Coding** | TDD (Red-Green-Refactor) | Development |
-| **Products** | MVP -> Measure -> Iterate | Development |
-| **Research** | Question -> Study -> Analyze | Research |
-| **Prompts** | Prompt -> Eval -> Iterate | Evals |
-| **Decisions** | Options -> Council -> Choose | Council |
-
----
-
-## Scale of Application
-
-| Level | Cycle Time | Example |
-|-------|-----------|---------|
-| **Micro** | Minutes | TDD: test, code, refactor |
-| **Meso** | Hours-Days | Feature: spec, implement, validate |
-| **Macro** | Weeks-Months | Product: MVP, launch, measure PMF |
-
----
-
-## Integration Points
-
-| Phase | Skills to Invoke |
-|-------|-----------------|
-| **Goal** | Council for validation |
-| **Observe** | Research for context |
-| **Hypothesize** | Council for ideas, RedTeam for stress-test |
-| **Experiment** | Development (Worktrees) for parallel tests |
-| **Measure** | Evals for structured measurement |
-| **Analyze** | Council for multi-perspective analysis |
-
----
-
-## Key Principles (Quick Reference)
-
-1. **Goal-First** - Define success before starting
-2. **Hypothesis Plurality** - NEVER just one idea (minimum 3)
-3. **Minimum Viable Experiments** - Smallest test that teaches
-4. **Falsifiability** - Experiments must be able to fail
-5. **Measure What Matters** - Only goal-relevant data
-6. **Honest Analysis** - Compare to goal, not expectations
-7. **Rapid Iteration** - Cycle speed > perfect experiments
-
----
-
-## Anti-Patterns
-
-| Bad | Good |
-|-----|------|
-| "Make it better" | "Reduce load time from 3s to 1s" |
-| "I think X will work" | "Here are 3 approaches: X, Y, Z" |
-| "Prove I'm right" | "Design test that could disprove" |
-| "Pretend failure didn't happen" | "What did we learn?" |
-| "Keep experimenting forever" | "Ship and learn from production" |
-
----
-
-## Quick Start
-
-1. **Goal** - What does success look like?
-2. **Observe** - What do we know?
-3. **Hypothesize** - At least 3 ideas
-4. **Experiment** - Minimum viable tests
-5. **Measure** - Collect goal-relevant data
-6. **Analyze** - Compare to success criteria
-7. **Iterate** - Adjust and repeat
-
-**The answer emerges from the cycle, not from guessing.**
+- A weeks-long decision needing methodology review and statistical rigor → StructuredInvestigation at research grade: pre-registered goal, five or more hypotheses, independent review recorded.
