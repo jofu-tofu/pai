@@ -11,7 +11,7 @@ A small seed corpus expanded into a diverse, schema-valid, deduplicated N-exampl
 - Every turn after the first had all examples accepted so far in its input and sampled from confidence < 0.10, and later turns' accepted examples sit further into the tails than earlier ones, pushed outward as the corpus grew.
 - The run stopped when any termination condition was true (target N reached; the last turn rejected ≥40% of generations as semantic duplicates; three consecutive turns produced <2 accepted examples), and a diversity-collapse stop left a clear note in `summary.md` giving the actual diversity ceiling for this seed.
 - `summary.md` reports the diversity index (`Tools/Diversity.ts index`, 1 minus mean pairwise TF-IDF cosine) for the seed and for the final corpus, and the corpus index is the higher of the two.
-- `seed.json`, `schema.json`, `generations.jsonl` (every accepted example with provenance), `rejected.jsonl` (every rejected example with reason) and `summary.md` (final stats) exist under `~/.claude/LIFEOS/MEMORY/WORK/{slug}/synthetic-data/`, and the response points the user at them.
+- `seed.json`, `schema.json`, `generations.jsonl` (every accepted example with provenance), `rejected.jsonl` (every rejected example with reason) and `summary.md` (final stats) exist under the explicitly selected output directory, and the response points the user at them.
 
 ## Anti-criteria
 
@@ -26,15 +26,15 @@ A small seed corpus expanded into a diverse, schema-valid, deduplicated N-exampl
 - **Target N** — how many examples the final corpus should have
 - **Optional: domain hints** — let the user steer the distribution
 
-Typical consumers: eval sets (the Assay skill), prompt-injection test corpora, writing-style fine-tuning sets, synthetic Q&A pairs for retrieval evals.
+Typical consumers: eval sets (the a user-selected evaluation tool skill), prompt-injection test corpora, writing-style fine-tuning sets, synthetic Q&A pairs for retrieval evals.
 
 ## Tool contract
 
-Each turn is a fresh generation request, but the model sees all previously accepted examples to enforce non-duplication. Every turn's candidates go through the dedupe tool before acceptance, and the index runs once on the seed and once on the final corpus. Run from `~/.claude`:
+Each turn is a fresh generation request, but the model sees all previously accepted examples to enforce non-duplication. Every turn's candidates go through the dedupe tool before acceptance, and the index runs once on the seed and once on the final corpus. Run from `<host-config-dir>`:
 
 ```bash
-bun skills/BeCreative/Tools/Diversity.ts dedupe --accepted <seed + accepted so far> --candidates <turn output> [--threshold 0.85]
-bun skills/BeCreative/Tools/Diversity.ts index <seed.json> <generations.jsonl>
+bun <skill-dir>/Tools/Diversity.ts dedupe --accepted <seed + accepted so far> --candidates <turn output> [--threshold 0.85]
+bun <skill-dir>/Tools/Diversity.ts index <seed.json> <generations.jsonl>
 ```
 
 Files are a JSON array or JSONL; a record with an `example` field is read as that example, so turn output and `generations.jsonl` pass as-is. Full contract: `Tools/Diversity.help.md`.
@@ -56,7 +56,7 @@ Files are a JSON array or JSONL; a record with an `example` field is read as tha
 
 ## Output format
 
-Written to `~/.claude/LIFEOS/MEMORY/WORK/{slug}/synthetic-data/`:
+Written to the selected output directory:
 
 - `seed.json` — the original seed corpus
 - `schema.json` — the validation schema

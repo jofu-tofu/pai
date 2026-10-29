@@ -5,7 +5,7 @@ Checks a RhetoricalLens output (`Intents/RhetoricalLens.md`) against the parts o
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/RhetoricalLensCheck.ts <file|-> [--source <text-file>] [--max-words N] [--sections <list>] [--json]
+bun <skill-dir>/Tools/RhetoricalLensCheck.ts <file|-> [--source <text-file>] [--max-words N] [--sections <list>] [--json]
 ```
 
 | Flag | Meaning |

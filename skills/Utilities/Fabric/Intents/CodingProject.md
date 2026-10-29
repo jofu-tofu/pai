@@ -20,7 +20,7 @@ Our ideal-state port of Fabric's `create_coding_project`. The upstream pattern s
 - A follow-up asking for a change ("use Postgres instead", "add auth") returns all nine sections again with every affected file in full, so the revised output stands on its own.
 - A source is read in full before anything is written (`Intents/ExecutePattern.md` § Tool contract covers fetching URLs and YouTube links).
 - The words are plain and exact, specific to this project: a sentence in SUMMARY, TAKEAWAYS or SUGGESTIONS could not be moved to a different project and stay true.
-- `bun skills/Fabric/Tools/CodingProjectCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/CodingProjectCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -35,7 +35,7 @@ Our ideal-state port of Fabric's `create_coding_project`. The upstream pattern s
 ## Evals
 
 - suite: fabric-codingproject — code checks on the nine sections and the literal facts each case pins, plus judged checks on whether the code does the job, keeps every requirement, stays secure and matches across sections.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -45,10 +45,10 @@ Our ideal-state port of Fabric's `create_coding_project`. The upstream pattern s
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/CodingProjectCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/CodingProjectCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

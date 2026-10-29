@@ -22,7 +22,7 @@ Our ideal-state port of Fabric's `check_falsifiability`. The upstream pattern st
 - Every line is specific to this input. A disprover, test or rewrite that would fit most other claims as well ("gather more evidence", "define terms more clearly") fails.
 - When the input is a source, the audit reflects what it actually claims, read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
 - The words are plain and exact: the most precise ordinary word wins over philosophy-of-science jargon, and a term a non-specialist would not know is explained in the same line or replaced.
-- `bun skills/Fabric/Tools/CheckFalsifiabilityCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/CheckFalsifiabilityCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -39,7 +39,7 @@ Our ideal-state port of Fabric's `check_falsifiability`. The upstream pattern st
 ## Evals
 
 - suite: fabric-checkfalsifiability — code checks on the title, the seven sections, the verdict fields and the Kafka list, plus judged checks on fair verdicts, testability over truth, traps grounded in the text, and specific tests and rewrites.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -48,10 +48,10 @@ Our ideal-state port of Fabric's `check_falsifiability`. The upstream pattern st
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/CheckFalsifiabilityCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/CheckFalsifiabilityCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

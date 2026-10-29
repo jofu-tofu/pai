@@ -7,6 +7,8 @@ metadata:
   version: "1.0.0"
 ---
 
+Read `PORTABILITY.md` before use; it defines the standalone tool and storage contract and replaces any inherited platform-specific setup.
+
 # SkillTranslate - Cross-Platform Skill Translation
 
 **Invoke when:** Converting skills between platforms, showing platform equivalents, understanding cross-system mappings, translating workflows.
@@ -57,7 +59,7 @@ Executable engines for translation:
 
 **Translate a skill to Windsurf:**
 ```bash
-bun run $PAI_DIR/.claude/skills/SkillTranslate/Tools/TranslateSkill.ts \
+bun run <workspace-dir>/.claude/<skill-dir>/Tools/TranslateSkill.ts \
   --skill UpdatePAI \
   --from claude-code \
   --to windsurf \
@@ -66,14 +68,14 @@ bun run $PAI_DIR/.claude/skills/SkillTranslate/Tools/TranslateSkill.ts \
 
 **Show platform equivalents:**
 ```bash
-bun run $PAI_DIR/.claude/skills/SkillTranslate/Tools/ShowMappings.ts \
+bun run <workspace-dir>/.claude/<skill-dir>/Tools/ShowMappings.ts \
   --from claude-code \
   --to windsurf
 ```
 
 **Validate mapping completeness:**
 ```bash
-bun run $PAI_DIR/.claude/skills/SkillTranslate/Tools/ValidateMappings.ts \
+bun run <workspace-dir>/.claude/<skill-dir>/Tools/ValidateMappings.ts \
   --mapping claude-windsurf
 ```
 

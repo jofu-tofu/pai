@@ -5,7 +5,7 @@ Checks an AnalyzeThreatReport output (`Intents/AnalyzeThreatReport.md`) against 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeThreatReportCheck.ts <file|-> [--mode full|trends|cmds] [--json]
+bun <skill-dir>/Tools/AnalyzeThreatReportCheck.ts <file|-> [--mode full|trends|cmds] [--json]
 ```
 
 | Flag | Meaning |

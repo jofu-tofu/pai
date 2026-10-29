@@ -20,7 +20,7 @@
  *   index    {n, meanPairwiseSimilarity, diversityIndex} per file, where
  *            diversityIndex = 1 - mean pairwise similarity (0 = all identical, 1 = no shared terms).
  *
- * @author LifeOS System
+ * @author standalone skill System
  * @version 1.0.0
  */
 

@@ -19,7 +19,7 @@ Our ideal-state port of Fabric's `analyze_claims`. The upstream pattern stays in
 - Labels are a few plain words for the character of each claim as the text shows it (overreach, opinion-as-data, unsourced statistic, emotional appeal, cherry-picked). A political-lean label appears only when the claim plainly carries one, and is applied the same way to every side.
 - The Argument summary (at most 30 words) says what the input argues. The Overall analysis (at most 40 words) names the argument's main strength and main weakness (for an argument that recommends an action, the weakness includes what acting on it would leave exposed) and says how a reader should update their view, specific to this input.
 - Words are plain and exact, the way a careful fact-checker would put it to a colleague.
-- `bun skills/Fabric/Tools/AnalyzeClaimsCheck.ts` passed on the exact output before it was delivered, with `--source` set to the input whenever the input was text or a file. Where no shell is available, the sections, word counts, grades and quotes are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/AnalyzeClaimsCheck.ts` passed on the exact output before it was delivered, with `--source` set to the input whenever the input was text or a file. Where no shell is available, the sections, word counts, grades and quotes are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -39,7 +39,7 @@ Our ideal-state port of Fabric's `analyze_claims`. The upstream pattern stays in
 ## Evals
 
 - suite: fabric-analyzeclaims — code checks on the sections, grade letters and no-claims line; judged checks on claims kept separate and at their stated scope (a fact split from the cause drawn from it), opinion data and anecdotes told from measurement, evidence that is real or marked as the text's own, class-level evidence brought for an unverifiable subject, the input's missing method named, residual risk and side effects of a recommended action weighed, fallacy quotes taken verbatim, and the non-claims question answered directly.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -48,10 +48,10 @@ Our ideal-state port of Fabric's `analyze_claims`. The upstream pattern stays in
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeClaimsCheck.ts <file|-> [--source <input-file>] [--json]
+bun <skill-dir>/Tools/AnalyzeClaimsCheck.ts <file|-> [--source <input-file>] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

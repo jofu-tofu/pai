@@ -5,7 +5,7 @@ Checks an AnalyzeClaims output (`Intents/AnalyzeClaims.md`) against the parts of
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeClaimsCheck.ts <file|-> [--source <input-file>] [--json]
+bun <skill-dir>/Tools/AnalyzeClaimsCheck.ts <file|-> [--source <input-file>] [--json]
 ```
 
 | Flag | Meaning |

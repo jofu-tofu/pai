@@ -16,7 +16,7 @@ Our ideal-state port of Fabric's `check_agreement`. The upstream pattern stays i
 - Every label names a clause the document actually contains, by its section number and heading, or by its heading or a short exact quote when the document is unnumbered. Every quote is exact, and every number (fee, notice period, cap, term length) is the one the document states.
 - The Responses hold one request per Critical and Important issue, in the same order, addressed to the other party and ready to paste. Each names the clause and asks for a specific change (replacement wording, a number, a cap, a carve-out or a deletion) with the reason in a clause, courteous and firm.
 - Every item is specific to this agreement: it would read wrong pasted under a different document. Words are plain and exact, the vocabulary a sharp contracts lawyer would use with a client.
-- `bun skills/Fabric/Tools/CheckAgreementCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the sections, counts and Response labels are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/CheckAgreementCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the sections, counts and Response labels are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -33,7 +33,7 @@ Our ideal-state port of Fabric's `check_agreement`. The upstream pattern stays i
 ## Evals
 
 - suite: fabric-checkagreement — code checks on the sections, numbered labelled items and Response labels; judged checks on fidelity to the document, catching the buried and missing terms, severity calibration, the signer's side, and specific Responses.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -42,10 +42,10 @@ Our ideal-state port of Fabric's `check_agreement`. The upstream pattern stays i
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/CheckAgreementCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/CheckAgreementCheck.ts <file|-> [--json]
 #   exit 0: review shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

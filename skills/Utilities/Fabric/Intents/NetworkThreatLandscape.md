@@ -21,7 +21,7 @@ Our ideal-state port of Fabric's `create_network_threat_landscape`. The upstream
 - Each Evidence item quotes, character for character, a line or fragment of the input that a finding rests on, and says in a few words which finding it supports. There are 3 to 20. For a bare exposure or question there is no input to quote, and the section is the single bullet `- No scan data was supplied.`
 - Every section is specific to this input: a risk, recommendation or trend that would read the same under any other scan fails.
 - Words are plain and exact, the vocabulary a network security engineer uses with a colleague.
-- `bun skills/Fabric/Tools/NetworkThreatLandscapeCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the sections, counts and formats are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/NetworkThreatLandscapeCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the sections, counts and formats are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -37,7 +37,7 @@ Our ideal-state port of Fabric's `create_network_threat_landscape`. The upstream
 ## Evals
 
 - suite: fabric-networkthreatlandscape — code checks on the section order, the Risk line format, the no-data line and the no-bold rule; judged checks on open versus filtered ports, version-backed CVEs, recommendations tied to the ports found, trends with real counts, and faithful evidence.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -46,10 +46,10 @@ Our ideal-state port of Fabric's `create_network_threat_landscape`. The upstream
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, and the scan when it was pasted, then check and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, and the scan when it was pasted, then check and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/NetworkThreatLandscapeCheck.ts <file|-> [--source <scan-file>] [--json]
+bun <skill-dir>/Tools/NetworkThreatLandscapeCheck.ts <file|-> [--source <scan-file>] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

@@ -5,7 +5,7 @@ Checks a SecurePrompt output (`Intents/SecurePrompt.md`) against the parts of it
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/SecurePromptCheck.ts <file|-> [--sections list] [--json]
+bun <skill-dir>/Tools/SecurePromptCheck.ts <file|-> [--sections list] [--json]
 ```
 
 | Flag | Meaning |

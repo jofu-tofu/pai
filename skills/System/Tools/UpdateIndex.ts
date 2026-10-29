@@ -11,13 +11,13 @@ import { readdir, readFile, writeFile, stat } from "fs/promises";
 import { join, basename, relative } from "path";
 import { parse as parseYaml } from "yaml";
 import { homedir } from "os";
-import { toForwardSlash, parseFrontmatter as parseFrontmatterUtil, extractLineAfterPattern, joinLines, formatPathForDisplay, getEnvVarSyntax, getEnvVar } from '../../../hooks/lib/platform";
+import { toForwardSlash, parseFrontmatter as parseFrontmatterUtil, extractLineAfterPattern, joinLines, formatPathForDisplay, getEnvVarSyntax, getEnvVar } from './lib/platform.ts';
 
-const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
-const UPDATES_DIR = join(PAI_DIR, "MEMORY", "PAISYSTEMUPDATES");
+const WORKSPACE_ROOT = process.env.WORKSPACE_DIR || process.cwd();
+const UPDATES_DIR = join(WORKSPACE_ROOT, ".skill-output", "system-updates");
 const INDEX_PATH = join(UPDATES_DIR, "index.json");
 const CHANGELOG_PATH = join(UPDATES_DIR, "CHANGELOG.md");
-const RECENT_PATH = join(PAI_DIR, "skills", "CORE", "USER", "UPGRADES", "RECENT.md");
+const RECENT_PATH = join(WORKSPACE_ROOT, "skills", "CORE", "USER", "UPGRADES", "RECENT.md");
 
 type SignificanceLabel = 'trivial' | 'minor' | 'moderate' | 'major' | 'critical';
 type ChangeType = 'skill_update' | 'structure_change' | 'doc_update' | 'hook_update' | 'workflow_update' | 'config_update' | 'tool_update' | 'multi_area';
@@ -404,7 +404,7 @@ function generateRecent(updates: UpdateRecord[], count: number = 10): string {
 
   // Use cross-platform path display - formatPathForDisplay uses ~ on Unix, full path on Windows
   const updatesDisplayPath = formatPathForDisplay(UPDATES_DIR);
-  const paiVarSyntax = getEnvVarSyntax('PAI_DIR');
+  const paiVarSyntax = getEnvVarSyntax('WORKSPACE_ROOT');
 
   const lines: string[] = [
     "# Recent System Updates",

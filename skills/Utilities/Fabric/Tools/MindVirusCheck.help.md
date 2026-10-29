@@ -5,7 +5,7 @@ Checks a MindVirus output (`Intents/MindVirus.md`) against the parts of its cont
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/MindVirusCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/MindVirusCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

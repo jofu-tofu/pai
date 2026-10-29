@@ -5,7 +5,7 @@ Checks a ReportFinding output (`Intents/ReportFinding.md`) against the parts of 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ReportFindingCheck.ts <file|-> [--extra Name[,Name]] [--json]
+bun <skill-dir>/Tools/ReportFindingCheck.ts <file|-> [--extra Name[,Name]] [--json]
 ```
 
 | Flag | Meaning |

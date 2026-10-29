@@ -14,7 +14,7 @@ Our ideal-state port of Fabric's `create_cyber_summary`. The upstream pattern st
 - Within each section the most consequential item comes first: active exploitation, then severity and reach.
 - Every fact is the source's: no CVE ID, version, count, score, date, actor or attribution the source does not give, and attribution is stated with the source's own confidence ("which the vendor attributes to…").
 - The words are plain and exact: the precise ordinary word over jargon, no hype ("massive", "devastating"), each item a complete line a reader can act on without opening the source.
-- `bun skills/Fabric/Tools/CyberSummaryCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/CyberSummaryCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -28,7 +28,7 @@ Our ideal-state port of Fabric's `create_cyber_summary`. The upstream pattern st
 ## Evals
 
 - suite: fabric-cybersummary — code checks on the section shape, plus judged checks on classification, specificity, fidelity and the inferred read.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -41,10 +41,10 @@ Our ideal-state port of Fabric's `create_cyber_summary`. The upstream pattern st
 
 ## Tool contract
 
-Fetching a URL or a YouTube transcript follows `Intents/ExecutePattern.md` § Tool contract. Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Fetching a URL or a YouTube transcript follows `Intents/ExecutePattern.md` § Tool contract. Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/CyberSummaryCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/CyberSummaryCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

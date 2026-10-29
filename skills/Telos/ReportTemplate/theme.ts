@@ -1,7 +1,7 @@
 // Report theme: palette, font roles and any @font-face files.
 //
 // This file ships neutral defaults. WriteReport replaces it with the user's
-// `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/Telos/ReportTheme.ts` when that
+// `<configRoot>/standalone skill/USER/CUSTOMIZATIONS/SKILLS/Telos/ReportTheme.ts` when that
 // file exists (and copies the user's `Fonts/` directory to `public/Fonts/`).
 // tailwind.config.ts reads it for the Tailwind palette and font families and
 // emits the matching `:root` CSS variables and `@font-face` rules.

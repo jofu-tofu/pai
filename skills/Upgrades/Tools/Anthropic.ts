@@ -28,7 +28,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { createHash } from 'crypto';
 import { join } from 'path';
 import { homedir } from 'os';
-import { splitLines, getEnvVar } from '../../../hooks/lib/platform';
+import { splitLines, getEnvVar } from './lib/platform';
 
 // Types
 interface Source {
@@ -79,8 +79,7 @@ interface State {
 }
 
 // Config
-const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
-const SKILL_DIR = join(PAI_DIR, 'skills', 'PAIUpgrade');
+const SKILL_DIR = join(import.meta.dir, "..");
 const STATE_DIR = join(SKILL_DIR, 'state');
 const STATE_FILE = join(STATE_DIR, 'last-check.json');
 const SOURCES_FILE = join(SKILL_DIR, 'sources.json');
@@ -396,7 +395,7 @@ function generateRecommendation(update: Update): string {
   // Commands/Slash Commands
   if (titleLower.includes('command') || titleLower.includes('slash command')) {
     return `**PAI Impact:** HIGH - Command system update\n` +
-      `**Why:** PAI uses slash commands extensively ($PAI_DIR/Commands/). Changes affect our command architecture and user workflows.\n` +
+      `**Why:** PAI uses slash commands extensively (WORKSPACE_DIR/Commands/). Changes affect our command architecture and user workflows.\n` +
       `**Action:** Review for new command patterns or capabilities. Update PAI's command templates if conventions change.`;
   }
 

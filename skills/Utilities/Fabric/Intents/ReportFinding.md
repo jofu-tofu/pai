@@ -16,7 +16,7 @@ Our ideal-state port of Fabric's `create_report_finding` and `improve_report_fin
 - The References are 1 to 5 named links to sources that exist at that address: OWASP pages, CWE entries, vendor advisories, standards. Each one is about this issue, this technology or its fix. Fewer real references beat more doubtful ones.
 - The One-Sentence Summary states the finding and why it matters in plain words, in under 25 words, so a reader who sees only that line knows what to fix.
 - The words are plain and exact. Each sentence is specific to this finding, and a line that would fit most other findings of the same class ("This could lead to serious consequences") is cut.
-- `bun skills/Fabric/Tools/ReportFindingCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ReportFindingCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -32,7 +32,7 @@ Our ideal-state port of Fabric's `create_report_finding` and `improve_report_fin
 ## Evals
 
 - suite: fabric-reportfinding — code checks on sections, the severity line, references and summary length, plus judged checks on fidelity to the input, invented facts, severity reasoning and specificity.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -41,10 +41,10 @@ Our ideal-state port of Fabric's `create_report_finding` and `improve_report_fin
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ReportFindingCheck.ts <file|-> [--extra Name[,Name]] [--json]
+bun <skill-dir>/Tools/ReportFindingCheck.ts <file|-> [--extra Name[,Name]] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

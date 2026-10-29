@@ -3,7 +3,7 @@
 ## Available Templates
 
 ```
-$PAI_DIR/skills/Utilities/Prompting/Templates/Evals/
+<skill-dir>
 ├── Judge.hbs       # Configurable LLM-as-Judge prompts
 ├── Rubric.hbs      # Evaluation criteria definitions
 ├── TestCase.hbs    # Test case specifications
@@ -18,10 +18,10 @@ $PAI_DIR/skills/Utilities/Prompting/Templates/Evals/
 Use the JUDGE template for custom evaluation:
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Prompting/Tools/RenderTemplate.ts \
+bun run <skill-dir> \
   -t Evals/Judge.hbs \
-  -d $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/judge-config.yaml \
-  -o $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/judge-prompt.md
+  -d <skill-dir> \
+  -o <skill-dir>
 ```
 
 ### Judge Config Example
@@ -55,10 +55,10 @@ output:
 Use the RUBRIC template for scoring criteria:
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Prompting/Tools/RenderTemplate.ts \
+bun run <skill-dir> \
   -t Evals/Rubric.hbs \
-  -d $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/rubric.yaml \
-  -o $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/rubric.md
+  -d <skill-dir> \
+  -o <skill-dir>
 ```
 
 ---

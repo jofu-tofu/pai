@@ -13,7 +13,7 @@
 import { readFileSync, existsSync, readdirSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
-import { getEnvVar } from '../../../hooks/lib/platform";
+import { getEnvVar } from './lib/platform.ts';
 
 interface AgentContext {
   agentType: string;
@@ -27,9 +27,9 @@ export class AgentContextLoader {
 
   constructor() {
     // Use PAI_DIR environment variable for path resolution (cross-platform)
-    this.claudeHome = getEnvVar('PAI_DIR') || join(homedir(), "pai");
+    this.claudeHome = join(import.meta.dir, "..");
     // Use lowercase 'skills' for consistency with actual directory structure
-    this.agentsDir = join(this.claudeHome, "skills", "Agents");
+    this.agentsDir = this.claudeHome;
   }
 
   /**

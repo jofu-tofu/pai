@@ -18,7 +18,7 @@ Our ideal-state port of Fabric's `create_sigma_rules`. The upstream pattern stay
 - `falsepositives` names the specific legitimate activity likely to trip this rule. `level` weighs how rare and how damaging the matched activity is against how firm the source's evidence is: confirmed credential dumping is high or critical and a broad admin tool rates lower, and a step the source reports thinly or as unconfirmed ("may have", "reportedly", one uncorroborated sighting) rates one step lower than it would if confirmed, with the description saying why.
 - `tags` carry the ATT&CK tactic and technique the rule detects (`attack.credential_access`, `attack.t1003.001`), lowercase, and the technique is the one the source's evidence establishes. When the evidence fits more than one technique, the tag is the one that assumes least, never a narrower one the source does not show: archives sent to an address over HTTPS is `attack.exfiltration` with no `attack.t1041` (Exfiltration Over C2 Channel) unless the source says that address is the C2 server.
 - The closing Not covered list names two things, each as one bullet with its reason: a TTP that no log in scope can see (an email lure, a password spray visible only at a VPN appliance), which gets no forced rule, and each place the source is too thin to pin a rule down (it never says how the payload arrived, or names an address but no process), naming the rule that limit narrows. It is left out when there is neither.
-- `bun skills/Fabric/Tools/SigmaRulesCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the rules are checked against the same rules by hand, and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/SigmaRulesCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the rules are checked against the same rules by hand, and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -34,7 +34,7 @@ Our ideal-state port of Fabric's `create_sigma_rules`. The upstream pattern stay
 ## Evals
 
 - suite: fabric-sigmarules — code checks on the section layout and Sigma fields, plus judged checks on fidelity to the source, behavioral detection, valid fields and conditions, the input-kind read, and a thin report kept to its evidence (no added variants, a caveated indicator rule, levels held down).
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -44,10 +44,10 @@ Our ideal-state port of Fabric's `create_sigma_rules`. The upstream pattern stay
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/SigmaRulesCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/SigmaRulesCheck.ts <file|-> [--json]
 #   exit 0: every rule parses and holds the Sigma shape; exit 1: prints each failure with the rule's line and title
 ```
 

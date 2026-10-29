@@ -5,7 +5,7 @@ Checks an AnalyzeProse output (`Intents/AnalyzeProse.md`) against the parts of i
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeProseCheck.ts <file|-> [--mode ratings|pinker] [--source <text-file>] [--max-words N] [--sections <list>] [--json]
+bun <skill-dir>/Tools/AnalyzeProseCheck.ts <file|-> [--mode ratings|pinker] [--source <text-file>] [--max-words N] [--sections <list>] [--json]
 ```
 
 | Flag | Meaning |

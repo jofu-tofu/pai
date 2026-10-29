@@ -16,7 +16,7 @@ Our ideal-state port of Fabric's `extract_ideas`. The upstream pattern stays in 
 - No two bullets state the same idea in different words, and no two open with the same first two words.
 - Each bullet is one complete sentence of 4 to 15 words, in plain, exact words: the most precise ordinary word over jargon, no hedging filler, no word spent on reaching the count.
 - Input that advances no ideas (a shopping list, a log, a schedule, a table of raw numbers) gets the one `None found:` line saying what the input is instead.
-- `bun skills/Fabric/Tools/ExtractIdeasCheck.ts` passed on the exact output before it was delivered, with `--count` set whenever the request named a count. Where no shell is available, the shape, word counts and openings are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ExtractIdeasCheck.ts` passed on the exact output before it was delivered, with `--count` set whenever the request named a count. Where no shell is available, the shape, word counts and openings are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -32,7 +32,7 @@ Our ideal-state port of Fabric's `extract_ideas`. The upstream pattern stays in 
 ## Evals
 
 - suite: fabric-extractideas — code checks on the one heading, the bullet shape and the none line; judged checks on completeness, faithfulness to the source (a rejected view kept as rejected), ideas stated as claims rather than narration, specificity, the topic read and the named count.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -41,10 +41,10 @@ Our ideal-state port of Fabric's `extract_ideas`. The upstream pattern stays in 
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ExtractIdeasCheck.ts <file|-> [--count N] [--json]
+bun <skill-dir>/Tools/ExtractIdeasCheck.ts <file|-> [--count N] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

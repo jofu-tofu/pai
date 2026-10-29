@@ -9,9 +9,6 @@
 ## Required Knowledge (Pre-load from Skills)
 
 ### Constitutional Foundation
-- **skills/PAI/CONSTITUTION.md** - Foundational architectural principles
-- **skills/PAI/CoreStack.md** - Stack preferences (TypeScript > Python, bun > npm, etc.)
-- **skills/PAI/Architecture.md** - PAI's system architecture patterns
 
 ### Development Methodology
 - **skills/Development/METHODOLOGY.md** - Spec-driven, test-driven development approach
@@ -27,7 +24,6 @@
 
 Load these dynamically based on task keywords:
 
-- **Security** → skills/PAI/SecurityProtocols.md
 - **Testing** → skills/Development/TESTING.md, skills/Development/TestingPhilosophy.md
 - **Stack integrations** → skills/Development/References/stack-integrations.md
 

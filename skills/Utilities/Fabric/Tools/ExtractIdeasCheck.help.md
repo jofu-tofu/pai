@@ -5,7 +5,7 @@ Checks an ExtractIdeas output (`Intents/ExtractIdeas.md`) against the parts of i
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ExtractIdeasCheck.ts <file|-> [--count N] [--json]
+bun <skill-dir>/Tools/ExtractIdeasCheck.ts <file|-> [--count N] [--json]
 ```
 
 | Flag | Meaning |

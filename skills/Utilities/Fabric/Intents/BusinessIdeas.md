@@ -17,7 +17,7 @@ Our ideal-state port of Fabric's `extract_business_ideas`. The upstream pattern 
 - No two items in a list state the same idea in different words, and no two items in a list open on the same first two words.
 - The words are plain and exact: what is sold and to whom in ordinary words, no startup jargon ("leverage synergies", "disrupt the space", "AI-powered platform"), no hedging, no hype.
 - Input that holds no business at all (a packing list, a log, a recipe card with no context) gets the one `None found:` line saying what the input is instead.
-- `bun skills/Fabric/Tools/BusinessIdeasCheck.ts` passed on the exact output before it was delivered, with `--extracted` or `--elaborated` set whenever the request named a count. Where no shell is available, the shape and counts are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/BusinessIdeasCheck.ts` passed on the exact output before it was delivered, with `--extracted` or `--elaborated` set whenever the request named a count. Where no shell is available, the shape and counts are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -33,7 +33,7 @@ Our ideal-state port of Fabric's `extract_business_ideas`. The upstream pattern 
 ## Evals
 
 - suite: fabric-businessideas — code checks on the two headings, numbered items, the `Differentiator:` and `Pivot from #k.` shape, and the none line; judged checks on businesses stated as what is sold to whom, faithfulness to the source, no invented numbers, real pivots with concrete edges, specificity and the topic read.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -42,10 +42,10 @@ Our ideal-state port of Fabric's `extract_business_ideas`. The upstream pattern 
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/BusinessIdeasCheck.ts <file|-> [--extracted N] [--elaborated N] [--json]
+bun <skill-dir>/Tools/BusinessIdeasCheck.ts <file|-> [--extracted N] [--elaborated N] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

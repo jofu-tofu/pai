@@ -5,7 +5,7 @@ Checks a StoicLens output (`Intents/StoicLens.md`) against the parts of its cont
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/StoicLensCheck.ts <file|-> [--source <text-file>] [--sections <list>] [--json]
+bun <skill-dir>/Tools/StoicLensCheck.ts <file|-> [--source <text-file>] [--sections <list>] [--json]
 ```
 
 | Flag | Meaning |

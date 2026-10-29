@@ -5,7 +5,7 @@ Checks a SigmaRules output (`Intents/SigmaRules.md`) against the parts of its co
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/SigmaRulesCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/SigmaRulesCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

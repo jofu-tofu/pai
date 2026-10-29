@@ -16,14 +16,14 @@ Capture visual evidence from the current browser state or from a freshly loaded 
 
 1. **Load the page if needed**
    ```bash
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts <url>
+   bun run <skill-dir> <url>
    ```
    Use this when the screenshot also needs diagnostics from the page load.
 
 2. **Take the screenshot**
    ```bash
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts screenshot
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts screenshot <path>
+   bun run <skill-dir> screenshot
+   bun run <skill-dir> screenshot <path>
    ```
 
 3. **Prefer evidence over decoration**

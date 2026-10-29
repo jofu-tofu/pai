@@ -20,7 +20,7 @@ Our ideal-state port of Fabric's `explain_terms`. The upstream pattern stays in 
 - Each Why it matters names what in this content depends on the term: the claim, decision, number or step a reader cannot follow without it. For a topic or question, it names what understanding the term unlocks in the field. A line that would fit any content using the term fails.
 - A source is read in full before anything is written (`Intents/ExecutePattern.md` § Tool contract covers fetching URLs and YouTube links).
 - The words are plain and exact: the most precise ordinary word wins over jargon, and no entry carries filler.
-- `bun skills/Fabric/Tools/ExplainTermsCheck.ts` passed on the exact output before it was delivered, with `--source` set to the input whenever the input was text or a file and `--count` set to any count a hint asked for. Where no shell is available, or the check cannot run, the shape and counts are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ExplainTermsCheck.ts` passed on the exact output before it was delivered, with `--source` set to the input whenever the input was text or a file and `--count` set to any count a hint asked for. Where no shell is available, or the check cannot run, the shape and counts are checked by hand and nothing about the check appears in the output.
 - The reply is the finished glossary itself, as reader-facing markdown in the Output format, and nothing else. The check is a silent step taken with a tool, never text in the reply: the reply holds no command, heredoc, file path, saved-draft step, checker output or note about checking, and it never ends on an attempt to run something. When a check fails, the fixed glossary is delivered whole; when the check cannot run at all, the glossary is still delivered whole.
 
 ## Anti-criteria
@@ -42,7 +42,7 @@ Our ideal-state port of Fabric's `explain_terms`. The upstream pattern stays in 
 ## Evals
 
 - suite: fabric-explainterms — code checks on the heading, the entry and sub-bullet shape, the requested count and the no-terms line; judged checks on terms kept to what the content uses, definitions in the content's sense, analogies that map the mechanism, Why it matters tied to the input, basic words left out, and the inferred read.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -51,10 +51,10 @@ Our ideal-state port of Fabric's `explain_terms`. The upstream pattern stays in 
 
 ## Tool contract
 
-Run from `~/.claude`, with a shell tool, out of the reader's sight. Save the draft, check it, fix what it names, and deliver only on exit 0. None of this appears in the reply: the reply is the glossary alone. With no shell tool in the session, skip the command and check the rules in Output format by hand.
+Run from `<host-config-dir>`, with a shell tool, out of the reader's sight. Save the draft, check it, fix what it names, and deliver only on exit 0. None of this appears in the reply: the reply is the glossary alone. With no shell tool in the session, skip the command and check the rules in Output format by hand.
 
 ```bash
-bun skills/Fabric/Tools/ExplainTermsCheck.ts <file|-> [--source <input-file>] [--count N] [--json]
+bun <skill-dir>/Tools/ExplainTermsCheck.ts <file|-> [--source <input-file>] [--count N] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

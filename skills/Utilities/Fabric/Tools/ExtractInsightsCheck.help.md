@@ -5,7 +5,7 @@ Checks an ExtractInsights output (`Intents/ExtractInsights.md`) against the part
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ExtractInsightsCheck.ts <file|-> [--count N] [--json]
+bun <skill-dir>/Tools/ExtractInsightsCheck.ts <file|-> [--count N] [--json]
 ```
 
 | Flag | Meaning |

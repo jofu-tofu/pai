@@ -5,7 +5,7 @@ Checks a SummarizeMeeting output (`Intents/SummarizeMeeting.md`) against the par
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/SummarizeMeetingCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/SummarizeMeetingCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |
@@ -25,7 +25,7 @@ bun skills/Fabric/Tools/SummarizeMeetingCheck.ts <file|-> [--json]
 - No item text appears twice, within a section or across sections.
 - Outside TASKS and TIMELINE (which open on owners and dates by design), no two items in a section open with the same three words.
 - No bold or italics (`**`, `__`, `*word*`, `_word_`), no sub-bullets or indented lines, no numbered list items, and no text outside the title and sections.
-- A line starting `--- HARVEST`, or a `> ` warning line that names Harvest, ends the summary; the Harvest result or warning block after it is not checked.
+Use host tools explicitly. Save notes only when the user requests an export.
 
 ## Exit codes
 

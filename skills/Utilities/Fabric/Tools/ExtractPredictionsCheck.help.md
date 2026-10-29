@@ -5,7 +5,7 @@ Checks an ExtractPredictions output (`Intents/ExtractPredictions.md`) against th
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ExtractPredictionsCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/ExtractPredictionsCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

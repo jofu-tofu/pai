@@ -5,7 +5,7 @@ Checks a PullRequest description (`Intents/PullRequest.md`) against the parts of
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/PullRequestCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/PullRequestCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

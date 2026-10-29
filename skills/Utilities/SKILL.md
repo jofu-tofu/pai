@@ -1,21 +1,12 @@
 ---
 name: Utilities
-description: Developer utilities and tools — evals, Fabric patterns, browser automation, and meta-prompting. USE WHEN eval, evaluate, test agent, benchmark, verify behavior, regression test, capability test, fabric, fabric pattern, run fabric, update patterns, sync fabric, browser, screenshot, debug web, verify UI, troubleshoot frontend, automate browser, meta-prompting, template generation, prompt optimization, programmatic prompt, render template.
-compatibility: Designed for Claude Code and Devin (or similar agent products)
-metadata:
-  author: pai
-  version: "1.0.0"
+description: Optional router for local prompt, evaluation and browser utilities. USE WHEN choose a utility skill, utility tools.
 ---
 
 # Utilities
 
-Unified skill for developer utility and tooling workflows.
+Read PORTABILITY.md. Browser, Evals, Fabric and Prompting are independently copyable child skills. Read the requested child's SKILL.md when installed. No shared runtime is provided by this router.
 
-## Workflow Routing
+## Examples
 
-| Request Pattern | Route To |
-|---|---|
-| Eval, evaluate, test agent, benchmark, verify behavior, regression test, capability test | `Evals/SKILL.md` |
-| Fabric, fabric pattern, run fabric, update patterns, sync fabric, summarize | `Fabric/SKILL.md` |
-| Browser, screenshot, debug web, verify UI, troubleshoot frontend, automate browser | `Browser/SKILL.md` |
-| Meta-prompting, template generation, prompt optimization, programmatic prompt | `Prompting/SKILL.md` |
+Ask for the Utilities workflow with the relevant task, input files and output destination. Apply the local method using available host tools, then report the result and evidence; identify any unavailable capability.

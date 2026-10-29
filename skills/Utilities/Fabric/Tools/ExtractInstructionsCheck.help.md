@@ -5,7 +5,7 @@ Checks an ExtractInstructions output (`Intents/ExtractInstructions.md`) against 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ExtractInstructionsCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/ExtractInstructionsCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

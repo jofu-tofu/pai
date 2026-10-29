@@ -17,7 +17,7 @@ Our ideal-state port of Fabric's `analyze_threat_report`, `analyze_threat_report
 - Each section holds as many items as the report genuinely supports, never padded to a minimum with filler and never cut below what the report actually contains. An empty section (a report with no statistics, no quotable lines, or no named references) holds the single line `- None found.` rather than invented material.
 - Every fact is the report's own: no trend, number, quote, reference, CVE, version or attribution the report does not give, and a quote is the exact text with nothing paraphrased, trimmed mid-phrase or stitched together.
 - The words are plain and exact: the precise ordinary word over jargon and marketing language, no hype, each item a complete line a reader can use without opening the report.
-- `bun skills/Fabric/Tools/AnalyzeThreatReportCheck.ts` passed on the exact output, with the mode it was written for, before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/AnalyzeThreatReportCheck.ts` passed on the exact output, with the mode it was written for, before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -32,7 +32,7 @@ Our ideal-state port of Fabric's `analyze_threat_report`, `analyze_threat_report
 ## Evals
 
 - suite: fabric-analyzethreatreport — code checks on the section shape per mode, plus judged checks on the inferred read, specificity, fidelity to the report, verbatim quotes and the mode selection.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -45,10 +45,10 @@ Our ideal-state port of Fabric's `analyze_threat_report`, `analyze_threat_report
 
 ## Tool contract
 
-Fetching a URL or a YouTube transcript follows `Intents/ExecutePattern.md` § Tool contract. Run from `~/.claude`. Save the draft, check it with the mode it was written for, and deliver only on exit 0:
+Fetching a URL or a YouTube transcript follows `Intents/ExecutePattern.md` § Tool contract. Run from `<host-config-dir>`. Save the draft, check it with the mode it was written for, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeThreatReportCheck.ts <file|-> [--mode full|trends|cmds] [--json]
+bun <skill-dir>/Tools/AnalyzeThreatReportCheck.ts <file|-> [--mode full|trends|cmds] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 #   --mode defaults to full
 ```

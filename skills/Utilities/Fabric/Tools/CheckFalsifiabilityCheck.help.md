@@ -5,7 +5,7 @@ Checks a CheckFalsifiability output (`Intents/CheckFalsifiability.md`) against t
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/CheckFalsifiabilityCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/CheckFalsifiabilityCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

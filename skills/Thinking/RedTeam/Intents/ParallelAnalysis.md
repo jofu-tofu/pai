@@ -1,5 +1,10 @@
 # ParallelAnalysis
 
+## Host execution
+
+Use the current host's agent tools with explicit task briefs. If multiple providers are available and permitted, use distinct vendors and record them. Otherwise use independent agents or sequential role passes on the available model and state the reduced independence. Do not install a runtime or infer provider access from a file on disk. Do not claim a participant ran when it failed. Await all participants, then synthesize and retain material disagreement.
+
+
 **Contents:** Ideal State · Anti-criteria · Output format · Tool contract · Examples · References
 
 Attacks an argument from many diverse perspectives and returns its strongest objections, ranked by severity; a full pass adds the strongest steelman and the strongest surviving counter-argument against it.
@@ -7,7 +12,7 @@ Attacks an argument from many diverse perspectives and returns its strongest obj
 ## Ideal State
 
 - Depth matches the request. A quick pass ("quick", "4-6 strongest objections", a time budget) returns the 4-6 strongest objections, severity-ranked, each naming the claim it breaks, why it breaks, and a remediation that fits the stated constraints; a steelman of the opposite is added only when asked. A full pass returns the steelman and counter-argument below.
-- An inline pass (the caller says inline or no agents, or cannot spawn) is done in the caller's own context with no `Inference.ts` call and no `Agent` spawn, and its output says the attack came from one model, so the cross-vendor signal is absent.
+Use host tools explicitly. Save notes only when the user requests an export.
 - On a full pass, the output is the strongest steelman of the argument and the strongest surviving counter-argument against it, each an 8-point story explanation, 12-16 words per point, attacking real weaknesses (never strawmen), ranked by severity.
 - The counter-argument defeats the steelman, not a weaker version of it: a proponent reads the steelman and says "yes, that's my argument," and reads the counter-argument and cannot say "that's not what I meant."
 - The critique names the fundamental flaw as a specific assumption and states how the whole structure collapses if that assumption falls.
@@ -84,10 +89,7 @@ Each point is self-contained, uses plain language, attacks a real weakness, and 
 
 **Dispatch parallel adversarial personas, split across vendors** (full or quick pass, never inline). An attacker is text in, text out, so each persona is one direct call, all launched in parallel:
 
-```bash
-bun "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/LIFEOS/TOOLS/Inference.ts" --level <level> --vendor <openai|anthropic> --timeout 180000 \
-  "<persona brief>" "<full argument + claim decomposition + attack instructions>"
-```
+Use the current host's tools for this operation; see `PORTABILITY.md`.
 
 Alternate personas between `openai` and `anthropic`: attackers that share one model share its blind spots, and a finding both vendors reach independently is the strongest signal this intent produces. Run the two or three personas aimed at the load-bearing claims at `--level max` and the rest at `high`. A persona that needs live evidence (a precedent, a current number) is an `Agent` spawn with its brief as the prompt instead.
 
@@ -134,7 +136,7 @@ The steelman and counter-argument, rendered as the deliverable in the Output for
 ## References
 
 **This intent requires:**
-- `LIFEOS/TOOLS/Inference.ts` for the parallel cross-vendor persona calls
+- host-provided agent tools for independent role calls
 - **FirstPrinciples skill** for Deconstruct (decomposition) and Challenge (constraint classification)
 
 Research and ExtractWisdom pairings are in `Integration.md`.

@@ -5,7 +5,7 @@ Checks an AnalyzeRisk output (`Intents/AnalyzeRisk.md`) against the parts of its
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeRiskCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/AnalyzeRiskCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

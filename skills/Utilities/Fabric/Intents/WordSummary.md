@@ -16,8 +16,8 @@ Our ideal-state port of Fabric's `create_5_sentence_summary`. The upstream patte
 - A summary of a source says what the source says about its own case. It never turns the source into a general lesson the source does not draw ("Density pays" from one city's rents is a claim the text never made).
 - When the input asks a question, every level answers it. When the input is a source, the levels capture what that source actually says, read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs). When the input is a bare topic, every level carries the inferred read (first criterion) at the level of insight an expert would sign, never a description of what the topic is, covers or contains.
 - The words are plain and exact: the most precise ordinary word wins over jargon, and a word is spent on meaning, never on padding to hit the count.
-- When the input is a URL or text of 200 characters or more, the summarize-family Harvest side effect in `Intents/ExecutePattern.md` § Tool contract fired on the same input, and its result block (or its error, as a warning) follows the levels after a blank line and a `--- HARVEST ---` line. A bare topic, a question or the conversation never fires it.
-- `bun skills/Fabric/Tools/WordSummaryCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the counts are checked by hand and nothing about the check appears in the output.
+Use host tools explicitly. Save notes only when the user requests an export.
+- `bun <skill-dir>/Tools/WordSummaryCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the counts are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -25,14 +25,14 @@ Our ideal-state port of Fabric's `create_5_sentence_summary`. The upstream patte
 - Never truncation posing as a smaller level, such as "Suffering souls seeking moral truth" followed by "Suffering souls seeking truth".
 - Never a bare topic answered with a description of it ("Novels argued what tsars forbade", "Superfluous men seeking God") instead of what it teaches ("Suffering, faced honestly, can redeem").
 - Never a claim the source does not make, and never a source summarized from its title or a fetched page summary instead of its full text.
-- No commentary, caveats, sub-bullets or explanation anywhere. The whole output is the heading and the levels, plus the one cap note when N was capped and the Harvest block when one is due.
+Use host tools explicitly. Save notes only when the user requests an export.
 - Never markdown ordered-list syntax (`5. text` at the start of a line): renderers renumber a list that starts at 5 as 5, 6, 7, so a countdown displays backwards.
 - Never the old Fabric pattern text run as the prompt for this request.
 
 ## Evals
 
 - suite: fabric-wordsummary — code checks on shape and count, plus judged checks on standalone meaning, reframing, specificity and the one-word level.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -41,10 +41,10 @@ Our ideal-state port of Fabric's `create_5_sentence_summary`. The upstream patte
 
 ## Tool contract
 
-Fetching a URL or a YouTube transcript, and the summarize-family Harvest trigger, follow `Intents/ExecutePattern.md` § Tool contract. Run from `~/.claude`. Save the draft (without the Harvest block), check it, and deliver only on exit 0:
+Use host tools explicitly. Save notes only when the user requests an export.
 
 ```bash
-bun skills/Fabric/Tools/WordSummaryCheck.ts <file|-> [--levels N] [--json]
+bun <skill-dir>/Tools/WordSummaryCheck.ts <file|-> [--levels N] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; --levels pins the expected N
 ```
 

@@ -14,7 +14,7 @@ Run evaluations for a specific use case.
 
 ```bash
 # Check use case exists
-ls $PAI_DIR/skills/Utilities/Evals/UseCases/<use-case>/config.yaml
+ls <skill-dir>
 ```
 
 If missing, redirect to `CreateUseCase.md` workflow.
@@ -28,7 +28,7 @@ curl -s http://localhost:5173 > /dev/null 2>&1 && echo "Running" || echo "Not ru
 
 If not running, start it:
 ```bash
-cd $PAI_DIR/skills/Utilities/Evals/EvalServer && bun run dev &
+cd <skill-dir> && bun run dev &
 ```
 
 ### Step 3: Run Evaluation
@@ -42,7 +42,7 @@ cd $PAI_DIR/skills/Utilities/Evals/EvalServer && bun run dev &
 
 **Option B: CLI**
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts \
+bun run <skill-dir> \
   --use-case <name> \
   --model claude-3-5-sonnet-20241022
 ```

@@ -5,7 +5,7 @@ Checks a CyberSummary output (`Intents/CyberSummary.md`) against the parts of it
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/CyberSummaryCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/CyberSummaryCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

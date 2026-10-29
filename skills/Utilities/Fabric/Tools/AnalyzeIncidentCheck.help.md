@@ -5,7 +5,7 @@ Checks an AnalyzeIncident output (`Intents/AnalyzeIncident.md`) against the part
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeIncidentCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/AnalyzeIncidentCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

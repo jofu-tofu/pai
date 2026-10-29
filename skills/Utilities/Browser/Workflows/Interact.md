@@ -16,14 +16,14 @@ Use minimal browser interaction to reach the page state that needs to be debugge
 
 1. **Load the starting page with diagnostics**
    ```bash
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts <url>
+   bun run <skill-dir> <url>
    ```
 
 2. **Use only the interaction needed to reach the target state**
    ```bash
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts fill "<selector>" "<value>"
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts click "<selector>"
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts type "<selector>" "<text>"
+   bun run <skill-dir> fill "<selector>" "<value>"
+   bun run <skill-dir> click "<selector>"
+   bun run <skill-dir> type "<selector>" "<text>"
    ```
    Each command prints the updated accessibility tree so you can confirm the UI changed.
 

@@ -17,7 +17,7 @@ Our ideal-state port of Fabric's `write_semgrep_rule`. The upstream pattern stay
 - Each rule's fields say exactly what a triager needs: an `id` that names the bug in kebab-case; a `message` in plain words saying what matched, why it is dangerous and how to fix it (a metavariable the patterns bind may name the matched code); a `severity` that reflects real impact; the correct `languages`; and `metadata` with the CWE (plus OWASP category for security rules, and for advisory input the CVE or GHSA id, package and affected versions). A `fix` appears only when the safe rewrite is mechanical and keeps behavior.
 - Test code follows the rule in its language, synthetic and as short as proof allows (one function or a few lines per variant, no padding), with at least one line marked `ruleid: <id>` for each variant the rule claims to catch and lines marked `ok: <id>` for the nearest safe forms, each annotation in a comment on the line before the code it describes.
 - A source is read in full before the rule is written (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube links and URLs), and the rule targets the API, package and versions the source names.
-- `bun skills/Fabric/Tools/SemgrepRuleCheck.ts` passed on the exact output before it was delivered, so Semgrep validated the rule and every marked test line behaved as marked. Where no shell is available, the rule and annotations are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/SemgrepRuleCheck.ts` passed on the exact output before it was delivered, so Semgrep validated the rule and every marked test line behaved as marked. Where no shell is available, the rule and annotations are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -36,7 +36,7 @@ Our ideal-state port of Fabric's `write_semgrep_rule`. The upstream pattern stay
 ## Evals
 
 - suite: fabric-semgreprule — code checks on the YAML shape, required fields and test annotations, plus judged checks on generality, safe-form exclusion and fidelity to the input.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -45,10 +45,10 @@ Our ideal-state port of Fabric's `write_semgrep_rule`. The upstream pattern stay
 
 ## Tool contract
 
-This runs on a saved draft before the reply, when a shell is available; the command and its output never appear in the reply. Run from `~/.claude`, fix each failed check, and deliver the rule and test code only on exit 0:
+This runs on a saved draft before the reply, when a shell is available; the command and its output never appear in the reply. Run from `<host-config-dir>`, fix each failed check, and deliver the rule and test code only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/SemgrepRuleCheck.ts <file|-> [--json] [--no-semgrep]
+bun <skill-dir>/Tools/SemgrepRuleCheck.ts <file|-> [--json] [--no-semgrep]
 #   exit 0: shape holds, semgrep --validate passed, semgrep --test passed
 #   exit 1: prints each failed check; exit 2: bad usage, unreadable input, or semgrep missing
 ```

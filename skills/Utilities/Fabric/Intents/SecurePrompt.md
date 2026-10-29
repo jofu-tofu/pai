@@ -28,7 +28,7 @@ Our ideal-state port of Fabric's `greybeard_secure_prompt_engineer`. The upstrea
 - Every rubric criterion can be graded pass or fail from a transcript of the test suite and names the tests it grades by ID, and every test is graded by at least one criterion. The rubric covers usefulness (the benign test) as well as security. A release bar under the table states the concrete condition for shipping the prompt: which rows must pass on every trial, how many trials, and what blocks release.
 - Notes names the residual risks a prompt cannot close for this deployment and the control outside the prompt that closes each (least-privilege tool scopes, output filtering, confirmation in the application, rate limits, logging).
 - The words are plain and exact, in the deployment's own vocabulary, written as instructions a model follows rather than a persona it performs.
-- `bun skills/Fabric/Tools/SecurePromptCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/SecurePromptCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -49,7 +49,7 @@ Our ideal-state port of Fabric's `greybeard_secure_prompt_engineer`. The upstrea
 ## Evals
 
 - suite: fabric-secureprompt — code checks on the five sections, the fenced prompt, the test and rubric tables and the release bar, plus judged checks on deployment fit, authority order, usefulness, failing closed, tests that agree with the prompt, and the refusal gate.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -58,10 +58,10 @@ Our ideal-state port of Fabric's `greybeard_secure_prompt_engineer`. The upstrea
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/SecurePromptCheck.ts <file|-> [--sections list] [--json]
+bun <skill-dir>/Tools/SecurePromptCheck.ts <file|-> [--sections list] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage
 ```
 

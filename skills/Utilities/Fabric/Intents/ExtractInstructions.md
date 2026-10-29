@@ -25,7 +25,7 @@ Our ideal-state port of Fabric's `extract_instructions`. The upstream pattern st
 - When the input is a source, every step, quantity and warning comes from it, read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs). For a bare topic or question, every step is one practitioners actually follow, and the safety-critical ones are in their safe order. Nothing is attributed to a named authority, and no figure appears that the model cannot stand behind.
 - When the input teaches no procedure and none can be drawn from it, the output is the title and the single line `No instructions found in {the source}.`, and nothing else.
 - The whole output is valid Markdown with no bold and no italics: the title, the sections and their lists.
-- `bun skills/Fabric/Tools/ExtractInstructionsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ExtractInstructionsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -48,7 +48,7 @@ Our ideal-state port of Fabric's `extract_instructions`. The upstream pattern st
 ## Evals
 
 - suite: fabric-extractinstructions — code checks on the title, the sections, the numbered steps, the kept figures and literal values and the no-instructions line, plus judged checks on step order, one action per step, the source's grouping, warnings and checks in place, fidelity to the source with nothing added, the hint override, the safe order for a bare task and specificity.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -57,10 +57,10 @@ Our ideal-state port of Fabric's `extract_instructions`. The upstream pattern st
 
 ## Tool contract
 
-Run from `~/.claude`, with a shell tool, out of the reader's sight. Save the draft, check it, fix what it names, and deliver only on exit 0. None of this appears in the reply: the reply is the instructions alone. With no shell tool in the session, skip the command and check the rules in Output format by hand.
+Run from `<host-config-dir>`, with a shell tool, out of the reader's sight. Save the draft, check it, fix what it names, and deliver only on exit 0. None of this appears in the reply: the reply is the instructions alone. With no shell tool in the session, skip the command and check the rules in Output format by hand.
 
 ```bash
-bun skills/Fabric/Tools/ExtractInstructionsCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/ExtractInstructionsCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

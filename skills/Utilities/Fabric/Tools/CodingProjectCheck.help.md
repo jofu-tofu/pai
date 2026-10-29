@@ -5,7 +5,7 @@ Checks a CodingProject output (`Intents/CodingProject.md`) against the parts of 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/CodingProjectCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/CodingProjectCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

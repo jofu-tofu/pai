@@ -1,6 +1,6 @@
 # The Science Protocol
 
-Skills implement Science independently; compliance is documentation, not runtime coupling. Science orchestrates diagnosis and investigation of cross-domain and novel problems without an existing skill pattern; specialist skills execute domain work and Science coordinates their results. Experiment comparisons that improve a measured target belong to HillClimb.
+Skills implement Science independently; compliance is documentation, not runtime coupling. Science orchestrates diagnosis and investigation of cross-domain and novel problems without an existing skill pattern; specialist skills execute domain work and Science coordinates their results. Experiment comparisons that improve a measured target belong to measured iteration.
 
 ## Interface
 
@@ -11,14 +11,14 @@ A compliant intent provides a goal with success criteria, measurable indicators,
 | Specialist | Science supplies | Specialist returns |
 |------------|------------------|--------------------|
 | Development | Hypothesis, success criteria | Test results, coverage |
-| Assay | Measurements, baseline comparison | Scores, statistical analysis |
+| a user-selected evaluation tool | Measurements, baseline comparison | Scores, statistical analysis |
 | Research | Questions, scope | Findings, evidence quality |
 | Council | Options, judgment criteria | Synthesis, convergence |
 | Worktree | Variant names, comparison criteria | Diff analysis, recommendations |
 
-For prompts, invoke Assay → Compare directly; do not build ad-hoc evaluation. Compare supplies a paired-difference confidence interval and a meaningful-difference threshold stated before the run. It does not do position swapping, multi-judge panels or p-values, so a design that needs them says how it gets them. HillClimb carries the invocation contract (`skills/HillClimb/Intents/Prompt.md`) and records Compare's CI as the climb's noise floor.
+For prompts, invoke a user-selected evaluation tool → Compare directly; do not build ad-hoc evaluation. Compare supplies a paired-difference confidence interval and a meaningful-difference threshold stated before the run. It does not do position swapping, multi-judge panels or p-values, so a design that needs them says how it gets them. measured iteration carries the invocation contract (`skills/measured iteration/Intents/Prompt.md`) and records Compare's CI as the climb's noise floor.
 
-A HillClimb climb whose `stall` is categorized `structural` comes to `Science/Intents/StructuredInvestigation.md` (or DefineGoal when the goal itself is wrong): examine the use case and measurement frame, then return a new hypothesis, direction, or evidence to continue the climb.
+A measured iteration climb whose `stall` is categorized `structural` comes to `Science/Intents/StructuredInvestigation.md` (or DefineGoal when the goal itself is wrong): examine the use case and measurement frame, then return a new hypothesis, direction, or evidence to continue the climb.
 
 ## Scale
 

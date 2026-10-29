@@ -5,16 +5,16 @@
 # Agents are composed by combining: expertise + personality + approach
 #
 # Configuration:
-#   Base traits:  $PAI_DIR/skills/Agents/Data/Traits.yaml (this file)
-#   User traits:  $PAI_DIR/skills/CORE/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml
+#   Base traits:  <skill-dir>/Data/Traits.yaml (this file)
+#   User traits:  <skill-dir>/Customizations/Traits.yaml
 #
 # User traits are merged over base - user values take priority.
 # Add custom voices, personalities, and prosody settings in the user file.
 #
 # Usage:
-#   bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --task "Review security architecture"
-#   bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --traits "security,skeptical,thorough"
-#   bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --list
+#   bun run <skill-dir>/Tools/ComposeAgent.ts --task "Review security architecture"
+#   bun run <skill-dir>/Tools/ComposeAgent.ts --traits "security,skeptical,thorough"
+#   bun run <skill-dir>/Tools/ComposeAgent.ts --list
 
 # ==============================================================================
 # EXPERTISE AREAS - Domain knowledge and specialization

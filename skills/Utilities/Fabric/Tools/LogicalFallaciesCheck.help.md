@@ -5,7 +5,7 @@ Checks a LogicalFallacies output (`Intents/LogicalFallacies.md`) against the par
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/LogicalFallaciesCheck.ts <file|-> [--source <input-file>] [--json]
+bun <skill-dir>/Tools/LogicalFallaciesCheck.ts <file|-> [--source <input-file>] [--json]
 ```
 
 | Flag | Meaning |

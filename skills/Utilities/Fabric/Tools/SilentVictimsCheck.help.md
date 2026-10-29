@@ -5,7 +5,7 @@ Checks a SilentVictims output (`Intents/SilentVictims.md`) against the parts of 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/SilentVictimsCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/SilentVictimsCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

@@ -23,7 +23,7 @@
  * above its BEGIN marker, and headings inside a region never match --section.
  *
  * --region rewrites ONLY the bytes between the AUTOMATED markers of the named
- * region (LIFEOS/TOOLS/TelosRegions.ts owns the format). It skips the write
+ * region (Tools/lib/TelosRegions.ts owns the format). It skips the write
  * when the content hash is unchanged, backs up under its own prefix
  * (Backups/TELOS.region-*) so hand-edit backups are never pruned by it, never
  * touches the H2 `<!-- updated -->` markers or the frontmatter, and logs one
@@ -54,17 +54,16 @@
 
 import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, renameSync } from 'fs';
 import { basename, dirname, join } from 'path';
-import { getPrincipal } from '../../../hooks/lib/identity';
+const getPrincipal = () => ({ timezone: process.env.TELOS_TIMEZONE || "UTC" });
 import { homedir } from "node:os";
-import { invariant, InvariantViolation } from '../../../LIFEOS/TOOLS/Invariant';
-import { TelosLockTimeout, withTelosLock, type TelosLockHandle, type TelosLockOptions } from '../../../LIFEOS/TOOLS/TelosLock';
-import { exciseRegions, parseRegions, planRegionWrite, REGION_WHICH, RegionError, type RegionWhich } from '../../../LIFEOS/TOOLS/TelosRegions';
+import { invariant, InvariantViolation } from './lib/Invariant';
+import { TelosLockTimeout, withTelosLock, type TelosLockHandle, type TelosLockOptions } from './lib/TelosLock';
+import { exciseRegions, parseRegions, planRegionWrite, REGION_WHICH, RegionError, type RegionWhich } from './lib/TelosRegions';
 
 // Same resolution as DashboardTemplate/lib/telos-data.ts: the config root honors
-// CLAUDE_CONFIG_DIR (isolated installs), LIFEOS_USER_DIR relocates the user tree,
+// CLAUDE_CONFIG_DIR (isolated installs), TELOS_DIR relocates the user tree,
 // and the HOME fallback reads $HOME before os.homedir() (public issue #1919 item 2, @dissembler21-png).
-const CONFIG_ROOT = process.env.CLAUDE_CONFIG_DIR || join((process.env.HOME ?? process.env.USERPROFILE ?? homedir()), '.claude');
-const TELOS_DIR = join(process.env.LIFEOS_USER_DIR || join(CONFIG_ROOT, 'LIFEOS', 'USER'), 'TELOS');
+const TELOS_DIR = process.env.TELOS_DIR || join(process.cwd(), "telos");
 // Changelog file: prefer whichever casing already exists (older installs used
 // 'Updates.md'; the docs and scaffold use 'updates.md'), so case-sensitive
 // filesystems never fork the changelog into two files (public issue #1452).

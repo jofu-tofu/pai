@@ -23,7 +23,7 @@ Our ideal-state port of Fabric's `detect_silent_victims`. The upstream pattern s
 - Every victim, harm and recommendation is specific to this input. A line that would fit most other actions as well ("society as a whole", "future generations may be affected", "increase transparency") fails.
 - When the input is a source, the audit reflects what it actually describes, read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
 - The words are plain and exact: the most precise ordinary word wins over policy or ethics jargon, and severity is said in what happens to people, not in adjectives.
-- `bun skills/Fabric/Tools/SilentVictimsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/SilentVictimsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -44,7 +44,7 @@ Our ideal-state port of Fabric's `detect_silent_victims`. The upstream pattern s
 ## Evals
 
 - suite: fabric-silentvictims — code checks on the sections, the five scan categories, the severity table and the verdict, plus judged checks on calibration, specific victims, the reversed test and concrete recommendations.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -53,10 +53,10 @@ Our ideal-state port of Fabric's `detect_silent_victims`. The upstream pattern s
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/SilentVictimsCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/SilentVictimsCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

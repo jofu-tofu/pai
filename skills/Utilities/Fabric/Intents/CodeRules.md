@@ -21,7 +21,7 @@ Our ideal-state port of Fabric's `generate_code_rules`. The upstream pattern sta
 - When the input is a source, every rule is one the source states or plainly demonstrates, read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs); nothing contradicts it, and no command, tool or version appears that it does not give. For a bare topic or question, every rule is current practice an expert in that stack would sign, with no version number or flag the model cannot stand behind.
 - When the input teaches no coding practice, the output is the single line `No code rules found in {the source}.`, and nothing else.
 - The whole output is valid Markdown with no bold and no italics: the bulleted list alone.
-- `bun skills/Fabric/Tools/CodeRulesCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/CodeRulesCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -40,7 +40,7 @@ Our ideal-state port of Fabric's `generate_code_rules`. The upstream pattern sta
 ## Evals
 
 - suite: fabric-coderules — code checks on the bare list with no title, one-sentence bulleted rules, backticked commands, the source's literal tools and the no-rules line, plus judged checks on fidelity to the source, leaving out default behavior, concreteness, the hint override, in-source exclusions and corrections, kept hedges, generalized examples and expert practice for a bare stack.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -49,10 +49,10 @@ Our ideal-state port of Fabric's `generate_code_rules`. The upstream pattern sta
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/CodeRulesCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/CodeRulesCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

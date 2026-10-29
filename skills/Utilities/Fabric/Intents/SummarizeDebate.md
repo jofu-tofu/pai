@@ -19,8 +19,8 @@ Our ideal-state port of Fabric's `summarize_debate`. The upstream pattern stays 
 - The Prediction, in at most three sentences, says which side is more likely to prove right on the underlying question, how confident that call is, and why. It may differ from the debate's winner, and when it does it says so. For a bare topic or question it draws on what is known about the subject: outside facts are ones an expert would sign, stated plainly. For a pasted exchange, file, URL or conversation, it reasons from the evidence in the debate plus only broad, uncontested background, never a statistic, study, date, schedule or claim about the speakers' situation that the source does not contain. When the deciding evidence is missing, it names the open question the call hinges on and keeps the confidence low.
 - The Follow-up opens with one sentence on where the debate leaves the question, including any conditional compromise still on the table, then up to five bullets, each a specific, observable development (a study result, a ruling, a number crossing a line, an event the source mentions) and which side it would favor. A bullet uses only dates, deadlines and plans the source gives or the public record holds.
 - Every line is specific to this debate: it would read wrong pasted under a different one. Words are plain and exact, the vocabulary a sharp, fair moderator would use, with no item in a list opening on the same words as another (Common ground bullets, which may open on the speaker who conceded, excepted).
-- When the input is a URL or text of 200 or more characters, the harvest skill ran on the same input in the background as the summarize family's side effect (`Intents/ExecutePattern.md` § Tool contract, Trigger), and its result block follows the summary. Where harvest is not installed or cannot run, it is skipped without comment.
-- `bun skills/Fabric/Tools/SummarizeDebateCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the sections, counts and word limits are checked by hand and nothing about the check appears in the output.
+Use host tools explicitly. Save notes only when the user requests an export.
+- `bun <skill-dir>/Tools/SummarizeDebateCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the sections, counts and word limits are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -38,7 +38,7 @@ Our ideal-state port of Fabric's `summarize_debate`. The upstream pattern stays 
 ## Evals
 
 - suite: fabric-summarizedebate — code checks on the sections, the paired side sections, the stated and inferred tags, word limits and the rating lines; judged checks on fidelity to each side at the strength it argued, the crux, specific mind-changing evidence aimed against each side's reasons, concessions and conditional compromises in Common ground, no invented outside facts for a pasted exchange, rating independent of the verdict, and the inferred read for topics, questions and non-debates.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -47,10 +47,10 @@ Our ideal-state port of Fabric's `summarize_debate`. The upstream pattern stays 
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft (without the harvest block), check it, and deliver only on exit 0:
+Use host tools explicitly. Save notes only when the user requests an export.
 
 ```bash
-bun skills/Fabric/Tools/SummarizeDebateCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/SummarizeDebateCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 
@@ -61,7 +61,7 @@ bun skills/Fabric/Tools/SummarizeDebateCheck.ts <file|-> [--json]
 | (any full summary or a not-a-debate line) | `<file>` or `-` | Check the saved draft or stdin |
 | (piping the result to another tool) | `--json` | Print `{ok, notDebate, sides, problems}` |
 
-A hint-narrowed output (only some sections asked for) skips the check, since its shape is the hint's. The harvest side effect, its input-type gate and its result block follow `Intents/ExecutePattern.md` § Tool contract and § Output format.
+Use host tools explicitly. Save notes only when the user requests an export.
 
 ## Output format
 

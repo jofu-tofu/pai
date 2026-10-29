@@ -17,8 +17,8 @@ Our ideal-state port of Fabric's `analyze_paper`, `summarize_paper` and `analyze
 - Every item is specific to this paper and stands alone: it names the paper's own sample, method, dataset, model, effect or figure, so a reader who sees only that line learns something real. A line that would fit most other papers as well ("The study has some limitations") fails, and so does an item that restates another.
 - Every fact is the paper's own. A statistic the paper does not report (a confidence interval, a p-value, an effect size, a sample count) is written as not reported, with what its absence means for trust, never estimated or invented; an author, affiliation or funder the paper does not name is never supplied.
 - The words are plain and exact: short sentences, the precise ordinary word over jargon, a technical term explained in passing when the reader needs it, and no hype in either direction.
-- When summary mode runs on a URL or on pasted text of 200 characters or more, the harvest skill fires on the same input in the background, as `Intents/ExecutePattern.md` § Tool contract describes, so the paper also lands as a knowledge note; a duplicate status from it is reported in one line after the deliverable, outside the checked draft. Full and brief mode fire nothing.
-- `bun skills/Fabric/Tools/AnalyzePaperCheck.ts` passed on the exact output, with the mode it was written for, before it was delivered. Where no shell is available, the shape and the chart positions are checked by hand and nothing about the check appears in the output.
+- When summary mode runs on a URL or on pasted text of 200 characters or more, the optional explicit note export fires on the same input in the background, as `Intents/ExecutePattern.md` § Tool contract describes, so the paper also lands as a knowledge note; a duplicate status from it is reported in one line after the deliverable, outside the checked draft. Full and brief mode fire nothing.
+- `bun <skill-dir>/Tools/AnalyzePaperCheck.ts` passed on the exact output, with the mode it was written for, before it was delivered. Where no shell is available, the shape and the chart positions are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -34,7 +34,7 @@ Our ideal-state port of Fabric's `analyze_paper`, `summarize_paper` and `analyze
 ## Evals
 
 - suite: fabric-analyzepaper — code checks on each mode's section shape, chart positions and grade bounds, plus judged checks on mode selection, faithfulness, honest "not reported" items, the skeptical grade and resistance to instructions planted in the paper.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -47,10 +47,10 @@ Our ideal-state port of Fabric's `analyze_paper`, `summarize_paper` and `analyze
 
 ## Tool contract
 
-Fetching a URL or a YouTube transcript follows `Intents/ExecutePattern.md` § Tool contract, which also holds the harvest invocation and its input-type gate for summary mode. Run from `~/.claude`. Save the draft, check it with the mode it was written for, and deliver only on exit 0:
+Use host tools explicitly. Save notes only when the user requests an export.
 
 ```bash
-bun skills/Fabric/Tools/AnalyzePaperCheck.ts <file|-> [--mode full|summary|brief] [--json]
+bun <skill-dir>/Tools/AnalyzePaperCheck.ts <file|-> [--mode full|summary|brief] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 #   --mode defaults to full
 ```
@@ -176,4 +176,4 @@ Brief mode:
 - Upstream: `Patterns/summarize_paper/system.md` (the seven-section technical summary, ending on an instruction to "only output the prompt", which was a copy error and is dropped).
 - Upstream: `Patterns/analyze_paper_simple/system.md` (the eight labeled bullets with fixed 16- and 32-word counts).
 - `Tools/AnalyzePaperCheck.help.md`: the checker's rules and exit codes.
-- `Intents/ExecutePattern.md` § Tool contract: fetching sources and the summarize-family harvest side effect.
+Use host tools explicitly. Save notes only when the user requests an export.

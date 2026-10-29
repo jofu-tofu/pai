@@ -20,7 +20,7 @@ Ask the user:
 
 ### Step 2: Create Judge Config
 
-Create `$PAI_DIR/skills/Utilities/Evals/UseCases/<name>/judge-config.yaml`:
+Create `<skill-dir>`:
 
 ```yaml
 judge:
@@ -52,10 +52,10 @@ output:
 ### Step 3: Render Judge Prompt
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Prompting/Tools/RenderTemplate.ts \
+bun run <skill-dir> \
   -t Evals/Judge.hbs \
-  -d $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/judge-config.yaml \
-  -o $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/judge-prompt.md \
+  -d <skill-dir> \
+  -o <skill-dir> \
   --preview
 ```
 
@@ -86,7 +86,7 @@ criteria:
 Run a single test case to verify:
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts \
+bun run <skill-dir> \
   --use-case <name> \
   --test-id <single-test> \
   --verbose

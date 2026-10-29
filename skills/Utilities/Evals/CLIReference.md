@@ -16,30 +16,30 @@ User Request -> AI orchestrates -> EvalServer CLI -> Deterministic results
 
 ```bash
 # Create new use case
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts use-case create --name <name>
+bun run <skill-dir> use-case create --name <name>
 
 # List all use cases
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts use-case list
+bun run <skill-dir> use-case list
 
 # Show use case details
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts use-case show <name>
+bun run <skill-dir> use-case show <name>
 ```
 
 ### Test Case Management
 
 ```bash
 # Add test case to use case
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts test-case add --use-case <name>
+bun run <skill-dir> test-case add --use-case <name>
 
 # List test cases for use case
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts test-case list --use-case <name>
+bun run <skill-dir> test-case list --use-case <name>
 ```
 
 ### Run Evaluations
 
 ```bash
 # Run eval for use case (optional model specification)
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts --use-case <name> [--model <model>]
+bun run <skill-dir> --use-case <name> [--model <model>]
 ```
 
 ---
@@ -49,7 +49,7 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts --use-case <name> 
 Start the EvalServer for visual evaluation:
 
 ```bash
-cd $PAI_DIR/skills/Utilities/Evals/EvalServer
+cd <skill-dir>
 bun run dev  # Starts on http://localhost:5173
 ```
 
@@ -66,7 +66,7 @@ bun run dev  # Starts on http://localhost:5173
 ### Files (Source of Truth)
 
 ```
-$PAI_DIR/skills/Utilities/Evals/
+<skill-dir>
 ├── UseCases/
 │   └── <name>/
 │       ├── config.yaml         # Criteria, thresholds

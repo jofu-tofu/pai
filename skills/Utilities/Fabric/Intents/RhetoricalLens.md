@@ -20,7 +20,7 @@ Our ideal-state port of Fabric's `lens_rhetorical`. The upstream pattern stays i
 - Depth follows the text, and the whole analysis fits a budget set by the text's length: under 250 words for a text under 50 words, under 600 for a text under 300 words, under 1000 for a text under 1500 words, and under 1500 beyond that; a bare named text or genre stays under 800. A slogan or a two-line ad gets one or two techniques. A dimension the text barely uses gets one sentence saying so and why, never padding.
 - Words are plain and exact, with rhetoric terms (ethos, anaphora, kairos) used where they are the precise word and explained by what they point at.
 - Sources are read in full before any analysis (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
-- `bun skills/Fabric/Tools/RhetoricalLensCheck.ts` passed on the exact output before it was delivered, with `--source` pointing at the supplied text whenever there was one, or `--max-words 800` when there was none. Where no shell is available, the sections and quotations are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/RhetoricalLensCheck.ts` passed on the exact output before it was delivered, with `--source` pointing at the supplied text whenever there was one, or `--max-words 800` when there was none. Where no shell is available, the sections and quotations are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -36,7 +36,7 @@ Our ideal-state port of Fabric's `lens_rhetorical`. The upstream pattern stays i
 ## Evals
 
 - suite: fabric-rhetoricallens — code checks on the title, the six sections in order, the Source and Answer lines and the technique bullets; judged checks on analysis over summary, quotations faithful to the text, the strongest and most precarious ethos, felt against told emotion, specific gaps and the reader the text fails.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -45,10 +45,10 @@ Our ideal-state port of Fabric's `lens_rhetorical`. The upstream pattern stays i
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft (and the supplied text, when there is one), check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft (and the supplied text, when there is one), check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/RhetoricalLensCheck.ts <file|-> [--source <text-file>] [--max-words N] [--sections <list>] [--json]
+bun <skill-dir>/Tools/RhetoricalLensCheck.ts <file|-> [--source <text-file>] [--max-words N] [--sections <list>] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

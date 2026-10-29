@@ -19,7 +19,7 @@ Show clear, visual representation of how components, fields, and directories map
 
 Display complete mapping between platforms:
 ```bash
-bun run $PAI_DIR/skills/SkillTranslate/Tools/ShowMappings.ts \
+bun run <skill-dir> \
   --from claude-code \
   --to windsurf
 ```
@@ -34,7 +34,7 @@ bun run $PAI_DIR/skills/SkillTranslate/Tools/ShowMappings.ts \
 
 Focus on a single component type:
 ```bash
-bun run $PAI_DIR/skills/SkillTranslate/Tools/ShowMappings.ts \
+bun run <skill-dir> \
   --from claude-code \
   --to windsurf \
   --component workflow

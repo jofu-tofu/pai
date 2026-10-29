@@ -10,6 +10,8 @@ version: 1.2.1
 description: "Structured multi-angle exploration running 2-8 sequential passes over the same problem, each through a different scientific lens, to surface hidden requirements and edge cases invisible from one angle; each pass yields new ISC criteria. USE WHEN iterative depth, explore deeper, multi-angle analysis, surface hidden requirements, blind spot check, what am I missing. NOT FOR scope/zoom analysis (use ApertureOscillation)."
 ---
 
+Read `PORTABILITY.md` before use; it defines the standalone tool and storage contract and replaces any inherited platform-specific setup.
+
 # IterativeDepth
 
 IterativeDepth examines one problem through several structurally different lenses (literal, stakeholder, failure, temporal and more) and merges what each angle surfaces into ISC criteria a single pass misses. The method rests on 20 established techniques across cognitive science, AI/ML, requirements engineering and design thinking (`ScientificFoundation.md`).
@@ -33,7 +35,7 @@ IterativeDepth examines one problem through several structurally different lense
 
 ## Data & Config
 
-User customizations live at `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/IterativeDepth/` (`configRoot` is `$CLAUDE_CONFIG_DIR` when set, else `~/.claude`). When that directory exists, its PREFERENCES.md, configurations and resources override the defaults; when it is absent, the defaults stand.
+Use request preferences or local `Customizations/PREFERENCES.md`. Save outputs to the user's requested destination. Read `PORTABILITY.md`.
 
 ## Gotchas
 

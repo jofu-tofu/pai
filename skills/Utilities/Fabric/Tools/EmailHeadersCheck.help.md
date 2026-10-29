@@ -5,7 +5,7 @@ Checks an EmailHeaders analysis (`Intents/EmailHeaders.md`) against the parts of
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/EmailHeadersCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/EmailHeadersCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

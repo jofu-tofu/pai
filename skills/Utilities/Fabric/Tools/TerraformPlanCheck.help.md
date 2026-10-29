@@ -5,7 +5,7 @@ Checks a TerraformPlan review (`Intents/TerraformPlan.md`) against the parts of 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/TerraformPlanCheck.ts <review|-> [--plan <plan.txt|plan.json>] [--json]
+bun <skill-dir>/Tools/TerraformPlanCheck.ts <review|-> [--plan <plan.txt|plan.json>] [--json]
 ```
 
 | Flag | Meaning |

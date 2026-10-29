@@ -11,7 +11,7 @@ An auditable, multi-hypothesis investigation record for complex problems, at wor
 - Findings the investigation did not set out to test are labelled exploratory and as needing replication, apart from the planned verdicts.
 - The Investigation Record carries every section in the Output format table, and an **Investigation Summary: problem name** documents the outcome.
 - A research-grade investigation (one spanning days or weeks, reviewed by several people, shared externally, needing statistical rigor, or settling a macro product or architecture decision) also carries: the goal and analysis plan pre-registered with the timestamp at which they were locked (DefineGoal), the analysis plan naming its statistical tests, missing-data handling and multiple-comparison correction so that a verdict drawn from several hypotheses or metrics on one dataset is judged at the corrected threshold, five or more hypotheses, ethical constraints noted, and a recorded reviewer and verdict at each of the five Review checkpoints under Safety gates.
-- When the question becomes "make this measured number better", the goal and hypotheses go to HillClimb, which runs the experiments.
+- When the question becomes "make this measured number better", the goal and hypotheses go to measured iteration, which runs the experiments.
 
 ## Anti-criteria
 
@@ -46,7 +46,7 @@ A research-grade investigation is reviewed at five boundaries, each by someone w
 | Experiment Execution | Per experiment: Started timestamp, Status (Running/Complete), Raw Observations, Anomalies |
 | Results | Per experiment table: Metric / Expected / Actual / Delta; Qualitative Observations; Data Quality Notes |
 | Analysis | Goal Comparison table: Success Criterion / Required / Achieved / Status; Hypothesis Status with evidence; Key Learnings, Surprises, New Questions, Implications |
-| Iteration | Stops and pivots with their evidence and reason (abort conditions included); achieved → document/finish; promising → deeper test; all refuted → new hypotheses; insufficient data → further experiments; changed frame → new goal (DefineGoal); a measured target to improve → HillClimb |
+| Iteration | Stops and pivots with their evidence and reason (abort conditions included); achieved → document/finish; promising → deeper test; all refuted → new hypotheses; insufficient data → further experiments; changed frame → new goal (DefineGoal); a measured target to improve → measured iteration |
 | Review (research grade) | Pre-registration timestamp; for each of the five Review checkpoints, the reviewer and verdict or the principal's waiver; ethical constraints |
 
 ### Documentation Artifact
@@ -57,4 +57,4 @@ Produce **Investigation Summary: problem name** with Date, Duration, Goal, Key F
 
 - [Methodology.md](../Methodology.md) governs execution, including precommitted outcomes, collection limits and parallel experiments; [Protocol.md](../Protocol.md) covers specialist handoffs.
 - [DefineGoal](DefineGoal.md) writes the pre-registered goal a research-grade investigation starts from.
-- Measured experiments on a target: `skills/HillClimb/References/Experiments.md`.
+- Measured experiments on a target: `skills/measured iteration/References/Experiments.md`.

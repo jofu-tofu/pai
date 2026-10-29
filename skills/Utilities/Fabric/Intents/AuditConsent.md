@@ -18,7 +18,7 @@ Our ideal-state port of Fabric's `audit_consent`. The upstream pattern stays in 
 - Every change under What would make this genuine names the term, clause or practice it changes and what it becomes, specific enough to adopt as written. Minimum viable consent is the smallest set of those changes that would make the consent defensible, and it is a subset of them, never a new idea.
 - Words are plain and exact: "you can only opt out by deleting your account" over "asymmetric exit friction", with ethics vocabulary used only where it is the precise word.
 - Sources are read in full before any audit (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
-- `bun skills/Fabric/Tools/AuditConsentCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the sections, table rows, fixed values and verdict consistency are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/AuditConsentCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the sections, table rows, fixed values and verdict consistency are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -35,7 +35,7 @@ Our ideal-state port of Fabric's `audit_consent`. The upstream pattern stays in 
 ## Evals
 
 - suite: fabric-auditconsent — code checks on the sections, channel and verdict values and the no-consent-claim line; judged checks on evidence tied to the input, the channel rule, even-handed verdicts, and recommendations that name the term they change.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -44,10 +44,10 @@ Our ideal-state port of Fabric's `audit_consent`. The upstream pattern stays in 
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/AuditConsentCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/AuditConsentCheck.ts <file|-> [--json]
 #   exit 0: shape and verdict consistency hold; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

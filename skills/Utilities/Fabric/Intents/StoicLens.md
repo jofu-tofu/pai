@@ -25,7 +25,7 @@ Our ideal-state port of Fabric's `lens_stoic`. The upstream pattern stays in `Pa
 - Depth follows what the text carries, not its word count. A thin fragment or slogan gets two or three entries a section. A paragraph that makes several distinct moves (a diagnosis, a rule, an example, a closing maxim) carries a full reading, usually four to six entries a section, each developed past a single sentence, because each move has its own lineage and its own strain. A section with little to say says it in a sentence, never padding.
 - Words are plain and exact, with philosophical terms (the dichotomy of control, eudaimonia, ataraxia) used where they are the precise word and glossed by what they mean.
 - Sources are read in full before any reading (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
-- `bun skills/Fabric/Tools/StoicLensCheck.ts` passed on the exact output before it was delivered, with `--source` pointing at the supplied text whenever there was one. Where no shell is available, the sections and quotations are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/StoicLensCheck.ts` passed on the exact output before it was delivered, with `--source` pointing at the supplied text whenever there was one. Where no shell is available, the sections and quotations are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -49,7 +49,7 @@ Our ideal-state port of Fabric's `lens_stoic`. The upstream pattern stays in `Pa
 ## Evals
 
 - suite: fabric-stoiclens — code checks on the title, the five sections in order, the Source, Answer and nothing-to-trace lines, the named or unnamed lineage marks, attributed questions with a Stoic one among them, and connection marks; judged checks on reading over summary, unnamed sources found, quotations faithful to the text, accurate attributions, tensions at the right moment, and no Stoicism forced onto a text that is not Stoic.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -58,10 +58,10 @@ Our ideal-state port of Fabric's `lens_stoic`. The upstream pattern stays in `Pa
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft (and the supplied text, when there is one), check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft (and the supplied text, when there is one), check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/StoicLensCheck.ts <file|-> [--source <text-file>] [--sections <list>] [--json]
+bun <skill-dir>/Tools/StoicLensCheck.ts <file|-> [--source <text-file>] [--sections <list>] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

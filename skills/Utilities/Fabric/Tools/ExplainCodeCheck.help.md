@@ -5,7 +5,7 @@ Checks an ExplainCode output (`Intents/ExplainCode.md`) against the parts of its
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ExplainCodeCheck.ts <file|-> [--question] [--kind code|config|security] [--json]
+bun <skill-dir>/Tools/ExplainCodeCheck.ts <file|-> [--question] [--kind code|config|security] [--json]
 ```
 
 | Flag | Meaning |

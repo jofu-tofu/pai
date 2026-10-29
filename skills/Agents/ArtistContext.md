@@ -9,8 +9,6 @@
 ## Required Knowledge (Pre-load from Skills)
 
 ### Core Foundations
-- **skills/PAI/CoreStack.md** - Stack preferences and tooling
-- **skills/PAI/CONSTITUTION.md** - Constitutional principles
 
 ### Visual Standards
 - **skills/Art/SKILL.md** - Art skill workflows and content types

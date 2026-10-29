@@ -10,6 +10,8 @@ version: 1.1.21
 description: "Physics-based reasoning framework (Musk methodology) that deconstructs a problem to irreducible fundamental truths, classifies every element as hard constraint, soft constraint, or assumption, then reconstructs the optimal solution from fundamentals alone. USE WHEN first principles, fundamental truths, challenge assumptions, real constraint, rebuild from scratch, start over, physics first, question everything, reasoning by analogy. NOT FOR structural feedback loops (use SystemsThinking)."
 ---
 
+Read `PORTABILITY.md` before use; it defines the standalone tool and storage contract and replaces any inherited platform-specific setup.
+
 # FirstPrinciples
 
 **Contents:** Ideal State · Intent Routing · Constraint Classification · The Core Distinction · The Load-Bearing Rules · Output Format · Data & Config · Gotchas · Examples
@@ -85,7 +87,7 @@ A full run (all three intents) reports in this combined shape; each intent's own
 
 ## Data & Config
 
-User customizations live at `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/FirstPrinciples/` (`configRoot` is `$CLAUDE_CONFIG_DIR` when set, else `~/.claude`). When that directory exists, its `PREFERENCES.md`, configurations and resources apply and override the defaults here; when it is absent, the defaults stand.
+Use request preferences or local `Customizations/PREFERENCES.md`. Save outputs to the user's requested destination. Read `PORTABILITY.md`.
 
 ## Gotchas
 

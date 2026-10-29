@@ -79,7 +79,7 @@ export async function POST(request: Request) {
         { status: 409 }
       )
     }
-    if ('changed' in locked.value) {
+    if (locked.value.changed !== undefined) {
       return NextResponse.json(
         { error: `The AUTOMATED ${locked.value.changed.join(', ')} region of ${filename} is machine-owned and changes only through UpdateTelos --region; nothing was saved.` },
         { status: 409 }

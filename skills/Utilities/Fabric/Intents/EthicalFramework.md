@@ -18,7 +18,7 @@ Our ideal-state port of Fabric's `extract_ethical_framework`. The upstream patte
 - The analysis extracts the text's ethics and judges it only against the stated floor. It never grades the text against the analyst's own politics or values.
 - Words are plain and exact: "the company can change the terms without notice" over "unilateral modification rights", with ethics vocabulary used only where it is the precise word.
 - Sources are read in full before any analysis (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
-- `bun skills/Fabric/Tools/EthicalFrameworkCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the sections, verdict values and table are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/EthicalFrameworkCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the sections, verdict values and table are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -35,7 +35,7 @@ Our ideal-state port of Fabric's `extract_ethical_framework`. The upstream patte
 ## Evals
 
 - suite: fabric-ethicalframework — code checks on the sections, verdict values, coercion table and the no-prescriptive-content line; judged checks on quotes faithful to the text, protections kept apart from violations, specific contradictions, and an assessment that follows from the findings.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -44,10 +44,10 @@ Our ideal-state port of Fabric's `extract_ethical_framework`. The upstream patte
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/EthicalFrameworkCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/EthicalFrameworkCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

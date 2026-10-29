@@ -19,7 +19,7 @@ Our ideal-state port of Fabric's `extract_insights`. The upstream pattern stays 
 - No two bullets carry the same idea in different words, and no two open on the same word.
 - An insight from a source says what that source argues or shows, stated plainly, and never a lesson the source does not draw. When the input is a source, it is read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs). When the input is a bare topic or a question, every bullet is true and well founded, at the level an expert would sign.
 - The words are plain and exact, in the simple, approachable register of Paul Graham's essays: the most precise ordinary word wins over jargon, and every word carries meaning.
-- `bun skills/Fabric/Tools/ExtractInsightsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ExtractInsightsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -36,7 +36,7 @@ Our ideal-state port of Fabric's `extract_insights`. The upstream pattern stays 
 ## Evals
 
 - suite: fabric-extractinsights — code checks on the heading, the bullet count, the eight-word bullets, distinct openings and the thin-source line, plus judged checks on insight over description, faithfulness to the source, specificity and complete thoughts.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -50,10 +50,10 @@ Our ideal-state port of Fabric's `extract_insights`. The upstream pattern stays 
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ExtractInsightsCheck.ts <file|-> [--count N] [--json]
+bun <skill-dir>/Tools/ExtractInsightsCheck.ts <file|-> [--count N] [--json]
 #   --count pins the N the request asked for (default 10)
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```

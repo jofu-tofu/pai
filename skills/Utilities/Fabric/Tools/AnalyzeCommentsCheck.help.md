@@ -5,7 +5,7 @@ Checks an AnalyzeComments output (`Intents/AnalyzeComments.md`) against the part
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeCommentsCheck.ts <file|-> [--source <comments-file>] [--json]
+bun <skill-dir>/Tools/AnalyzeCommentsCheck.ts <file|-> [--source <comments-file>] [--json]
 ```
 
 | Flag | Meaning |

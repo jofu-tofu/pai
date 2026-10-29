@@ -5,7 +5,7 @@ Checks an ExtractPoc output (`Intents/ExtractPoc.md`) against the parts of its c
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ExtractPocCheck.ts <file|-> [--json] [--no-parse]
+bun <skill-dir>/Tools/ExtractPocCheck.ts <file|-> [--json] [--no-parse]
 ```
 
 | Flag | Meaning |

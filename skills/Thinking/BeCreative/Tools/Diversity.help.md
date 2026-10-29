@@ -9,8 +9,8 @@ Similarity is TF-IDF cosine over word unigrams and bigrams of each example's fla
 ## Commands
 
 ```
-bun skills/BeCreative/Tools/Diversity.ts dedupe --accepted <file> --candidates <file> [--threshold 0.85]
-bun skills/BeCreative/Tools/Diversity.ts index <file> [<file>...]
+bun <skill-dir>/Tools/Diversity.ts dedupe --accepted <file> --candidates <file> [--threshold 0.85]
+bun <skill-dir>/Tools/Diversity.ts index <file> [<file>...]
 ```
 
 - `dedupe` prints one JSON line per candidate: `{index, maxSimilarity, nearest, duplicate}`. Each candidate is compared with every accepted example (pass seed plus accepted corpus) and every earlier non-duplicate candidate in the same batch. `duplicate` is `maxSimilarity > threshold`. `nearest` indexes the accepted list first, then kept candidates at `accepted.length + index`.

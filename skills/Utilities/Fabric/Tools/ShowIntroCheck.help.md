@@ -5,7 +5,7 @@ Checks a ShowIntro output (`Intents/ShowIntro.md`) against the parts of its cont
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ShowIntroCheck.ts <file|-> [--topics N] [--json]
+bun <skill-dir>/Tools/ShowIntroCheck.ts <file|-> [--topics N] [--json]
 ```
 
 | Flag | Meaning |

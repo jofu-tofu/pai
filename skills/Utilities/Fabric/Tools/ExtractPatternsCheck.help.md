@@ -5,7 +5,7 @@ Checks an ExtractPatterns output (`Intents/ExtractPatterns.md`) against the part
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ExtractPatternsCheck.ts <file|-> [--count N] [--json]
+bun <skill-dir>/Tools/ExtractPatternsCheck.ts <file|-> [--count N] [--json]
 ```
 
 | Flag | Meaning |

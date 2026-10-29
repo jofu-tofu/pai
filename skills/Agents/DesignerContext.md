@@ -9,8 +9,6 @@
 ## Required Knowledge (Pre-load from Skills)
 
 ### Core Foundations
-- **skills/PAI/CoreStack.md** - Stack preferences and tooling
-- **skills/PAI/CONSTITUTION.md** - Constitutional principles
 
 ### Design Standards
 - **skills/FrontendDesign/SKILL.md** - Frontend design workflows and patterns

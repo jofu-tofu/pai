@@ -5,7 +5,7 @@ Checks an AnalyzePaper output (`Intents/AnalyzePaper.md`) against the parts of i
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/AnalyzePaperCheck.ts <file|-> [--mode full|summary|brief] [--json]
+bun <skill-dir>/Tools/AnalyzePaperCheck.ts <file|-> [--mode full|summary|brief] [--json]
 ```
 
 | Flag | Meaning |

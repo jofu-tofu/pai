@@ -5,7 +5,7 @@ Checks a UlTags output (`Intents/UlTags.md`) against the parts of its contract t
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/UlTagsCheck.ts <file|-> [--extra tag1,tag2] [--json]
+bun <skill-dir>/Tools/UlTagsCheck.ts <file|-> [--extra tag1,tag2] [--json]
 ```
 
 | Flag | Meaning |

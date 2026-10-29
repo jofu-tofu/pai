@@ -15,10 +15,10 @@
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { homedir } from "os";
-import { joinLines, getEnvVar } from '../../../hooks/lib/platform";
+import { joinLines, getEnvVar } from './lib/platform.ts';
 
-const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
-const UPDATES_DIR = join(PAI_DIR, "MEMORY", "PAISYSTEMUPDATES");
+const WORKSPACE_ROOT = process.env.WORKSPACE_DIR || process.cwd();
+const UPDATES_DIR = join(WORKSPACE_ROOT, ".skill-output", "system-updates");
 const INDEX_PATH = join(UPDATES_DIR, "index.json");
 
 interface UpdateRecord {

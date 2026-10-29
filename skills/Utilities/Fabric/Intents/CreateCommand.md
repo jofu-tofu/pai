@@ -12,7 +12,7 @@ Our ideal-state port of Fabric's `create_command`. The upstream pattern stays in
 - The supplied documentation is the only source of truth for which options exist: every switch, option, and subcommand in the command appears verbatim in that documentation, and a capability the docs do not expose is left out of the command rather than invented.
 - Thin, partial, or mismatched documentation still yields a command: build the single best runnable invocation the documented options allow, fill in the objective's concrete values, and silently drop whatever the docs do not cover. A documentation gap is answered by the command that omits the missing capability, never by a note about the gap, a refusal, a question, or a characterization of why a part is missing.
 - The command is the whole output, done better than the upstream for a frontier model: no penetration-tester persona, no reasoning narration, no "virtual minutes", no markdown fence, and no note, warning, or explanation around it. The words are plain and exact and specific to this tool and this objective.
-- `bun skills/Fabric/Tools/CreateCommandCheck.ts` passed on the exact output before it was delivered: the shape holds and the command parses as valid shell. Where no shell is available the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/CreateCommandCheck.ts` passed on the exact output before it was delivered: the shape holds and the command parses as valid shell. Where no shell is available the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -28,7 +28,7 @@ Our ideal-state port of Fabric's `create_command`. The upstream pattern stays in
 ## Evals
 
 - suite: fabric-createcommand — code checks on shape (one command, no markdown, no prose, no placeholder) and a shell-syntax parse, plus judged checks on using only documented flags and meeting the objective.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -43,10 +43,10 @@ Our ideal-state port of Fabric's `create_command`. The upstream pattern stays in
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/CreateCommandCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/CreateCommandCheck.ts <file|-> [--json]
 #   exit 0: shape holds and the command parses; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

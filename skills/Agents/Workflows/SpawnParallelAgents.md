@@ -358,6 +358,6 @@ Use **SpawnParallelAgents workflow** when:
 
 ## References
 
-- Agent personalities: `$PAI_DIR/skills/Agents/AgentPersonalities.md`
+- Agent personalities: `<skill-dir>`
 - Intern agent definition: Line 277-287 in AgentPersonalities.md
-- Delegation patterns: `$PAI_DIR/skills/PAI/Workflows/Delegation.md`
+- Delegation patterns: `<skill-dir>`

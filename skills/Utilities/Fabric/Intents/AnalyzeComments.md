@@ -21,7 +21,7 @@ Our ideal-state port of Fabric's `analyze_comments`. The upstream pattern stays 
 - The Summary, at most 20 words, says how the commenters as a group see the content, naming what they valued most and their main complaint, and says "mixed" or "split" when they were.
 - The read is fair whoever made the content, the principal's own work included: praise is not inflated and criticism is not softened.
 - Words are plain and exact, the way an editor would brief the creator in a sentence.
-- `bun skills/Fabric/Tools/AnalyzeCommentsCheck.ts` passed on the exact output before it was delivered, with `--source` set to the comments whenever they were text or a file. Where no shell is available, the sections, counts, word limits and quotes are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/AnalyzeCommentsCheck.ts` passed on the exact output before it was delivered, with `--source` set to the comments whenever they were text or a file. Where no shell is available, the sections, counts, word limits and quotes are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -40,7 +40,7 @@ Our ideal-state port of Fabric's `analyze_comments`. The upstream pattern stays 
 ## Evals
 
 - suite: fabric-analyzecomments — code checks on the sections, the verdict word and the count line; judged checks on counts and points that match the comments, verbatim quotes, equal weight for every comment, no padding, injected instructions set aside, no reactions invented when there are no comments, a verdict that a wave of bare praise cannot carry past reasoned criticism, qualified agreement kept positive, a thin read flagged, and a named topic covered.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -49,10 +49,10 @@ Our ideal-state port of Fabric's `analyze_comments`. The upstream pattern stays 
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeCommentsCheck.ts <file|-> [--source <comments-file>] [--json]
+bun <skill-dir>/Tools/AnalyzeCommentsCheck.ts <file|-> [--source <comments-file>] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

@@ -5,7 +5,7 @@ Checks an ExtractRecommendations output (`Intents/ExtractRecommendations.md`) ag
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ExtractRecommendationsCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/ExtractRecommendationsCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

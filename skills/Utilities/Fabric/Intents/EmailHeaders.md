@@ -27,7 +27,7 @@ Our ideal-state port of Fabric's `analyze_email_headers`. The upstream pattern s
 - The security concerns are specific to these headers: a display name that impersonates a brand or person the address does not belong to, a `Reply-To` that diverts replies to another domain, a lookalike or freshly unrelated envelope domain, a `Received` chain whose hops or timing do not fit the claimed sender, a DMARC policy of `p=none` that lets spoofs through. Each recommendation says who acts (the recipient or the sending domain's owner) and what to change, and a clean message gets "no concerns found" rather than generic advice.
 - The dig commands set `DOMAIN` to the Header From domain and query its MX, SPF, the M365 default DKIM selectors (`selector1`, `selector2`), the Google default selector (`google`), the other common defaults (`s1`, `s2`, `k1`, `k2`), the DMARC TXT and the `_dmarc` NS, then the two domain-checker URLs. The selector and `d=` domain from the message's own DKIM-Signature are queried first, because that is the key that actually signed it.
 - The words are plain and exact: a result is named by its RFC term, a concern by what it lets an attacker do, and nothing is padded with tutorial text the principal did not ask for.
-- `bun skills/Fabric/Tools/EmailHeadersCheck.ts` passed on the exact analysis before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/EmailHeadersCheck.ts` passed on the exact analysis before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -45,7 +45,7 @@ Our ideal-state port of Fabric's `analyze_email_headers`. The upstream pattern s
 ## Evals
 
 - suite: fabric-emailheaders — code checks on the summary table, the address lines and the dig block, plus judged checks on trusted-source verdicts, alignment, forwarding and specific concerns.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -56,10 +56,10 @@ Our ideal-state port of Fabric's `analyze_email_headers`. The upstream pattern s
 
 ## Tool contract
 
-Run from `~/.claude`. Save the analysis, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the analysis, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/EmailHeadersCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/EmailHeadersCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

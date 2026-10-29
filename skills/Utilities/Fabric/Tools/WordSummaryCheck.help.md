@@ -5,7 +5,7 @@ Checks a WordSummary output (`Intents/WordSummary.md`) against the parts of its 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/WordSummaryCheck.ts <file|-> [--levels N] [--json]
+bun <skill-dir>/Tools/WordSummaryCheck.ts <file|-> [--levels N] [--json]
 ```
 
 | Flag | Meaning |

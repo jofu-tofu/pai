@@ -54,7 +54,7 @@ Ask the user:
 
 ```bash
 # Check prompts exist
-ls $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/prompts/
+ls <skill-dir>
 
 # Should see both versions:
 # v1.0.0.md
@@ -63,7 +63,7 @@ ls $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/prompts/
 
 ### Step 3: Create Comparison Config
 
-Create `$PAI_DIR/skills/Utilities/Evals/UseCases/<name>/comparisons/<comparison-name>.yaml`:
+Create `<skill-dir>`:
 
 ```yaml
 comparison:
@@ -106,7 +106,7 @@ comparison:
 **Option A: Via CLI**
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts \
+bun run <skill-dir> \
   --use-case <name> \
   --compare prompts/v1.0.0.md prompts/v1.1.0.md \
   --position-swap
@@ -289,10 +289,10 @@ focus: "depth"
 For detailed comparison setup, use the Comparison template:
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Prompting/Tools/RenderTemplate.ts \
+bun run <skill-dir> \
   -t Evals/Comparison.hbs \
-  -d $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/comparisons/<name>.yaml \
-  -o $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/comparisons/<name>-setup.md \
+  -d <skill-dir> \
+  -o <skill-dir> \
   --preview
 ```
 

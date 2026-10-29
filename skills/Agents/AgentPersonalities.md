@@ -71,7 +71,7 @@ PAI uses a **hybrid agent system** that combines:
 **Trigger words:** "custom agents", "custom", "specialized agents with different expertise"
 
 **What happens:**
-1. Run `bun run $PAI_DIR/skills/Agents/Tools/AgentFactory.ts` for EACH agent
+1. Run `bun run <skill-dir>` for EACH agent
 2. Use DIFFERENT trait combinations to get unique voices
 3. Each agent gets a personality-matched ElevenLabs voice
 4. Launch with the full AgentFactory-generated prompt
@@ -144,16 +144,16 @@ bun run AgentFactory.ts --traits "..."  # Overkill for generic parallel work
 - **Approach**: thorough, rapid, systematic, exploratory, comparative, synthesizing, adversarial, consultative
 
 **Internal Infrastructure** (for {daidentity.name}'s use):
-- Trait definitions: `$PAI_DIR/skills/Agents/Data/Traits.yaml`
-- Agent template: `$PAI_DIR/skills/Agents/Templates/DynamicAgent.hbs`
-- Composition tool: `$PAI_DIR/skills/Agents/Tools/AgentFactory.ts`
+- Trait definitions: `<skill-dir>`
+- Agent template: `<skill-dir>`
+- Composition tool: `<skill-dir>`
 
 ---
 
 ## Named Agent Architecture
 
-- **Location**: `$PAI_DIR/skills/PAI/AgentPersonalities.md` (this file)
-- **Consumer**: `$PAI_DIR/VoiceServer/server.ts` extracts JSON config from this file
+- **Location**: `<skill-dir>` (this file)
+Voice output is optional and only runs when explicitly requested through a host-provided tool.
 - **Format**: Human-readable markdown with embedded JSON configuration
 
 ## Configuration

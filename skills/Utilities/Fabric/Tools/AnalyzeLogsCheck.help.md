@@ -5,7 +5,7 @@ Checks an AnalyzeLogs output (`Intents/AnalyzeLogs.md`) against the parts of its
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeLogsCheck.ts <file|-> [--log <logfile>] [--json]
+bun <skill-dir>/Tools/AnalyzeLogsCheck.ts <file|-> [--log <logfile>] [--json]
 ```
 
 | Flag | Meaning |

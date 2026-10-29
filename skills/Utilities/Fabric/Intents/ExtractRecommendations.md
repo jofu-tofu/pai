@@ -19,7 +19,7 @@ Our ideal-state port of Fabric's `extract_recommendations`. The upstream pattern
 - When the input makes no recommendation and none follows from it, the output is the title and the single line `No recommendations found in {the source}.`, and nothing else.
 - When the input is a source, the recommendations are the ones it actually makes or that its content supports, read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs). For a bare topic, every recommendation is one practitioners of the field actually give; nothing is attributed to a named authority or carries a figure the model cannot stand behind.
 - The whole output is valid Markdown with no bold and no italics: the title and the bulleted list.
-- `bun skills/Fabric/Tools/ExtractRecommendationsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ExtractRecommendationsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -35,7 +35,7 @@ Our ideal-state port of Fabric's `extract_recommendations`. The upstream pattern
 ## Evals
 
 - suite: fabric-extractrecommendations — code checks on the title, the 16-word limit, the 20-bullet cap and the no-recommendations line, plus judged checks on what counts as a recommendation, fidelity to the source, the implied tag, the hint override and specificity.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -44,10 +44,10 @@ Our ideal-state port of Fabric's `extract_recommendations`. The upstream pattern
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ExtractRecommendationsCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/ExtractRecommendationsCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

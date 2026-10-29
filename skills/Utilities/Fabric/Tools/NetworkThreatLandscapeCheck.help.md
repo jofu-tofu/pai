@@ -5,7 +5,7 @@ Checks a NetworkThreatLandscape output (`Intents/NetworkThreatLandscape.md`) aga
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/NetworkThreatLandscapeCheck.ts <file|-> [--source <input-file>] [--json]
+bun <skill-dir>/Tools/NetworkThreatLandscapeCheck.ts <file|-> [--source <input-file>] [--json]
 ```
 
 | Flag | Meaning |

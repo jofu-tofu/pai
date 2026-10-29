@@ -5,7 +5,7 @@ Checks a ThreatScenarios output (`Intents/ThreatScenarios.md`) against the parts
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ThreatScenariosCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/ThreatScenariosCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

@@ -5,7 +5,7 @@ Checks a GoldenRules output (`Intents/GoldenRules.md`) against the parts of its 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/GoldenRulesCheck.ts <file|-> [--source] [--json]
+bun <skill-dir>/Tools/GoldenRulesCheck.ts <file|-> [--source] [--json]
 ```
 
 | Flag | Meaning |

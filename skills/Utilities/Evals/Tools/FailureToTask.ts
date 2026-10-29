@@ -12,10 +12,10 @@ import { existsSync, mkdirSync, writeFileSync, readFileSync, appendFileSync } fr
 import { join } from 'path';
 import { stringify as stringifyYaml } from 'yaml';
 import { parseArgs } from 'util';
-import { paiPath } from '../../../hooks/lib/paths';
-import { splitLines } from '../../../hooks/lib/platform';
 
-const EVALS_DIR = paiPath('skills', 'Evals');
+import { splitLines } from './lib/platform.ts';
+
+const EVALS_DIR = join(import.meta.dir, "..");
 const FAILURES_LOG = join(EVALS_DIR, 'Data', 'failures.jsonl');
 const TASKS_DIR = join(EVALS_DIR, 'UseCases');
 

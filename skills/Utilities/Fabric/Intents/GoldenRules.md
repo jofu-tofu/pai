@@ -20,7 +20,7 @@ Our ideal-state port of Fabric's `create_golden_rules`. The upstream pattern sta
 - The Quick Reference table has one row per rule in document order, its number, category, a short form of the rule and its tier. The Checklist turns the rules into boxes a person ticks before a commit, merge or deploy, each citing the rules it checks, and every Critical rule is cited by at least one box.
 - When the input supports no rule at all, the output is the title and the single line `No golden rules found in {the source}.`, and nothing else.
 - When the input is a source, the rules are the ones it states or shows, read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs). For a bare topic, every rule is one practitioners of the field actually hold; nothing is attributed to a named authority and no figure appears that the model cannot stand behind.
-- `bun skills/Fabric/Tools/GoldenRulesCheck.ts` passed on the exact output before it was delivered, with `--source` when the input was a source. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/GoldenRulesCheck.ts` passed on the exact output before it was delivered, with `--source` when the input was a source. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -36,7 +36,7 @@ Our ideal-state port of Fabric's `create_golden_rules`. The upstream pattern sta
 ## Evals
 
 - suite: fabric-goldenrules — code checks on the title, tiers, rule fields, Basis lines, the secret placeholder and the checklist, plus judged checks on the inferred read, fidelity to the source, specificity, ranking and checkable tests.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -45,10 +45,10 @@ Our ideal-state port of Fabric's `create_golden_rules`. The upstream pattern sta
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/GoldenRulesCheck.ts <file|-> [--source] [--json]
+bun <skill-dir>/Tools/GoldenRulesCheck.ts <file|-> [--source] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

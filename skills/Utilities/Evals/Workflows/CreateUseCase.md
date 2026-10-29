@@ -21,12 +21,12 @@ Ask the user:
 ### Step 2: Create Use Case Directory
 
 ```bash
-mkdir -p $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/{test-cases,golden-outputs,prompts}
+mkdir -p <skill-dir>
 ```
 
 ### Step 3: Create Config File
 
-Create `$PAI_DIR/skills/Utilities/Evals/UseCases/<name>/config.yaml`:
+Create `<skill-dir>`:
 
 ```yaml
 name: <use_case_name>
@@ -84,7 +84,7 @@ models:
 
 ### Step 4: Create Initial Prompt Version
 
-Create `$PAI_DIR/skills/Utilities/Evals/UseCases/<name>/prompts/v1.0.0.md`:
+Create `<skill-dir>`:
 
 ```markdown
 # <Task Name> Prompt v1.0.0
@@ -108,7 +108,7 @@ Create `$PAI_DIR/skills/Utilities/Evals/UseCases/<name>/prompts/v1.0.0.md`:
 
 ### Step 5: Create Test Cases
 
-Create test cases in `$PAI_DIR/skills/Utilities/Evals/UseCases/<name>/test-cases/`:
+Create test cases in `<skill-dir>`:
 
 Each test case is a YAML file:
 
@@ -160,7 +160,7 @@ Golden outputs serve as:
 
 ### Step 7: Create README
 
-Create `$PAI_DIR/skills/Utilities/Evals/UseCases/<name>/README.md`:
+Create `<skill-dir>`:
 
 ```markdown
 # <Use Case Name>
@@ -195,7 +195,7 @@ Create `$PAI_DIR/skills/Utilities/Evals/UseCases/<name>/README.md`:
 ## Running Evaluations
 
 \`\`\`bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts --use-case <name>
+bun run <skill-dir> --use-case <name>
 \`\`\`
 
 ## Version History
@@ -207,17 +207,17 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts --use-case <name>
 
 ```bash
 # Check structure
-ls -la $PAI_DIR/skills/Utilities/Evals/UseCases/<name>/
+ls -la <skill-dir>
 
 # Validate config
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts use-case show <name>
+bun run <skill-dir> use-case show <name>
 ```
 
 ### Step 9: Run Initial Eval
 
 ```bash
 # Run first evaluation to verify setup
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts \
+bun run <skill-dir> \
   --use-case <name> \
   --test-id 001-basic \
   --verbose

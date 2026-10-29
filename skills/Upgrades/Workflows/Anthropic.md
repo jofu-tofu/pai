@@ -1,13 +1,13 @@
 # Anthropic Workflow
 
-Check 30+ official Anthropic sources for updates relevant to PAI infrastructure.
+Check 30+ official Anthropic sources for updates relevant to the user's tools.
 
 ## Process
 
 ### Step 1: Run the Anthropic Check Tool
 
 ```bash
-bun $PAI_DIR/skills/Upgrades/Tools/Anthropic.ts
+bun <skill-dir>
 ```
 
 **Options:**

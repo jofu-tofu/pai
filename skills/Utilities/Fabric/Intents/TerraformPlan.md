@@ -23,7 +23,7 @@ Our ideal-state port of Fabric's `analyze_terraform_plan`. The upstream pattern 
 - The Verdict is one of `Safe to apply`, `Apply with care` or `Do not apply as is`, followed by one sentence of why. A plan that destroys or replaces anything, or is cut off so that part of it is unseen, is never `Safe to apply`. A plan that destroys or replaces stored data without evidence it was meant, opens an administrative port or a data store to the internet, removes encryption or deletion protection, or exposes a secret is `Do not apply as is`.
 - The Summary is one sentence of at most 25 words that says what the plan does and its single most important consequence.
 - Words are plain and exact, the vocabulary an infrastructure engineer would use with a colleague reviewing the same plan.
-- `bun skills/Fabric/Tools/TerraformPlanCheck.ts` passed on the exact review before it was delivered, with `--plan` pointing at the plan whenever one was supplied. Where no shell is available, the counts, the destroy and replace coverage and the addresses are checked by hand against the plan, and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/TerraformPlanCheck.ts` passed on the exact review before it was delivered, with `--plan` pointing at the plan whenever one was supplied. Where no shell is available, the counts, the destroy and replace coverage and the addresses are checked by hand against the plan, and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -45,7 +45,7 @@ Our ideal-state port of Fabric's `analyze_terraform_plan`. The upstream pattern 
 ## Evals
 
 - suite: fabric-terraformplan — code checks on the Plan line, verdict wording and sections; judged checks on catching each destroy and replacement with its data loss, naming the exact risky attribute, plan-specific takeaways, and secrets kept out of the review.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -59,7 +59,7 @@ Our ideal-state port of Fabric's `analyze_terraform_plan`. The upstream pattern 
 
 ## Tool contract
 
-Run from `~/.claude`. A binary plan file is turned into text from the directory it was made in, where its providers are installed:
+Run from `<host-config-dir>`. A binary plan file is turned into text from the directory it was made in, where its providers are installed:
 
 ```bash
 terraform show -no-color <planfile>     # human-readable; or: terraform show -json <planfile>
@@ -69,7 +69,7 @@ terraform show -no-color <planfile>     # human-readable; or: terraform show -js
 Save the review (and the plan, when it was pasted), check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/TerraformPlanCheck.ts <review|-> [--plan <plan.txt|plan.json>] [--json]
+bun <skill-dir>/Tools/TerraformPlanCheck.ts <review|-> [--plan <plan.txt|plan.json>] [--json]
 #   exit 0: shape holds (and, with --plan, counts, destroy/replace coverage, addresses and secrets agree with the plan)
 #   exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```

@@ -25,7 +25,7 @@ Our ideal-state port of Fabric's `create_threat_scenarios`. The upstream pattern
 - Every scenario, bullet and control is specific to this input. A line that would fit most other systems as well ("Attackers may exploit vulnerabilities") fails.
 - When the input is a source, the model reflects what it actually describes, read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
 - The words are plain and exact: the most precise ordinary word wins over security jargon, and a term a non-specialist would not know is explained in the same line or replaced.
-- `bun skills/Fabric/Tools/ThreatScenariosCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ThreatScenariosCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -46,7 +46,7 @@ Our ideal-state port of Fabric's `create_threat_scenarios`. The upstream pattern
 ## Evals
 
 - suite: fabric-threatscenarios — code checks on the section order and the scenario table, plus judged checks on realistic ranking, honest handling of the named fear, specific controls and the verdict.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -55,10 +55,10 @@ Our ideal-state port of Fabric's `create_threat_scenarios`. The upstream pattern
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ThreatScenariosCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/ThreatScenariosCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

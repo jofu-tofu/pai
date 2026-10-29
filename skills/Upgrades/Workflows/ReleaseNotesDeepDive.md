@@ -1,6 +1,6 @@
 # Release Notes Deep Dive Workflow
 
-Deeply analyze Claude Code `/release-notes` output by researching each feature across multiple authoritative sources, then generate upgrade recommendations for PAI infrastructure.
+Deeply analyze Claude Code `/release-notes` output by researching each feature across multiple authoritative sources, then generate upgrade recommendations for the user's tools.
 
 **Trigger:** "analyze release notes", "deep dive release notes", "research new features"
 

@@ -7,8 +7,8 @@ A McKinsey-style professional consulting report from TELOS analysis content, ren
 ## Ideal State
 
 - The five assessment artifacts (`findings.json`, `recommendations.json`, `roadmap.json`, `methodology.json`, `narrative.json` in `{source}/artifacts/`) exist in the Artifact Schema shape before the report is generated, and the report content comes from them: the artifacts/ directory is the contract between the assessment and the report. No other intent writes them; this intent builds any missing or stale artifact from the source files (InterviewExtraction's category files such as `FINDINGS.md`, `CRITICAL_ISSUES.md`, `BLOCKERS.md`, `RECOMMENDATIONS.md`, `VISION.md`, plus the CreateNarrativePoints narrative for `narrative.json`), every finding keeping its role-based source.
-- The report is a complete Next.js app in `{output_dir}` copied from the entire template at `~/.claude/skills/Telos/ReportTemplate/`, with `lib/report-data.ts` generated from the artifacts in the ReportData structure (`clientName`, `reportTitle`, `reportDate` as the current month/year, and all findings, recommendations and roadmap from the TELOS analysis) and `app/layout.tsx` metadata updated with the client name; it runs under `bun dev` and hot-reloads when the report is regenerated.
-- The report follows the nine-section Report Structure (Cover Page, Executive Summary, Situation Assessment, Key Findings, Risk Analysis, Strategic Recommendations, Target State Vision, Implementation Roadmap, Call to Action), uses the report theme (the user's `ReportTheme.ts` and `Fonts/` from `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/Telos/` when present, else the template's neutral `theme.ts`) per the font roles below, and its McKinsey visual elements, and switches to the light theme when printed (PDF-ready).
+- The report is a complete Next.js app in `{output_dir}` copied from the entire template at `<skill-dir>/ReportTemplate/`, with `lib/report-data.ts` generated from the artifacts in the ReportData structure (`clientName`, `reportTitle`, `reportDate` as the current month/year, and all findings, recommendations and roadmap from the TELOS analysis) and `app/layout.tsx` metadata updated with the client name; it runs under `bun dev` and hot-reloads when the report is regenerated.
+- The report follows the nine-section Report Structure (Cover Page, Executive Summary, Situation Assessment, Key Findings, Risk Analysis, Strategic Recommendations, Target State Vision, Implementation Roadmap, Call to Action), uses the report theme (the user's `ReportTheme.ts` and `Fonts/` from local `Customizations/` when present, else the template's neutral `theme.ts`) per the font roles below, and its McKinsey visual elements, and switches to the light theme when printed (PDF-ready).
 - The finished report passes every check: your logo displays correctly (125x125, left-justified); the "TELOS Assessment" label is visible above the title; the cover has the correct client name and date; the executive summary fits on one page; the methodology exhibit shows interview count and roles; all findings have evidence/sources (role-based, not names); recommendations are specific and actionable; the vision section is compelling and concrete; the roadmap has realistic phases; the call to action is clear; all exhibits are numbered and titled; color usage is subtle and professional; the confidentiality notice is included.
 - The writing is McKinsey-style professional consulting: every assertion is direct and confident and cites the evidence behind it (evidence-backed assertions), each finding is stated with its strategic framing (what it means for the client), the language is executive-appropriate, and every recommendation is clear and names a concrete action (actionable insights).
 - When the report will be presented to a board or executive audience, every Content Review Checklist item holds before board presentation, including: all individual names removed from sources, sources referencing roles/teams only, and an Executive Summary methodology section showing the interview count and the roles interviewed (by role category, not by name).
@@ -38,7 +38,7 @@ A McKinsey-style professional consulting report from TELOS analysis content, ren
 
 The theme (palette, font roles, `@font-face` files) lives in the template's `theme.ts`, which `tailwind.config.ts` turns into the Tailwind palette, font families, `:root` CSS variables and `@font-face` rules; `app/globals.css` and `components/` only reference those roles. The template ships neutral defaults (system sans, Georgia body, a slate palette).
 
-**User theme.** When `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/Telos/` holds `ReportTheme.ts`, the generated report uses it: copy it over `{output_dir}/theme.ts`, and copy that directory's `Fonts/` to `{output_dir}/public/Fonts/` (each `@font-face` `src` is `/Fonts/<file>`, matching case). Its `PREFERENCES.md` § Report design names the faces per role. With neither file present, the shipped defaults stand.
+**User theme.** When local `Customizations/` holds `ReportTheme.ts`, the generated report uses it: copy it over `{output_dir}/theme.ts`, and copy that directory's `Fonts/` to `{output_dir}/public/Fonts/` (each `@font-face` `src` is `/Fonts/<file>`, matching case). Its `PREFERENCES.md` § Report design names the faces per role. With neither file present, the shipped defaults stand.
 
 **Font roles:**
 
@@ -159,25 +159,7 @@ The theme (palette, font roles, `@font-face` files) lives in the template's `the
 
 ### Build and run
 
-```bash
-ls {source}/artifacts/
-# Should contain: findings.json, recommendations.json, roadmap.json, methodology.json, narrative.json
-
-# Copy template to output directory (if not already done)
-cp -r ~/.claude/skills/Telos/ReportTemplate/* {output_dir}/
-
-# User theme, when set (Design § User theme)
-U="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/Telos"
-[ -f "$U/ReportTheme.ts" ] && cp "$U/ReportTheme.ts" {output_dir}/theme.ts
-[ -d "$U/Fonts" ] && mkdir -p {output_dir}/public/Fonts && cp "$U"/Fonts/*.woff2 {output_dir}/public/Fonts/
-
-# Install dependencies
-cd {output_dir} && bun install
-
-# after writing {output_dir}/lib/report-data.ts (mapping below)
-cd {output_dir} && bun dev
-# Opens at http://localhost:3000
-```
+Use the current host's tools for this operation; see `PORTABILITY.md`.
 
 ### Artifacts → ReportData mapping
 
@@ -236,9 +218,9 @@ const reportData = {
 
 ### Maintenance
 
-**To update fonts or palette:** edit `ReportTheme.ts` and the files in `Fonts/` under `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/Telos/` (Setup.md § Fill in); the template itself carries no font files.
+**To update fonts or palette:** edit `ReportTheme.ts` and the files in `Fonts/` under `PORTABILITY.md` (Setup.md § Fill in); the template itself carries no font files.
 
-**To update template components:** edit files in `~/.claude/skills/Telos/ReportTemplate/components/`.
+**To update template components:** edit files in `<skill-dir>/ReportTemplate/components/`.
 
 ## Safety gates
 
@@ -290,4 +272,4 @@ User: "Create a TELOS report for Acme Corp"
 ## References
 
 - InterviewExtraction output supplies evidence quotes; CreateNarrativePoints supplies the narrative content.
-- Theme shape: `ReportTemplate/theme.ts`; user theme and fonts: `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/Telos/` (`Setup.md`).
+- Theme shape: `ReportTemplate/theme.ts`; user theme and fonts: `PORTABILITY.md` (`Setup.md`).

@@ -24,7 +24,7 @@ Our ideal-state port of Fabric's `analyze_incident`. The upstream pattern stays 
 - Everything in the Analysis that describes this incident uses only reported facts. A pass/fail line, an action step or a lesson never adds a detail the source does not give, such as an alert that did not fire, encryption that "went unnoticed", or a step the victim skipped; "as happened here" is written only where the source says it happened.
 - The Remediation is the one action that would most directly have stopped this incident, aimed at its root cause, and the Action plan is the ordered steps to carry it out. When the source does not report the root cause, the Remediation is aimed at the reported entry path and the first Action plan step confirms the open cause (naming our most likely reading as the thing to check) before acting on it. The Lessons learned say what this incident teaches that a reader could act on elsewhere. All three are specific to this incident: each would read wrong if pasted under a different breach.
 - Words are plain and exact, the vocabulary a security analyst would use with a colleague.
-- `bun skills/Fabric/Tools/AnalyzeIncidentCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the fields, ID formats and cross-references are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/AnalyzeIncidentCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the fields, ID formats and cross-references are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -44,7 +44,7 @@ Our ideal-state port of Fabric's `analyze_incident`. The upstream pattern stays 
 ## Evals
 
 - suite: fabric-analyzeincident — code checks on the record's fields, date and ID formats; judged checks on fidelity to the source, the attack-versus-disclosure date, hedged attribution, and remediation tied to the root cause.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -53,10 +53,10 @@ Our ideal-state port of Fabric's `analyze_incident`. The upstream pattern stays 
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeIncidentCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/AnalyzeIncidentCheck.ts <file|-> [--json]
 #   exit 0: record shape holds; exit 1: prints each failed rule; exit 2: bad usage
 ```
 

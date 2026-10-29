@@ -5,7 +5,7 @@ Checks an ExplainTerms output (`Intents/ExplainTerms.md`) against the parts of i
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ExplainTermsCheck.ts <file|-> [--source <input-file>] [--count N] [--json]
+bun <skill-dir>/Tools/ExplainTermsCheck.ts <file|-> [--source <input-file>] [--count N] [--json]
 ```
 
 | Flag | Meaning |

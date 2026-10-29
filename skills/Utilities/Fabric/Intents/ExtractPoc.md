@@ -11,7 +11,7 @@ Our ideal-state port of Fabric's `extract_poc`. The upstream pattern stays in `P
 - The commands run top to bottom as written: a PoC that needs a login or a token first lists that step before the step that uses it, and a multi-request exploit keeps each request on its own line.
 - The whole output is one fenced shell block and nothing else, so it pastes into a terminal and runs, and the block parses under `bash -n`.
 - When the source gives nothing to build a command from — no endpoint, request, payload or artifact, so any command would have to be invented — the whole output is the single sentinel line naming what is missing, never a command invented to fill the gap.
-- `bun skills/Fabric/Tools/ExtractPocCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ExtractPocCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -24,7 +24,7 @@ Our ideal-state port of Fabric's `extract_poc`. The upstream pattern stays in `P
 ## Evals
 
 - suite: fabric-extractpoc — code checks on the one-shell-block shape and the `bash -n` parse, plus judged checks on fidelity to the source, invented values and the no-PoC decline.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -38,10 +38,10 @@ Our ideal-state port of Fabric's `extract_poc`. The upstream pattern stays in `P
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ExtractPocCheck.ts <file|-> [--json] [--no-parse]
+bun <skill-dir>/Tools/ExtractPocCheck.ts <file|-> [--json] [--no-parse]
 #   exit 0: shape holds and the block parses; exit 1: prints each failed rule; exit 2: bad usage, unreadable input, or bash missing
 ```
 

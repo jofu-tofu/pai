@@ -19,7 +19,7 @@ Our ideal-state port of Fabric's `extract_predictions`. The upstream pattern sta
 - When the input makes no prediction, the output is the title and the single line `No predictions found in {the source}.`, and nothing else.
 - When the input is a source, the predictions are the ones it actually makes, read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs). A prediction listed for a bare topic or person is one the model knows was actually made; one it cannot attribute with confidence is left out rather than guessed.
 - The whole output is valid Markdown with no bold and no italics: the title, the bulleted list, and the table.
-- `bun skills/Fabric/Tools/ExtractPredictionsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ExtractPredictionsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -35,7 +35,7 @@ Our ideal-state port of Fabric's `extract_predictions`. The upstream pattern sta
 ## Evals
 
 - suite: fabric-extractpredictions — code checks on the table header, the no-predictions line and plain Markdown, plus judged checks on fidelity to stated confidence and dates, what counts as a prediction, attribution, and specific verifications.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -44,10 +44,10 @@ Our ideal-state port of Fabric's `extract_predictions`. The upstream pattern sta
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ExtractPredictionsCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/ExtractPredictionsCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

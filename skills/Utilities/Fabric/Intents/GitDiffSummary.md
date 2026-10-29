@@ -16,7 +16,7 @@ Our ideal-state port of Fabric's `summarize_git_diff`. The upstream pattern stay
 - Every claim is in the diff, or in a hint the principal typed. The message says what changed and, when the diff shows it (a test name, a comment, an error message), why. It never invents a motive, a bug, an issue number or a performance gain the diff does not show.
 - When the change removes or renames something callers use, or changes its arguments, defaults or output, the subject carries `!` and the message ends with one `BREAKING CHANGE: ` line that says what a caller must now do.
 - The words are plain and exact: the precise ordinary word, code identifiers in backticks exactly as the diff spells them, and no word spent on filler.
-- `bun skills/Fabric/Tools/GitDiffSummaryCheck.ts` passed on the exact message before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/GitDiffSummaryCheck.ts` passed on the exact message before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -34,7 +34,7 @@ Our ideal-state port of Fabric's `summarize_git_diff`. The upstream pattern stay
 ## Evals
 
 - suite: fabric-gitdiffsummary — code checks on the subject grammar, the CHANGES list and its bounds, plus judged checks on type choice, specificity, fidelity to the diff and the breaking-change footer.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -48,17 +48,17 @@ Our ideal-state port of Fabric's `summarize_git_diff`. The upstream pattern stay
 
 ## Tool contract
 
-Fetching a URL follows `Intents/ExecutePattern.md` § Tool contract. A diff is not knowledge to keep, so this intent is outside the summarize family and never fires Harvest. A GitHub commit, pull request or compare URL with `.diff` appended returns the raw unified diff. With no diff supplied, read the working tree:
+Use host tools explicitly. Save notes only when the user requests an export.
 
 ```bash
 git diff --staged          # what will be committed
 git diff                   # when nothing is staged
 ```
 
-Run from `~/.claude`. Save the message, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the message, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/GitDiffSummaryCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/GitDiffSummaryCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

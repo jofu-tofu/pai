@@ -5,7 +5,7 @@ Checks a ReviewDesign output (`Intents/ReviewDesign.md`) against the parts of it
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ReviewDesignCheck.ts <file|-> [--source <design-file>] [--json]
+bun <skill-dir>/Tools/ReviewDesignCheck.ts <file|-> [--source <design-file>] [--json]
 ```
 
 | Flag | Meaning |

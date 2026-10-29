@@ -5,7 +5,7 @@ Checks an EthicalFramework output (`Intents/EthicalFramework.md`) against the pa
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/EthicalFrameworkCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/EthicalFrameworkCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

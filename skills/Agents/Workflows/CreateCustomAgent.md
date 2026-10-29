@@ -29,19 +29,19 @@ Extract from {principal.name}'s request:
 # Example for 3 custom research agents:
 
 # Agent 1 - Enthusiastic Explorer
-bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts \
+bun run <skill-dir> \
   --traits "research,enthusiastic,exploratory" \
   --task "Research quantum computing applications" \
   --output json
 
 # Agent 2 - Skeptical Analyst
-bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts \
+bun run <skill-dir> \
   --traits "research,skeptical,systematic" \
   --task "Research quantum computing applications" \
   --output json
 
 # Agent 3 - Thorough Synthesizer
-bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts \
+bun run <skill-dir> \
   --traits "research,analytical,synthesizing" \
   --task "Research quantum computing applications" \
   --output json
@@ -252,8 +252,8 @@ Colors are deterministic - same trait combination always produces the same color
 
 ## References
 
-- Trait definitions: `$PAI_DIR/skills/Agents/Data/Traits.yaml`
-- User customizations: `$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml`
-- Agent template: `$PAI_DIR/skills/Agents/Templates/DynamicAgent.hbs`
-- ComposeAgent tool: `$PAI_DIR/skills/Agents/Tools/ComposeAgent.ts`
-- Voice mappings: `$PAI_DIR/skills/Agents/AgentPersonalities.md`
+- Trait definitions: `<skill-dir>`
+- User customizations: `Customizations/`
+- Agent template: `<skill-dir>`
+- ComposeAgent tool: `<skill-dir>`
+- Voice mappings: `<skill-dir>`

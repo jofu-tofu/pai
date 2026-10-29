@@ -5,7 +5,7 @@ Checks a SecureByDesignQuestions output (`Intents/SecureByDesignQuestions.md`) a
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/SecureByDesignQuestionsCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/SecureByDesignQuestionsCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

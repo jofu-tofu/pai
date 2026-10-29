@@ -5,7 +5,7 @@ Checks an AuditConsent output (`Intents/AuditConsent.md`) against the parts of i
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/AuditConsentCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/AuditConsentCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

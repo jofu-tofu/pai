@@ -5,7 +5,7 @@ Checks a CodeRules output (`Intents/CodeRules.md`) against the parts of its cont
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/CodeRulesCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/CodeRulesCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

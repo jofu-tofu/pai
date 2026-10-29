@@ -17,7 +17,7 @@ Our ideal-state port of Fabric's `compare_and_contrast`. The upstream pattern st
 - The In common line names what the items genuinely share that is worth knowing, and the Key difference line names the one difference that matters most for the read, in one short sentence each, under 40 words. For a question, the Key difference line answers it.
 - The whole output is brief: 2 to 8 items, 3 to 6 dimensions by default, nothing beyond the title, the table and the two closing lines.
 - The words are plain and exact: the most precise ordinary word wins over jargon, and a term a non-specialist would not know is replaced or explained in its cell.
-- `bun skills/Fabric/Tools/CompareAndContrastCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/CompareAndContrastCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -33,7 +33,7 @@ Our ideal-state port of Fabric's `compare_and_contrast`. The upstream pattern st
 ## Evals
 
 - suite: fabric-compareandcontrast — code checks on the title, the table shape, the item rows and the two closing lines, plus judged checks on the inferred read, dimensions that actually separate the items, concrete and accurate cells, fidelity to a source, and a Key difference line that answers a question.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -42,10 +42,10 @@ Our ideal-state port of Fabric's `compare_and_contrast`. The upstream pattern st
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/CompareAndContrastCheck.ts <file|-> [--table-only] [--json]
+bun <skill-dir>/Tools/CompareAndContrastCheck.ts <file|-> [--table-only] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 #   --table-only: the request said "just the table", so the two closing lines must be absent
 ```

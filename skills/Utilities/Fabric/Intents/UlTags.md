@@ -14,7 +14,7 @@ Our ideal-state port of Fabric's `apply_ul_tags`. The upstream pattern stays in 
 - Each tag's scope is the one in § Output format: `personal` is a piece whose subject is the author's own life (a story, an experience, a reflection), not a first-person report of a setup, a test or a method; `books` is a piece about a book or books (a review, a reading list), not one that cites a book; `tutorial` is a piece that teaches how to do something step by step, not one that explains an idea; `business` is a piece about companies, markets, money or the economics of work, not one that happens to describe a team's process or a product a company sells; `innovation` is a piece whose subject is a new idea, invention or breakthrough, not one that uses or reviews a new tool; `future` is a piece that argues where something is heading, such as a paragraph on how a field, a job or a practice will change in the coming years, not one that adds a single forecast clause or a hedge about what vendors will keep doing.
 - The tags are ordered from the piece's most central theme to its least.
 - When nothing in the vocabulary fits, the output is `{"tags": []}`, never a stretched tag.
-- The reply in this turn is the JSON object itself, finished. Checking happens before the reply and leaves no trace in it: when a shell tool is actually available, `bun skills/Fabric/Tools/UlTagsCheck.ts` passed on the exact output first; when no tool is available, or the turn is one answer with no tool calls, the shape is checked by hand. Either way the reply holds the object and nothing else, never a tool call, a command or a plan to check standing in for it.
+- The reply in this turn is the JSON object itself, finished. Checking happens before the reply and leaves no trace in it: when a shell tool is actually available, `bun <skill-dir>/Tools/UlTagsCheck.ts` passed on the exact output first; when no tool is available, or the turn is one answer with no tool calls, the shape is checked by hand. Either way the reply holds the object and nothing else, never a tool call, a command or a plan to check standing in for it.
 
 ## Anti-criteria
 
@@ -30,7 +30,7 @@ Our ideal-state port of Fabric's `apply_ul_tags`. The upstream pattern stays in 
 ## Evals
 
 - suite: fabric-ultags — code checks that the output parses as JSON and holds the expected tags, plus judged checks on conservative tagging, the nesting rule, tag scope and input inference.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -39,10 +39,10 @@ Our ideal-state port of Fabric's `apply_ul_tags`. The upstream pattern stays in 
 
 ## Tool contract
 
-Only when this session gives a real shell tool: run from `~/.claude`, save the draft, check it, and deliver only on exit 0. With no tool, skip this and check the shape by hand. The command and its output never appear in the reply.
+Only when this session gives a real shell tool: run from `<host-config-dir>`, save the draft, check it, and deliver only on exit 0. With no tool, skip this and check the shape by hand. The command and its output never appear in the reply.
 
 ```bash
-bun skills/Fabric/Tools/UlTagsCheck.ts <file|-> [--extra tag1,tag2] [--json]
+bun <skill-dir>/Tools/UlTagsCheck.ts <file|-> [--extra tag1,tag2] [--json]
 #   exit 0: the object parses and every rule holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

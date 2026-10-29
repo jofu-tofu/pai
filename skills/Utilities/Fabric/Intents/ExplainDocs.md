@@ -18,7 +18,7 @@ Our ideal-state port of Fabric's `explain_docs`. The upstream pattern stays in `
 - Every flag, subcommand, argument order, default and output described is the one the tool really has. When the input is documentation, every option and command is supported by that documentation, so it works on the version documented; general knowledge may choose which jobs are common, never add an option the docs do not give, and behavior the docs do not state is left out or said to be undocumented. When behavior differs by version, platform or implementation (GNU against BSD, a flag added in a later release), the entry it affects says so.
 - A source is read in full before anything is written (`Intents/ExecutePattern.md` § Tool contract covers fetching URLs and YouTube links).
 - The words are plain and exact. Commands, flags, paths and values appear in inline code exactly as typed.
-- `bun skills/Fabric/Tools/ExplainDocsCheck.ts` passed on the exact output before it was delivered, with `--source` set to the input whenever the input was documentation text or a file. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ExplainDocsCheck.ts` passed on the exact output before it was delivered, with `--source` set to the input whenever the input was documentation text or a file. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -36,7 +36,7 @@ Our ideal-state port of Fabric's `explain_docs`. The upstream pattern stays in `
 ## Evals
 
 - suite: fabric-explaindocs — code checks on the title, the four sections, the overview lengths, the use-case and option line shapes, and documented flags; judged checks on fidelity to the docs, commands that work, real options for a bare tool, the asked job first, and an API's real syntax.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -45,10 +45,10 @@ Our ideal-state port of Fabric's `explain_docs`. The upstream pattern stays in `
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ExplainDocsCheck.ts <file|-> [--source <input-file>] [--tool <name>] [--json]
+bun <skill-dir>/Tools/ExplainDocsCheck.ts <file|-> [--source <input-file>] [--tool <name>] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

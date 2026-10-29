@@ -20,7 +20,7 @@ Our ideal-state port of Fabric's `extract_patterns`. The upstream pattern stays 
 - For a bare topic, the list is the 10 to 20 patterns best grounded in cases the model knows of, and Meta names those cases (companies, projects, people, studies, with years where it matters) and counts how many of the named cases show each pattern. A pattern it cannot ground in named cases is left out rather than asserted.
 - An input in which nothing recurs (a single short message, one data point, a list of unrelated items) gets the title, the Patterns heading and the one `None found:` line saying what the input is and why nothing recurs, and nothing else.
 - The words are plain and exact throughout: the most precise ordinary word over jargon, no hedging filler, and no two patterns opening on the same two words.
-- `bun skills/Fabric/Tools/ExtractPatternsCheck.ts` passed on the exact output before it was delivered, with `--count N` whenever the request named a count. Where no shell is available, the shape, word counts and section order are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ExtractPatternsCheck.ts` passed on the exact output before it was delivered, with `--count N` whenever the request named a count. Where no shell is available, the shape, word counts and section order are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -37,7 +37,7 @@ Our ideal-state port of Fabric's `extract_patterns`. The upstream pattern stays 
 ## Evals
 
 - suite: fabric-extractpatterns — code checks on the title, the five sections in order, the Best heading and the none line; judged checks on patterns that truly recur, counts that match the input, specific patterns over theme labels, Best 5 argued from evidence, advice tied to patterns, grounded topic cases and the typed hint.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -46,10 +46,10 @@ Our ideal-state port of Fabric's `extract_patterns`. The upstream pattern stays 
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ExtractPatternsCheck.ts <file|-> [--count N] [--json]
+bun <skill-dir>/Tools/ExtractPatternsCheck.ts <file|-> [--count N] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

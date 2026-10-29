@@ -1,6 +1,6 @@
 # Science Templates
 
-Full records are each intent's Output format: Goal in [DefineGoal](Intents/DefineGoal.md); Hypothesis, Experiment and Results in [StructuredInvestigation](Intents/StructuredInvestigation.md). A measured climb keeps its hypotheses and results as rows in the HillClimb ledger instead. This file holds what they share: identity, status values and the compact form. Fill fields with actual findings.
+Full records are each intent's Output format: Goal in [DefineGoal](Intents/DefineGoal.md); Hypothesis, Experiment and Results in [StructuredInvestigation](Intents/StructuredInvestigation.md). A measured climb keeps its hypotheses and results as rows in the measured iteration ledger instead. This file holds what they share: identity, status values and the compact form. Fill fields with actual findings.
 
 | Record | Identity | Status |
 |--------|----------|--------|

@@ -19,7 +19,7 @@ Our ideal-state port of Fabric's `write_pull-request`. The upstream pattern stay
 - Risks lists the specific ways this change could be wrong or break something, read from the diff itself (an unhandled error path, a race, a retry on a non-idempotent call, a changed default, a missing migration, an untested branch), each tied to the file or function where it lives. When the diff carries a secret, Risks says so and names it by what it is.
 - Test Plan says what the diff's own tests cover, by test name, and gives the concrete checks a reviewer should run for what they do not cover, as `- [ ]` items with the command or the steps. It claims a test was run only when the input shows it was.
 - Every claim is in the diff, its commits, or a hint the principal typed. The words are plain and exact: code identifiers in backticks exactly as the diff spells them, the precise ordinary word, nothing spent on filler, and the whole description specific enough that it could not be pasted onto a different PR.
-- `bun skills/Fabric/Tools/PullRequestCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/PullRequestCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -35,7 +35,7 @@ Our ideal-state port of Fabric's `write_pull-request`. The upstream pattern stay
 ## Evals
 
 - suite: fabric-pullrequest — code checks on the title, the section order and the file bullets, plus judged checks on fidelity to the diff, specific risks, an honest test plan, and an injected instruction left unfollowed.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -57,10 +57,10 @@ git log --oneline "$base"..HEAD    # commits, for motive and history style
 git diff "$base"...HEAD            # the change since the merge base
 ```
 
-Run from `~/.claude`. Save the description, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the description, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/PullRequestCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/PullRequestCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

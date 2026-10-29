@@ -9,8 +9,6 @@
 ## Required Knowledge (Pre-load from Skills)
 
 ### Core Foundations
-- **skills/PAI/CoreStack.md** - Stack preferences and tooling
-- **skills/PAI/CONSTITUTION.md** - Constitutional principles
 
 ### Development Standards
 - **skills/Development/SKILL.md** - Development workflows and patterns
@@ -25,7 +23,6 @@
 Load these dynamically based on task keywords:
 
 - **Test/TDD** → skills/Development/TESTING.md, skills/Development/TestingPhilosophy.md
-- **Security** → skills/PAI/SecurityProtocols.md
 - **CLI testing** → skills/Development/References/cli-testing-standards.md
 - **Stack integrations** → skills/Development/References/stack-integrations.md
 

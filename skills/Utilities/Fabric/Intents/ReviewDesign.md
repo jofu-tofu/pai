@@ -19,7 +19,7 @@ Our ideal-state port of Fabric's `review_design`. The upstream pattern stays in 
 - Every fact the review rests on that the design does not give (expected load, team size, data sensitivity, the cloud it runs on) appears under Assumptions as `Assumed:`, and the facts the design gives that decide a finding appear as `Stated:`, so the reader can correct a wrong one.
 - Words are plain and exact: "two app servers write the same counter, so concurrent requests lose updates" over "potential concurrency-related data integrity concerns".
 - Sources are read in full before any review (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
-- `bun skills/Fabric/Tools/ReviewDesignCheck.ts` passed on the exact output before it was delivered, with `--source` pointing at the supplied design text when there was one. Where no shell is available, the sections, finding lines, severity order, verdict consistency and quotations are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ReviewDesignCheck.ts` passed on the exact output before it was delivered, with `--source` pointing at the supplied design text when there was one. Where no shell is available, the sections, finding lines, severity order, verdict consistency and quotations are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -38,7 +38,7 @@ Our ideal-state port of Fabric's `review_design`. The upstream pattern stays in 
 ## Evals
 
 - suite: fabric-reviewdesign — code checks on the heading, verdict line, the seven areas, the closing strengths and ranked changes, finding lines and the no-design line; judged checks on findings tied to this design, no invented facts, a verdict that follows the findings, and fixes specific enough to act on.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -47,10 +47,10 @@ Our ideal-state port of Fabric's `review_design`. The upstream pattern stays in 
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ReviewDesignCheck.ts <file|-> [--source <design-file>] [--json]
+bun <skill-dir>/Tools/ReviewDesignCheck.ts <file|-> [--source <design-file>] [--json]
 #   exit 0: shape and verdict consistency hold; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

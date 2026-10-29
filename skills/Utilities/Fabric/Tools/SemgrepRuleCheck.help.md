@@ -5,7 +5,7 @@ Checks a SemgrepRule output (`Intents/SemgrepRule.md`) against the parts of its 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/SemgrepRuleCheck.ts <file|-> [--json] [--no-semgrep]
+bun <skill-dir>/Tools/SemgrepRuleCheck.ts <file|-> [--json] [--no-semgrep]
 ```
 
 | Flag | Meaning |

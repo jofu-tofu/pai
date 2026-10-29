@@ -20,7 +20,7 @@ Our ideal-state port of Fabric's `create_design_document`. The upstream pattern 
 - Every line is specific to this input. A control, risk, requirement or element that would fit most other systems as well ("Use strong passwords", "Encrypt sensitive data", "Users" with no role) fails unless it names this system's part, data or failure.
 - A source is read in full before the document is written (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs), and every stated fact the document relies on is in the source or the conversation.
 - The words are plain and exact: the precise ordinary word wins over jargon, and an architecture or security term is used only where it is the clearest name for the thing.
-- The reply is the document and nothing else: its first line is the title and its last line is the last question. `bun skills/Fabric/Tools/DesignDocumentCheck.ts` passed on the exact output before it was delivered, Mermaid rendering included, run through a real tool call when a shell tool is available. The commands, file writes and checker results stay in those tool calls and never appear in the reply. Where no tool is available, the shape is checked by hand and nothing stands in for the tools: no command, no tool-call markup, no simulated output, no note that a check ran or would run.
+- The reply is the document and nothing else: its first line is the title and its last line is the last question. `bun <skill-dir>/Tools/DesignDocumentCheck.ts` passed on the exact output before it was delivered, Mermaid rendering included, run through a real tool call when a shell tool is available. The commands, file writes and checker results stay in those tool calls and never appear in the reply. Where no tool is available, the shape is checked by hand and nothing stands in for the tools: no command, no tool-call markup, no simulated output, no note that a check ran or would run.
 
 ## Anti-criteria
 
@@ -37,7 +37,7 @@ Our ideal-state port of Fabric's `create_design_document`. The upstream pattern 
 ## Evals
 
 - suite: fabric-designdocument — code checks on the section order, the three Mermaid blocks, the five-column tables, the control and risk prefixes and the assumed defaults, plus judged checks on input-kind inference, fidelity to a pasted design, keeping proposed and open items in rough notes apart from decided ones, specificity, risk appetite and the typed-hint override.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -46,10 +46,10 @@ Our ideal-state port of Fabric's `create_design_document`. The upstream pattern 
 
 ## Tool contract
 
-For a session that has a shell tool. Run from `~/.claude` through that tool: save the draft, check it, and deliver only on exit 0. None of this appears in the reply, and with no shell tool it is skipped, never written out:
+For a session that has a shell tool. Run from `<host-config-dir>` through that tool: save the draft, check it, and deliver only on exit 0. None of this appears in the reply, and with no shell tool it is skipped, never written out:
 
 ```bash
-bun skills/Fabric/Tools/DesignDocumentCheck.ts <file|-> [--no-render] [--json]
+bun <skill-dir>/Tools/DesignDocumentCheck.ts <file|-> [--no-render] [--json]
 #   exit 0: shape holds and every Mermaid block renders through mmdc
 #   exit 1: prints each failed rule; exit 2: bad usage, unreadable input, or mmdc missing
 ```

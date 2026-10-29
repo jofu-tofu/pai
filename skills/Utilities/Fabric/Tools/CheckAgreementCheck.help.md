@@ -5,7 +5,7 @@ Checks a CheckAgreement output (`Intents/CheckAgreement.md`) against the parts o
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/CheckAgreementCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/CheckAgreementCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

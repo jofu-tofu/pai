@@ -14,7 +14,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 
 import { join, basename } from 'path';
 import { parse as parseYAML, stringify as stringifyYAML } from 'yaml';
 import { homedir } from 'os';
-import { parseFrontmatter as parseFrontmatterUtil, splitLines, getEnvVar } from '../../../hooks/lib/platform';
+import { parseFrontmatter as parseFrontmatterUtil, splitLines, getEnvVar } from './lib/platform.ts';
 
 // Types
 interface PlatformSchema {
@@ -51,9 +51,9 @@ interface TranslationContext {
 }
 
 // Configuration
-const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
-const SKILLS_DIR = join(PAI_DIR, 'skills');
-const MAPPINGS_DIR = join(PAI_DIR, 'skills', 'SkillTranslate', 'Mappings');
+const SKILL_ROOT = join(import.meta.dir, "..");
+const SKILLS_DIR = process.env.SKILLS_DIR || process.cwd();
+const MAPPINGS_DIR = join(SKILL_ROOT, "Mappings");
 
 // Parse CLI arguments
 function parseArgs(): { skill: string; from: string; to: string; output?: string } {

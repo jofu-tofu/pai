@@ -19,7 +19,7 @@ Our ideal-state port of Fabric's `analyze_risk`. The upstream pattern stays in `
 - What would change the rating names the one to three facts that would move it most, each with the rating it would move to.
 - Words are plain and exact: "they can keep your files for a year after you cancel" over "extended post-termination retention exposure".
 - Sources are read in full before any assessment (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
-- `bun skills/Fabric/Tools/AnalyzeRiskCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the lines, sections, table rows, fixed values and rating consistency are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/AnalyzeRiskCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the lines, sections, table rows, fixed values and rating consistency are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -35,7 +35,7 @@ Our ideal-state port of Fabric's `analyze_risk`. The upstream pattern stays in `
 ## Evals
 
 - suite: fabric-analyzerisk — code checks on the lines, sections, tables, fixed values and the no-vendor line; judged checks on evidence tied to the input, no invented vendor facts, a rating that matches the data, and controls tied to findings.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -44,10 +44,10 @@ Our ideal-state port of Fabric's `analyze_risk`. The upstream pattern stays in `
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeRiskCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/AnalyzeRiskCheck.ts <file|-> [--json]
 #   exit 0: shape and rating consistency hold; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

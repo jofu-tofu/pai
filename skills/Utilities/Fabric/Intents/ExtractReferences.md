@@ -24,7 +24,7 @@ Our ideal-state port of Fabric's `extract_references`. The upstream pattern stay
 - Each work appears once, however often the content mentions it. Bullets follow the order the works first appear in the content; for a bare topic, the most foundational work comes first.
 - The list holds at most 20 works, or the number a hint asks for. When the content refers to more, the works it leans on most are kept and one closing line says how many passing references were left out.
 - Words are plain and exact, the way a careful librarian would list sources for a colleague.
-- `bun skills/Fabric/Tools/ExtractReferencesCheck.ts` passed on the exact output before it was delivered, with `--source` set to the input whenever the input was text or a file, `--max` set to any count a hint asked for, and `--words` set to any bullet length a hint asked for. Where no shell is available, the shape, counts and titles are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ExtractReferencesCheck.ts` passed on the exact output before it was delivered, with `--source` set to the input whenever the input was text or a file, `--max` set to any count a hint asked for, and `--words` set to any bullet length a hint asked for. Where no shell is available, the shape, counts and titles are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -44,7 +44,7 @@ Our ideal-state port of Fabric's `extract_references`. The upstream pattern stay
 ## Evals
 
 - suite: fabric-extractreferences — code checks on the heading, the bullet shape, the cap and the no-references line; judged checks on references kept to what the content actually refers to, every referred-to work present (an untitled fable included), misattributions corrected, people and products left out, allusions identified, unidentified works kept as described with no guessed title, given URLs kept, and notes specific to the input.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -53,10 +53,10 @@ Our ideal-state port of Fabric's `extract_references`. The upstream pattern stay
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ExtractReferencesCheck.ts <file|-> [--source <input-file>] [--max N] [--words N] [--json]
+bun <skill-dir>/Tools/ExtractReferencesCheck.ts <file|-> [--source <input-file>] [--max N] [--words N] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

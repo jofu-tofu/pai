@@ -16,11 +16,11 @@ import { parse as parseYaml } from 'yaml';
 import { parseArgs } from 'util';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { paiPath } from '../../../hooks/lib/paths';
+
 
 const execAsync = promisify(exec);
 
-const EVALS_DIR = paiPath('skills', 'Evals');
+const EVALS_DIR = join(import.meta.dir, "..");
 const RESULTS_DIR = join(EVALS_DIR, 'Results');
 
 /**
@@ -164,10 +164,7 @@ export function formatForISC(result: AlgorithmEvalResult): string {
  * Note: ISC integration requires PAI skill to be available
  */
 export async function updateISCWithResult(result: AlgorithmEvalResult): Promise<void> {
-  const status = result.passed ? 'DONE' : 'BLOCKED';
-  const iscManagerPath = paiPath('skills', 'PAI', 'Tools', 'ISCManager.ts');
-
-  await execAsync(`bun run ${iscManagerPath} update --row ${result.isc_row} --status ${status} --note "${formatForISC(result)}"`);
+  throw new Error("Automatic task mutation is unavailable. Copy the returned evidence into your host task record explicitly.");
 }
 
 // CLI interface

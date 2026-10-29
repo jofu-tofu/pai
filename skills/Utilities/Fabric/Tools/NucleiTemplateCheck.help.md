@@ -5,7 +5,7 @@ Checks a NucleiTemplate output (`Intents/NucleiTemplate.md`) against the parts o
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/NucleiTemplateCheck.ts <file|-> [--json] [--no-nuclei]
+bun <skill-dir>/Tools/NucleiTemplateCheck.ts <file|-> [--json] [--no-nuclei]
 ```
 
 | Flag | Meaning |

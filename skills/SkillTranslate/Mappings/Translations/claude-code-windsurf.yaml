@@ -138,7 +138,7 @@ semantic_mappings:
     windsurf: "Trigger patterns in cascade.yaml"
 
   tool_execution:
-    claude: "bun run $PAI_DIR/path/to/tool.ts"
+    claude: "bun run WORKSPACE_DIR/path/to/tool.ts"
     windsurf: "windsurf run path/to/command.ts"
 
 # Special handling rules

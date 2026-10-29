@@ -5,7 +5,7 @@ Checks a GitDiffSummary commit message (`Intents/GitDiffSummary.md`) against the
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/GitDiffSummaryCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/GitDiffSummaryCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |
@@ -22,7 +22,7 @@ bun skills/Fabric/Tools/GitDiffSummaryCheck.ts <file|-> [--json]
 - No line starts with `#`: git strips such lines as comments when a message is edited in the commit editor, so a `## CHANGES` heading would vanish.
 - No code fence, bold, sub-bullet or URL, and nothing before the subject.
 - After the bullets, the only line allowed is one `BREAKING CHANGE: ` footer (`BREAKING-CHANGE:` also accepted), and it is present exactly when the subject carries `!`.
-- A trailing Harvest block, from a `--- HARVEST ---` line (or a bare `---` rule whose remainder mentions Harvest) onward, is ignored, so a message can be checked with or without it. A trailing blockquote (`> …`) that mentions Harvest is read as the same block, since a Harvest warning is sometimes written that way.
+Use host tools explicitly. Save notes only when the user requests an export.
 
 ## Exit codes
 

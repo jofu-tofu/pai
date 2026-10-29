@@ -18,7 +18,7 @@ Our ideal-state port of Fabric's `explain_code`. The upstream pattern stays in `
 - Behavior that depends on something outside the input (an imported function, an environment variable, a server default, a version) is said to depend on it, with what would change, never filled in as a guess stated as fact.
 - A source is read in full before anything is written (`Intents/ExecutePattern.md` § Tool contract covers fetching URLs and YouTube links).
 - The words are plain and exact, specific to this input: a reader could not move a sentence to a different snippet and have it still be true. Identifiers, flags, values and commands appear in backticks exactly as written in the input.
-- `bun skills/Fabric/Tools/ExplainCodeCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ExplainCodeCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -32,7 +32,7 @@ Our ideal-state port of Fabric's `explain_code`. The upstream pattern stays in `
 ## Evals
 
 - suite: fabric-explaincode — code checks on sections and literal facts, plus judged checks on fidelity to what the code does, finding severity, risky settings and the inferred read.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -42,10 +42,10 @@ Our ideal-state port of Fabric's `explain_code`. The upstream pattern stays in `
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ExplainCodeCheck.ts <file|-> [--question] [--kind code|config|security] [--json]
+bun <skill-dir>/Tools/ExplainCodeCheck.ts <file|-> [--question] [--kind code|config|security] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

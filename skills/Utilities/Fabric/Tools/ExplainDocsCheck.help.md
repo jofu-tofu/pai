@@ -5,7 +5,7 @@ Checks an ExplainDocs output (`Intents/ExplainDocs.md`) against the parts of its
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ExplainDocsCheck.ts <file|-> [--source <input-file>] [--tool <name>] [--json]
+bun <skill-dir>/Tools/ExplainDocsCheck.ts <file|-> [--source <input-file>] [--tool <name>] [--json]
 ```
 
 | Flag | Meaning |

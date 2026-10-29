@@ -1,6 +1,6 @@
 ---
 name: Evals
-description: Agent evaluation framework based on Anthropic's best practices. USE WHEN eval, evaluate, test agent, benchmark, verify behavior, regression test, capability test. Includes three grader types (code-based, model-based, human), transcript capture, pass@k/pass^k metrics, and ALGORITHM integration.
+description: Agent evaluation framework based on Anthropic's best practices. USE WHEN eval, evaluate, test agent, benchmark, verify behavior, regression test, capability test. Includes three grader types (code-based, model-based, human), transcript capture, pass@k/pass^k metrics, and explicit result reporting.
 implements: Science
 science_cycle_time: meso
 compatibility: Designed for Claude Code and Devin (or similar agent products)
@@ -9,10 +9,12 @@ metadata:
   version: "1.0.0"
 ---
 
+Read `PORTABILITY.md` before use; it defines the standalone tool and storage contract and replaces any inherited platform-specific setup.
+
 ## Customization
 
 **Before executing, check for user customizations at:**
-`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Evals/`
+`Customizations/`
 
 If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 
@@ -78,19 +80,19 @@ Comprehensive agent evaluation system based on Anthropic's "Demystifying Evals f
 
 ```bash
 # Run an eval suite
-bun run $PAI_DIR/skills/Utilities/Evals/Tools/AlgorithmBridge.ts -s <suite>
+bun run <skill-dir> -s <suite>
 
 # Log a failure for later conversion
-bun run $PAI_DIR/skills/Utilities/Evals/Tools/FailureToTask.ts log "description" -c category -s severity
+bun run <skill-dir> log "description" -c category -s severity
 
 # Convert failures to test tasks
-bun run $PAI_DIR/skills/Utilities/Evals/Tools/FailureToTask.ts convert-all
+bun run <skill-dir> convert-all
 
 # Manage suites
-bun run $PAI_DIR/skills/Utilities/Evals/Tools/SuiteManager.ts create <name> -t capability -d "description"
-bun run $PAI_DIR/skills/Utilities/Evals/Tools/SuiteManager.ts list
-bun run $PAI_DIR/skills/Utilities/Evals/Tools/SuiteManager.ts check-saturation <name>
-bun run $PAI_DIR/skills/Utilities/Evals/Tools/SuiteManager.ts graduate <name>
+bun run <skill-dir> create <name> -t capability -d "description"
+bun run <skill-dir> list
+bun run <skill-dir> check-saturation <name>
+bun run <skill-dir> graduate <name>
 ```
 
 ### ALGORITHM Integration
@@ -99,7 +101,7 @@ Evals is a verification method for THE ALGORITHM ISC rows:
 
 ```bash
 # Run eval and update ISC row
-bun run $PAI_DIR/skills/Utilities/Evals/Tools/AlgorithmBridge.ts -s regression-core -r 3 -u
+bun run <skill-dir> -s regression-core -r 3 -u
 ```
 
 ISC rows can specify eval verification:
@@ -214,3 +216,11 @@ task:
 - **ALGORITHM**: Evals is a verification method
 - **Science**: Evals implements scientific method
 - **Browser**: For visual verification graders
+
+## Standalone evaluator
+
+Optional model graders use local `Tools/Inference.ts`. Set `EVAL_COMMAND` to an executable and optional `EVAL_ARGS` to a JSON string array. It receives one JSON object on stdin with systemPrompt, userPrompt, level and timeout, and returns plain text on stdout; nonzero exit, empty output and timeout are failures. No account discovery occurs. Code graders need no model. Tools store suites/results inside this copied folder; choose a writable copy. AlgorithmBridge can return a result tied to an external checklist id, but automatic task mutation is unavailable.
+
+## Examples
+
+Ask for the Evals workflow with the relevant task, input files and output destination. Apply the local method using available host tools, then report the result and evidence; identify any unavailable capability.

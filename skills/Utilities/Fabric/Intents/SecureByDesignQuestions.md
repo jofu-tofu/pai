@@ -16,7 +16,7 @@ Our ideal-state port of Fabric's `ask_secure_by_design_questions`. The upstream 
 - The output has the shape in § Output format: an OVERVIEW of 15 to 35 words (aim for about 25; naming an assumed build does not license a longer one), then SECURE BY DESIGN QUESTIONS with at least three capitalized theme headings, 15 to 50 questions in all, each a single question of 10 to 30 words, no question repeated.
 - A source is read in full before any question is written (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs), and every detail a question relies on is in the source or the conversation.
 - The words are plain and exact: the precise ordinary word wins over jargon, and a security term is used only where it is the clearest name for the thing.
-- `bun skills/Fabric/Tools/SecureByDesignQuestionsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/SecureByDesignQuestionsCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -30,7 +30,7 @@ Our ideal-state port of Fabric's `ask_secure_by_design_questions`. The upstream 
 ## Evals
 
 - suite: fabric-securebydesignquestions — code checks on the two sections, theme headings and question shape, plus judged checks on specificity, input-kind inference, the typed-hint override, not re-asking what the design answers, and prioritization.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -39,10 +39,10 @@ Our ideal-state port of Fabric's `ask_secure_by_design_questions`. The upstream 
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/SecureByDesignQuestionsCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/SecureByDesignQuestionsCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

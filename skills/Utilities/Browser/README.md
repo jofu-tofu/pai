@@ -6,7 +6,7 @@ Debug-first Playwright workflow for page verification and frontend troubleshooti
 
 ```bash
 # Install dependencies
-cd "$PAI_DIR/skills/Utilities/Browser"
+cd "<skill-dir>
 bun install
 
 # Install Chromium browser

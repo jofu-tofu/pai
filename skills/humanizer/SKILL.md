@@ -1,13 +1,7 @@
 ---
 name: humanizer
 version: 2.2.0
-description: |
-  Remove signs of AI-generated writing from text. Use when editing or reviewing
-  text to make it sound more natural and human-written. Based on Wikipedia's
-  comprehensive "Signs of AI writing" guide. Detects and fixes patterns including:
-  inflated symbolism, promotional language, superficial -ing analyses, vague
-  attributions, em dash overuse, rule of three, AI vocabulary words, negative
-  parallelisms, and excessive conjunctive phrases.
+description: Remove common signs of AI-generated prose while preserving meaning and technical detail. USE WHEN humanize text, make writing sound natural, remove AI writing patterns.
 allowed-tools:
   - Read
   - Write
@@ -16,6 +10,8 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 ---
+
+Read `PORTABILITY.md` before use; it defines the standalone tool and storage contract and replaces any inherited platform-specific setup.
 
 # Humanizer: Remove AI Writing Patterns
 
@@ -486,3 +482,7 @@ Provide:
 This skill is based on [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing), maintained by WikiProject AI Cleanup. The patterns documented there come from observations of thousands of instances of AI-generated text on Wikipedia.
 
 Key insight from Wikipedia: "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
+
+## Examples
+
+Ask for the humanizer workflow with the relevant task, input files and output destination. Apply the local method using available host tools, then report the result and evidence; identify any unavailable capability.

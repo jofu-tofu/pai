@@ -5,7 +5,7 @@ Checks an ExtractReferences output (`Intents/ExtractReferences.md`) against the 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/ExtractReferencesCheck.ts <file|-> [--source <input-file>] [--max N] [--words N] [--json]
+bun <skill-dir>/Tools/ExtractReferencesCheck.ts <file|-> [--source <input-file>] [--max N] [--words N] [--json]
 ```
 
 | Flag | Meaning |

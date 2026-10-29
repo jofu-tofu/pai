@@ -40,7 +40,7 @@ This system DOES:
 ## File Structure
 
 ```
-$PAI_DIR/skills/Agents/
+<skill-dir>
 ├── ArchitectContext.md     # Architecture specialist context
 ├── EngineerContext.md       # Implementation specialist context
 ├── DesignerContext.md       # UX/UI specialist context
@@ -166,13 +166,13 @@ That's it. Simple. No elaborate profile system. Just a reading list.
 
 ```bash
 # List available agent types
-bun run $PAI_DIR/skills/Agents/Tools/LoadAgentContext.ts
+bun run <skill-dir>
 
 # View context for specific agent
-bun run $PAI_DIR/skills/Agents/Tools/LoadAgentContext.ts Architect
+bun run <skill-dir> Architect
 
 # Generate enriched prompt for spawning
-bun run $PAI_DIR/skills/Agents/Tools/LoadAgentContext.ts Architect "Design new skill system"
+bun run <skill-dir> Architect "Design new skill system"
 ```
 
 ---
@@ -181,7 +181,7 @@ bun run $PAI_DIR/skills/Agents/Tools/LoadAgentContext.ts Architect "Design new s
 
 To add a new agent type:
 
-1. Create `[AgentType]Context.md` in `$PAI_DIR/skills/Agents/`
+1. Create `[AgentType]Context.md` in `<skill-dir>`
 2. Follow the context file format above
 3. Reference relevant Skills (don't duplicate content)
 4. Specify model preference (opus/sonnet/haiku)

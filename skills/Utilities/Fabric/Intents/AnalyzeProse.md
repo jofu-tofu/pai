@@ -21,7 +21,7 @@ Our ideal-state port of Fabric's `analyze_prose` and `analyze_prose_pinker`. The
 - When a text was supplied, every quotation from it appears in it word for word. Suggested wording is either a rewrite after `→` or a short word or phrase ("use", "you"), never a sentence presented as if the text said it.
 - The words are plain and exact, and the whole output fits the budget `Tools/AnalyzeProseCheck.ts` sets from the mode and the text's length (about 500 words for a ratings analysis and 1500 for a Pinker one).
 - Sources are read in full before any grade is given (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
-- `bun skills/Fabric/Tools/AnalyzeProseCheck.ts` passed on the exact output before it was delivered, with `--source` pointing at the supplied text whenever there was one. Where no shell is available, the sections, grades, arithmetic and quotations are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/AnalyzeProseCheck.ts` passed on the exact output before it was delivered, with `--source` pointing at the supplied text whenever there was one. Where no shell is available, the sections, grades, arithmetic and quotations are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -38,7 +38,7 @@ Our ideal-state port of Fabric's `analyze_prose` and `analyze_prose_pinker`. The
 ## Evals
 
 - suite: fabric-analyzeprose — code checks on the title of each mode, the sections in order, the grade labels, the Source and Answer lines and the scoring lines; judged checks on grades earned by the text, quoted and specific findings, overall rating as the lowest grade, arithmetic that adds up, real spelling errors caught, and rewrites that improve the passage.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -48,10 +48,10 @@ Our ideal-state port of Fabric's `analyze_prose` and `analyze_prose_pinker`. The
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft (and the supplied text, when there is one), check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft (and the supplied text, when there is one), check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeProseCheck.ts <file|-> [--mode ratings|pinker] [--source <text-file>] [--max-words N] [--sections <list>] [--json]
+bun <skill-dir>/Tools/AnalyzeProseCheck.ts <file|-> [--mode ratings|pinker] [--source <text-file>] [--max-words N] [--sections <list>] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

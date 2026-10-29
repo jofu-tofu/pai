@@ -733,7 +733,7 @@ evals backup --output evals-backup-2025-11-15.tar.gz
 ## File Structure
 
 ```
-$PAI_DIR/skills/Utilities/Evals/
+<skill-dir>
 ├── PROJECT.md                    # This file
 ├── SKILL.md                      # Skill definition
 │

@@ -22,7 +22,7 @@ Our ideal-state port of Fabric's `analyze_logs`. The upstream pattern stays in `
 - The whole log is read before anything is written. A source is read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching URLs); a log too large to read is counted in code over the whole file, and the Limits section says what was covered that way.
 - A log that shows a healthy system gets "None." under Findings and a Verdict that says it is healthy; nothing is invented to fill the shape.
 - The words are plain and exact, specific to this log: a reader could not move a sentence to a different log and have it still be true.
-- `bun skills/Fabric/Tools/AnalyzeLogsCheck.ts` passed on the exact output, with `--log` pointing at the analyzed log, before it was delivered. Where no shell is available, the shape and the quotes are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/AnalyzeLogsCheck.ts` passed on the exact output, with `--log` pointing at the analyzed log, before it was delivered. Where no shell is available, the shape and the quotes are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -42,7 +42,7 @@ Our ideal-state port of Fabric's `analyze_logs`. The upstream pattern stays in `
 ## Evals
 
 - suite: fabric-analyzelogs — code checks on shape, quotes and masking, plus judged checks on ranking, root cause, specificity and the no-log read.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -56,10 +56,10 @@ Our ideal-state port of Fabric's `analyze_logs`. The upstream pattern stays in `
 
 ## Tool contract
 
-Run from `~/.claude`. When a log was analyzed, save it and the draft, check the draft, and deliver only on exit 0. A bare topic or question with no log has no fixed shape, so the checker is not run on it.
+Run from `<host-config-dir>`. When a log was analyzed, save it and the draft, check the draft, and deliver only on exit 0. A bare topic or question with no log has no fixed shape, so the checker is not run on it.
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeLogsCheck.ts <file|-> [--log <logfile>] [--json]
+bun <skill-dir>/Tools/AnalyzeLogsCheck.ts <file|-> [--log <logfile>] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

@@ -16,7 +16,7 @@ Our ideal-state port of Fabric's `analyze_bill` and its sibling `analyze_bill_sh
 - A bill that hides nothing gets `- None found` under Covert goals and a Mostly overt verdict. Unadvertised effects are reported because they are in the text, never because a bill is expected to have them.
 - The Verdict is one of three labels (Mostly overt, Mixed, Mostly covert) with one sentence of at most 30 words (16 in the short form) naming the provision that decided it. It is an opinionated call on this bill, made on what the provisions do, never on the sponsors' party or the subject's politics, and held to the same standard whichever side the bill favors.
 - Words are plain and exact, the way a careful legislative analyst would brief a colleague: what the provision does, in ordinary words, specific to this bill.
-- `bun skills/Fabric/Tools/AnalyzeBillCheck.ts` passed on the exact output before it was delivered, with `--short` for the short form. Where no shell is available, the sections, fields, bullet anchors and word counts are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/AnalyzeBillCheck.ts` passed on the exact output before it was delivered, with `--short` for the short form. Where no shell is available, the sections, fields, bullet anchors and word counts are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -31,7 +31,7 @@ Our ideal-state port of Fabric's `analyze_bill` and its sibling `analyze_bill_sh
 ## Evals
 
 - suite: fabric-analyzebill — code checks on the sections, Bill fields, `Not stated` for absent facts, the verdict label and the two single-line outcomes; judged checks on covert goals tied to real provisions, the buried provisions found, no invented motive on a clean bill, and the short form's size.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -40,10 +40,10 @@ Our ideal-state port of Fabric's `analyze_bill` and its sibling `analyze_bill_sh
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeBillCheck.ts <file|-> [--short] [--json]
+bun <skill-dir>/Tools/AnalyzeBillCheck.ts <file|-> [--short] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

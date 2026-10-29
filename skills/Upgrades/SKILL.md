@@ -1,15 +1,17 @@
 ---
 name: Upgrades
-description: Track PAI upgrade opportunities. USE WHEN upgrades, improvement tracking. SkillSearch('upgrades') for docs.
+description: Track PAI upgrade opportunities. USE WHEN upgrades, improvement tracking. Read the files in this skill directory.
 compatibility: Designed for Claude Code and Devin (or similar agent products). Benefits from internet access.
 metadata:
   author: pai
   version: "1.0.0"
 ---
 
+Read `PORTABILITY.md` before use; it defines the standalone tool and storage contract and replaces any inherited platform-specific setup.
+
 # Upgrades
 
-Monitor Anthropic ecosystem AND AI development YouTube channels for updates that can improve PAI infrastructure.
+Monitor Anthropic ecosystem AND AI development YouTube channels for updates that can improve the user's tools.
 
 
 ## Workflow Routing
@@ -76,7 +78,7 @@ User: "deep dive the latest release notes"
 ## YouTube Monitoring
 
 YouTube channels are configured via the **Skill Customization Layer**.
-See `$PAI_DIR/SKILLCUSTOMIZATIONS/Upgrades/` for user-specific channels.
+See `<workspace-dir>/SKILLCUSTOMIZATIONS/Upgrades/` for user-specific channels.
 
 **Features:**
 - Detection of new videos via yt-dlp
@@ -98,15 +100,15 @@ See `$PAI_DIR/SKILLCUSTOMIZATIONS/Upgrades/` for user-specific channels.
 - `state/last-check.json` - Anthropic state
 - `state/youtube-videos.json` - YouTube state
 
-**User Customizations** (`$PAI_DIR/SKILLCUSTOMIZATIONS/Upgrades/`):
+**User Customizations** (`<workspace-dir>/SKILLCUSTOMIZATIONS/Upgrades/`):
 - `EXTEND.yaml` - Extension manifest
 - `youtube-channels.json` - User's personal YouTube channels
 
-Use `bun $PAI_DIR/skills/PAI/Tools/LoadSkillConfig.ts` to load configs with customizations merged.
+Use `bun <skill-dir>` to load configs with customizations merged.
 
 ## Integration
 
 Uses **VideoTranscript** skill for transcript extraction:
 ```bash
-bun $PAI_DIR/skills/PAI/Tools/GetTranscript.ts "<youtube-url>"
+bun <skill-dir> "<youtube-url>"
 ```

@@ -9,10 +9,8 @@ export interface TelosFile {
   type: 'markdown' | 'csv'
 }
 
-// Config root honors CLAUDE_CONFIG_DIR (isolated installs); LIFEOS_USER_DIR relocates the user data tree.
-const CONFIG_ROOT = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude')
-// The one TELOS location: discovery, save and upload all use it.
-export const TELOS_DIR = path.join(process.env.LIFEOS_USER_DIR || path.join(CONFIG_ROOT, 'LIFEOS/USER'), 'TELOS')
+// Config root honors CLAUDE_CONFIG_DIR (isolated installs); TELOS_DIR relocates the user data tree.
+export const TELOS_DIR = process.env.TELOS_DIR || path.join(process.cwd(), "telos")
 
 export function getAllTelosData(): TelosFile[] {
   const files: TelosFile[] = []

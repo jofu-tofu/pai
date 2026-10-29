@@ -27,4 +27,4 @@ Produce **Goal Specification: project/problem name**, with Date and Owner.
 
 ## References
 
-Use [Templates.md](../Templates.md) for shared record statuses. Continue to context gathering and hypotheses in [StructuredInvestigation](StructuredInvestigation.md); when the goal is a measured number to improve, HillClimb (`skills/HillClimb/SKILL.md`) runs the experiments.
+Use [Templates.md](../Templates.md) for shared record statuses. Continue to context gathering and hypotheses in [StructuredInvestigation](StructuredInvestigation.md); when the goal is a measured number to improve, measured iteration (`skills/measured iteration/SKILL.md`) runs the experiments.

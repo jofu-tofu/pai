@@ -5,7 +5,7 @@ Checks an AuditTransparency output (`Intents/AuditTransparency.md`) against the 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/AuditTransparencyCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/AuditTransparencyCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |

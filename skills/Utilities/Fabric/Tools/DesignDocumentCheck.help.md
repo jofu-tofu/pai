@@ -5,7 +5,7 @@ Checks a DesignDocument output (`Intents/DesignDocument.md`) against the parts o
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/DesignDocumentCheck.ts <file|-> [--no-render] [--json]
+bun <skill-dir>/Tools/DesignDocumentCheck.ts <file|-> [--no-render] [--json]
 ```
 
 | Flag | Meaning |

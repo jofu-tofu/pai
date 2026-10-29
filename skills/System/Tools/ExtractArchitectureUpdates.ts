@@ -12,11 +12,11 @@
 import { readFile, writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { homedir } from "os";
-import { joinLines, getEnvVar } from '../../../hooks/lib/platform";
+import { joinLines, getEnvVar } from './lib/platform.ts';
 
-const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
-const ARCHITECTURE_PATH = join(PAI_DIR, "skills", "CORE", "SYSTEM", "ARCHITECTURE.md");
-const UPDATES_DIR = join(PAI_DIR, "MEMORY", "PAISYSTEMUPDATES");
+const WORKSPACE_ROOT = process.env.WORKSPACE_DIR || process.cwd();
+const ARCHITECTURE_PATH = join(WORKSPACE_ROOT, "skills", "CORE", "SYSTEM", "ARCHITECTURE.md");
+const UPDATES_DIR = join(WORKSPACE_ROOT, ".skill-output", "system-updates");
 
 interface ExtractedUpdate {
   date: string;

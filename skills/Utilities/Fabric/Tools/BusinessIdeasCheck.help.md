@@ -5,7 +5,7 @@ Checks a BusinessIdeas output (`Intents/BusinessIdeas.md`) against the parts of 
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/BusinessIdeasCheck.ts <file|-> [--extracted N] [--elaborated N] [--json]
+bun <skill-dir>/Tools/BusinessIdeasCheck.ts <file|-> [--extracted N] [--elaborated N] [--json]
 ```
 
 | Flag | Meaning |

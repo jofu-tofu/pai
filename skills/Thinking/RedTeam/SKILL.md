@@ -10,6 +10,8 @@ version: 1.2.1
 description: "Adversarial analysis deploying parallel expert agents to stress-test ideas, strategies, and plans — attacks atomic claims, then steelmans and counter-argues, with severity-ranked findings and remediation; also tests an idea or investment against 11 persistent world models from 6 months to 50 years (Fast/Standard/Deep), and refreshes and reports on those models. USE WHEN red team, attack idea, counterarguments, critique, stress test, devil's advocate, find weaknesses, break this, poke holes, strongest objection, world threat model, world model, test idea against the future, how will this hold up in 10 or 20 years, time horizon, long-term risk, update world models, show world models. NOT FOR collaborative debate to find best path (use Council), or threat modeling your own estate (ThreatModel)."
 ---
 
+Read `PORTABILITY.md` before use; it defines the standalone tool and storage contract and replaces any inherited platform-specific setup.
+
 # RedTeam
 
 **Contents:** Ideal State · Intent Routing · Data & Config · Gotchas · Examples
@@ -23,9 +25,9 @@ It also attacks an idea through time. A persistent world-model harness (ported f
 - Every attack lands on the argument's load-bearing claims, and the headline finding is the flaw that would collapse the structure, never a pile of nitpicks.
 - Findings are ranked by severity with noise discarded, each names the claim it breaks, and each weakness carries a remediation that fits the stated constraints.
 - Length follows the requested depth: a quick or inline pass returns the 4-6 strongest objections; a full stress test returns a steelman and a counter-argument (8 points each) from attackers split across model vendors; designing something new returns one synthesized solution from competing proposals.
-- When the caller says inline or no agents, nothing is dispatched: no `Inference.ts` call and no `Agent` spawn.
+Use host tools explicitly. Save notes only when the user requests an export.
 - An idea tested through time gets a verdict at every one of the 11 horizons, stated as scenarios with probability ranges, never as predictions, at the tier asked for (Standard when none is named); any horizon or capability that failed is named in the result instead of vanishing.
-- Every world model it reads or writes lives under `<configRoot>/LIFEOS/MEMORY/RESEARCH/WorldModels/` with a `last_updated` date, so how fresh a model is shows before an idea is tested against it.
+- Every world model it reads or writes lives under `PORTABILITY.md` with a `last_updated` date, so how fresh a model is shows before an idea is tested against it.
 
 ## Intent Routing
 
@@ -47,13 +49,11 @@ It also attacks an idea through time. A persistent world-model harness (ported f
 
 ### World Model Storage
 
-Models are stored at `<configRoot>/LIFEOS/MEMORY/RESEARCH/WorldModels/`: `INDEX.md` (summary of all models with last-updated dates) and one horizon file each, `6-month.md`, `1-year.md`, `2-year.md`, `3-year.md`, `5-year.md`, `7-year.md`, `10-year.md`, `15-year.md`, `20-year.md`, `30-year.md`, `50-year.md`. Scenario models (alternative futures) live in `<configRoot>/LIFEOS/MEMORY/RESEARCH/WorldModels/Scenarios/`.
+Models are stored at `PORTABILITY.md`: `INDEX.md` (summary of all models with last-updated dates) and one horizon file each, `6-month.md`, `1-year.md`, `2-year.md`, `3-year.md`, `5-year.md`, `7-year.md`, `10-year.md`, `15-year.md`, `20-year.md`, `30-year.md`, `50-year.md`. Scenario models (alternative futures) live in `PORTABILITY.md`.
 
 ## Data & Config
 
-User customizations, when present, live at `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/RedTeam/` (configRoot is `$CLAUDE_CONFIG_DIR` when set, else `~/.claude`). Any PREFERENCES.md, configurations, or resources there override the defaults; when the directory does not exist, proceed with skill defaults.
-
-First-time setup (building the world models, the vendors a full run uses) is in [Setup.md](Setup.md).
+Use request preferences or local `Customizations/PREFERENCES.md`. Save outputs to the user's requested destination. Read `PORTABILITY.md`.
 
 ## Gotchas
 

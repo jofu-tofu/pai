@@ -5,7 +5,7 @@ Checks a CompareAndContrast output (`Intents/CompareAndContrast.md`) against the
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/CompareAndContrastCheck.ts <file|-> [--table-only] [--json]
+bun <skill-dir>/Tools/CompareAndContrastCheck.ts <file|-> [--table-only] [--json]
 ```
 
 | Flag | Meaning |

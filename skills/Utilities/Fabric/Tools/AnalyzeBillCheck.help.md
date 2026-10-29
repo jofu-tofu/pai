@@ -5,7 +5,7 @@ Checks an AnalyzeBill output (`Intents/AnalyzeBill.md`) against the parts of its
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/AnalyzeBillCheck.ts <file|-> [--short] [--json]
+bun <skill-dir>/Tools/AnalyzeBillCheck.ts <file|-> [--short] [--json]
 ```
 
 | Flag | Meaning |

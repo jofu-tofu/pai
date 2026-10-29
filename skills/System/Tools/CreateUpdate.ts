@@ -20,10 +20,10 @@ import { writeFile, mkdir, readFile } from "fs/promises";
 import { join } from "path";
 import { parseArgs } from "util";
 import { homedir } from "os";
-import { splitLines, joinLines } from '../../../hooks/lib/platform';
+import { splitLines, joinLines } from './lib/platform.ts';
 
-const PAI_DIR = process.env.PAI_DIR || join(homedir(), 'pai');
-const UPDATES_DIR = join(PAI_DIR, "MEMORY", "PAISYSTEMUPDATES");
+const WORKSPACE_ROOT = process.env.WORKSPACE_DIR || process.cwd();
+const UPDATES_DIR = join(WORKSPACE_ROOT, ".skill-output", "system-updates");
 const INDEX_PATH = join(UPDATES_DIR, "INDEX.md");
 
 // ============================================================================

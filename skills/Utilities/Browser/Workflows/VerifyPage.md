@@ -16,7 +16,7 @@ Verify that a page renders correctly and surface browser-side failures with evid
 
 1. **Start with the diagnostic command**
    ```bash
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts <url>
+   bun run <skill-dir> <url>
    ```
    Use this first unless the user already has an active browser session on the target page.
 
@@ -25,16 +25,16 @@ Verify that a page renders correctly and surface browser-side failures with evid
 
 3. **Check a target selector when the task names one**
    ```bash
-   bun run $PAI_DIR/skills/Utilities/Browser/examples/verify-page.ts <url> "<selector>"
+   bun run <skill-dir> <url> "<selector>"
    ```
    Use this when the user cares about a specific heading, button, form, or region.
 
 4. **Drill deeper only where needed**
    ```bash
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts errors
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts console
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts network
-   bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts failed
+   bun run <skill-dir> errors
+   bun run <skill-dir> console
+   bun run <skill-dir> network
+   bun run <skill-dir> failed
    ```
 
 5. **Capture final proof**

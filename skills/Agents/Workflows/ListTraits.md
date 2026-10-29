@@ -15,7 +15,7 @@ User says:
 ### Step 1: Run ComposeAgent with --list Flag
 
 ```bash
-bun run $PAI_DIR/skills/Agents/Tools/ComposeAgent.ts --list
+bun run <skill-dir> --list
 ```
 
 ### Step 2: Present Results to User
@@ -210,7 +210,7 @@ Popular Combos:
 ## User Customization Note
 
 **v2.0 Feature:** Users can add custom traits by creating:
-`$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml`
+`Customizations/`
 
 Custom traits are merged over base traits - user definitions take priority. This allows adding:
 - New expertise areas
@@ -225,7 +225,7 @@ Custom traits are merged over base traits - user definitions take priority. This
 
 ## References
 
-- Full trait definitions: `$PAI_DIR/skills/Agents/Data/Traits.yaml`
-- User customizations: `$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml`
+- Full trait definitions: `<skill-dir>`
+- User customizations: `Customizations/`
 - Voice mappings: Lines 349-794 in Traits.yaml
-- ComposeAgent tool: `$PAI_DIR/skills/Agents/Tools/ComposeAgent.ts`
+- ComposeAgent tool: `<skill-dir>`

@@ -22,7 +22,7 @@ Our ideal-state port of Fabric's `audit_transparency`. The upstream pattern stay
 - Facts about a real, named organization come from the input or the well-known public record, and anything the model is inferring rather than reading is marked as inferred in the same line.
 - When the input is a source, the audit reflects what it actually says, read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
 - The words are plain and exact: the most precise ordinary word wins over legal or technical jargon, and a term a non-specialist would not know is explained in the same line or replaced.
-- `bun skills/Fabric/Tools/AuditTransparencyCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/AuditTransparencyCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -40,7 +40,7 @@ Our ideal-state port of Fabric's `audit_transparency`. The upstream pattern stay
 ## Evals
 
 - suite: fabric-audittransparency — code checks on the title, the eight sections in order and the table headers, plus judged checks on the inferred read, evidence-backed ratings, honest justification calls, a plain explainability attempt and specific recommendations.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -49,10 +49,10 @@ Our ideal-state port of Fabric's `audit_transparency`. The upstream pattern stay
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/AuditTransparencyCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/AuditTransparencyCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

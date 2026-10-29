@@ -27,7 +27,7 @@ Our ideal-state port of Fabric's `detect_mind_virus`. The upstream pattern stays
 - Every line is specific to this input. A line that would fit most other content as well ("uses emotional language", "check the sources", "think critically") fails.
 - When the input is a source, the check reflects what it actually says, read in full (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube and URLs).
 - The words are plain and exact: the most precise ordinary word wins over psychology jargon, and a term a non-specialist would not know is explained in the same line or replaced.
-- `bun skills/Fabric/Tools/MindVirusCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/MindVirusCheck.ts` passed on the exact output before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -47,7 +47,7 @@ Our ideal-state port of Fabric's `detect_mind_virus`. The upstream pattern stays
 ## Evals
 
 - suite: fabric-mindvirus — code checks on the title, the nine sections, the six-row exploit table, the fixed fields and the verdict level, plus judged checks on evidence grounded in the text, advocacy kept apart from manipulation, even-handed reading of a bare idea, and specific inoculation.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -60,10 +60,10 @@ Our ideal-state port of Fabric's `detect_mind_virus`. The upstream pattern stays
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/MindVirusCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/MindVirusCheck.ts <file|-> [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

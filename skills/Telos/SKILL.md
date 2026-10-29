@@ -10,11 +10,13 @@ version: 1.1.3
 description: Personal TELOS reads and updates goals, beliefs, narratives, and strategies with timestamped backups; Project TELOS analyzes .md/.csv directories for dependencies, bottlenecks, and alignment. USE WHEN Telos, life goals, projects, dependencies, update TELOS, narrative points, McKinsey report, dashboard, what am I wrong about, life frames, mental models. NOT FOR conversational constitutional review (Interview).
 ---
 
+Read `PORTABILITY.md` before use; it defines the standalone tool and storage contract and replaces any inherited platform-specific setup.
+
 # Telos
 
 **Contents:** Ideal State · Intent Routing · Data & Config · Project TELOS Analysis · Building Dashboards · Gotchas · Examples
 
-Reads and changes the principal's personal TELOS (life goals, ideal and current state, beliefs, strategies, wisdom, lessons, wrong-beliefs and the rest) at `~/.claude/LIFEOS/USER/TELOS/`, every change made through the Update intent's tool with a timestamped backup and a changelog line, because a hand edit can lose history or break the structure other tools parse. **TELOS** (Telic Evolution and Life Operating System) is the context-gathering system behind it. The same skill also runs Project TELOS: it reads a directory of .md/.csv files for dependency chains (PROBLEMS→GOALS→STRATEGIES→PROJECTS), bottlenecks, alignment and progress, and renders the analysis as a McKinsey-style report, n=24 narrative points, or a Next.js dashboard built by parallel engineers.
+Reads and changes the principal's personal TELOS (life goals, ideal and current state, beliefs, strategies, wisdom, lessons, wrong-beliefs and the rest) at the path explicitly supplied in `TELOS_DIR`, every change made through the Update intent's tool with a timestamped backup and a changelog line, because a hand edit can lose history or break the structure other tools parse. **TELOS** (Telic Evolution and Life Operating System) is the context-gathering system behind it. The same skill also runs Project TELOS: it reads a directory of .md/.csv files for dependency chains (PROBLEMS→GOALS→STRATEGIES→PROJECTS), bottlenecks, alignment and progress, and renders the analysis as a McKinsey-style report, n=24 narrative points, or a Next.js dashboard built by parallel engineers.
 
 ## Ideal State
 
@@ -36,9 +38,9 @@ General project analysis, dashboards, dependency mapping and executive summaries
 
 | User Request | Context | Location |
 |--------------|---------|----------|
-| "my TELOS", "my goals", "my beliefs", "add to TELOS" | Personal TELOS | `~/.claude/LIFEOS/USER/TELOS/` |
+| "my TELOS", "my goals", "my beliefs", "add to TELOS" | Personal TELOS | `PORTABILITY.md` |
 | "analyze [project]", "dashboard for" | Project TELOS | User-specified directory |
-| "analyze ~/path/to/project" | Project TELOS | Specified path |
+| "analyze the explicitly selected notes directory | Project TELOS | Specified path |
 
 | File | Read when |
 |------|-----------|
@@ -48,23 +50,11 @@ General project analysis, dashboards, dependency mapping and executive summaries
 
 ## Data & Config
 
-All personal TELOS files live at `~/.claude/LIFEOS/USER/TELOS/`, in the USER tree, not under the Telos skill directory. `updates.md` is the changelog of every TELOS update and `Backups/` holds the timestamped backups. The optional report theme (`ReportTheme.ts`, `Fonts/`, `PREFERENCES.md` § Report design) lives at `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/Telos/`. Setup: [Setup.md](Setup.md).
-
-An install that keeps TELOS unified holds the categories as H2 sections of `TELOS.md`, including the Ideal State and Current State sections, and its updates target `TELOS.md` with `--section`. The machine-owned AUTOMATED regions inside the Current State and Ideal State sections change only through `--region current|ideal` (Update.md § Tool contract). An install may also keep per-domain `IDEAL_STATE/` and `CURRENT_STATE/` directories beside it; the Update tool cannot write those (Update.md § Gotchas).
-
-The split-file taxonomy below is the canonical file list, and the Update tool's `VALID_FILES` validates file names against it. A fresh install's starter scaffold ships a subset, and the tool creates a valid file on first write.
-
-| Group | Files |
-|-------|-------|
-| Core philosophy | **TELOS.md** (main framework document), **MISSION.md**, **BELIEFS.md** (core beliefs and world model), **WISDOM.md** |
-| Life data | **BOOKS.md**, **MOVIES.md**, **LESSONS.md**, **WRONG.md** (things the principal was wrong about, for growth tracking) |
-| Mental models | **FRAMES.md**, **MODELS.md** (decision-making models), **NARRATIVES.md** (self-stories), **STRATEGIES.md** |
-| Goals and challenges | **GOALS.md** (short- and long-term), **PROJECTS.md**, **PROBLEMS.md**, **CHALLENGES.md**, **PREDICTIONS.md**, **TRAUMAS.md** (past traumas, for context and healing) |
-| Change tracking | **updates.md** |
+Use request preferences or local `Customizations/PREFERENCES.md`. Save outputs to the user's requested destination. Read `PORTABILITY.md`.
 
 ## Project TELOS Analysis
 
-Point the skill at a project directory (named project, explicit path, or common location). The analysis covers every `.md`/`.csv` file in the target tree (e.g. `~/Projects/<your-org-tree>`), with no required structure and no fixed file list:
+Point the skill at a project directory (named project, explicit path, or common location). The analysis covers every `.md`/`.csv` file in the target tree (e.g. `the explicitly selected notes directory`), with no required structure and no fixed file list:
 
 ```bash
 find $TARGET_DIR -type f \( -name "*.md" -o -name "*.csv" \)
@@ -91,7 +81,7 @@ User: "add to ideal state: publish one book a year"
 
 **Example 2: Analyze project with TELOS**
 ```
-User: "analyze ~/Projects/MyApp with TELOS"
+User: "analyze the explicitly selected notes directory with TELOS"
 --> Project TELOS analysis over every .md and .csv file in the tree
 --> Dependency chains, bottlenecks, alignment and progress metrics, each traced to its file
 ```
@@ -102,3 +92,7 @@ User: "create a TELOS report for Acme Corp"
 --> WriteReport intent
 --> A running Next.js report app in the output directory, nine sections, role-based sources, print-ready
 ```
+
+## Existing notes
+
+Set `TELOS_DIR` to your own notes directory. No global vault discovery or migration occurs. `Tools/UpdateTelos.ts` accepts only its documented flat TELOS filenames; for nested vault notes use the host editor with an explicit backup rather than claiming that tool supports arbitrary paths. Logs use `TELOS_TIMEZONE` or UTC.

@@ -5,7 +5,7 @@ Checks a Summarize output (`Intents/Summarize.md`) against the parts of its cont
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/SummarizeCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/SummarizeCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |
@@ -23,7 +23,7 @@ bun skills/Fabric/Tools/SummarizeCheck.ts <file|-> [--json]
 - No item repeats another item or the one-sentence summary, and no two numbered items open on the same two words.
 - No bold anywhere.
 - Words split on whitespace; punctuation at a word's edges is ignored, a token of pure punctuation (an em-dash) is not a word, and a hyphenated compound or a number is one word.
-- Everything from a `--- HARVEST ---` line on is the Harvest block and is not checked.
+Use host tools explicitly. Save notes only when the user requests an export.
 
 ## Exit codes
 

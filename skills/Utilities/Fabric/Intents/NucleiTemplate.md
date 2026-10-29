@@ -13,7 +13,7 @@ Our ideal-state port of Fabric's `write_nuclei_template_rule`. The upstream patt
 - The matchers confirm the issue rather than merely reaching the host: the template carries at least one matcher, and a web detection pairs a content signal (a `word`, `regex` or `dsl` matcher on the body or a header unique to the vulnerable state) with a `status` or second matcher under `matchers-condition: and`, so a bare 200 or a generic page is not reported as a finding. A blind or out-of-band bug uses `{{interactsh-url}}` with an `interactsh_protocol` matcher rather than guessing at a response.
 - The matching approach fits the protocol: `http` with model-based requests for ordinary checks and `raw` when exact bytes matter, `tcp` for raw network services, `dns`, `ssl` or `headless` when the vulnerability lives there; `dsl` expressions and extractors (`internal: true` when a value feeds a later request) are used where correlation or a computed condition is needed, and every regex is RE2 (no lookbehind or backreferences).
 - A source is read in full before the template is written (`Intents/ExecutePattern.md` § Tool contract covers fetching YouTube links and URLs), and the template's paths, parameters, affected product and version, and matched strings come from what the source actually describes.
-- The template has passed `bun skills/Fabric/Tools/NucleiTemplateCheck.ts` before delivery where a shell is available (so `nuclei -validate` accepted it and the structural checks held), or been checked by hand against the contract where none is. The check is silent either way: the command, its output, an exit code, and any "validated" or "passed" note never appear in the reply.
+- The template has passed `bun <skill-dir>/Tools/NucleiTemplateCheck.ts` before delivery where a shell is available (so `nuclei -validate` accepted it and the structural checks held), or been checked by hand against the contract where none is. The check is silent either way: the command, its output, an exit code, and any "validated" or "passed" note never appear in the reply.
 - The whole reply is one complete YAML template in a single fenced block and nothing else. No tool-call or function-call markup, no pasted shell command or command output, no exit code, no verification note, and never a second, partial, truncated or repeated copy of the template — the way to show the work is a clean, complete template, not a transcript of producing it.
 
 ## Anti-criteria
@@ -31,7 +31,7 @@ Our ideal-state port of Fabric's `write_nuclei_template_rule`. The upstream patt
 ## Evals
 
 - suite: fabric-nucleitemplate — code checks on the YAML shape, required `info` fields, placeholder use and matcher presence, plus judged checks on matcher specificity, placeholder correctness and fidelity to the input.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -40,10 +40,10 @@ Our ideal-state port of Fabric's `write_nuclei_template_rule`. The upstream patt
 
 ## Tool contract
 
-Run from `~/.claude`. This is a silent pre-delivery step, never part of the reply: save the draft to a scratch file, check it, fix whatever the checker flags, and emit only the final YAML. Where no shell is available, skip it and check the template by hand against the contract. The command, its output and its exit code never appear in the delivered reply.
+Run from `<host-config-dir>`. This is a silent pre-delivery step, never part of the reply: save the draft to a scratch file, check it, fix whatever the checker flags, and emit only the final YAML. Where no shell is available, skip it and check the template by hand against the contract. The command, its output and its exit code never appear in the delivered reply.
 
 ```bash
-bun skills/Fabric/Tools/NucleiTemplateCheck.ts <file|-> [--json] [--no-nuclei]
+bun <skill-dir>/Tools/NucleiTemplateCheck.ts <file|-> [--json] [--no-nuclei]
 #   exit 0: shape holds, placeholders used, matchers present, nuclei -validate passed
 #   exit 1: prints each failed check; exit 2: bad usage, unreadable input, or nuclei missing
 ```

@@ -118,7 +118,7 @@ const REGION_RE = /^<!--\s*AUTOMATED:BEGIN\s+([A-Za-z0-9_-]+)\s*-->\s*$[\s\S]*?^
 export function changedAutomatedRegions(before: string, after: string): string[] {
   const regions = (text: string) => {
     const out = new Map<string, string>()
-    for (const m of text.matchAll(REGION_RE)) out.set(m[1], (out.get(m[1]) ?? '') + m[0])
+    for (const m of text.matchAll(REGION_RE)) { const region = m[1]; if (region !== undefined) out.set(region, (out.get(region) ?? '') + m[0]) }
     return out
   }
   const a = regions(before)
@@ -128,7 +128,7 @@ export function changedAutomatedRegions(before: string, after: string): string[]
 
 /**
  * Run `fn` holding the shared TELOS lock for `realTarget`: the `.<name>.lock`
- * file beside it that LIFEOS/TOOLS/TelosLock.ts defines, taken with an
+ * file beside it that Tools/lib/TelosLock.ts defines, taken with an
  * exclusive create and released only while it still carries our token. When
  * another writer holds it, `fn` does not run and the lock path is returned so
  * the caller can refuse; a lock left by a dead writer is cleared by the next

@@ -7,8 +7,8 @@
  * Merges base traits (ships with PAI) with user customizations.
  *
  * Configuration files:
- *   Base:  $PAI_DIR/skills/Agents/Data/Traits.yaml
- *   User:  $PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml
+ *   Base:  <skill-dir>/Data/Traits.yaml
+ *   User:  WORKSPACE_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml
  *
  * Usage:
  *   # Infer traits from task description
@@ -33,14 +33,14 @@ import { parse as parseYaml } from "yaml";
 import Handlebars from "handlebars";
 import { join } from "path";
 import { homedir } from "os";
-import { getEnvVar } from '../../../hooks/lib/platform";
-import { getPaiDir, paiPath } from '../../../hooks/lib/paths";
+import { getEnvVar } from './lib/platform.ts';
+
 
 // Paths - Cross-platform via PAI utilities
-const PAI_DIR = getPaiDir();
-const BASE_TRAITS_PATH = paiPath('skills', 'Agents', 'Data', 'Traits.yaml');
-const USER_TRAITS_PATH = paiPath('skills', 'PAI', 'USER', 'SKILLCUSTOMIZATIONS', 'Agents', 'Traits.yaml');
-const TEMPLATE_PATH = paiPath('skills', 'Agents', 'Templates', 'DynamicAgent.hbs');
+const SKILL_ROOT = join(import.meta.dir, "..");
+const BASE_TRAITS_PATH = join(SKILL_ROOT, "Data", "Traits.yaml");
+const USER_TRAITS_PATH = join(SKILL_ROOT, "Customizations", "Traits.yaml");
+const TEMPLATE_PATH = join(SKILL_ROOT, "Templates", "DynamicAgent.hbs");
 
 // Types
 interface ProsodySettings {
@@ -507,8 +507,8 @@ OPTIONS:
   -h, --help           Show this help
 
 CONFIGURATION:
-  Base traits:  $PAI_DIR/skills/Agents/Data/Traits.yaml
-  User traits:  $PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml
+  Base traits:  <skill-dir>/Data/Traits.yaml
+  User traits:  WORKSPACE_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Agents/Traits.yaml
 
   User traits are merged over base (user takes priority).
   Add your custom voices, personalities, and prosody settings in the user file.

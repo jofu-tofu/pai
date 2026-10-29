@@ -1,10 +1,15 @@
 # TechnicalCreativity
 
+## Host execution
+
+Use the current host's agent tools with explicit task briefs. If multiple providers are available and permitted, use distinct vendors and record them. Otherwise use independent agents or sequential role passes on the available model and state the reduced independence. Do not install a runtime or infer provider access from a file on disk. Do not claim a participant ran when it failed. Await all participants, then synthesize and retain material disagreement.
+
+
 Diverse, non-obvious engineering solutions from two vendors, each with trade-offs and difficulty, and one justified recommendation.
 
 ## Ideal State
 
-- The solution set merges 5 solutions from each of two vendors (OpenAI at `--level max`, Anthropic at `--level high`), with duplicates dropped and each solution labelled with the vendor that produced it.
+- Generate several distinct solutions through independent roles; use different providers when available and label each source. Disclose one-provider or sequential execution.
 - Solutions are mutually distinct approaches, not variations on one design.
 - Every solution carries the five fields: core approach, the key non-obvious insight or cross-domain connection, trade-offs (performance, complexity, cost, maintainability), implementation difficulty 1-10 with the reason, and why it is not the default answer.
 - The recommendation names one approach and justifies it against the stated constraints.
@@ -13,20 +18,14 @@ Diverse, non-obvious engineering solutions from two vendors, each with trade-off
 
 ## Anti-criteria
 
-- Generation never runs on one vendor alone: a single model's "diverse" set shares that model's defaults.
+- Never claim vendor independence when only one provider ran.
 - Not used for writing, naming, or marketing angles; those go to the other intents.
 
 ## Tool contract
 
-Technical ideas are judged by whether they work, so generation goes to the strongest correctness lane, with a second vendor for contrast. Run both calls in parallel, each asking for 5 solutions with the five fields from the Ideal State:
+Technical ideas are judged by whether they work, so generation goes to the strongest correctness lane, with a second vendor for contrast. Ask independent roles for several solutions with the five fields from the Ideal State.
 
-```bash
-bun ~/.claude/LIFEOS/TOOLS/Inference.ts --level max --vendor openai --timeout 300000 \
-  "You generate diverse, non-obvious technical solutions and state their trade-offs honestly." \
-  "<problem + hard/soft constraints + measurable success criteria + the five fields from the Ideal State>"
-bun ~/.claude/LIFEOS/TOOLS/Inference.ts --level high --vendor anthropic --timeout 300000 \
-  "<same system prompt>" "<same user prompt>"
-```
+Use the current host's tools for this operation; see `PORTABILITY.md`.
 
 ## Output format
 

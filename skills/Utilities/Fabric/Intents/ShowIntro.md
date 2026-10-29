@@ -15,7 +15,7 @@ Our ideal-state port of Fabric's `create_show_intro`. The upstream pattern stays
 - The topics run across the whole show in the order it takes them, from the opening minutes to the close, so the last third of the show is represented whenever it held something worth naming. A list that covers only the first half fails.
 - Every fact is the show's own. The guest line holds no title, employer or credential the show does not give. A topic never claims more than was said, so an idea the guest floated is never stated as a settled finding.
 - The intro reads well aloud in under a minute: plain spoken words, short sentences, nothing a host would stumble over. Each topic is a 2-to-7-word header. It is never a full sentence, and never a question unless the show itself was built around that question.
-- `bun skills/Fabric/Tools/ShowIntroCheck.ts` passed on the exact intro before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/ShowIntroCheck.ts` passed on the exact intro before it was delivered. Where no shell is available, the shape is checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -31,7 +31,7 @@ Our ideal-state port of Fabric's `create_show_intro`. The upstream pattern stays
 ## Evals
 
 - suite: fabric-showintro — code checks on the four-block shape, the topic count and length, and the guest named in the opener and the closer, plus judged checks on surprise, specificity, coverage of the whole show and fidelity to the source.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -44,10 +44,10 @@ Our ideal-state port of Fabric's `create_show_intro`. The upstream pattern stays
 
 ## Tool contract
 
-Fetching a URL or a YouTube transcript follows `Intents/ExecutePattern.md` § Tool contract. Run from `~/.claude`. Save the intro, check it, and deliver only on exit 0:
+Fetching a URL or a YouTube transcript follows `Intents/ExecutePattern.md` § Tool contract. Run from `<host-config-dir>`. Save the intro, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/ShowIntroCheck.ts <file|-> [--topics N] [--json]
+bun <skill-dir>/Tools/ShowIntroCheck.ts <file|-> [--topics N] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

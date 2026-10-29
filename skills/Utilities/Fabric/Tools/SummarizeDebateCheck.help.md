@@ -5,7 +5,7 @@ Checks a SummarizeDebate output (`Intents/SummarizeDebate.md`) against the parts
 ## Usage
 
 ```bash
-bun skills/Fabric/Tools/SummarizeDebateCheck.ts <file|-> [--json]
+bun <skill-dir>/Tools/SummarizeDebateCheck.ts <file|-> [--json]
 ```
 
 | Flag | Meaning |
@@ -28,7 +28,7 @@ bun skills/Fabric/Tools/SummarizeDebateCheck.ts <file|-> [--json]
 - Prediction is prose (no bullets) and names at least one side, by its full name or its last word (a surname such as "Grant"), or says neither or both.
 - Follow-up opens on one sentence, then one to five `- ` bullets and nothing else.
 - No bold, no italics, and no numbered list lines anywhere.
-- A `--- HARVEST ---` result block and everything after it is ignored, since the harvest side effect appends it.
+Use host tools explicitly. Save notes only when the user requests an export.
 
 ## Exit codes
 

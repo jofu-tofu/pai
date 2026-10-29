@@ -17,7 +17,7 @@ Our ideal-state port of Fabric's `find_logical_fallacies`. The upstream pattern 
 - An argument whose reasoning holds gets the one `None found:` line saying why, never a list padded to look thorough.
 - The same standard applies whichever side an argument favors.
 - Words are plain and exact, the way a careful logic teacher would mark a student's essay.
-- `bun skills/Fabric/Tools/LogicalFallaciesCheck.ts` passed on the exact output before it was delivered, with `--source` set to the input whenever the input was text or a file. Where no shell is available, the line shape, types, word counts and quotes are checked by hand and nothing about the check appears in the output.
+- `bun <skill-dir>/Tools/LogicalFallaciesCheck.ts` passed on the exact output before it was delivered, with `--source` set to the input whenever the input was text or a file. Where no shell is available, the line shape, types, word counts and quotes are checked by hand and nothing about the check appears in the output.
 
 ## Anti-criteria
 
@@ -33,7 +33,7 @@ Our ideal-state port of Fabric's `find_logical_fallacies`. The upstream pattern 
 ## Evals
 
 - suite: fabric-logicalfallacies — code checks on the section heading, the item line shape, the type list and the none line; judged checks on fallacies actually committed, quotes taken verbatim, explanations specific to the argument, sound reasoning left unflagged, and the definition question answered directly.
-- compiled: Assay checks every output against the Ideal State and Anti-criteria above.
+- compiled: a user-selected evaluation tool checks every output against the Ideal State and Anti-criteria above.
 
 ## Inputs
 
@@ -42,10 +42,10 @@ Our ideal-state port of Fabric's `find_logical_fallacies`. The upstream pattern 
 
 ## Tool contract
 
-Run from `~/.claude`. Save the draft, check it, and deliver only on exit 0:
+Run from `<host-config-dir>`. Save the draft, check it, and deliver only on exit 0:
 
 ```bash
-bun skills/Fabric/Tools/LogicalFallaciesCheck.ts <file|-> [--source <input-file>] [--json]
+bun <skill-dir>/Tools/LogicalFallaciesCheck.ts <file|-> [--source <input-file>] [--json]
 #   exit 0: shape holds; exit 1: prints each failed rule; exit 2: bad usage or unreadable input
 ```
 

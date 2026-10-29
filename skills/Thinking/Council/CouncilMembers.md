@@ -1,5 +1,10 @@
 # Council Members
 
+## Host execution
+
+Use the current host's agent tools with explicit task briefs. If multiple providers are available and permitted, use distinct vendors and record them. Otherwise use independent agents or sequential role passes on the available model and state the reduced independence. Do not install a runtime or infer provider access from a file on disk. Do not claim a participant ran when it failed. Await all participants, then synthesize and retain material disagreement.
+
+
 Council members are personas you write inline, tailored to the topic, then run as direct model calls split across vendors (§ Launch).
 
 ## Why inline briefs
@@ -31,23 +36,9 @@ Each member gets 2–4 sentences: a name, their role/expertise, the stance they 
 Example brief:
 > **Mara — real-time systems architect.** Believes push-first. Will defend WebSocket bidirectionality and attack SSE's connection-count limits and reconnection story. Speaks precisely, cites protocol behavior.
 
-### Launch: one direct call per member, split across vendors
+### Launch
 
-A council member is text in, text out: it needs no tools, and every round already carries the prior transcript in its prompt. Run each member as one `Inference.ts` call, all members of a round in parallel, and split the council across vendors so the members do not share one lineage's blind spots:
-
-```bash
-bun ~/.claude/LIFEOS/TOOLS/Inference.ts --level <level> --vendor <openai|anthropic> --no-fallback --timeout 180000 \
-  "<member brief>" "<topic context + round instructions + prior transcript>"
-```
-
-- **No fallback:** always pass `--no-fallback`. Without it an openai member that fails is answered by anthropic and the council quietly loses its second lineage. With it the call exits 1; report the missing member in the transcript and re-run it or proceed without it.
-- **Vendor:** alternate members between `openai` and `anthropic`. When the topic is judged by taste (naming, voice, visual or creative direction), give the majority to `anthropic`; when it is judged by correctness (does it work, is it true), give the majority to `openai`.
-- **Level:** `medium` for Quick, `high` for Debate, `max` when the principal asked for depth or the decision is expensive to get wrong. Levels resolve to models in `LIFEOS/TOOLS/models.ts`; never name a model here.
-- **Lookups:** a member who must fetch something live (a current number, a doc) is an `Agent` spawn instead, with the brief as its prompt and no `model:` pin, because the direct call has no tools.
-
-The tool prints the model it executed on stderr. A member that did not run on the requested vendor is reported in the transcript, never silently kept. Do not send members to the Sol worker or the Haiku agents; those exist for code tasks.
-
-Paired probe, 2026-09-18: four member briefs on a Claude subagent and on one direct call. The direct call held persona, length and structure on all four, while one subagent member wrapped its answer in a report about itself and each cost about 100k tokens of injected context.
+Dispatch one task-specific brief per member through the host. Prefer varied providers when available; otherwise disclose the shared model lineage. Provider choice and reasoning effort follow current host settings. Members needing current evidence receive the relevant search or file tools. Report failed members and never silently replace one vendor with another. Await each round before the next.
 
 ## Default Perspective Slots
 

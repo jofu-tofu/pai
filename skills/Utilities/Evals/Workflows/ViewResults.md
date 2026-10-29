@@ -23,7 +23,7 @@ Ask the user:
 
 ```bash
 # Show most recent run
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
+bun run <skill-dir> results \
   --use-case <name> \
   --latest
 ```
@@ -32,7 +32,7 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
 
 ```bash
 # List last 10 runs
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
+bun run <skill-dir> results \
   --use-case <name> \
   --limit 10
 ```
@@ -42,7 +42,7 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
 **Single Run Details:**
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
+bun run <skill-dir> results \
   --run-id <run-id> \
   --verbose
 ```
@@ -50,7 +50,7 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
 **Per-Test-Case Breakdown:**
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
+bun run <skill-dir> results \
   --run-id <run-id> \
   --show-cases
 ```
@@ -61,19 +61,19 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
 
 ```bash
 # Generate markdown report
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts report \
+bun run <skill-dir> report \
   --run-id <run-id> \
-  --output $PAI_DIR/skills/Utilities/Evals/Results/<use-case>/<run-id>/report.md
+  --output <skill-dir>
 ```
 
 **Using Report Template:**
 
 ```bash
 # Render with template
-bun run $PAI_DIR/skills/Utilities/Prompting/Tools/RenderTemplate.ts \
+bun run <skill-dir> \
   -t Evals/Report.hbs \
-  -d $PAI_DIR/skills/Utilities/Evals/Results/<use-case>/<run-id>/results.yaml \
-  -o $PAI_DIR/skills/Utilities/Evals/Results/<use-case>/<run-id>/report.md
+  -d <skill-dir> \
+  -o <skill-dir>
 ```
 
 ### Step 5: Query Database
@@ -81,7 +81,7 @@ bun run $PAI_DIR/skills/Utilities/Prompting/Tools/RenderTemplate.ts \
 **Direct SQLite Queries:**
 
 ```bash
-cd $PAI_DIR/skills/Utilities/Evals/EvalServer
+cd <skill-dir>
 
 # Recent runs by use case
 sqlite3 storage/evals.db "
@@ -114,7 +114,7 @@ sqlite3 storage/evals.db "
 **Two Runs Side-by-Side:**
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts compare \
+bun run <skill-dir> compare \
   --run-a <run-id-1> \
   --run-b <run-id-2>
 ```
@@ -122,7 +122,7 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts compare \
 **Trend Analysis:**
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts trend \
+bun run <skill-dir> trend \
   --use-case <name> \
   --days 30
 ```
@@ -261,7 +261,7 @@ For spreadsheet analysis.
 ### Regression Detection
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts trend \
+bun run <skill-dir> trend \
   --use-case <name> \
   --detect-regression \
   --threshold 0.10  # Alert if >10% drop
@@ -314,7 +314,7 @@ Alert: None
 ### "How did the last eval go?"
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
+bun run <skill-dir> results \
   --use-case <name> \
   --latest \
   --summary
@@ -323,7 +323,7 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
 ### "Why did test X fail?"
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
+bun run <skill-dir> results \
   --run-id <run-id> \
   --test-id <test-id> \
   --verbose
@@ -332,7 +332,7 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
 ### "Is performance improving or declining?"
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts trend \
+bun run <skill-dir> trend \
   --use-case <name> \
   --days 14
 ```
@@ -340,7 +340,7 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts trend \
 ### "Which model is best for this task?"
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts compare \
+bun run <skill-dir> compare \
   --use-case <name> \
   --compare-models \
   --recent
@@ -349,7 +349,7 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts compare \
 ### "Show me all failures this week"
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli.ts results \
+bun run <skill-dir> results \
   --use-case <name> \
   --since "7 days ago" \
   --failures-only

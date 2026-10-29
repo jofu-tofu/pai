@@ -14,11 +14,11 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYAML } from 'yaml';
 import { homedir } from 'os';
-import { getEnvVar } from '../../../hooks/lib/platform';
+import { getEnvVar } from './lib/platform.ts';
 
 // Configuration
-const PAI_DIR = getEnvVar('PAI_DIR') || join(homedir(), 'pai');
-const MAPPINGS_DIR = join(PAI_DIR, '.claude', 'skills', 'SkillTranslate', 'Mappings');
+const SKILL_ROOT = join(import.meta.dir, "..");
+const MAPPINGS_DIR = join(SKILL_ROOT, "Mappings");
 
 // Parse CLI arguments
 function parseArgs(): { mapping?: string; from?: string; to?: string } {

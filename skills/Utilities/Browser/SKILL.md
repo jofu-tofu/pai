@@ -7,6 +7,8 @@ metadata:
   version: "2.0.0"
 ---
 
+Read `PORTABILITY.md` before use; it defines the standalone tool and storage contract and replaces any inherited platform-specific setup.
+
 # Browser
 
 Debug-first Playwright automation for seeing the rendered page, collecting diagnostics, and verifying browser behavior before you claim a web change works.
@@ -49,9 +51,9 @@ User: "Fill the login form and verify the dashboard loads"
 
 ## Execution Notes
 
-- Check for Browser customizations at `$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Browser/` before running the skill.
-- If `$PAI_DIR/skills/PAI/USER/SKILLCUSTOMIZATIONS/Browser/session-context.md` exists, read it first for selectors, auth notes, dev-server URLs, and known quirks.
-- Start with `bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts <url>` whenever you need the clearest diagnostic picture.
+- Check for Browser customizations at `Customizations/` before running the skill.
+- If `Customizations/` exists, read it first for selectors, auth notes, dev-server URLs, and known quirks.
+- Start with `bun run <skill-dir> <url>` whenever you need the clearest diagnostic picture.
 - Use `a11y` when text structure is enough; use screenshots when visual proof matters.
 - Use `click`, `fill`, and `type` only to reach the state you need to inspect or verify.
 - If the page shows console errors or failed requests, report them instead of claiming success.
@@ -59,19 +61,19 @@ User: "Fill the login form and verify the dashboard loads"
 ## Public Command Surface
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts <url>
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts a11y
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts errors
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts console
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts network
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts failed
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts screenshot [path]
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts click <selector>
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts fill <selector> <value>
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts type <selector> <text>
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts status
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts restart
-bun run $PAI_DIR/skills/Utilities/Browser/Tools/Browse.ts stop
+bun run <skill-dir> <url>
+bun run <skill-dir> a11y
+bun run <skill-dir> errors
+bun run <skill-dir> console
+bun run <skill-dir> network
+bun run <skill-dir> failed
+bun run <skill-dir> screenshot [path]
+bun run <skill-dir> click <selector>
+bun run <skill-dir> fill <selector> <value>
+bun run <skill-dir> type <selector> <text>
+bun run <skill-dir> status
+bun run <skill-dir> restart
+bun run <skill-dir> stop
 ```
 
 ## Verification Standard

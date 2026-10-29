@@ -33,7 +33,7 @@ models:
 
 ### Step 3: Create Model Comparison Config
 
-Create `$PAI_DIR/skills/Utilities/Evals/UseCases/<name>/model-comparisons/<comparison-name>.yaml`:
+Create `<skill-dir>`:
 
 ```yaml
 model_comparison:
@@ -84,7 +84,7 @@ model_comparison:
 **Option A: CLI (Sequential)**
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts \
+bun run <skill-dir> \
   --use-case <name> \
   --models claude-3-5-sonnet-20241022,gpt-4o,gemini-1.5-pro
 ```
@@ -93,15 +93,15 @@ bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts \
 
 ```bash
 # Run each model in parallel for speed
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts \
+bun run <skill-dir> \
   --use-case <name> \
   --model claude-3-5-sonnet-20241022 &
 
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts \
+bun run <skill-dir> \
   --use-case <name> \
   --model gpt-4o &
 
-bun run $PAI_DIR/skills/Utilities/Evals/EvalServer/cli-run.ts \
+bun run <skill-dir> \
   --use-case <name> \
   --model gemini-1.5-pro &
 
@@ -127,7 +127,7 @@ Results stored in:
 Use Report template:
 
 ```bash
-bun run $PAI_DIR/skills/Utilities/Prompting/Tools/RenderTemplate.ts \
+bun run <skill-dir> \
   -t Evals/Report.hbs \
   -d Results/<use-case>/models/<run-id>/summary.yaml \
   -o Results/<use-case>/models/<run-id>/report.md

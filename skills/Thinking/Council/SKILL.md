@@ -10,6 +10,8 @@ version: 1.2.2
 description: "Multi-agent collaborative debate producing visible round-by-round transcripts with real intellectual friction — members are topic-briefed custom agents, run as a 3-round DEBATE or a 1-round QUICK check, to find the best path. USE WHEN council, debate, multiple perspectives, weigh options, deliberate, get different views, what would experts say, pros and cons. NOT FOR pure adversarial attack (use RedTeam)."
 ---
 
+Read `PORTABILITY.md` before use; it defines the standalone tool and storage contract and replaces any inherited platform-specific setup.
+
 # Council
 
 Runs a multi-agent debate. Topic-briefed members discuss a topic over rounds, respond to each other's actual points, and surface insights through real intellectual friction. You get a visible round-by-round transcript plus a synthesis. DEBATE runs three rounds; QUICK runs one for a fast perspective check.
@@ -42,9 +44,7 @@ Council is collaborative-adversarial (debate to find the best path) and produces
 
 ## Data & Config
 
-User customizations live at `<configRoot>/LIFEOS/USER/CUSTOMIZATIONS/SKILLS/Council/` (`configRoot` is `$CLAUDE_CONFIG_DIR` when set, else `~/.claude`). When that directory exists, its PREFERENCES.md, configurations and resources override the defaults here; when it is absent, the defaults stand.
-
-First-time setup for the vendor split is in [Setup.md](Setup.md).
+Use request preferences or local `Customizations/PREFERENCES.md`. Save outputs to the user's requested destination. Read `PORTABILITY.md`.
 
 ## Integration
 

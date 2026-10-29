@@ -26,7 +26,7 @@ Competing agents plus a critic produce a synthesis superior to any single propos
 
 **Three-round protocol:**
 
-1. Round 1, competing proposals: launch 2-3 personas in parallel to produce competing solutions, each on a different vendor where possible (`Inference.ts --vendor openai|anthropic --level high`, or an `Agent` spawn when a persona needs tools).
+Use host tools explicitly. Save notes only when the user requests an export.
 2. Round 2, critique: a critic reads all proposals and critiques each. Run the critic at `--level max` on the vendor that wrote the fewest proposals.
 3. Round 3, collaborative synthesis: the original agents read the critique and collaborate on a final solution.
 
